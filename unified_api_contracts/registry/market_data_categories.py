@@ -1080,6 +1080,18 @@ VENUE_DATA_TYPE_CAPABILITIES: dict[str, dict[str, str]] = {
         "liquidations": "2020-01-01",
         "futures_chain": "2020-01-01",
     },
+    # BYBIT-SPOT — canonical suffixed variant (Tardis ``bybit-spot``, split from
+    # bare BYBIT 2026-06-23 per cefi_universe_capture_rule). Bare BYBIT above
+    # covers Tardis ``bybit`` (perp/derivative form). MTDS per-venue lookups hit
+    # the suffixed BYBIT-SPOT form. Populated 2026-07-07 (task
+    # bybit_spot_manifest_stray_captures-004) so Layer-1 EXPECTED denominator
+    # picks up BYBIT-SPOT instead of Carve-out-1 zeroing it. Start dates =
+    # VenueMapping.venue_start_dates BYBIT-SPOT = Tardis ``bybit-spot``
+    # availableSince 2021-12-04.
+    "BYBIT-SPOT": {
+        "trades": "2021-12-04",
+        "book_snapshot_5": "2021-12-04",
+    },
     "OKX": {
         "trades": "2020-01-01",
         "book_snapshot_5": "2020-01-01",
