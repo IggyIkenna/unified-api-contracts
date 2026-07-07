@@ -1132,12 +1132,17 @@ VENUE_DATA_TYPE_CAPABILITIES: dict[str, dict[str, str]] = {
         "derivative_ticker": "2023-05-20",  # S3 hyperliquid-archive/asset_ctxs/
         "perp_funding": "2023-05-20",  # perp_funding_handler REST /info fundingHistory
     },
-    # ASTER — only derivative_ticker (fundingRate REST) and trades (aggTrades
-    # REST, ~30-day rolling depth) are wired in _fetch_aster_rest. Genesis =
-    # 2023-07-22 (operator-confirmed 2026-06-17 via the Astherus pre-rebrand
-    # venue). book_snapshot_5 + liquidations both out of scope (no wired fetch
-    # path). perp_funding: collected by perp_funding_handler (declared in
-    # _defi.py _ProtocolCapability data_types=["perp_funding"]).
+    # ASTER — batch+live: derivative_ticker (fundingRate REST) and trades
+    # (aggTrades REST, ~30-day rolling depth) are wired in _fetch_aster_rest;
+    # live-only: book_snapshot_5 + liquidations via aster_book_liq_ws.py
+    # (Binance-Futures-compatible WS at wss://fstream.asterdex.com — depth5@100ms
+    # + !forceOrder@arr). Batch REST has no historical depth or force-order
+    # feed, so pre-wire history stays typed honest absence
+    # (EXPECTED_PRE_SOURCE_COVERAGE_START via the enumerator's per-(venue,dt)
+    # start_date gate). Genesis = 2023-07-22 (operator-confirmed 2026-06-17
+    # via the Astherus pre-rebrand venue). perp_funding: collected by
+    # perp_funding_handler (declared in _defi.py _ProtocolCapability
+    # data_types=["perp_funding"]).
     # IMPORTANT — pre-2024 Aster funding is BINANCE-PROXIED (Astherus pre-rebrand
     # mirrored Binance funding); it is imported, NOT Aster-native — label `source`
     # honestly. SSOT: perp_funding_data_semantics_and_cadence_2026_06_16.md §GAP 2.
@@ -1145,6 +1150,8 @@ VENUE_DATA_TYPE_CAPABILITIES: dict[str, dict[str, str]] = {
         "trades": "2023-07-22",
         "derivative_ticker": "2023-07-22",
         "perp_funding": "2023-07-22",  # perp_funding_handler REST Aster API
+        "book_snapshot_5": "2026-06-23",  # live-only via aster_book_liq_ws
+        "liquidations": "2026-06-23",  # live-only via aster_book_liq_ws
     },
     # Tier-3 CeFi (2026-05-01) — spot=trades+book; perp=+ derivative_ticker
     # +liquidations. None carry chain bundles (perps are individual syms).
@@ -1818,8 +1825,7 @@ def _default_seed_instruments_for(venue: str, data_type: str) -> tuple[str, ...]
         # If the venue's capability table doesn't declare this data_type at
         # all, the venue isn't wired to publish it — empty seed so the
         # Tier-3 sentinel doesn't fan out an expectation that can never be
-        # satisfied. ASTER is the canonical case (no book_snapshot_5 per
-        # VENUE_DATA_TYPE_CAPABILITIES, only trades + derivative_ticker).
+        # satisfied.
         if venue_caps and data_type not in venue_caps:
             return ()
         # Spot-only venues. Names ending in -SPOT plus the historical bare
