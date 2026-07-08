@@ -257,34 +257,11 @@ DATA_TYPE_CAPABILITY_REGISTRY: Final[tuple[DataTypeCapability, ...]] = (
     # ``book_snapshot_5`` itself resolves source. NOT added to SOURCE_PRIORITY as
     # raw vendor rows (they are computed-service outputs, like greeks_snapshot).
     #
-    # ``order_flow_imbalance`` — L5-DERIVABLE NOW (top-of-book + L5-aggregated
-    # bid/ask sizes -> imbalance + microprice). live+batch capable for every venue
-    # that already carries ``book_snapshot_5``. Unblocks MARKET_MAKING_PASSIVE_SPREAD
-    # + MARKET_MAKING_INVENTORY_SKEW at the feed level.
-    *(
-        DataTypeCapability(
-            asset_group=AssetGroup.CEFI,
-            data_type="order_flow_imbalance",
-            venue=_venue,
-            instrument_type="",
-            live_capable=True,
-            batch_capable=True,
-            streaming_protocol="ws",
-            sources=("market_tick_data_service/cli/handlers/book_microstructure_handler.py",),
-            notes=("Derived from book_snapshot_5 (L5): imbalance + microprice. batch==live."),
-        )
-        for _venue in (
-            "BINANCE-FUTURES",
-            "BINANCE-SPOT",
-            "OKX-FUTURES",
-            "OKX-SPOT",
-            "OKX-SWAP",
-            "BYBIT",
-            "DERIBIT",
-            "COINBASE-SPOT",
-            "UPBIT",
-        )
-    ),
+    # ``order_flow_imbalance`` RETIRED (2026-07-08) — zero real consumers, zero
+    # production rows ever captured; duplicated market-data-processing-service's
+    # imbalance_ratio feature family. MTDS deleted book_microstructure_handler.py's
+    # order_flow_imbalance computation (market-tick-data-service@a4fb3d13); this
+    # UAC capability declaration retired to match.
     # ``depth_of_book_10`` (L10 ladder) + ``queue_position`` (per-level resting
     # queue / order-by-order) — need a DEEPER book than the captured L5 snapshot.
     # The canonical ``CanonicalBookMicrostructure`` shape carries the fields, but
@@ -466,10 +443,11 @@ DATA_TYPE_CAPABILITY_REGISTRY: Final[tuple[DataTypeCapability, ...]] = (
     # + cefi_universe_capture_rule_2026_06_23.md.
     #
     # ── Tardis CEX SPOT venues (KRAKEN-SPOT / BITGET-SPOT / BITFINEX-SPOT) ─
-    # Same Tardis spot capture surface as COINBASE-SPOT/UPBIT above:
-    # trades + book_snapshot_5 + order_flow_imbalance (L5-derived). The two
-    # deeper-book data_types stay honest-absent (depth_of_book_10 /
-    # queue_position need an L10/full-L2 capture, like every existing venue).
+    # Same Tardis spot capture surface as COINBASE-SPOT/UPBIT above: trades +
+    # book_snapshot_5 (order_flow_imbalance RETIRED 2026-07-08 — see the L2
+    # microstructure section above). The two deeper-book data_types stay
+    # honest-absent (depth_of_book_10 / queue_position need an L10/full-L2
+    # capture, like every existing venue).
     *(
         DataTypeCapability(
             asset_group=AssetGroup.CEFI,
@@ -485,7 +463,7 @@ DATA_TYPE_CAPABILITY_REGISTRY: Final[tuple[DataTypeCapability, ...]] = (
         # canonical venue for the Tardis ``bybit-spot`` endpoint, same spot
         # capture surface; pairs with BYBIT perps on the entity prefix.
         for _venue in ("KRAKEN-SPOT", "BITGET-SPOT", "BITFINEX-SPOT", "BYBIT-SPOT")
-        for _dt in ("trades", "book_snapshot_5", "order_flow_imbalance")
+        for _dt in ("trades", "book_snapshot_5")
     ),
     # ── Tardis CEX PERP/FUTURES venues (KRAKEN-FUTURES / BITGET-FUTURES /
     # BITFINEX-FUTURES) — the derivatives complex. Same as the spot surface
@@ -513,7 +491,8 @@ DATA_TYPE_CAPABILITY_REGISTRY: Final[tuple[DataTypeCapability, ...]] = (
         for _dt, _itype in (
             ("trades", ""),
             ("book_snapshot_5", ""),
-            ("order_flow_imbalance", ""),
+            # order_flow_imbalance RETIRED 2026-07-08 — see the L2 microstructure
+            # section above.
             ("derivative_ticker", "perpetual"),
             ("liquidations", "perpetual"),
             ("futures_chain", ""),
@@ -589,6 +568,12 @@ DATA_TYPE_CAPABILITY_REGISTRY: Final[tuple[DataTypeCapability, ...]] = (
     # derivative_ticker (perp funding). Minimum perp surface so the data_type
     # axis is non-empty (operator 2026-06-23: all venues incl small DEX-perps
     # are in scope). DERIBIT-COMBO rides Deribit's multi-leg combo feed.
+    # PACIFICA-SOLANA + LIGHTER-ZKSYNC (like HYPERLIQUID + ASTER above): the
+    # standalone ``perp_funding`` data_type was RETIRED for these 2 venues
+    # (2026-07-08, operator-approved) in favor of this derivative_ticker row's
+    # embedded funding_rate field — a live-fetch probe confirmed byte-identical/
+    # same-source funding data for both. derivative_ticker IS the funding source
+    # here; no separate perp_funding capability declaration exists or is needed.
     *(
         DataTypeCapability(
             asset_group=AssetGroup.CEFI,

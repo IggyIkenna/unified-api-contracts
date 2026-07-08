@@ -110,9 +110,14 @@ class PipelineMode(StrEnum):
     # SSOT: data_completion_to_100_all_ag_2026_06_21.md task-085.
     BATCH_EXTENDED = "batch_extended"
     BATCH_MASSIVE = "batch_massive"
-    # MTDS L2 microstructure computed outputs (order_flow_imbalance /
-    # depth_of_book_10 / queue_position) — derived from the canonical
-    # book_snapshot_5. Internal computed source: batch=live symmetry, re-run=replay.
+    # MTDS L2 microstructure computed outputs (depth_of_book_10 / queue_position;
+    # order_flow_imbalance RETIRED 2026-07-08 — zero real consumers, zero
+    # production rows ever captured) — derived from the canonical book_snapshot_5.
+    # Internal computed source: batch=live symmetry, re-run=replay. KEPT (not
+    # deleted with order_flow_imbalance): mtds_microstructure remains a live
+    # SOURCE_PRIORITY source for depth_of_book_10/queue_position, so the
+    # BATCH_/LIVE_/REPLAY_MTDS_MICROSTRUCTURE members stay required by the
+    # PipelineMode<->SOURCE_PRIORITY closed-set round-trip invariant.
     BATCH_MTDS_MICROSTRUCTURE = "batch_mtds_microstructure"
     BATCH_MDPS_ODDS_HORIZON_BUCKET = "batch_mdps_odds_horizon_bucket"
     BATCH_INSTRUMENTS_SERVICE = "batch_instruments_service"

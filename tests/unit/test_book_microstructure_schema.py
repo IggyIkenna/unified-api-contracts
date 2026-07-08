@@ -6,8 +6,13 @@ by MTDS from the canonical ``book_snapshot_5``. The tests assert (a) the public
 export surface, (b) batch==live (the same instance round-trips identically
 regardless of source), (c) honest-absence of the deeper-book fields (queue /
 depth-10) that an L5 source cannot fill, and (d) the data_type / SOURCE_PRIORITY
-registrations: order_flow_imbalance is live-capable from L5, while
-queue_position / depth_of_book_10 are an honest gap (need a deeper book).
+registrations: queue_position / depth_of_book_10 are an honest gap (need a
+deeper book).
+
+order_flow_imbalance (the third L2-microstructure data_type, formerly
+live-capable from L5 alone) RETIRED 2026-07-08 — zero real consumers, zero
+production rows ever captured; duplicated market-data-processing-service's
+imbalance_ratio feature family. See market-tick-data-service@a4fb3d13.
 
 SSOT: v2_engine_venue_buildout_2026_06_15.md Phase D P2 (a).
 """
@@ -16,18 +21,6 @@ from __future__ import annotations
 
 from datetime import UTC, datetime
 from decimal import Decimal
-
-_L5_VENUES = (
-    "BINANCE-FUTURES",
-    "BINANCE-SPOT",
-    "OKX-FUTURES",
-    "OKX-SPOT",
-    "OKX-SWAP",
-    "BYBIT",
-    "DERIBIT",
-    "COINBASE-SPOT",
-    "UPBIT",
-)
 
 
 def test_canonical_types_exported_from_root() -> None:
@@ -99,24 +92,6 @@ def test_batch_equals_live_identical_dump() -> None:
     assert from_live.model_dump() == from_batch.model_dump()
 
 
-def test_order_flow_imbalance_live_capable_for_l5_venues() -> None:
-    """order_flow_imbalance is L5-derivable -> live+batch capable for every venue
-    that already carries book_snapshot_5."""
-    from unified_api_contracts.registry.data_type_capability import (
-        DATA_TYPE_CAPABILITY_REGISTRY,
-    )
-
-    rows = {
-        c.venue: c
-        for c in DATA_TYPE_CAPABILITY_REGISTRY
-        if c.data_type == "order_flow_imbalance"
-    }
-    for venue in _L5_VENUES:
-        assert venue in rows, f"missing order_flow_imbalance row for {venue}"
-        assert rows[venue].live_capable is True
-        assert rows[venue].batch_capable is True
-
-
 def test_queue_and_depth_are_honest_gap() -> None:
     """queue_position + depth_of_book_10 need a deeper book than L5 -> honest gap
     (neither live nor batch capable until a deeper capture lands)."""
@@ -136,7 +111,7 @@ def test_source_priority_registered_for_microstructure() -> None:
     """SOURCE_PRIORITY carries the new data_types, keyed to the computed source."""
     from unified_api_contracts.canonical.crosscutting.source_priority import SOURCE_PRIORITY
 
-    for dt in ("order_flow_imbalance", "depth_of_book_10", "queue_position"):
+    for dt in ("depth_of_book_10", "queue_position"):
         assert ("cefi", dt) in SOURCE_PRIORITY
         assert SOURCE_PRIORITY[("cefi", dt)] == ["mtds_microstructure"]
 
