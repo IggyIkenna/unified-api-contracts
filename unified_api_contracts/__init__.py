@@ -1225,8 +1225,10 @@ from .internal.domain.fund_administration import (
     SubscriptionStatus,
 )
 from .internal.reference.canonical_id_builder import (
+    build_canonical_instrument_id,
     build_combo_id,
     build_instrument_id,
+    build_leg,
 )
 from .internal.reference.ticker_registry import (
     EXCHANGE_BY_TICKER,
@@ -2251,10 +2253,12 @@ __all__ = [
     "assert_no_cross_client_transfer",
     "bar_window_for_close",
     "breaker_fired_event",
+    "build_canonical_instrument_id",
     "build_cefi_partition_path",
     "build_combo_id",
     "build_defi_partition_path",
     "build_instrument_id",
+    "build_leg",
     "build_prediction_partition_path",
     "build_tradfi_partition_path",
     "candidate_parquet_paths",

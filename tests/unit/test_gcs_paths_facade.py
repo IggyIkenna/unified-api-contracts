@@ -33,7 +33,12 @@ ENV = "prd"  # canonical production env short form
         (AssetGroup.CEFI, f"instruments-store-cefi-{ENV}-{PID}"),
         (AssetGroup.DEFI, f"instruments-store-defi-{ENV}-{PID}"),
         (AssetGroup.SPORTS, f"instruments-store-sports-{ENV}-{PID}"),
-        (AssetGroup.PREDICTION, f"instruments-store-prediction-{ENV}-{PID}"),
+        # Prediction is ABBREVIATED "pred" (fixed 2026-07-08 — the prior unabbreviated
+        # "instruments-store-prediction-..." template was a dead bucket name that has
+        # never existed; the real bucket is "instruments-store-pred-...", confirmed
+        # live with 33,122 blobs). See gcs_paths.py's BUCKET_TEMPLATES_BY_ASSET_GROUP_KIND
+        # comment for the full history.
+        (AssetGroup.PREDICTION, f"instruments-store-pred-{ENV}-{PID}"),
     ],
 )
 def test_instruments_bucket_per_asset_group(asset_group: AssetGroup, expected: str) -> None:

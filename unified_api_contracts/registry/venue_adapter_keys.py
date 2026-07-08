@@ -151,8 +151,12 @@ VENUE_TO_ADAPTER_KEY: dict[str, str] = {
     "CONVEX-ETHEREUM": "convex",
     "IDLE-ETHEREUM": "idle",
     "IDLE-ARBITRUM": "idle",
-    "YEARN-ETHEREUM": "yearn",
-    "YEARN-ARBITRUM": "yearn",
+    # YEARN_V3, not bare YEARN — PROTOCOL_CAPABILITIES / DEPRECATED_DEFI_GHOST_VENUE_NAMES /
+    # defi_venue_capabilities.py / venue_launch_dates.py / defi_venues.py / chain_env.py all
+    # treat YEARN_V3 as canonical (operator decision 2026-07-08, instrument_id_format_
+    # canonicalization systemic-duplicate-spelling pass — this was the outlier registry).
+    "YEARN_V3-ETHEREUM": "yearn",
+    "YEARN_V3-ARBITRUM": "yearn",
     # Beefy multi-chain yield aggregator (curated TOP-vault snapshot per chain).
     # Polygon intentionally excluded 2026-05-12 — every Polygon vault was
     # status=eol on the curated snapshot date.

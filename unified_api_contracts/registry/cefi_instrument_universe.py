@@ -139,24 +139,41 @@ CEFI_ACCEPTED_QUOTE_ASSETS: frozenset[str] = frozenset({
 # for the UPBIT entity. KRW is NOT globally added (it would admit thousands of
 # cross pairs on other venues). Keyed on the venue ENTITY prefix (split on '-')
 # so UPBIT / UPBIT-SPOT both resolve.
+#
+# BITFINEX-FUTURES -> BTC (bug fix, 2026-07-08): Bitfinex's OWN derivatives
+# symbol parser (the ``bitfinex-derivatives`` branch of ``_resolve_base_quote``
+# above) extracts a REAL quote for Bitfinex's BTC-margined inverse perps —
+# ``ETHF0:BTCF0`` -> base=ETH, quote=BTC (confirmed live via
+# api-pub.bitfinex.com/v2/tickers: ~2,000+ ETH/day, ~$6-7M/day). The same family
+# includes ``LTCF0:BTCF0``, ``XRPF0:BTCF0``, ``XAUTF0:BTCF0``. These are genuine
+# derivatives, not exotic spot cross-pairs, so BTC was wrongly rejected by the
+# fleet-default quote gate. Keyed on the FULL canonical venue string
+# ``BITFINEX-FUTURES`` (NOT the bare ``BITFINEX`` entity) so the extension does
+# NOT leak into ``BITFINEX-SPOT`` — a genuine BASE/BTC SPOT cross-pair (e.g.
+# ``ETHBTC``) must stay rejected as an exotic cross pair; only the derivatives
+# leg gets the BTC allowance.
 _CEFI_VENUE_QUOTE_EXTENSIONS: dict[str, frozenset[str]] = {
     "UPBIT": frozenset({"KRW"}),
+    "BITFINEX-FUTURES": frozenset({"BTC"}),
 }
 
 
 def accepted_quotes_for_venue(venue: str | None) -> frozenset[str]:
-    """Return the accepted quote-asset set for ``venue`` (entity-normalized).
+    """Return the accepted quote-asset set for ``venue``.
 
     The fleet default is :data:`CEFI_ACCEPTED_QUOTE_ASSETS` (USDT/USDC/USD).
-    A venue whose ENTITY prefix is in :data:`_CEFI_VENUE_QUOTE_EXTENSIONS` (today
-    only ``UPBIT`` → ``KRW``) gets that extension UNIONED in — so an UPBIT KRW
-    spot pair passes the quote gate while KRW stays rejected on every other venue
-    (operator 2026-06-23, cefi_universe_capture_rule).
+    ``venue`` is checked against :data:`_CEFI_VENUE_QUOTE_EXTENSIONS` two ways:
+    first by its FULL canonical string (e.g. ``BITFINEX-FUTURES`` -> ``BTC``, so
+    the extension does not leak into the sibling ``BITFINEX-SPOT``), then by its
+    ENTITY prefix — split on ``-`` — (e.g. ``UPBIT`` -> ``KRW``, so both
+    ``UPBIT`` and ``UPBIT-SPOT`` resolve). Either match is UNIONED into the
+    fleet default (operator 2026-06-23, cefi_universe_capture_rule).
     """
     if not venue:
         return CEFI_ACCEPTED_QUOTE_ASSETS
-    entity = venue.strip().upper().split("-", 1)[0]
-    extra = _CEFI_VENUE_QUOTE_EXTENSIONS.get(entity)
+    venue_upper = venue.strip().upper()
+    entity = venue_upper.split("-", 1)[0]
+    extra = _CEFI_VENUE_QUOTE_EXTENSIONS.get(venue_upper) or _CEFI_VENUE_QUOTE_EXTENSIONS.get(entity)
     if extra is None:
         return CEFI_ACCEPTED_QUOTE_ASSETS
     return CEFI_ACCEPTED_QUOTE_ASSETS | extra
@@ -186,8 +203,45 @@ CEFI_OPTIONS_UNDERLYINGS: frozenset[str] = frozenset({
 # CEFI-SIDE of the equity/commodity-basis arc: each Binance tradfi PERP (cefi
 # MVP) <-> its captured tradfi UNDERLYING (tradfi MVP), both MVP. Crypto perps
 # (BTC/ETH/SOL/…) are NOT here — only the tradfi-underlying perps. The 3 KRX
-# names (HYUNDAI/SAMSUNG/SKHYNIX, or the OKX KRX codes below) are perp-side MVP
-# but their tradfi UNDERLYING is BLOCKED-DATA (no US-listed cash twin).
+# names (HYUNDAI/SAMSUNG/SKHYNIX) are perp-side MVP but their tradfi UNDERLYING
+# is BLOCKED-DATA (no US-listed cash twin).
+#
+# RE-SYNCED 2026-07-08 against the live Binance ``fapi/v1/exchangeInfo``
+# (``contractType=TRADIFI_PERPETUAL``, 118 symbols live today, all
+# ``status=TRADING``; underlyingType in {EQUITY, COMMODITY, PREMARKET,
+# KR_EQUITY}). Changes from the 105-entry 2026-06-24 snapshot:
+#   - ADDED 21 tickers live on Binance today but missing from the 2026-06-24
+#     capture: ANTHROPIC / OPENAI (underlyingType=PREMARKET, pre-IPO share
+#     perps), BBX, BSP, BX, BZ (underlyingType=COMMODITY), CAT, CBRS, DRAM,
+#     FLEX, KORU, KSTR, MVLL, QNTX, SQQQ, STRC, STXX, TER, TQQQ, TTWO, TXN.
+#   - RENAMED the 3 KRX entries from the KRX numeric code to Binance's (and
+#     OKX's / Bybit's — confirmed on all 3 venues) actual live ``baseAsset``
+#     string: 005930->SAMSUNG, 000660->SKHYNIX, 005380->HYUNDAI. The numeric
+#     KRX code never matched any live venue's real base_ccy for THIS
+#     (cefi-perp) universe — it is the correct identifier for the SEPARATE
+#     TradFi-side Yahoo/Databento universe (``TRADFI_EQUITY_PERP_BASIS_UNIVERSE``
+#     / ``KRX_EQUITIES``), which is an independent identifier namespace and is
+#     intentionally left unchanged.
+#   - REMOVED AMC, MARA: verified genuinely delisted — absent from Binance
+#     ``fapi/v1/exchangeInfo`` (no symbol at all, any contractType/status),
+#     absent from OKX (``/api/v5/public/instruments`` across SWAP/FUTURES/
+#     SPOT/MARGIN, and ``AMC-USDT-SWAP``/``MARA-USDT-SWAP`` return OKX error
+#     51001 "doesn't exist"), and absent from Bybit
+#     (``/v5/market/instruments-info?category=linear``). Neither symbol is in
+#     ``TRADFI_EQUITY_PERP_BASIS_UNIVERSE`` so no cross-file symmetry breaks.
+#   - KEPT (not removed) despite no longer appearing under
+#     ``contractType=TRADIFI_PERPETUAL`` on Binance today: CFG, DIA, INX, ROBO,
+#     SLX, SPX. These tickers are still LIVE on Binance/OKX/Bybit, but Binance
+#     now tags them ``underlyingType=COIN`` with subtypes Meme/Infrastructure/
+#     RWA/Alpha — the ticker has been reused by an unrelated crypto token
+#     (e.g. SPX = the "SPX6900" meme coin, not the S&P 500), not "delisted" in
+#     the simple sense. All 6 also have live symmetric entries in
+#     ``TRADFI_EQUITY_PERP_BASIS_UNIVERSE`` (real DIA/CFG/ROBO/SLX ETFs/stocks)
+#     and in ``crypto_equity_link.CRYPTO_EQUITY_PERP_TO_REAL_EQUITY`` cross-refs
+#     — resolving this correctly needs a dedicated cross-venue + cross-file
+#     audit (does OKX/Bybit's same-ticker perp reuse the SAME crypto token, or
+#     a genuine surviving equity-basis product?) rather than a unilateral
+#     removal here. FLAGGED for follow-up, not silently dropped.
 CEFI_EQUITY_PERP_BASE_UNIVERSE: frozenset[str] = frozenset({
     # --- US equities (OKX 17-perp universe + Binance/Bybit verified coverage) ---
     "AAPL",     # Apple
@@ -205,12 +259,10 @@ CEFI_EQUITY_PERP_BASE_UNIVERSE: frozenset[str] = frozenset({
     "MSTR",     # MicroStrategy
     "PLTR",     # Palantir
     "GME",      # GameStop
-    "AMC",      # AMC Entertainment
-    "MARA",     # Marathon Digital
-    # --- Korean equities (OKX confirmed) ---
-    "005930",   # Samsung Electronics (KRX code)
-    "000660",   # SK Hynix (KRX code)
-    "005380",   # Hyundai Motor (KRX code)
+    # --- Korean equities (Binance/OKX/Bybit confirmed live 2026-07-08) ---
+    "SAMSUNG",  # Samsung Electronics (Binance/OKX/Bybit baseAsset string)
+    "SKHYNIX",  # SK Hynix (Binance/OKX/Bybit baseAsset string)
+    "HYUNDAI",  # Hyundai Motor (Binance/OKX/Bybit baseAsset string)
     # --- Binance tradfi-perp single stocks / ADRs (2026-06-24 symmetry) ---
     "AAOI", "ADBE", "ALAB", "AMAT", "ARM", "ASML", "ASTS", "AVGO", "AXTI",
     "BE", "BMNR", "BRKB", "CFG", "CIEN", "COHR", "COST", "CRCL", "CRDO", "CRM",
@@ -219,11 +271,19 @@ CEFI_EQUITY_PERP_BASE_UNIVERSE: frozenset[str] = frozenset({
     "MRVL", "MU", "NBIS", "NOK", "NOW", "NVO", "ONDS", "ORCL", "PAYP", "QCOM",
     "RIVN", "RKLB", "SMCI", "SNDK", "SONY", "SPCX", "TSM", "UBER", "USAR",
     "WDC", "WMT", "V", "ZM",
+    # --- Binance tradfi-perp single stocks / ADRs (2026-07-08 re-sync additions) ---
+    "BBX", "BSP", "BX", "CAT", "CBRS", "DRAM", "FLEX", "KORU", "KSTR", "MVLL",
+    "QNTX", "STRC", "STXX", "TER", "TTWO", "TXN",
+    # --- Binance tradfi-perp pre-IPO / premarket share perps (2026-07-08) ---
+    "ANTHROPIC",  # Anthropic (underlyingType=PREMARKET, pre-IPO)
+    "OPENAI",     # OpenAI (underlyingType=PREMARKET, pre-IPO)
     # --- Binance tradfi-perp commodities (RAW base_asset form) ---
     "XAU", "XAG", "XPT", "XPD", "NATGAS", "COPPER", "CL",
+    "BZ",  # 2026-07-08 re-sync addition (underlyingType=COMMODITY)
     # --- Binance tradfi-perp indices / sector + commodity ETFs ---
     "SPX", "SPY", "QQQ", "IWM", "DIA", "SOXL", "XLE", "EWJ", "EWZ", "EWT",
     "EWY", "ROBO", "SLX", "URNM", "UVXY", "INX",
+    "SQQQ", "TQQQ",  # 2026-07-08 re-sync additions (leveraged QQQ ETFs)
 })
 
 # Staking / restaking / liquid-staking (LST) / liquid-restaking (LRT) tokens

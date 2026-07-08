@@ -6,8 +6,10 @@ from unified_api_contracts.internal.reference.availability import (
 from unified_api_contracts.internal.reference.canonical_id_builder import (
     SUPPORTED_INSTRUMENT_TYPES,
     UNSUPPORTED_BY_DESIGN,
+    build_canonical_instrument_id,
     build_combo_id,
     build_instrument_id,
+    build_leg,
 )
 from unified_api_contracts.internal.reference.circuit_breaker_config import (
     CircuitBreakerConfigRegistry,
@@ -102,8 +104,10 @@ __all__ = [
     "UnknownInstrumentTypeError",
     "VenueCircuitBreakerConfig",
     "asset_class_for_instrument_type",
+    "build_canonical_instrument_id",
     "build_combo_id",
     "build_instrument_id",
+    "build_leg",
     "derive_ledger_asset_fields",
     "get_instruments_available_on",
     "instrument_type_for_action",

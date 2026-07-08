@@ -57,24 +57,28 @@ from typing import Final
 # ---------------------------------------------------------------------------
 CRYPTO_EQUITY_PERP_TO_REAL_EQUITY: Final[dict[str, str]] = {
     # --- US equities — Binance/OKX/Bybit confirmed coverage ---
-    "AAPL": "AAPL",    # Apple — Bybit AAPLX tokenized + OKX AAPL-USDT-SWAP
-    "TSLA": "TSLA",    # Tesla — Bybit TSLA + OKX TSLA-USDT-SWAP
-    "AMZN": "AMZN",    # Amazon — OKX AMZN-USDT-SWAP
-    "MSFT": "MSFT",    # Microsoft — OKX MSFT-USDT-SWAP
+    "AAPL": "AAPL",  # Apple — Bybit AAPLX tokenized + OKX AAPL-USDT-SWAP
+    "TSLA": "TSLA",  # Tesla — Bybit TSLA + OKX TSLA-USDT-SWAP
+    "AMZN": "AMZN",  # Amazon — OKX AMZN-USDT-SWAP
+    "MSFT": "MSFT",  # Microsoft — OKX MSFT-USDT-SWAP
     "GOOGL": "GOOGL",  # Alphabet — OKX/Binance may label "GOOG"; canonical Databento is GOOGL
-    "GOOG": "GOOGL",   # Alphabet Class C alias (some venues use GOOG, Databento=GOOGL)
-    "META": "META",    # Meta Platforms — Binance METAUSDT perp, OKX META-USDT-SWAP
-    "NVDA": "NVDA",    # NVIDIA — Binance NVDAUSDT perp, OKX NVDA-USDT-SWAP
-    "NFLX": "NFLX",    # Netflix — OKX NFLX-USDT-SWAP
-    "AMD": "AMD",      # AMD — OKX AMD-USDT-SWAP
-    "INTC": "INTC",    # Intel — OKX INTC-USDT-SWAP
-    "BABA": "BABA",    # Alibaba — OKX BABA-USDT-SWAP
-    "COIN": "COIN",    # Coinbase — OKX COIN-USDT-SWAP
-    "MSTR": "MSTR",    # MicroStrategy — OKX MSTR-USDT-SWAP
-    "PLTR": "PLTR",    # Palantir — OKX PLTR-USDT-SWAP
-    "GME": "GME",      # GameStop — OKX GME-USDT-SWAP
-    "AMC": "AMC",      # AMC Entertainment — OKX AMC-USDT-SWAP
-    "MARA": "MARA",    # Marathon Digital — OKX MARA-USDT-SWAP
+    "GOOG": "GOOGL",  # Alphabet Class C alias (some venues use GOOG, Databento=GOOGL)
+    "META": "META",  # Meta Platforms — Binance METAUSDT perp, OKX META-USDT-SWAP
+    "NVDA": "NVDA",  # NVIDIA — Binance NVDAUSDT perp, OKX NVDA-USDT-SWAP
+    "NFLX": "NFLX",  # Netflix — OKX NFLX-USDT-SWAP
+    "AMD": "AMD",  # AMD — OKX AMD-USDT-SWAP
+    "INTC": "INTC",  # Intel — OKX INTC-USDT-SWAP
+    "BABA": "BABA",  # Alibaba — OKX BABA-USDT-SWAP
+    "COIN": "COIN",  # Coinbase — OKX COIN-USDT-SWAP
+    "MSTR": "MSTR",  # MicroStrategy — OKX MSTR-USDT-SWAP
+    "PLTR": "PLTR",  # Palantir — OKX PLTR-USDT-SWAP
+    "GME": "GME",  # GameStop — OKX GME-USDT-SWAP
+    # AMC / MARA REMOVED 2026-07-08: verified genuinely delisted from all 3
+    # tracked venues — absent from Binance fapi/v1/exchangeInfo (no symbol,
+    # any contractType/status), OKX (SWAP/FUTURES/SPOT/MARGIN instruments,
+    # AMC-USDT-SWAP / MARA-USDT-SWAP return OKX error 51001 "doesn't exist"),
+    # and Bybit (/v5/market/instruments-info?category=linear). See matching
+    # removal in cefi_instrument_universe.CEFI_EQUITY_PERP_BASE_UNIVERSE.
 }
 
 # ---------------------------------------------------------------------------

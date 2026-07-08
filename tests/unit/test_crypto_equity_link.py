@@ -17,6 +17,10 @@ from unified_api_contracts.registry.cefi_instrument_universe import (
 )
 
 # The verified OKX 17 US equity perp bases + Binance/Bybit reps.
+# AMC / MARA REMOVED 2026-07-08: verified genuinely delisted from Binance, OKX,
+# and Bybit (see crypto_equity_link.CRYPTO_EQUITY_PERP_TO_REAL_EQUITY comment
+# and cefi_instrument_universe.CEFI_EQUITY_PERP_BASE_UNIVERSE comment for the
+# full verification evidence) — this set now covers 15 of the original 17.
 _OKX_17_BASES = frozenset(
     {
         "AAPL",
@@ -32,8 +36,6 @@ _OKX_17_BASES = frozenset(
         "MSTR",
         "PLTR",
         "GME",
-        "AMC",
-        "MARA",
     }
 )
 
@@ -114,8 +116,7 @@ def test_cefi_equity_perp_base_universe_contains_linked_bases() -> None:
     aliases_not_in_universe = frozenset({"GOOG"})
     missing_non_alias = missing - aliases_not_in_universe
     assert not missing_non_alias, (
-        f"Linked equity perp bases missing from CEFI_EQUITY_PERP_BASE_UNIVERSE: "
-        f"{sorted(missing_non_alias)}"
+        f"Linked equity perp bases missing from CEFI_EQUITY_PERP_BASE_UNIVERSE: {sorted(missing_non_alias)}"
     )
 
 

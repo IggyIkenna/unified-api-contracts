@@ -7,6 +7,14 @@ Covers:
 - DeFi ``VENUE-CHAIN`` composition.
 - Full enum coverage via union of ``SUPPORTED_INSTRUMENT_TYPES`` and ``UNSUPPORTED_BY_DESIGN``.
 - Top-level ``unified_api_contracts.build_instrument_id`` re-export.
+- ``passthrough=True`` raw exchange-native id wrapping.
+- ``build_leg`` — shared InstrumentLeg construction for multi-leg combos.
+- ``build_canonical_instrument_id`` — the one-entry-point dispatcher for
+  every asset group (CeFi/DeFi/TradFi/Prediction/Sports).
+- A CCXT-vs-Tardis compatibility table proving the shared builder reproduces
+  the real, already-shipped per-venue ids from
+  ``canonical_id_p0_ccxt_live_batch_divergence_2026_07_08.md`` without the
+  CCXT adapter itself needing to call this module.
 """
 
 from __future__ import annotations
@@ -16,15 +24,18 @@ from decimal import Decimal
 
 import pytest
 
-from unified_api_contracts import ComboStrategyType
+from unified_api_contracts import AssetGroup, ComboStrategyType
 from unified_api_contracts import build_combo_id as top_level_build_combo_id
 from unified_api_contracts import build_instrument_id as top_level_build_instrument_id
 from unified_api_contracts._instrument_enums import InstrumentType
+from unified_api_contracts.internal import InstrumentLeg
 from unified_api_contracts.internal.reference.canonical_id_builder import (
     SUPPORTED_INSTRUMENT_TYPES,
     UNSUPPORTED_BY_DESIGN,
+    build_canonical_instrument_id,
     build_combo_id,
     build_instrument_id,
+    build_leg,
 )
 
 # ---------------------------------------------------------------------------
@@ -616,3 +627,228 @@ class TestTopLevelReExport:
 
     def test_top_level_build_combo_id_is_same_callable(self) -> None:
         assert top_level_build_combo_id is build_combo_id
+
+
+# ---------------------------------------------------------------------------
+# passthrough=True — raw exchange-native id wrapping
+# ---------------------------------------------------------------------------
+
+
+class TestPassthrough:
+    def test_option_passthrough_matches_tardis_convention(self) -> None:
+        # Deribit's real raw instrument_name already encodes expiry/strike/right —
+        # passthrough wraps it verbatim instead of reconstructing from parts.
+        assert (
+            build_instrument_id("deribit", InstrumentType.OPTION, "BTC-9JUL26-56000-C", passthrough=True)
+            == "DERIBIT:OPTION:BTC-9JUL26-56000-C"
+        )
+
+    def test_future_passthrough_no_expiry_required(self) -> None:
+        # No expiry_date/strike/option_right needed — passthrough bypasses
+        # the structured-reconstruction requirement entirely.
+        assert (
+            build_instrument_id("bybit", InstrumentType.FUTURE, "BTCUSDT-10JUL26", passthrough=True)
+            == "BYBIT:FUTURE:BTCUSDT-10JUL26"
+        )
+
+    def test_passthrough_upper_cases_cefi_symbol(self) -> None:
+        assert (
+            build_instrument_id("binance", InstrumentType.SPOT_PAIR, "btcusdt", passthrough=True)
+            == "BINANCE:SPOT_PAIR:BTCUSDT"
+        )
+
+    def test_passthrough_preserves_defi_symbol_case(self) -> None:
+        # DeFi token symbols stay case-sensitive even under passthrough.
+        assert (
+            build_instrument_id("aave_v3", InstrumentType.A_TOKEN, "aUSDC", chain="ethereum", passthrough=True)
+            == "AAVE_V3-ETHEREUM:A_TOKEN:aUSDC"
+        )
+
+    def test_passthrough_empty_symbol_raises(self) -> None:
+        with pytest.raises(ValueError, match="passthrough=True requires"):
+            build_instrument_id("deribit", InstrumentType.OPTION, "", passthrough=True)
+
+
+# ---------------------------------------------------------------------------
+# build_leg — shared InstrumentLeg construction
+# ---------------------------------------------------------------------------
+
+
+class TestBuildLeg:
+    def test_cme_calendar_leg_passthrough(self) -> None:
+        leg = build_leg("CME", InstrumentType.FUTURE, "ESM6", side="BUY", passthrough=True)
+        assert leg == InstrumentLeg(instrument_key="CME:FUTURE:ESM6", side="BUY", ratio=1)
+
+    def test_deribit_combo_leg_passthrough_with_ratio(self) -> None:
+        leg = build_leg(
+            "DERIBIT",
+            InstrumentType.OPTION,
+            "BTC-25DEC26-70000-C",
+            side="SELL",
+            ratio=2,
+            passthrough=True,
+        )
+        assert leg == InstrumentLeg(instrument_key="DERIBIT:OPTION:BTC-25DEC26-70000-C", side="SELL", ratio=2)
+
+    def test_structured_option_leg(self) -> None:
+        leg = build_leg(
+            "deribit",
+            InstrumentType.OPTION,
+            "BTC",
+            side="BUY",
+            expiry_date=_dt.date(2026, 3, 28),
+            strike=Decimal("65000"),
+            option_right="C",
+        )
+        assert leg == InstrumentLeg(instrument_key="DERIBIT:OPTION:BTC-20260328-65000-C", side="BUY", ratio=1)
+
+    def test_leg_default_ratio_is_one(self) -> None:
+        leg = build_leg("CME", InstrumentType.FUTURE, "CLZ26", side="SELL", passthrough=True)
+        assert leg.ratio == 1
+
+
+# ---------------------------------------------------------------------------
+# build_canonical_instrument_id — one entry point, every asset group
+# ---------------------------------------------------------------------------
+
+
+class TestBuildCanonicalInstrumentId:
+    def test_cefi_delegates_to_build_instrument_id(self) -> None:
+        assert (
+            build_canonical_instrument_id(AssetGroup.CEFI, "bybit", InstrumentType.PERPETUAL, "BTCUSDT")
+            == "BYBIT:PERPETUAL:BTCUSDT"
+        )
+
+    def test_cefi_accepts_lowercase_string_asset_group(self) -> None:
+        # Free-form string is accepted, not just the AssetGroup enum member.
+        assert (
+            build_canonical_instrument_id("cefi", "bybit", InstrumentType.PERPETUAL, "BTCUSDT")
+            == "BYBIT:PERPETUAL:BTCUSDT"
+        )
+
+    def test_defi_delegates_with_chain(self) -> None:
+        assert (
+            build_canonical_instrument_id(AssetGroup.DEFI, "aave_v3", InstrumentType.LENDING, "USDC", chain="arbitrum")
+            == "AAVE_V3-ARBITRUM:LENDING:USDC"
+        )
+
+    def test_tradfi_delegates_with_expiry(self) -> None:
+        assert (
+            build_canonical_instrument_id(
+                AssetGroup.TRADFI,
+                "cme",
+                InstrumentType.FUTURE,
+                "ES",
+                expiry_date=_dt.date(2026, 6, 20),
+            )
+            == "CME:FUTURE:ES-20260620"
+        )
+
+    def test_prediction_delegates_to_build_instrument_id(self) -> None:
+        inner = "PRED:SPORTS:abc123def456"
+        assert (
+            build_canonical_instrument_id(AssetGroup.PREDICTION, "polymarket", InstrumentType.PREDICTION_MARKET, inner)
+            == f"POLYMARKET:PREDICTION_MARKET:{inner}"
+        )
+
+    def test_sports_dispatches_to_fixture_builder_not_venue_type_symbol(self) -> None:
+        result = build_canonical_instrument_id(
+            AssetGroup.SPORTS,
+            league="ENG_PREMIER_LEAGUE",
+            home_team="ARSENAL",
+            away_team="CHELSEA",
+            fixture_date="2026-03-22",
+        )
+        assert result == "ENG_PREMIER_LEAGUE:ARSENAL_v_CHELSEA:20260322"
+        # Structurally NOT VENUE:TYPE:SYMBOL — only 2 colons, not the
+        # 3-colon-minimum shape every other asset group produces.
+        assert result.count(":") == 2
+
+    def test_sports_with_fixture_time(self) -> None:
+        result = build_canonical_instrument_id(
+            "sports",
+            league="ENG_PREMIER_LEAGUE",
+            home_team="ARSENAL",
+            away_team="CHELSEA",
+            fixture_date="2026-03-22",
+            fixture_time="15:00",
+        )
+        assert result == "ENG_PREMIER_LEAGUE:ARSENAL_v_CHELSEA:20260322_1500"
+
+    def test_sports_missing_required_fields_raises(self) -> None:
+        with pytest.raises(ValueError, match="asset_group=sports requires"):
+            build_canonical_instrument_id(AssetGroup.SPORTS, league="ENG_PREMIER_LEAGUE")
+
+    def test_non_sports_missing_instrument_type_raises(self) -> None:
+        with pytest.raises(ValueError, match="requires instrument_type"):
+            build_canonical_instrument_id(AssetGroup.CEFI, "bybit", None, "BTCUSDT")
+
+    def test_invalid_asset_group_string_raises(self) -> None:
+        with pytest.raises(ValueError):
+            build_canonical_instrument_id("not_a_real_asset_group", "bybit", InstrumentType.PERPETUAL, "BTCUSDT")
+
+    def test_passthrough_forwarded(self) -> None:
+        result = build_canonical_instrument_id(
+            AssetGroup.CEFI,
+            "deribit",
+            InstrumentType.OPTION,
+            "BTC-9JUL26-56000-C",
+            passthrough=True,
+        )
+        assert result == "DERIBIT:OPTION:BTC-9JUL26-56000-C"
+
+
+# ---------------------------------------------------------------------------
+# CCXT-vs-Tardis compatibility table — proves the shared builder reproduces
+# the real, already-shipped per-venue ids from the CCXT live/batch fix
+# (canonical_id_p0_ccxt_live_batch_divergence_2026_07_08.md) WITHOUT the CCXT
+# adapter itself needing to route through this module. Values below are the
+# real "NEW ccxt instrument_key" / "REAL Tardis instrument_key" column from
+# that plan's per-venue verification table (all 13 venues converged there).
+# ---------------------------------------------------------------------------
+
+
+class TestCcxtTardisCompatibility:
+    @pytest.mark.parametrize(
+        ("venue", "instrument_type", "symbol", "expected"),
+        [
+            ("binance-spot", InstrumentType.SPOT_PAIR, "BTC-USDT", "BINANCE-SPOT:SPOT_PAIR:BTC-USDT"),
+            ("binance-futures", InstrumentType.PERPETUAL, "BTC-USDT", "BINANCE-FUTURES:PERPETUAL:BTC-USDT"),
+            ("bybit", InstrumentType.PERPETUAL, "0G-USDT", "BYBIT:PERPETUAL:0G-USDT"),
+            ("bybit-spot", InstrumentType.SPOT_PAIR, "BTC-USDT", "BYBIT-SPOT:SPOT_PAIR:BTC-USDT"),
+            ("okx-spot", InstrumentType.SPOT_PAIR, "BTC-USD", "OKX-SPOT:SPOT_PAIR:BTC-USD"),
+            ("okx-swap", InstrumentType.PERPETUAL, "BTC-USD", "OKX-SWAP:PERPETUAL:BTC-USD"),
+            ("coinbase-spot", InstrumentType.SPOT_PAIR, "BTC-USD", "COINBASE-SPOT:SPOT_PAIR:BTC-USD"),
+            ("upbit", InstrumentType.SPOT_PAIR, "WAXP-KRW", "UPBIT:SPOT_PAIR:WAXP-KRW"),
+            ("kraken-spot", InstrumentType.SPOT_PAIR, "0G-USD", "KRAKEN-SPOT:SPOT_PAIR:0G-USD"),
+            ("kraken-futures", InstrumentType.PERPETUAL, "BTC-USD", "KRAKEN-FUTURES:PERPETUAL:BTC-USD"),
+        ],
+    )
+    def test_cefi_simple_shapes_match_shipped_ccxt_fix(
+        self, venue: str, instrument_type: InstrumentType, symbol: str, expected: str
+    ) -> None:
+        # Structured base-quote construction — no passthrough needed for
+        # SPOT_PAIR/PERPETUAL since the shipped CCXT fix reconstructs these
+        # from ccxt's own base/quote fields (same shape build_instrument_id
+        # already produces).
+        assert build_instrument_id(venue, instrument_type, symbol) == expected
+
+    @pytest.mark.parametrize(
+        ("venue", "instrument_type", "raw_symbol", "expected"),
+        [
+            ("bybit", InstrumentType.FUTURE, "BTCUSDT-10JUL26", "BYBIT:FUTURE:BTCUSDT-10JUL26"),
+            ("okx-futures", InstrumentType.FUTURE, "BTC-USD-260710", "OKX-FUTURES:FUTURE:BTC-USD-260710"),
+            ("deribit", InstrumentType.OPTION, "BTC-9JUL26-56000-C", "DERIBIT:OPTION:BTC-9JUL26-56000-C"),
+        ],
+    )
+    def test_dated_derivative_passthrough_matches_shipped_ccxt_fix(
+        self, venue: str, instrument_type: InstrumentType, raw_symbol: str, expected: str
+    ) -> None:
+        # Dated FUTURE/OPTION: the shipped CCXT fix passes through ccxt's raw
+        # exchange-native market id verbatim (matching Tardis), exactly what
+        # passthrough=True does here — this is the gap noted in that plan's
+        # Progress Log as the reason it did NOT route through this module at
+        # the time ("would reconstruct FUTURE/OPTION ids from
+        # expiry/strike/right rather than passing through the raw
+        # exchange-native id like Tardis does").
+        assert build_instrument_id(venue, instrument_type, raw_symbol, passthrough=True) == expected
