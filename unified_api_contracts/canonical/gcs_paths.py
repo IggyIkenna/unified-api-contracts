@@ -84,7 +84,30 @@ BUCKET_TEMPLATES_BY_ASSET_GROUP_KIND: dict[tuple[AssetGroup, BucketKind], str | 
     (AssetGroup.SPORTS, BucketKind.INSTRUMENTS): "instruments-store-sports-{env}-{project_id}",
     (AssetGroup.SPORTS, BucketKind.MARKET_DATA): "market-data-tick-sports-{env}-{project_id}",
     # Prediction
-    (AssetGroup.PREDICTION, BucketKind.INSTRUMENTS): "instruments-store-prediction-{env}-{project_id}",
+    # INSTRUMENTS: FIXED 2026-07-08 — was the unabbreviated "instruments-store-
+    # prediction-{env}-{project_id}", a bucket that has never existed (confirmed live
+    # against the production GCP project: the abbreviated "instruments-store-pred-"
+    # form exists with real data — 33,122 blobs — while the unabbreviated
+    # "instruments-store-prediction-" form 404s). This was a dormant landmine — no
+    # consumer reaches this facade for PREDICTION+INSTRUMENTS today (instruments-
+    # service's own catalogue/orchestrator code resolves the prediction instruments
+    # bucket via the flat, already-correct
+    # `resolve_bucket_name(kind="instruments-store-prediction")` key, which abbreviates
+    # via cloud-providers.yaml) — but it is a live landmine for the next consumer that
+    # reaches for this per-asset-group facade instead. See
+    # unified-trading-pm/plans/active/issues/instrument_id_format_canonicalization_2026_07_08.md
+    # finding 8 and instruments-service/docs/PREDICTION_INSTRUMENTS.md.
+    (AssetGroup.PREDICTION, BucketKind.INSTRUMENTS): "instruments-store-pred-{env}-{project_id}",
+    # MARKET_DATA: deliberately LEFT AS THE LONG FORM, unlike INSTRUMENTS above — this
+    # is NOT the same bug. `market-data-tick-prediction-{pid}` is a REAL, currently-live
+    # legacy bucket mid-migration to the canonical `market-data-tick-pred-prd-{pid}` (see
+    # market-tick-data-service/scripts/migrate_prediction_to_pred_prd_v9.py +
+    # prediction_manifest_canonicalisation_2026_06_01.md §C — as of that migration's last
+    # audit the legacy bucket held 2,822 captured cells vs. canonical's 805, with cells
+    # unique to EACH side). Flipping this template to the abbreviated form before that
+    # migration's `--drop-stale` step completes would silently point every consumer of
+    # this facade at the less-complete bucket. Re-evaluate once that migration's
+    # Progress Log confirms `pred-prd` is the sole, complete SSOT.
     (AssetGroup.PREDICTION, BucketKind.MARKET_DATA): "market-data-tick-prediction-{env}-{project_id}",
 }
 
