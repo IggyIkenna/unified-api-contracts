@@ -57,7 +57,9 @@ class VenueMapping:
             "cryptofacilities",
             # 2026-05-12: Lighter (zkSync L2) — Tardis coverage from 2026-04-17.
             # Pre-2026-04-17 falls through to REST /candles in MTDS adapter.
-            "lighter-zksync",
+            # Tardis exchange slug is "lighter" (confirmed via /v1/exchanges/lighter);
+            # "lighter-zksync" is NOT a valid Tardis slug.
+            "lighter",
             # 2026-06-24: Binance COIN-M (inverse/delivery) perps + futures.
             # Distinct Tardis endpoint from ``binance-futures`` (USDT-M linear).
             "binance-delivery",
@@ -194,7 +196,8 @@ class VenueMapping:
             "cryptofacilities": "KRAKEN-FUTURES",
             # 2026-05-12 — Lighter (Tardis coverage from 2026-04-17).
             # MTDS routes pre-2026-04-17 dates to REST /candles; post to Tardis.
-            "lighter-zksync": "LIGHTER-ZKSYNC",
+            # Tardis exchange slug is "lighter" (NOT "lighter-zksync").
+            "lighter": "LIGHTER-ZKSYNC",
             # 2026-06-24: Binance COIN-M (inverse/delivery) perps + futures.
             # Distinct canonical venue from BINANCE-FUTURES (USDT-M linear).
             "binance-delivery": "BINANCE-DELIVERY",
@@ -827,7 +830,8 @@ class VenueMapping:
             ("HUOBI-FUTURES", "PERPETUAL"): "huobi-dm",
             ("HUOBI-FUTURES", "FUTURE"): "huobi-dm",
             # DEX perps with Tardis routing (2026-05-12)
-            ("LIGHTER-ZKSYNC", "PERPETUAL"): "lighter-zksync",
+            # Tardis exchange slug is "lighter" (NOT "lighter-zksync").
+            ("LIGHTER-ZKSYNC", "PERPETUAL"): "lighter",
             ("KRAKEN-FUTURES", "PERPETUAL"): "cryptofacilities",
             ("KRAKEN-FUTURES", "FUTURE"): "cryptofacilities",
             ("BITFINEX-FUTURES", "PERPETUAL"): "bitfinex-derivatives",
