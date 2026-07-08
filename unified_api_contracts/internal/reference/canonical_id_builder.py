@@ -5,11 +5,18 @@ for every :class:`InstrumentType` variant used across the Unified Trading
 System. DeFi venues are composed as ``VENUE-CHAIN`` so that the same protocol
 on different chains yields distinct IDs.
 
-This module is the single dispatch point for financial instrument IDs. Sports
-and prediction-market canonical IDs live in their domain modules
-(``canonical/domain/sports/canonical_ids.py`` and
-``canonical/domain/prediction/prediction_mapping.py``) and are re-used here
-via imports, not duplicated.
+This module is the single dispatch point for financial instrument IDs.
+:func:`build_canonical_instrument_id` is the **one entry point for every
+asset group** (operator decision, 2026-07-08 —
+``unified-trading-pm/plans/active/issues/instrument_id_format_canonicalization_2026_07_08.md``:
+"one builder for everything ... every asset group, every instrument type, can
+get its canonical instrument IDs, same with fixtures, just by filling in the
+right inputs"): it dispatches CeFi/DeFi/TradFi/Prediction to
+:func:`build_instrument_id` below, and Sports to the fixture-id domain
+builder (``canonical/domain/sports/canonical_ids.py``) — imported and
+re-used here, not duplicated, and NOT forced into the ``VENUE:TYPE:SYMBOL``
+shape (sports keeps its own ``LEAGUE:MATCHUP:DATE`` scheme, a separate,
+confirmed operator decision — see :func:`build_canonical_instrument_id`).
 
 Examples
 --------
@@ -27,6 +34,12 @@ CeFi::
         option_right="C",
     )
     # → "DERIBIT:OPTION:BTC-20260328-65000-C"
+
+    # Raw exchange-native passthrough (Tardis/CCXT convention for dated
+    # derivatives whose native symbol already encodes expiry/strike/right —
+    # bypasses structured reconstruction entirely):
+    build_instrument_id("deribit", InstrumentType.OPTION, "BTC-9JUL26-56000-C", passthrough=True)
+    # → "DERIBIT:OPTION:BTC-9JUL26-56000-C"
 
 TradFi::
 
@@ -47,6 +60,23 @@ DeFi::
         chain="ethereum",
     )
     # → "UNISWAP_V3-ETHEREUM:POOL:USDC-WETH-500"
+
+One entry point, any asset group (:func:`build_canonical_instrument_id`)::
+
+    build_canonical_instrument_id(AssetGroup.CEFI, "bybit", InstrumentType.PERPETUAL, "BTCUSDT")
+    # → "BYBIT:PERPETUAL:BTCUSDT"
+
+    build_canonical_instrument_id(
+        AssetGroup.DEFI, "aave_v3", InstrumentType.LENDING, "USDC", chain="arbitrum",
+    )
+    # → "AAVE_V3-ARBITRUM:LENDING:USDC"
+
+    build_canonical_instrument_id(
+        AssetGroup.SPORTS, "", None,
+        league="ENG_PREMIER_LEAGUE", home_team="ARSENAL", away_team="CHELSEA",
+        fixture_date="2026-03-22",
+    )
+    # → "ENG_PREMIER_LEAGUE:ARSENAL_v_CHELSEA:20260322"  (NOT VENUE:TYPE:SYMBOL — by design)
 """
 
 from __future__ import annotations
@@ -58,12 +88,19 @@ from typing import Final, Literal
 
 from unified_api_contracts._instrument_enums import InstrumentType
 from unified_api_contracts.canonical.domain.derivatives import ComboStrategyType
+from unified_api_contracts.canonical.domain.sports.canonical_ids import (
+    build_fixture_id as _build_sports_fixture_id,
+)
+from unified_api_contracts.canonical.gcs_paths import AssetGroup
+from unified_api_contracts.internal.reference.instrument import InstrumentLeg
 
 __all__ = [
     "SUPPORTED_INSTRUMENT_TYPES",
     "UNSUPPORTED_BY_DESIGN",
+    "build_canonical_instrument_id",
     "build_combo_id",
     "build_instrument_id",
+    "build_leg",
 ]
 
 
@@ -463,6 +500,33 @@ def build_combo_id(
     return f"{venue_token}:{InstrumentType.COMBO.value}:{underlying_up}-{strategy_token}-{tail}"
 
 
+def _build_passthrough(venue: str, itype: InstrumentType, symbol: str, chain: str | None) -> str:
+    """Wrap an already-fully-formed native/raw symbol as ``VENUE[-CHAIN]:TYPE:SYMBOL``.
+
+    Bypasses every type-specific structured construction (expiry/strike
+    reconstruction, fee-tier validation, etc.) — the caller is responsible
+    for ``symbol`` already being in its final, correct form. This is the
+    convention Tardis (batch CeFi/TradFi) and the CCXT live-mode adapter
+    already use verbatim for dated derivatives whose native symbol already
+    encodes expiry/strike/right (e.g. Deribit's ``BTC-9JUL26-56000-C``):
+    ``VENUE:TYPE:RAW_NATIVE_ID``, case preserved as given rather than
+    reconstructed from parts. Before this escape hatch existed,
+    :func:`build_instrument_id` could only RECONSTRUCT FUTURE/OPTION ids from
+    ``expiry_date``/``strike``/``option_right`` — exactly the reason the CCXT
+    live-mode fix (``instruments-service@8544273d``) chose not to route
+    through this module (see
+    ``canonical_id_p0_ccxt_live_batch_divergence_2026_07_08.md``). DeFi
+    symbols keep their on-chain case (delegates to :func:`_build_defi`);
+    every other category is upper-cased for CeFi/TradFi normalisation.
+    """
+    if not symbol:
+        msg = f"{itype.value} passthrough=True requires a non-empty symbol (the raw, already-formed native id)"
+        raise ValueError(msg)
+    if itype in _DEFI_TYPES:
+        return _build_defi(venue, itype, symbol, chain)
+    return f"{_venue_token(venue, chain)}:{itype.value}:{symbol.upper()}"
+
+
 def _build_sports_or_prediction(venue: str, itype: InstrumentType, symbol: str) -> str:
     """Build ``VENUE:TYPE:SYMBOL`` for sports/prediction wrappers.
 
@@ -496,6 +560,7 @@ def build_instrument_id(
     chain: str | None = None,
     quote_asset: str = "",
     margin_type: str = "",
+    passthrough: bool = False,
 ) -> str:
     """Build a canonical instrument ID for any supported InstrumentType.
 
@@ -541,6 +606,14 @@ def build_instrument_id(
     margin_type:
         v6 settlement dimension — ``"inverse"`` or ``"linear"``. Only
         meaningful (and emitted) when ``quote_asset`` is also non-empty.
+    passthrough:
+        When ``True``, skip all type-specific structured construction and
+        wrap ``symbol`` verbatim as ``VENUE[-CHAIN]:TYPE:SYMBOL`` (DeFi
+        preserves on-chain case; everything else upper-cases) — see
+        :func:`_build_passthrough`. Use this for raw exchange-native ids
+        that already encode their own expiry/strike/right (the Tardis/CCXT
+        convention for dated derivatives), instead of supplying
+        ``expiry_date``/``strike``/``option_right`` for reconstruction.
 
     Raises
     ------
@@ -561,6 +634,9 @@ def build_instrument_id(
             f"Add to SUPPORTED_INSTRUMENT_TYPES in canonical_id_builder.py."
         )
         raise ValueError(msg)
+
+    if passthrough:
+        return _build_passthrough(venue, instrument_type, symbol, chain)
 
     # CeFi simple (spot + perpetual + crypto-venue equity instruments)
     if instrument_type in (
@@ -601,3 +677,221 @@ def build_instrument_id(
     # Should be unreachable given the membership check above — defend anyway.
     msg = f"No builder registered for InstrumentType {instrument_type.value}"
     raise ValueError(msg)
+
+
+# ---------------------------------------------------------------------------
+# Multi-leg combo/spread leg construction
+# ---------------------------------------------------------------------------
+
+
+def build_leg(
+    venue: str,
+    instrument_type: InstrumentType,
+    symbol: str,
+    *,
+    side: Literal["BUY", "SELL"],
+    ratio: int = 1,
+    passthrough: bool = False,
+    expiry_date: _dt.date | None = None,
+    strike: Decimal | None = None,
+    option_right: Literal["C", "P"] | None = None,
+    chain: str | None = None,
+    quote_asset: str = "",
+    margin_type: str = "",
+) -> InstrumentLeg:
+    """Build one multi-leg combo/spread :class:`InstrumentLeg` via the shared builder.
+
+    Extends — rather than reinvents — the existing
+    :class:`~unified_api_contracts.internal.InstrumentLeg` infrastructure
+    already used by ``databento/symbology.py``'s
+    ``_parse_cme_calendar_spread_legs`` and both Deribit combo builders
+    (``deribit_combo_adapter.py``, ``tardis/combos.py``), each of which today
+    builds a leg's ``instrument_key`` with an ad hoc f-string (e.g.
+    ``f"{venue}:FUTURE:{front}"`` or ``f"DERIBIT:{leg_name}"``) instead of
+    going through :func:`build_instrument_id`. Routing leg construction
+    through this function gives every leg the same validation and
+    ``VENUE:TYPE:SYMBOL`` convention as a standalone instrument, and closes
+    real drift like a leg missing its ``:TYPE:`` segment entirely.
+
+    Args:
+        side: ``"BUY"`` or ``"SELL"`` — matches :attr:`InstrumentLeg.side`.
+        ratio: Leg ratio (e.g. ``2`` in a 1x2 ratio spread). Defaults to 1.
+        passthrough: See :func:`build_instrument_id` — pass an already
+            fully-formed native leg symbol (e.g. a Deribit
+            ``instrument_name``) straight through instead of reconstructing
+            it from ``expiry_date``/``strike``/``option_right``.
+
+    Examples
+    --------
+    CME calendar-spread front leg (raw exchange ticker passthrough, matching
+    the real convention already used by ``_parse_cme_calendar_spread_legs``)::
+
+        build_leg("CME", InstrumentType.FUTURE, "ESM6", side="BUY", passthrough=True)
+        # → InstrumentLeg(instrument_key="CME:FUTURE:ESM6", side="BUY", ratio=1)
+
+    Deribit combo leg::
+
+        build_leg(
+            "DERIBIT", InstrumentType.OPTION, "BTC-25DEC26-70000-C",
+            side="SELL", ratio=2, passthrough=True,
+        )
+        # → InstrumentLeg(instrument_key="DERIBIT:OPTION:BTC-25DEC26-70000-C", side="SELL", ratio=2)
+    """
+    leg_key = build_instrument_id(
+        venue,
+        instrument_type,
+        symbol,
+        expiry_date=expiry_date,
+        strike=strike,
+        option_right=option_right,
+        chain=chain,
+        quote_asset=quote_asset,
+        margin_type=margin_type,
+        passthrough=passthrough,
+    )
+    return InstrumentLeg(instrument_key=leg_key, side=side, ratio=ratio)
+
+
+# ---------------------------------------------------------------------------
+# One entry point, every asset group
+# ---------------------------------------------------------------------------
+
+
+def build_canonical_instrument_id(
+    asset_group: AssetGroup | str,
+    venue: str = "",
+    instrument_type: InstrumentType | None = None,
+    symbol: str = "",
+    *,
+    expiry_date: _dt.date | None = None,
+    strike: Decimal | None = None,
+    option_right: Literal["C", "P"] | None = None,
+    chain: str | None = None,
+    quote_asset: str = "",
+    margin_type: str = "",
+    passthrough: bool = False,
+    league: str | None = None,
+    home_team: str | None = None,
+    away_team: str | None = None,
+    fixture_date: str | None = None,
+    fixture_time: str = "",
+) -> str:
+    """Single dispatch entry point for a canonical id, for ANY asset group.
+
+    Operator decision, 2026-07-08 (`instrument_id_format_canonicalization_2026_07_08.md`):
+    *"one builder for everything ... every asset group, every instrument
+    type, can get its canonical instrument IDs, same with fixtures, just by
+    filling in the right inputs."* Per-domain builders that each
+    independently canonicalize are explicitly rejected — this function is
+    the single call site every adapter (CeFi/DeFi/TradFi/Prediction/Sports)
+    should route through; it never re-implements construction logic itself,
+    it dispatches to the one shared implementation per asset group:
+
+    - ``CEFI`` / ``DEFI`` / ``TRADFI`` / ``PREDICTION`` → :func:`build_instrument_id`
+      (``VENUE:TYPE:SYMBOL``, ``VENUE-CHAIN:TYPE:SYMBOL`` for DeFi).
+    - ``SPORTS`` → the sports domain builder
+      (``canonical/domain/sports/canonical_ids.build_fixture_id``),
+      producing ``LEAGUE:MATCHUP:DATE`` — **not** ``VENUE:TYPE:SYMBOL``. This
+      is an intentional, separately operator-confirmed design decision
+      ("sports doesn't have a clean TYPE/SYMBOL concept"), not a gap: a
+      fixture is an event between two named participants on a date, not a
+      type+symbol pair. Sports callers pass ``league``/``home_team``/
+      ``away_team``/``fixture_date`` (and optional ``fixture_time``) instead
+      of ``venue``/``instrument_type``/``symbol``.
+
+    Args:
+        asset_group: :class:`AssetGroup` or its lowercase string value
+            (``"cefi"``, ``"defi"``, ``"tradfi"``, ``"sports"``,
+            ``"prediction"``).
+        venue: Required for every group except ``SPORTS``.
+        instrument_type: Required for every group except ``SPORTS``.
+        symbol, expiry_date, strike, option_right, chain, quote_asset,
+        margin_type, passthrough: Forwarded verbatim to
+            :func:`build_instrument_id` — see its docstring.
+        league, home_team, away_team, fixture_date, fixture_time:
+            ``SPORTS``-only — already-canonical entity ids (e.g. built via
+            ``build_league_id``/``build_team_id``) and an ISO-ish date
+            string. Forwarded to ``build_fixture_id``.
+
+    Returns:
+        The canonical instrument id (or fixture id, for ``SPORTS``).
+
+    Raises:
+        ValueError: If ``asset_group`` is not a valid :class:`AssetGroup`
+            value, if a non-``SPORTS`` group is missing ``instrument_type``,
+            or if ``SPORTS`` is missing any of ``league``/``home_team``/
+            ``away_team``/``fixture_date``.
+
+    Examples
+    --------
+    CeFi::
+
+        build_canonical_instrument_id(AssetGroup.CEFI, "bybit", InstrumentType.PERPETUAL, "BTCUSDT")
+        # → "BYBIT:PERPETUAL:BTCUSDT"
+
+    DeFi::
+
+        build_canonical_instrument_id(
+            AssetGroup.DEFI, "aave_v3", InstrumentType.LENDING, "USDC", chain="arbitrum",
+        )
+        # → "AAVE_V3-ARBITRUM:LENDING:USDC"
+
+    TradFi::
+
+        build_canonical_instrument_id(
+            AssetGroup.TRADFI, "cme", InstrumentType.FUTURE, "ES", expiry_date=date(2026, 6, 20),
+        )
+        # → "CME:FUTURE:ES-20260620"
+
+    Sports (fixture, not VENUE:TYPE:SYMBOL)::
+
+        build_canonical_instrument_id(
+            "sports", league="ENG_PREMIER_LEAGUE", home_team="ARSENAL",
+            away_team="CHELSEA", fixture_date="2026-03-22",
+        )
+        # → "ENG_PREMIER_LEAGUE:ARSENAL_v_CHELSEA:20260322"
+    """
+    group = asset_group if isinstance(asset_group, AssetGroup) else AssetGroup(str(asset_group).lower())
+
+    if group is AssetGroup.SPORTS:
+        missing = [
+            name
+            for name, value in (
+                ("league", league),
+                ("home_team", home_team),
+                ("away_team", away_team),
+                ("fixture_date", fixture_date),
+            )
+            if not value
+        ]
+        if missing:
+            msg = (
+                "build_canonical_instrument_id: asset_group=sports requires "
+                f"league, home_team, away_team, fixture_date — missing: {missing}. "
+                "Sports keeps its own LEAGUE:MATCHUP:DATE scheme (operator-decided, "
+                "not forced into VENUE:TYPE:SYMBOL) — see build_fixture_id()."
+            )
+            raise ValueError(msg)
+        # Narrowed non-None by the `missing` check above.
+        assert league is not None
+        assert home_team is not None
+        assert away_team is not None
+        assert fixture_date is not None
+        return _build_sports_fixture_id(league, home_team, away_team, fixture_date, fixture_time)
+
+    if instrument_type is None:
+        msg = f"build_canonical_instrument_id: asset_group={group.value} requires instrument_type"
+        raise ValueError(msg)
+
+    return build_instrument_id(
+        venue,
+        instrument_type,
+        symbol,
+        expiry_date=expiry_date,
+        strike=strike,
+        option_right=option_right,
+        chain=chain,
+        quote_asset=quote_asset,
+        margin_type=margin_type,
+        passthrough=passthrough,
+    )
