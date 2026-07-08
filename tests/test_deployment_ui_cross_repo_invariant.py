@@ -48,11 +48,7 @@ def _imported_route_modules(main_py: Path) -> set[str]:
     tree = ast.parse(src, filename=str(main_py))
     modules: set[str] = set()
     for node in ast.walk(tree):
-        if (
-            isinstance(node, ast.ImportFrom)
-            and node.module is not None
-            and "routes" in node.module
-        ):
+        if isinstance(node, ast.ImportFrom) and node.module is not None and "routes" in node.module:
             for alias in node.names:
                 modules.add(alias.asname if alias.asname else alias.name)
     return modules
@@ -70,9 +66,7 @@ def _registered_prefixes(main_py: Path) -> set[str]:
     for node in ast.walk(tree):
         if not isinstance(node, ast.Call):
             continue
-        if not (
-            isinstance(node.func, ast.Attribute) and node.func.attr == "include_router"
-        ):
+        if not (isinstance(node.func, ast.Attribute) and node.func.attr == "include_router"):
             continue
         for kw in node.keywords:
             if kw.arg == "prefix" and isinstance(kw.value, ast.Constant):
@@ -96,7 +90,7 @@ EXPECTED_ROUTE_MODULES: frozenset[str] = frozenset(
         "checklist",
         "cloud_builds",
         "config",
-        "cost_daily",
+        "costs",
         "data_status",
         "deploy_events_sse",
         "deployments",

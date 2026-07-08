@@ -155,7 +155,10 @@ DATA_TYPES_BY_ASSET_GROUP: dict[str, list[str]] = {
         "dex_pool_swaps",  # DEX swap events (requires candle sampling)
         "lending_indices",  # Lending rate indices (supply/borrow APY, utilization)
         "liquidations",  # DeFi liquidation events
-        "perp_funding",  # Perpetual funding rates (Hyperliquid, Aster, GMX)
+        # Perpetual funding rates (GMX, Drift). HYPERLIQUID/ASTER/PACIFICA-SOLANA/
+        # LIGHTER-ZKSYNC perp_funding RETIRED 2026-07-08 — funding now reads via
+        # derivative_ticker's embedded funding_rate field for those 4 venues.
+        "perp_funding",
         "lst_rates",  # Liquid staking token exchange rates
         "oracle_prices",  # Chainlink oracle price snapshots
         "gas_fees",  # EVM gas fee history
@@ -1136,14 +1139,15 @@ VENUE_DATA_TYPE_CAPABILITIES: dict[str, dict[str, str]] = {
     # Tardis trades fetch path (returns []), so trades start = S3 archive start
     # 2025-03-22. liquidations is out of scope (Hyperliquid does not publish a
     # liquidations feed — no S3 prefix, no Tardis channel).
-    # perp_funding: collected by perp_funding_handler via POST /info fundingHistory
-    # (declared in _defi.py _ProtocolCapability data_types=["perp_funding"]);
-    # start date aligned with derivative_ticker S3 archive start.
+    # perp_funding (standalone data_type) RETIRED 2026-07-08 — operator-approved,
+    # in favor of this row's derivative_ticker embedded funding_rate field (S3
+    # asset_ctxs; a live-fetch probe confirmed byte-identical/same-source funding
+    # data). derivative_ticker IS the funding source now; no separate perp_funding
+    # start-date entry needed.
     "HYPERLIQUID": {
         "trades": "2025-03-22",  # S3 hl-mainnet-node-data/node_fills
         "book_snapshot_5": "2023-04-15",  # S3 hyperliquid-archive/market_data/
         "derivative_ticker": "2023-05-20",  # S3 hyperliquid-archive/asset_ctxs/
-        "perp_funding": "2023-05-20",  # perp_funding_handler REST /info fundingHistory
     },
     # ASTER — batch+live: derivative_ticker (fundingRate REST) and trades
     # (aggTrades REST, ~30-day rolling depth) are wired in _fetch_aster_rest;
@@ -1153,16 +1157,16 @@ VENUE_DATA_TYPE_CAPABILITIES: dict[str, dict[str, str]] = {
     # feed, so pre-wire history stays typed honest absence
     # (EXPECTED_PRE_SOURCE_COVERAGE_START via the enumerator's per-(venue,dt)
     # start_date gate). Genesis = 2023-07-22 (operator-confirmed 2026-06-17
-    # via the Astherus pre-rebrand venue). perp_funding: collected by
-    # perp_funding_handler (declared in _defi.py _ProtocolCapability
-    # data_types=["perp_funding"]).
+    # via the Astherus pre-rebrand venue). perp_funding (standalone data_type)
+    # RETIRED 2026-07-08 — operator-approved, in favor of this row's
+    # derivative_ticker embedded funding_rate field (fundingRate REST; a
+    # live-fetch probe confirmed byte-identical/same-source funding data).
     # IMPORTANT — pre-2024 Aster funding is BINANCE-PROXIED (Astherus pre-rebrand
     # mirrored Binance funding); it is imported, NOT Aster-native — label `source`
     # honestly. SSOT: perp_funding_data_semantics_and_cadence_2026_06_16.md §GAP 2.
     "ASTER": {
         "trades": "2023-07-22",
         "derivative_ticker": "2023-07-22",
-        "perp_funding": "2023-07-22",  # perp_funding_handler REST Aster API
         "book_snapshot_5": "2026-06-23",  # live-only via aster_book_liq_ws
         "liquidations": "2026-06-23",  # live-only via aster_book_liq_ws
     },

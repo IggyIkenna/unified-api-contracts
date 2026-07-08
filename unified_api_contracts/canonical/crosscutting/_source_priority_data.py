@@ -127,13 +127,17 @@ SOURCE_PRIORITY: Final[dict[tuple[str, str], list[str]]] = {
     # the cefi rows; the TradFi (Massive/Databento) chains feed the tradfi rows.
     ("cefi", "greeks_snapshot"): ["greeks_service"],
     ("cefi", "implied_vol_surface"): ["greeks_service"],
-    # L2 microstructure (Phase D P2) — order_flow_imbalance / depth_of_book_10 /
-    # queue_position are MTDS-COMPUTED from the canonical book_snapshot_5 (L5 book).
-    # Internal computed source (mtds_microstructure, COMPUTED_SOURCES-exempt from
-    # external provenance); batch==live (same derivation both modes). The upstream
-    # L5 book is sourced via (cefi, book_snapshot) → tardis batch + venue live;
-    # these rows carry the COMPUTED emitter as the provenance, like greeks_snapshot.
-    ("cefi", "order_flow_imbalance"): ["mtds_microstructure"],
+    # L2 microstructure (Phase D P2) — depth_of_book_10 / queue_position are
+    # MTDS-COMPUTED from the canonical book_snapshot_5 (L5 book) — honest gap
+    # until a deeper capture lands. Internal computed source (mtds_microstructure,
+    # COMPUTED_SOURCES-exempt from external provenance); batch==live (same
+    # derivation both modes). The upstream L5 book is sourced via
+    # (cefi, book_snapshot) → tardis batch + venue live; these rows carry the
+    # COMPUTED emitter as the provenance, like greeks_snapshot. (order_flow_imbalance
+    # — the third L2-microstructure data_type that shared this mtds_microstructure
+    # source — RETIRED 2026-07-08; zero real consumers, zero production rows ever
+    # captured. depth_of_book_10/queue_position remain, so mtds_microstructure
+    # stays registered as a source below.)
     ("cefi", "depth_of_book_10"): ["mtds_microstructure"],
     ("cefi", "queue_position"): ["mtds_microstructure"],
     # ---- DeFi -----------------------------------------------------------
@@ -363,7 +367,7 @@ COMPUTED_SOURCES: Final[frozenset[str]] = frozenset(
         "features_onchain_service",  # features-onchain per-tick snapshots
         "cross_instrument",  # features-service cross_instrument family outputs
         "greeks_service",  # greeks-service greeks_snapshot / implied_vol_surface
-        "mtds_microstructure",  # MTDS L2 microstructure (order_flow_imbalance/etc) from book_snapshot_5
+        "mtds_microstructure",  # MTDS L2 microstructure (depth_of_book_10/queue_position) from book_snapshot_5
     }
 )
 """Source strings denoting internal computed/service emitters (provenance-exempt).
