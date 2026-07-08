@@ -39,6 +39,35 @@ from .schemas import (
 
 _parse_decimal = d
 
+# Real ASTER quote-asset distribution (confirmed live via
+# fapi.asterdex.com/fapi/v1/exchangeInfo 2026-07-08: 504/509 perps quote USDT,
+# 3 quote USD1, 2 quote a bare "U"). Longest-suffix-first so "USDT" doesn't
+# false-match on the "USD"/"U" fallback. Used to recover the real settlement
+# currency from a raw concatenated exchange symbol (e.g. "BTCUSDT") when the
+# caller doesn't already have a separate base/quote pair to hand — 2026-07-08
+# canonicalization (VENUE:PERPETUAL:BASE-QUOTE, dropping the PERP shorthand).
+# SSOT: plans/active/issues/instrument_id_format_canonicalization_2026_07_08.md
+# finding 3+4; plans/active/canonical_id_p1_onchain_perp_perp_shorthand_2026_07_08.md.
+_ASTER_QUOTE_SUFFIXES: tuple[str, ...] = ("USDT", "USDC", "BUSD", "USDP", "USD1", "USD", "U")
+
+
+def _split_aster_symbol(symbol: str) -> tuple[str, str]:
+    """Split a raw concatenated ASTER exchange symbol (e.g. ``BTCUSDT``) into (base, quote)."""
+    for quote in _ASTER_QUOTE_SUFFIXES:
+        if symbol.endswith(quote) and len(symbol) > len(quote):
+            return symbol[: -len(quote)], quote
+    return symbol, ""
+
+
+def _aster_canonical_symbol(symbol: str) -> str:
+    """Return the canonical dash-joined ``BASE-QUOTE`` form of a raw ASTER symbol.
+
+    Falls back to the raw symbol unchanged if no known quote suffix matches
+    (never silently drops data).
+    """
+    base, quote = _split_aster_symbol(symbol)
+    return f"{base}-{quote}" if quote else symbol
+
 
 def _now_utc() -> datetime:
     return datetime.now(UTC)
@@ -90,7 +119,7 @@ def normalize_aster_ticker(
     raw: AsterTicker24hr, instrument_key: str | None = None, venue: str = "aster"
 ) -> CanonicalTicker:
     """Convert AsterTicker24hr to CanonicalTicker."""
-    ik = instrument_key or f"{venue}:PERPETUAL:{raw.symbol or ''}"
+    ik = instrument_key or f"{venue}:PERPETUAL:{_aster_canonical_symbol(raw.symbol or '')}"
     ts = ts_ms_to_datetime(raw.closeTime or raw.openTime)
     return CanonicalTicker(
         instrument_key=ik,
@@ -196,7 +225,7 @@ def normalize_aster_derivative_ticker(
 ) -> CanonicalDerivativeTicker:
     """Normalize Aster mark price (+ optional OI + funding) to CanonicalDerivativeTicker."""
     symbol = mark.symbol or (oi.symbol if oi else "") or (funding.symbol if funding else "")
-    ik = instrument_key or f"{venue}:PERPETUAL:{symbol}"
+    ik = instrument_key or f"{venue}:PERPETUAL:{_aster_canonical_symbol(symbol)}"
 
     timestamp = _ms_to_utc(mark.time) or _now_utc()
     mark_price = to_decimal(mark.markPrice) if mark.markPrice else None
@@ -262,7 +291,10 @@ def normalize_aster_market(
 ) -> CanonicalInstrument:
     """Normalize AsterMarket to CanonicalInstrument."""
     sym = raw.symbol or raw.market_id or ""
-    ik = f"{venue.upper()}:PERP:{sym}"
+    base = (raw.base_asset or "").upper()
+    quote = (raw.quote_asset or "").upper()
+    canonical_symbol = f"{base}-{quote}" if base and quote else _aster_canonical_symbol(sym)
+    ik = f"{venue.upper()}:PERPETUAL:{canonical_symbol}"
     return CanonicalInstrument(
         instrument_key=ik,
         venue=venue,
@@ -310,7 +342,7 @@ def normalize_aster_liquidation(
     """Convert AsterLiquidationOrder (@forceOrder WS event) to CanonicalLiquidation."""
     o: dict[str, object] = raw.o or {}
     sym = symbol or str(o.get("s") or "")
-    ik = f"{venue.upper()}:PERP:{sym}"
+    ik = f"{venue.upper()}:PERPETUAL:{_aster_canonical_symbol(sym)}"
     ts = datetime.fromtimestamp((raw.E or 0) / 1000.0, tz=UTC)
     side_raw = str(o.get("S") or "").upper()
     side = "buy" if side_raw == "BUY" else "sell"
