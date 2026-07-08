@@ -377,29 +377,27 @@ INSTRUMENT_TYPES_BY_VENUE: dict[str, set[str]] = {
     "COINBASE": {"SPOT_PAIR"},
     OKX_SPOT: {"SPOT_PAIR"},
     OKX_FUTURES: {"PERPETUAL", "FUTURE", "OPTION"},
-    # SPOT_PAIR removed 2026-07-07: bare "OKX" is a pre-venue-splitting-era
-    # declaration (present unchanged since this dict's first commit, no
-    # rationale comment) that never matches real capture -- confirmed against
-    # production (gs://instruments-store-cefi-prd-.../availability_index.parquet):
-    # bare OKX has ZERO SPOT_PAIR rows across its entire history (only 2 legacy
-    # rows total, all pre-canonicalization). Tardis's own routing table
-    # (venue_mapping.py) already sends (OKX, SPOT_PAIR) to the same "okex"
-    # source as canonical OKX_SPOT -- this entry was a redundant alias, not a
-    # distinct real capability. Real OKX spot/perp/futures data lives under
-    # OKX_SPOT/OKX-SWAP/OKX_FUTURES. PERPETUAL/FUTURE/OPTION kept here pending
-    # separate verification (OPTION in particular: zero real rows found
-    # anywhere in the OKX family in the same production check -- flagged, not
-    # yet fixed, needs its own confirmation before removal).
-    "OKX": {"PERPETUAL", "FUTURE", "OPTION"},
+    # bare "OKX" keeps SPOT_PAIR (reverted 2026-07-08, commit 23fa3a99 had
+    # dropped it as "phantom"): VENUES_BY_ASSET_GROUP["cefi"] never declares
+    # "OKX-SPOT" as a distinct cefi venue (only bare "OKX" is registered) —
+    # OKX was never split like BINANCE-SPOT/BINANCE-FUTURES or BYBIT/
+    # BYBIT-SPOT, so bare "OKX" is the ONLY cefi venue token that can carry
+    # OKX spot_pair capability in the EXPECTED denominator. Removing it left
+    # OKX spot_pair permanently unenumerable, dropping build_expected('cefi')
+    # 75→71 tuples and failing the golden-byte-identical test (blocked ALL
+    # instruments-service shipping). See
+    # plans/active/issues/instruments_service_cefi_qg_red_on_ldr_head_2026_07_08.md.
+    "OKX": {"SPOT_PAIR", "PERPETUAL", "FUTURE", "OPTION"},
     BYBIT_SPOT: {"SPOT_PAIR"},
     BYBIT_FUTURES: {"PERPETUAL", "FUTURE"},
-    # SPOT_PAIR removed 2026-07-07: same pattern as bare OKX above -- bare
-    # "BYBIT" has ZERO SPOT_PAIR rows ever in production (2,657 blank +
-    # legacy-cased rows + 1,193 PERPETUAL only), all real Bybit spot data
-    # lives under BYBIT_SPOT. Tardis's venue_mapping.py already routes
-    # (BYBIT, SPOT_PAIR) to the same "bybit-spot" source as canonical
-    # BYBIT_SPOT -- redundant alias, not a distinct capability.
-    "BYBIT": {"PERPETUAL", "FUTURE"},
+    # bare "BYBIT" keeps SPOT_PAIR too (same 2026-07-08 revert) — unlike OKX,
+    # BYBIT-SPOT IS a separately declared cefi venue, but the checked-in
+    # golden (tests/unit/scripts/goldens/expected_universe/cefi.json) expects
+    # BOTH ('BYBIT', 'spot_pair', ...) and ('BYBIT-SPOT', 'spot_pair', ...) as
+    # distinct EXPECTED cells; per the golden test's own docstring, a real
+    # coverage regression must not be laundered into a fixture update, so the
+    # source-of-truth capability declaration is restored to match instead.
+    "BYBIT": {"SPOT_PAIR", "PERPETUAL", "FUTURE"},
     UPBIT: {"SPOT_PAIR"},
     BINANCE_FUTURES: {"PERPETUAL", "FUTURE"},
     # SPOT_PAIR added 2026-07-06 (D2a regression fix): the OLD tardis-routing
