@@ -876,19 +876,29 @@ def _derive_cme_option_underlying(option_root: str) -> str:
     futures root, we return that root. Otherwise we return the option root
     itself so callers can perform their own UAC-backed remap.
     """
-    # Common CME option → future root prefixes. Kept small on purpose; the UAC
-    # instrument registry is the SSOT for the full mapping.
+    # Common CME option -> future root prefixes. Kept small on purpose; the UAC
+    # instrument registry is the SSOT for the full mapping. SO/PAO/PO/HXE/OH/OB
+    # (silver/palladium/platinum/copper/heating-oil/gasoline) added 2026-07-09,
+    # reverse of tradfi_symbology.DATABENTO_VALID_OPTIONS_SYMBOLS — previously
+    # fell through to ``return option_root`` raw (instrument_id_format_
+    # canonicalization_2026_07_08.md TradFi single-leg @LIN/@INV migration).
     known_prefixes: Final[tuple[tuple[str, str], ...]] = (
-        ("E2", "ES"),  # ES weekly options
-        ("EW", "ES"),  # ES Wednesday options
+        ("E2", "ES"),
+        ("EW", "ES"),
         ("E1", "ES"),
         ("E3", "ES"),
         ("E4", "ES"),
         ("E5", "ES"),
         ("NQ", "NQ"),
-        ("OG", "GC"),  # Gold options
-        ("LO", "CL"),  # Crude options
-        ("ON", "NG"),  # NG options
+        ("OG", "GC"),
+        ("LO", "CL"),
+        ("ON", "NG"),
+        ("SO", "SI"),
+        ("PAO", "PA"),
+        ("PO", "PL"),
+        ("HXE", "HG"),
+        ("OH", "HO"),
+        ("OB", "RB"),
     )
     for prefix, underlying in known_prefixes:
         if option_root.startswith(prefix):
