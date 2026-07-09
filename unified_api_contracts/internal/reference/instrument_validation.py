@@ -59,8 +59,8 @@ _DEFI_VENUE_PREFIXES = frozenset(
 # so adding a venue there is the only edit needed. CeFi covers Tardis canonical
 # venues + on-chain CLOBs; tradfi covers Databento + external providers; sports
 # covers bookmakers + odds aggregators; prediction covers binary CLOBs. Extra
-# legacy aliases (OKX without suffix, BITSTAMP-SPOT, HUOBI-* under earlier
-# names, MATCHBOOK / API_FOOTBALL) are still accepted for back-compat.
+# legacy aliases (OKX without suffix, MATCHBOOK / API_FOOTBALL) are still
+# accepted for back-compat.
 _CEFI_VENUES: frozenset[str] = frozenset(VENUES_BY_ASSET_GROUP["cefi"]) | frozenset(
     {
         "OKX",
@@ -68,9 +68,6 @@ _CEFI_VENUES: frozenset[str] = frozenset(VENUES_BY_ASSET_GROUP["cefi"]) | frozen
         "OKX-FUTURES",
         "OKX-SWAP",
         "COINBASE-SPOT",
-        "BITSTAMP-SPOT",
-        "HUOBI-SPOT",
-        "HUOBI-FUTURES",
     }
 )
 _TRADFI_VENUES: frozenset[str] = frozenset(VENUES_BY_ASSET_GROUP["tradfi"])

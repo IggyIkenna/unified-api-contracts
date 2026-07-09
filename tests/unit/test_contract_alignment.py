@@ -201,7 +201,7 @@ class TestCanonicalTrade:
         from unified_api_contracts.canonical.domain import CanonicalTrade
 
         trade = CanonicalTrade(
-            venue="bitstamp",
+            venue="kraken",
             symbol="ETHUSD",
             trade_id="trade-002",
             timestamp=datetime.now(UTC),

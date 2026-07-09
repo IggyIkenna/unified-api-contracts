@@ -96,12 +96,6 @@ providers:
     last_verified: "2026-03-15"
     status: green
 
-  bitstamp:
-    api_version: "v2"
-    spec_url: "https://www.bitstamp.net/api/"
-    last_verified: "2026-03-15"
-    status: green
-
   bybit:
     api_version: "v5"
     spec_url: "https://bybit-exchange.github.io/docs/v5/intro"
@@ -204,12 +198,6 @@ providers:
     status: yellow
     cassette_status: pending
     modes: [historical]
-
-  huobi:
-    api_version: "v1"
-    spec_url: "https://huobiapi.github.io/docs/spot/v1/en/"
-    last_verified: "2026-03-15"
-    status: green
 
   hyperliquid:
     api_version: "v1"

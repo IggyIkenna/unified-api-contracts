@@ -44,10 +44,7 @@ class VenueMapping:
             "coinbase-international",  # Coinbase Derivatives (perps) — pairs with COINBASE-SPOT perp-gate
             # Tier 2: Regional / specialist exchanges
             "upbit",  # Upbit (Korean exchange) - spot only, for kimchi premium
-            "bitstamp",  # Bitstamp - spot
             # Tier 3: Additional CeFi exchanges
-            "huobi",  # Huobi/HTX - spot
-            "huobi-dm",  # Huobi/HTX - derivatives (futures/swaps)
             # 2026-05-01 Tier-3: cryptofacilities = Kraken Futures (legacy id).
             "bitfinex",
             "bitfinex-derivatives",
@@ -154,11 +151,6 @@ class VenueMapping:
             "HYPERLIQUID": "hyperliquid",
             "UPBIT": "upbit",
             "COINBASE": "coinbase",
-            # Tier 2
-            "BITSTAMP-SPOT": "bitstamp",
-            # Tier 3
-            "HUOBI-SPOT": "htx",  # Huobi rebranded to HTX
-            "HUOBI-FUTURES": "htx",
             # Note: ASTER not in CCXT yet
         }
     )
@@ -823,12 +815,6 @@ class VenueMapping:
             # Coinbase Derivatives (perps) via Tardis coinbase-international
             ("COINBASE-FUTURES", "PERPETUAL"): "coinbase-international",
             ("COINBASE-FUTURES", "FUTURE"): "coinbase-international",
-            # Tier 2 exchanges (spot only)
-            ("BITSTAMP-SPOT", "SPOT_PAIR"): "bitstamp",
-            # Tier 3 exchanges
-            ("HUOBI-SPOT", "SPOT_PAIR"): "huobi",
-            ("HUOBI-FUTURES", "PERPETUAL"): "huobi-dm",
-            ("HUOBI-FUTURES", "FUTURE"): "huobi-dm",
             # DEX perps with Tardis routing (2026-05-12)
             # Tardis exchange slug is "lighter" (NOT "lighter-zksync").
             ("LIGHTER-ZKSYNC", "PERPETUAL"): "lighter",
@@ -855,10 +841,6 @@ class VenueMapping:
             "coinbase-international": ["PERPETUAL", "FUTURE"],
             # Tier 2
             "upbit": ["SPOT_PAIR"],
-            "bitstamp": ["SPOT_PAIR"],
-            # Tier 3
-            "huobi": ["SPOT_PAIR"],
-            "huobi-dm": ["PERPETUAL", "FUTURE"],
             # 2026-06-24: Binance COIN-M (inverse/delivery)
             "binance-delivery": ["PERPETUAL", "FUTURE"],
         }
