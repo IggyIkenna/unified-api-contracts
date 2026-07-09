@@ -1,4 +1,4 @@
-"""Legacy venue-specific SchemaContract overrides (Uniswap V2/V3/V4, Curve, Balancer, Ethena, Aave a_token extensions).
+"""Legacy venue-specific SchemaContract overrides (Ethena, Aave a_token extensions).
 
 Split out of ``contracts.py`` to keep the main module under the 900-line
 codex-compliance limit. This module is imported at module load time by
@@ -16,8 +16,6 @@ from __future__ import annotations
 from unified_api_contracts.internal.schemas.contracts import (
     CHAIN_COL,
     CONTRACT_REGISTRY,
-    DEFI_DEX_POOL_DEX_POOL_STATE,
-    DEFI_POOL_DEX_POOL_SWAPS,
     INSTRUMENT_ID_COL,
     TS_EVENT_COL,
     VENUE_COL,
@@ -26,76 +24,18 @@ from unified_api_contracts.internal.schemas.contracts import (
     SchemaContract,
 )
 
-# Historical/raw Uniswap (V2/V3/V4), Curve, Balancer pool rows carry the
-# pool hex address under ``pool_address`` rather than the canonical
-# ``symbol`` column the live handlers emit. These overrides let the
-# migration pipeline resolve to a contract that points to the column the
-# row actually has, without silent fallback.
-DEFI_UNISWAP_POOL_STATE_LEGACY = SchemaContract(
-    asset_group="defi",
-    instrument_type="pool",
-    data_type="dex_pool_state",
-    columns=list(DEFI_DEX_POOL_DEX_POOL_STATE.columns),
-    symbol_column="pool_address",
-    required_row_count_min=1,
-)
-
-DEFI_UNISWAP_POOL_SWAPS_LEGACY = SchemaContract(
-    asset_group="defi",
-    instrument_type="pool",
-    data_type="dex_pool_swaps",
-    columns=list(DEFI_POOL_DEX_POOL_SWAPS.columns),
-    symbol_column="pool_address",
-    required_row_count_min=1,
-)
-
-# Uniswap V3/V4/Curve/Balancer legacy rows carry the pool hex under
-# ``pool_address``. Uniswap V2 uses the older ``pair_address`` naming.
-DEFI_UNISWAP_V2_POOL_STATE_LEGACY = SchemaContract(
-    asset_group="defi",
-    instrument_type="pool",
-    data_type="dex_pool_state",
-    columns=list(DEFI_DEX_POOL_DEX_POOL_STATE.columns),
-    symbol_column="pair_address",
-    required_row_count_min=1,
-)
-DEFI_UNISWAP_V2_POOL_SWAPS_LEGACY = SchemaContract(
-    asset_group="defi",
-    instrument_type="pool",
-    data_type="dex_pool_swaps",
-    columns=list(DEFI_POOL_DEX_POOL_SWAPS.columns),
-    symbol_column="pair_address",
-    required_row_count_min=1,
-)
-
-for _venue in ("UNISWAP_V3", "CURVE", "BALANCER"):
-    VENUE_CONTRACT_OVERRIDES[("defi", _venue, "pool", "dex_pool_state")] = DEFI_UNISWAP_POOL_STATE_LEGACY
-    VENUE_CONTRACT_OVERRIDES[("defi", _venue, "pool", "dex_pool_swaps")] = DEFI_UNISWAP_POOL_SWAPS_LEGACY
-
-VENUE_CONTRACT_OVERRIDES[("defi", "UNISWAP_V2", "pool", "dex_pool_state")] = DEFI_UNISWAP_V2_POOL_STATE_LEGACY
-VENUE_CONTRACT_OVERRIDES[("defi", "UNISWAP_V2", "pool", "dex_pool_swaps")] = DEFI_UNISWAP_V2_POOL_SWAPS_LEGACY
-
-# Uniswap V4 raw rows use ``pool_id`` as the pool identifier (not
-# ``pool_address`` like V3). Separate override keeps V3/V4 in sync with
-# their actual writer grammars.
-DEFI_UNISWAP_V4_POOL_STATE_LEGACY = SchemaContract(
-    asset_group="defi",
-    instrument_type="pool",
-    data_type="dex_pool_state",
-    columns=list(DEFI_DEX_POOL_DEX_POOL_STATE.columns),
-    symbol_column="pool_id",
-    required_row_count_min=1,
-)
-DEFI_UNISWAP_V4_POOL_SWAPS_LEGACY = SchemaContract(
-    asset_group="defi",
-    instrument_type="pool",
-    data_type="dex_pool_swaps",
-    columns=list(DEFI_POOL_DEX_POOL_SWAPS.columns),
-    symbol_column="pool_id",
-    required_row_count_min=1,
-)
-VENUE_CONTRACT_OVERRIDES[("defi", "UNISWAP_V4", "pool", "dex_pool_state")] = DEFI_UNISWAP_V4_POOL_STATE_LEGACY
-VENUE_CONTRACT_OVERRIDES[("defi", "UNISWAP_V4", "pool", "dex_pool_swaps")] = DEFI_UNISWAP_V4_POOL_SWAPS_LEGACY
+# Uniswap V2/V3/V4, Curve, Balancer: REMOVED 2026-07-09
+# (defi_dex_pool_symbol_shape_fix_2026_07_09) — these 6 legacy per-venue
+# overrides pointed ``symbol_column`` at the bare on-chain address column
+# (``pool_address``/``pair_address``/``pool_id``) because the raw row never
+# carried a real canonical symbol. All 13 DEX-pool protocols' writers
+# (market_tick_data_service.cli.handlers._dex_pool_symbol) now resolve a real
+# ``symbol`` (``TOKEN0-TOKEN1[-FEE_TIER]`` when derivable, else the honest
+# unchanged bare address) for every row, so these venues fall through to the
+# now-consistent DEFI_DEX_POOL_DEX_POOL_STATE / DEFI_POOL_DEX_POOL_SWAPS
+# defaults (``symbol_column="symbol"``) — same behavior, one fewer legacy
+# branch. No other venue referenced these override objects (verified via
+# repo-wide grep before removal).
 
 
 # Aave V3 reserve-level datasets: oracle prices, rate indices (liquidity +

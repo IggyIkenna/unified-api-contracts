@@ -543,8 +543,14 @@ DEFI_LENDING_LIQUIDATIONS = SchemaContract(
     required_row_count_min=1,
 )
 
-# Uniswap V2/V3/V4, Curve, Balancer — pool-scoped rows use ``pool_id`` as the
-# canonical row symbol. ``dex_pool_state`` carries liquidity/price snapshots.
+# All 13 DEX-pool protocols (Uniswap V2/V3/V4, Balancer, Curve, PancakeSwap_V3,
+# Sushiswap/_V3, Camelot_V3, Aerodrome_V3, TraderJoe_V2, Velodrome_V2, GMX) write
+# the canonical ``TOKEN0-TOKEN1[-FEE_TIER]`` pool symbol (dash-separated, real
+# basis points — instrument_id_format_canonicalization_2026_07_08.md finding 2,
+# mirrored from the instruments-service sibling fix commit 4e072d93) under
+# ``symbol`` (market_tick_data_service.cli.handlers._dex_pool_symbol is the MTDS
+# SSOT for resolving it; defi_dex_pool_symbol_shape_fix_2026_07_09 migration).
+# ``dex_pool_state`` carries liquidity/price snapshots.
 DEFI_DEX_POOL_DEX_POOL_STATE = SchemaContract(
     asset_group="defi",
     instrument_type="pool",
@@ -558,10 +564,6 @@ DEFI_DEX_POOL_DEX_POOL_STATE = SchemaContract(
         ColumnSpec(name="sqrt_price_x96", dtype="string", nullable=True),
         ColumnSpec(name="price", dtype="float64", nullable=True),
     ],
-    # Live dex-pool handlers emit the pool identifier under ``symbol``
-    # (``USDC-WETH-500`` etc.) — legacy handler convention. A future
-    # canonicalisation pass can move it to ``pool_id``; the override
-    # registry is the place to flip that per-venue when it lands.
     symbol_column="symbol",
     required_row_count_min=1,
 )
@@ -583,8 +585,10 @@ DEFI_DEX_POOL_DEX_POOL_SWAPS = SchemaContract(
     required_row_count_min=1,
 )
 
-# Pool-variant swap dataset (instrument_type=pool used by the evm_defi handler
-# and dex_pools_handler for historical swaps snapshots).
+# Pool-variant swap dataset (instrument_type=pool, written by dex_swaps_handler
+# for the 13 DEX-pool protocols). Same canonical ``symbol`` shape as
+# DEFI_DEX_POOL_DEX_POOL_STATE above (defi_dex_pool_symbol_shape_fix_2026_07_09):
+# was ``pool_id`` (bare on-chain address) until this migration.
 DEFI_POOL_DEX_POOL_SWAPS = SchemaContract(
     asset_group="defi",
     instrument_type="pool",
@@ -598,7 +602,7 @@ DEFI_POOL_DEX_POOL_SWAPS = SchemaContract(
         ColumnSpec(name="amount1", dtype="float64", nullable=False),
         ColumnSpec(name="price", dtype="float64", nullable=False),
     ],
-    symbol_column="pool_id",
+    symbol_column="symbol",
     required_row_count_min=1,
 )
 
