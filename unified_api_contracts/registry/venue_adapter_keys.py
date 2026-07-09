@@ -196,6 +196,9 @@ VENUE_TO_ADAPTER_KEY: dict[str, str] = {
     "SANCTUM-SOLANA": "sanctum",
     "SOLBLAZE-SOLANA": "solblaze",
     "SOLANA-NATIVE-SOLANA": "solana_native",
+    # Solana lending adapters (2026-07-09) — real public REST/JSON APIs.
+    "MARGINFI-SOLANA": "marginfi",
+    "SOLEND-SOLANA": "solend",
     # Jupiter is execution-only (swap aggregator), not instrument discovery.
     # DEX perp venues (L2 + StarkNet + Solana clone)
     "LIGHTER-ZKSYNC": "lighter",

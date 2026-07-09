@@ -540,9 +540,11 @@ DEFI_VENUE_PHASE: dict[str, str] = {
     "RAYDIUM-SOLANA": "live",
     "JITO-SOLANA": "live",
     "DRIFT-SOLANA": "live",
-    # ── Pipeline (Solana — NOT IS-producible) ──
-    "MARGINFI-SOLANA": "pipeline",
-    "SOLEND-SOLANA": "pipeline",
+    # MarginFi + Solend Solana lending adapters (2026-07-09) — real,
+    # IS-producible per _build_defi_venues() (marginfi.py / solend.py now
+    # wired into instruments-service's factory + the Solana venue list).
+    "MARGINFI-SOLANA": "live",
+    "SOLEND-SOLANA": "live",
     # ── Pipeline (Solana catalogue Phase 1A, slot 5 2026-05-11) ──
     "JUPITER-SOLANA": "pipeline",
     "SOLBLAZE-SOLANA": "pipeline",

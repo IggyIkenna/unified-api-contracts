@@ -274,20 +274,43 @@ class TestDeFiMvp:
         """AAVE_V3-ETHEREUM LENDING lending_indices → MVP (carry base rates)."""
         assert is_mvp("defi", "AAVE_V3-ETHEREUM", "LENDING", "lending_indices")
 
-    def test_orca_solana_dex_pool_swaps_is_mvp(self) -> None:
-        """ORCA-SOLANA DEX_POOL dex_pool_swaps → MVP."""
-        assert is_mvp("defi", "ORCA-SOLANA", "DEX_POOL", "dex_pool_swaps")
+    def test_orca_solana_pool_dex_pool_swaps_is_mvp(self) -> None:
+        """ORCA-SOLANA POOL dex_pool_swaps → MVP.
+
+        POOL, not DEX_POOL — ``DEX_POOL`` was aspirational-only (v10-v12): no
+        live adapter ever emitted it (``orca.py`` builds
+        ``instrument_type=InstrumentType.POOL``, same as the EVM AMM
+        adapters). Verified 2026-07-09 via a repo-wide grep of every
+        ``adapters/defi/*.py`` file's real ``InstrumentType.*`` usage.
+        """
+        assert is_mvp("defi", "ORCA-SOLANA", "POOL", "dex_pool_swaps")
 
     def test_non_mvp_defi_venue_returns_false(self) -> None:
-        """YEARN_V3-ETHEREUM is in ALL_DEFI_VENUES but NOT in MVP → False."""
+        """YEARN_V3-ETHEREUM is in ALL_DEFI_VENUES but NOT IS-producible (not in P) → False.
+
+        Still excluded post-v13: v13 broadened DeFi MVP to "everything we
+        capture" == P (``VENUES_BY_ASSET_GROUP["defi"]``), not the broader
+        declarative ``ALL_DEFI_VENUES`` registry — YEARN_V3-ETHEREUM has a
+        real adapter but isn't part of the batch orchestrator's per-day
+        venue walk (``_build_defi_venues()``), so it stays phase="pipeline"
+        and out of MVP, same as ROCKETPOOL-ETHEREUM (see
+        ``TestDeFiMvpExclusionV12``).
+        """
         assert not is_mvp("defi", "YEARN_V3-ETHEREUM", "POOL", "dex_pool_state")
 
     def test_non_mvp_defi_data_type_returns_false(self) -> None:
-        """gas_fees is a DeFi data_type but NOT in the MVP set → False."""
-        assert not is_mvp("defi", "UNISWAP_V3-ETHEREUM", "POOL", "gas_fees")
+        """trades is a CeFi/prediction data_type, NOT a real DeFi data_type → False.
+
+        (Pre-v13 this test used ``gas_fees`` — v13 broadened DeFi MVP's
+        data_types to the FULL ``DATA_TYPES_BY_ASSET_GROUP["defi"]`` list
+        (see ``TestDeFiMvpV13Broadening``), which now includes ``gas_fees``.
+        ``trades`` is never a member of the defi data_types list at all, so
+        it remains a valid "impossible" negative case.)
+        """
+        assert not is_mvp("defi", "UNISWAP_V3-ETHEREUM", "POOL", "trades")
 
     def test_non_mvp_defi_instrument_type_returns_false(self) -> None:
-        """SPOT_ASSET is a DeFi instrument_type but NOT in MVP → False."""
+        """SPOT_ASSET is a DeFi InstrumentType enum member but NO adapter emits it → False."""
         assert not is_mvp("defi", "UNISWAP_V3-ETHEREUM", "SPOT_ASSET", "dex_pool_state")
 
 
@@ -1112,11 +1135,11 @@ class TestCoinbaseVenueOverrideV11:
 
         assert get_mvp_data_types_for_cefi_venue("FAKE_VENUE_XYZ") == frozenset()
 
-    def test_config_version_is_v12(self) -> None:
-        """MVP_SCOPE_CONFIG_VERSION == 12 after the DeFi MVP-exclusion (ROCKETPOOL removal)."""
+    def test_config_version_is_v13(self) -> None:
+        """MVP_SCOPE_CONFIG_VERSION == 13 after the DeFi MVP "everything we capture" broadening."""
         from unified_api_contracts.canonical.crosscutting.mvp_scope import MVP_SCOPE_CONFIG_VERSION
 
-        assert MVP_SCOPE_CONFIG_VERSION == 12
+        assert MVP_SCOPE_CONFIG_VERSION == 13
 
     def test_get_mvp_data_types_public_import_surface(self) -> None:
         """get_mvp_data_types_for_cefi_venue is importable from the package root."""
@@ -1156,11 +1179,17 @@ class TestDeFiMvpExclusionV12:
         """LIDO-ETHEREUM remains in DeFiMvpRule (IS-producible, in P)."""
         assert is_mvp("defi", "LIDO-ETHEREUM", "LST", "lst_rates")
 
-    def test_config_version_is_v12(self) -> None:
-        """MVP_SCOPE_CONFIG_VERSION == 12 after DeFi MVP-exclusion."""
+    def test_config_version_is_at_least_v12(self) -> None:
+        """MVP_SCOPE_CONFIG_VERSION >= 12 (the DeFi MVP-exclusion this class pins is still live).
+
+        Not pinned to exactly 12: v13 (DeFi MVP "everything we capture"
+        broadening) bumped the global monotonic version further while
+        preserving this class's ROCKETPOOL-ETHEREUM exclusion invariant
+        unchanged (see ``TestDeFiMvpV13Broadening`` for the v13-exact pin).
+        """
         from unified_api_contracts.canonical.crosscutting.mvp_scope import MVP_SCOPE_CONFIG_VERSION
 
-        assert MVP_SCOPE_CONFIG_VERSION == 12
+        assert MVP_SCOPE_CONFIG_VERSION >= 12
 
     def test_defi_identity_with_mds_capture_mvp_v12(self) -> None:
         """defi: Cartesian-product identity still holds after ROCKETPOOL removal."""
@@ -1171,6 +1200,88 @@ class TestDeFiMvpExclusionV12:
         assert isinstance(rule, DeFiMvpRule)
         expected = frozenset((v, it) for v in rule.venues for it in rule.instrument_types)
         assert mdps_mvp_universe("defi") == expected
+
+
+# ---------------------------------------------------------------------------
+# v13 — DeFi MVP "everything we capture" broadening (2026-07-09, operator
+# ruling on defi_perp_funding_mvp_scope_contradiction_2026_06_29.md §E5).
+# ---------------------------------------------------------------------------
+
+
+class TestDeFiMvpV13Broadening:
+    """v13: DeFi MVP == the full IS-producible capture universe (P), not a
+    curated 11-venue subset. Same pass wired 2 real Solana lending adapters
+    (MarginFi, Solend) into instruments-service and flipped their
+    ``DEFI_VENUE_PHASE`` from "pipeline" to "live"."""
+
+    def test_config_version_is_v13(self) -> None:
+        """MVP_SCOPE_CONFIG_VERSION == 13 exactly (the v13 broadening pass)."""
+        from unified_api_contracts.canonical.crosscutting.mvp_scope import MVP_SCOPE_CONFIG_VERSION
+
+        assert MVP_SCOPE_CONFIG_VERSION == 13
+
+    def test_defi_venues_equal_is_producible_set(self) -> None:
+        """DeFiMvpRule.venues == VENUES_BY_ASSET_GROUP["defi"] exactly (== P)."""
+        from unified_api_contracts.canonical.crosscutting.mvp_scope import DeFiMvpRule
+        from unified_api_contracts.registry.market_data_categories import (
+            VENUES_BY_ASSET_GROUP,
+        )
+
+        rule = MVP_SCOPE["defi"]
+        assert isinstance(rule, DeFiMvpRule)
+        assert rule.venues == frozenset(VENUES_BY_ASSET_GROUP["defi"])
+        # Broadened from the pre-v13 11-venue curated subset.
+        assert len(rule.venues) >= 57
+
+    def test_defi_data_types_equal_full_registry(self) -> None:
+        """DeFiMvpRule.data_types == the FULL DATA_TYPES_BY_ASSET_GROUP["defi"] list."""
+        from unified_api_contracts.canonical.crosscutting.mvp_scope import DeFiMvpRule
+        from unified_api_contracts.registry.market_data_categories import (
+            DATA_TYPES_BY_ASSET_GROUP,
+        )
+
+        rule = MVP_SCOPE["defi"]
+        assert isinstance(rule, DeFiMvpRule)
+        assert rule.data_types == frozenset(DATA_TYPES_BY_ASSET_GROUP["defi"])
+        # gas_fees was explicitly excluded pre-v13 — now in scope.
+        assert "gas_fees" in rule.data_types
+
+    def test_marginfi_solana_a_token_is_mvp(self) -> None:
+        """MARGINFI-SOLANA A_TOKEN lending_indices → MVP (new real adapter, 2026-07-09)."""
+        assert is_mvp("defi", "MARGINFI-SOLANA", "A_TOKEN", "lending_indices")
+
+    def test_marginfi_solana_debt_token_is_mvp(self) -> None:
+        """MARGINFI-SOLANA DEBT_TOKEN lending_indices → MVP."""
+        assert is_mvp("defi", "MARGINFI-SOLANA", "DEBT_TOKEN", "lending_indices")
+
+    def test_solend_solana_a_token_is_mvp(self) -> None:
+        """SOLEND-SOLANA A_TOKEN lending_indices → MVP (new real adapter, 2026-07-09)."""
+        assert is_mvp("defi", "SOLEND-SOLANA", "A_TOKEN", "lending_indices")
+
+    def test_solend_solana_debt_token_is_mvp(self) -> None:
+        """SOLEND-SOLANA DEBT_TOKEN lending_indices → MVP."""
+        assert is_mvp("defi", "SOLEND-SOLANA", "DEBT_TOKEN", "lending_indices")
+
+    def test_previously_excluded_multichain_venue_now_mvp(self) -> None:
+        """AAVE_V3-ARBITRUM was outside the pre-v13 curated (ETHEREUM-only) subset — now MVP."""
+        assert is_mvp("defi", "AAVE_V3-ARBITRUM", "LENDING", "lending_indices")
+
+    def test_drift_perpetual_perp_funding_now_mvp(self) -> None:
+        """DRIFT-SOLANA PERPETUAL perp_funding → MVP (resolves the linked
+        defi_perp_funding_mvp_scope_contradiction_2026_06_29.md contradiction
+        as Option 2 — PERPETUAL is now a real DeFi MVP instrument_type)."""
+        assert is_mvp("defi", "DRIFT-SOLANA", "PERPETUAL", "perp_funding")
+
+    def test_rocketpool_ethereum_still_excluded_post_v13(self) -> None:
+        """ROCKETPOOL-ETHEREUM stays excluded post-v13 — MVP venues are still ⊆ P."""
+        assert not is_mvp("defi", "ROCKETPOOL-ETHEREUM", "LST", "lst_rates")
+
+    def test_marginfi_solend_are_is_producible(self) -> None:
+        """MARGINFI-SOLANA / SOLEND-SOLANA are phase="live" (IS-producible) post-wiring."""
+        from unified_api_contracts.registry.defi_venues import DEFI_VENUE_PHASE
+
+        assert DEFI_VENUE_PHASE["MARGINFI-SOLANA"] == "live"
+        assert DEFI_VENUE_PHASE["SOLEND-SOLANA"] == "live"
 
 
 def test_accepted_quotes_for_venue_upbit_krw() -> None:

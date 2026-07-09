@@ -66,6 +66,17 @@ from unified_api_contracts.registry.cefi_instrument_universe import (
     STAKING_SPOT_EXCEPTION,
 )
 
+# DeFi MVP venue/data_type derivation source (operator 2026-07-09 — see
+# ``_mvp_defi_venues()`` below). Imported from the leaf module (NOT the
+# registry package ``__init__``), same acyclic-import discipline as the
+# CeFi imports above: the registry → crosscutting direction is acyclic.
+from unified_api_contracts.registry.market_data_categories import (
+    DATA_TYPES_BY_ASSET_GROUP as _MDC_DATA_TYPES_BY_ASSET_GROUP,
+)
+from unified_api_contracts.registry.market_data_categories import (
+    VENUES_BY_ASSET_GROUP as _MDC_VENUES_BY_ASSET_GROUP,
+)
+
 # The TradFi equity/ETF MVP basis universe — the DBEQ.BASIC cash-equity twins of
 # the Binance tradfi-perp underlyings (the basis-reference leg of the equity-basis
 # arb archetype). Used by the tradfi MVP rule's equity carve-out below so those
@@ -324,6 +335,47 @@ def _mvp_football_league_ids() -> frozenset[str]:
 
 
 # ---------------------------------------------------------------------------
+# DeFi MVP venue/data_type universe — "everything we capture" (operator
+# 2026-07-09 ruling on `defi_perp_funding_mvp_scope_contradiction_2026_06_29.md`
+# §E5: "DeFi MVP framing — define for now, just keep all as MVP though").
+# ---------------------------------------------------------------------------
+# Prior to this, DeFi had NO dedicated MVP set distinct from the factory
+# registry (curated to an 11-venue Ethereum/3-Solana-DEX subset, unlike
+# CeFi/TradFi/Sports/Prediction which each have a real, deliberately-scoped
+# MVP rule). The operator's ruling: DeFi MVP == the full current, real
+# capture universe -- every IS-producible venue -- rather than a curated
+# narrower subset, "for now" (a deliberate, simple starting point; a future
+# ruling may narrow it the way CeFi/TradFi are narrowed).
+#
+# Derived (not a hand-written literal) from ``VENUES_BY_ASSET_GROUP["defi"]``
+# so a newly-onboarded DeFi venue is automatically MVP the moment it goes
+# live -- mirrors ``_mvp_football_league_ids()``'s derivation pattern above.
+#
+# IMPORTANT: this is intentionally == P (the IS-producible venue set;
+# ``VENUES_BY_ASSET_GROUP["defi"]``, phase=="live" per
+# ``defi_venues.DEFI_VENUE_PHASE``), NOT the broader ``ALL_DEFI_VENUES``
+# declarative registry (which also carries "pipeline"-phase venues that
+# UAC has declared but instruments-service does not yet actually produce).
+# Instrument_universe_registry_consolidation_2026_06_29.md Decision D
+# established "every DeFi-MVP venue is IS-producible" as a data-correctness
+# invariant -- MVP membership feeds the honest-coverage reachable
+# denominator, so tagging a not-yet-producible venue MVP=true would mint a
+# phantom expected-but-never-captured cell. That is why e.g.
+# ROCKETPOOL-ETHEREUM (a real, wired adapter -- rocket_pool.py -- but
+# deliberately NOT in P; see ``TestDeFiMvpExclusionV12``) stays excluded
+# here too: "keep all as MVP" means all of P, not all of the factory's
+# adapter classes regardless of pipeline-wiring state.
+def _mvp_defi_venues() -> frozenset[str]:
+    """Return the full current DeFi venue capture universe (== P, IS-producible)."""
+    return frozenset(_MDC_VENUES_BY_ASSET_GROUP["defi"])
+
+
+def _mvp_defi_data_types() -> frozenset[str]:
+    """Return every DeFi data_type instruments-service/MTDS currently produce."""
+    return frozenset(_MDC_DATA_TYPES_BY_ASSET_GROUP["defi"])
+
+
+# ---------------------------------------------------------------------------
 # MVP_SCOPE — the single global config
 # ---------------------------------------------------------------------------
 
@@ -493,97 +545,53 @@ MVP_SCOPE: Final[dict[str, object]] = {
         sources=frozenset(),
     ),
     # ------------------------------------------------------------------
-    # defi
+    # defi — "everything we capture" (operator 2026-07-09, see
+    # ``_mvp_defi_venues()`` / ``_mvp_defi_data_types()`` above for the full
+    # ruling + rationale). Unlike cefi/tradfi/sports/prediction, this is NOT
+    # a curated narrower subset — it is every IS-producible DeFi venue (P),
+    # every real instrument_type any P-venue adapter emits, and every DeFi
+    # data_type the pipeline produces. All three axes are DERIVED (venues +
+    # data_types from the UAC market-data-categories SSOT; instrument_types
+    # hand-verified against live adapter code, see below) so this rule can
+    # never silently drift stale the way the prior 11-venue hand list did.
     #
-    # Venues: DEX pools (EVM + Solana), LST protocols, lending protocols
-    #   from the MVP archetype matrix (carry_staked_basis + arb_price_dispersion)
+    # instrument_types (verified 2026-07-09 via
+    # `grep -rhoE "InstrumentType\.[A-Z_]+" instruments-service/.../adapters/defi/*.py`
+    # — every value at least one live P-venue adapter actually emits):
+    #   POOL        — EVM + Solana AMM/CLMM pool snapshots (Uniswap, Curve, Balancer, Orca, Raydium, Kamino, …)
+    #   LENDING     — flat-record lending markets (Aave V3, Compound V3, Spark)
+    #   A_TOKEN     — supply-side lending leg (Morpho, Fluid, MarginFi, Solend)
+    #   DEBT_TOKEN  — borrow-side lending leg (Morpho, Fluid, MarginFi, Solend)
+    #   LST         — liquid staking tokens (Lido, EtherFi)
+    #   YIELD_BEARING — yield-bearing wrapped assets (Ethena sUSDe, EtherFi)
+    #   PERPETUAL   — on-chain perp markets (Drift)
+    #   SPOT_PAIR   — on-chain spot markets (Drift, EigenLayer governance token)
+    #   STAKING     — native/protocol staking (Jito, Marinade)
     #
-    # EVM DEX (arbitrage_price_dispersion leg):
-    #   UNISWAP_V3-ETHEREUM, CURVE-ETHEREUM, BALANCER-ETHEREUM,
-    #   SUSHISWAP_V3-ETHEREUM, PANCAKESWAP_V3-ETHEREUM
-    #
-    # Solana DEX (arbitrage_price_dispersion + carry_staked_basis):
-    #   PHOENIX-SOLANA (TODO: confirm canonical form — not in ALL_DEFI_VENUES;
-    #     see note below), ORCA-SOLANA, RAYDIUM-SOLANA, DRIFT-SOLANA
-    #
-    # LST protocols (carry_staked_basis leg):
-    #   LIDO-ETHEREUM (stETH), ROCKETPOOL-ETHEREUM (rETH),
-    #   TODO(mvp-scope): confirm cbETH (Coinbase Base token) — may be
-    #     COINBASE-ETHEREUM or another canonical form.
-    #   JITO (JitoSOL) + MARINADE (mSOL) are Solana — confirm canonical forms.
-    #
-    # Lending (carry_staked_basis — Aave/Compound base rates):
-    #   AAVE_V3-ETHEREUM, COMPOUND_V3-ETHEREUM
-    #
-    # NOTE on PHOENIX-SOLANA: The task spec lists "Phoenix" as a DeFi DEX
-    # venue. As of the defi_venues.py registry (2026-06-08), the Solana DEX
-    # entries include ORCA-SOLANA, RAYDIUM-SOLANA, DRIFT-SOLANA but NOT a
-    # PHOENIX-SOLANA entry. Phoenix is the Solana CLOB DEX; it may be listed
-    # under a different canonical name or not yet in the registry.
-    # TODO(mvp-scope): operator confirmation required on PHOENIX-SOLANA
-    # canonical venue ID in ALL_DEFI_VENUES before Phase 2 integration.
-    #
-    # instrument_types:
-    #   POOL       — legacy EVM AMM pool snapshots (Uniswap, Curve, Balancer)
-    #   DEX_POOL   — Solana-basis DEX orderbook/quote/trade shards (ORCA, RAYDIUM,
-    #                DRIFT, PHOENIX)
-    #   LST        — Liquid staking tokens (Lido stETH, RocketPool rETH, JitoSOL, mSOL)
-    #   LENDING    — Lending protocol markets (Aave V3, Compound V3)
-    #
-    # data_types (from DATA_TYPES_BY_ASSET_GROUP["defi"]):
-    #   dex_pool_state, dex_pool_swaps — DEX pool metrics + swap events
-    #   lst_rates                      — LST exchange rates (stETH/ETH ratio, rETH/ETH, etc.)
-    #   lending_indices                — Lending rate indices (supply APY, borrow APY, utilization)
-    #   perp_funding                   — Perpetual funding rates (Hyperliquid, Aster, Drift)
-    #   oracle_prices                  — Chainlink/Pyth oracle prices
+    # data_types: the full DATA_TYPES_BY_ASSET_GROUP["defi"] list (dex pool
+    # state/swaps, lending/utilization indices, LST rates, perp funding,
+    # oracle prices, gas fees, rewards/risk params, liquidation/flash-loan/
+    # bridge/mev/governance events, vault share price/APY/TVL, native
+    # staking rates, …) — not the prior curated 6-entry subset.
     # ------------------------------------------------------------------
     "defi": DeFiMvpRule(
-        venues=frozenset(
-            {
-                # EVM DEX (arbitrage_price_dispersion)
-                "UNISWAP_V3-ETHEREUM",
-                "CURVE-ETHEREUM",
-                "BALANCER-ETHEREUM",
-                "SUSHISWAP_V3-ETHEREUM",
-                "PANCAKESWAP_V3-ETHEREUM",
-                # Solana DEX (arbitrage_price_dispersion + carry_staked_basis)
-                "ORCA-SOLANA",
-                "RAYDIUM-SOLANA",
-                "DRIFT-SOLANA",
-                # TODO(mvp-scope): PHOENIX-SOLANA not found in ALL_DEFI_VENUES (2026-06-08).
-                # Add once the canonical entry lands in defi_venues.py.
-                # LST protocols (carry_staked_basis)
-                "LIDO-ETHEREUM",  # stETH
-                # ROCKETPOOL-ETHEREUM removed: not IS-producible (not in P per
-                # instrument_universe_registry_consolidation_2026_06_29.md Decision D).
-                # TODO(mvp-scope): confirm cbETH canonical venue name.
-                # TODO(mvp-scope): confirm JitoSOL (JITO-SOLANA?) and mSOL
-                # (MARINADE-SOLANA?) canonical venue names.
-                # Lending protocols (carry_staked_basis base rates)
-                "AAVE_V3-ETHEREUM",
-                "COMPOUND_V3-ETHEREUM",
-            }
-        ),
+        venues=_mvp_defi_venues(),
         instrument_types=frozenset(
             {
-                "POOL",  # InstrumentType.POOL — EVM AMM pools
-                "DEX_POOL",  # InstrumentType.DEX_POOL — Solana DEX orderbook/quote
-                "LST",  # InstrumentType.LST — Liquid staking tokens
-                "LENDING",  # InstrumentType.LENDING — Lending protocol markets
+                "POOL",  # InstrumentType.POOL
+                "LENDING",  # InstrumentType.LENDING
+                "A_TOKEN",  # InstrumentType.A_TOKEN
+                "DEBT_TOKEN",  # InstrumentType.DEBT_TOKEN
+                "LST",  # InstrumentType.LST
+                "YIELD_BEARING",  # InstrumentType.YIELD_BEARING
+                "PERPETUAL",  # InstrumentType.PERPETUAL
+                "SPOT_PAIR",  # InstrumentType.SPOT_PAIR
+                "STAKING",  # InstrumentType.STAKING
             }
         ),
-        data_types=frozenset(
-            {
-                "dex_pool_state",
-                "dex_pool_swaps",
-                "lst_rates",
-                "lending_indices",
-                "perp_funding",
-                "oracle_prices",
-            }
-        ),
+        data_types=_mvp_defi_data_types(),
         # sources: empty → all on-chain sources in scope (onchain_subgraph, onchain_rpc,
-        # pyth_hermes, chainlink, hyperliquid)
+        # pyth_hermes, chainlink, hyperliquid, defillama, …)
         sources=frozenset(),
     ),
     # ------------------------------------------------------------------
@@ -758,8 +766,27 @@ MVP_SCOPE: Final[dict[str, object]] = {
 # ---------------------------------------------------------------------------
 
 
-MVP_SCOPE_CONFIG_VERSION: Final[int] = 12
+MVP_SCOPE_CONFIG_VERSION: Final[int] = 13
 """Monotonic version of :data:`MVP_SCOPE`. Bump on any content change.
+
+v13 (2026-07-09): DeFi MVP framing defined — "everything we capture" (operator
+ruling on ``defi_perp_funding_mvp_scope_contradiction_2026_06_29.md`` §E5).
+Previously DeFi had no dedicated MVP set distinct from the factory registry;
+the prior ``DeFiMvpRule`` (v10-v12) was a curated 11-venue Ethereum/3-Solana-DEX
+subset, unlike cefi/tradfi/sports/prediction which each have a real,
+deliberately-narrowed MVP rule. New ruling: DeFi MVP == the full current
+capture universe — every IS-producible venue (``_mvp_defi_venues()`` ==
+``VENUES_BY_ASSET_GROUP["defi"]``, 57 venues, up from 11), every real
+instrument_type a live venue adapter emits (9 values, up from 4 — adds
+A_TOKEN/DEBT_TOKEN/YIELD_BEARING/PERPETUAL/STAKING; drops the never-real
+``DEX_POOL`` placeholder), and every DeFi data_type
+(``_mvp_defi_data_types()`` == the full ``DATA_TYPES_BY_ASSET_GROUP["defi"]``
+list, up from a curated 6-entry subset). The Decision-D invariant "every
+DeFi-MVP venue is IS-producible" is preserved (venues derive from P, not the
+broader ``ALL_DEFI_VENUES`` declarative registry) — ROCKETPOOL-ETHEREUM stays
+excluded. Same pass wired 2 new real Solana lending adapters (MarginFi,
+Solend) into instruments-service + flipped their ``DEFI_VENUE_PHASE`` to
+"live", growing P from 55 to 57.
 
 v12 (2026-06-29): DeFi MVP-exclusion (Decision D —
 instrument_universe_registry_consolidation_2026_06_29.md): remove
