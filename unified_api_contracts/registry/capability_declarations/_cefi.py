@@ -7,7 +7,7 @@ from datetime import date
 from ..capability import OperationDetail, OperationEnvDetail, SourceCapability
 
 # ---------------------------------------------------------------------------
-# CeFi exchanges (15)
+# CeFi exchanges (10)
 # ---------------------------------------------------------------------------
 
 _BINANCE = SourceCapability(
@@ -506,64 +506,6 @@ _BITGET = SourceCapability(
     chain=None,
     kind="perp_cex",
     coverage_start={"candles": date(2019, 4, 1)},
-)
-
-_BITSTAMP = SourceCapability(
-    source="bitstamp",
-    domains=["market", "execution", "position", "reference"],
-    crosscutting=["errors", "rate_limits", "latency", "connectivity"],
-    supports_live=True,
-    supports_batch=True,
-    supports_historical=True,
-    supports_testnet=False,
-    supports_mainnet=True,
-    auth_scope=["api_key"],
-    auth_environments={"prod": "prod_key"},
-    operations={
-        "market": ["ticker", "orderbook", "transactions", "ohlc", "ws_ticker", "ws_order_book", "ws_live_trades"],
-        "execution": ["buy_market", "sell_market", "cancel_order", "open_orders", "order_status"],
-        "position": ["balance", "user_transactions"],
-        "reference": ["trading_pairs_info"],
-    },
-    base_urls={"mainnet": "https://www.bitstamp.net"},
-    operation_details={
-        "buy_market": OperationDetail(
-            environments={
-                "mainnet": OperationEnvDetail(signing_scheme="hmac_sha256", required_credential="api_key"),
-            }
-        ),
-    },
-    chain=None,
-    kind="spot_cex",
-)
-
-_HUOBI = SourceCapability(
-    source="huobi",
-    domains=["market", "execution", "position", "reference"],
-    crosscutting=["errors", "rate_limits", "latency", "connectivity"],
-    supports_live=True,
-    supports_batch=True,
-    supports_historical=True,
-    supports_testnet=False,
-    supports_mainnet=True,
-    auth_scope=["api_key"],
-    auth_environments={"prod": "prod_key"},
-    operations={
-        "market": ["tickers", "depth", "trade", "kline", "ws_market_detail", "ws_depth", "ws_trade_detail"],
-        "execution": ["place_order", "cancel_order", "open_orders", "orders_list"],
-        "position": ["accounts", "account_balance", "account_history"],
-        "reference": ["common_symbols", "common_timestamp"],
-    },
-    base_urls={"mainnet": "https://api.huobi.pro"},
-    operation_details={
-        "place_order": OperationDetail(
-            environments={
-                "mainnet": OperationEnvDetail(signing_scheme="hmac_sha256", required_credential="api_key"),
-            }
-        ),
-    },
-    chain=None,
-    kind="perp_cex",
 )
 
 _KUCOIN = SourceCapability(
@@ -1270,8 +1212,6 @@ CEFI_CAPABILITIES: list[SourceCapability] = [
     _DERIBIT,
     _HYPERLIQUID,
     _BITGET,
-    _BITSTAMP,
-    _HUOBI,
     _KUCOIN,
     _MEXC,
     _UPBIT,

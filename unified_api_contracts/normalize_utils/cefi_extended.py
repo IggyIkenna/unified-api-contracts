@@ -27,7 +27,7 @@ from ..external.kucoin.normalize import (
 )
 
 # ---------------------------------------------------------------------------
-# Re-exports from cefi_extended2.py (MEXC, Huobi, Bitget, OKX, Deribit, Upbit)
+# Re-exports from cefi_extended2.py (MEXC, Bitget, OKX, Deribit, Upbit)
 # ---------------------------------------------------------------------------
 from .cefi_extended2 import (
     normalize_bitget_fill,
@@ -35,10 +35,6 @@ from .cefi_extended2 import (
     normalize_bitget_orderbook,
     normalize_bitget_trade,
     normalize_deribit_fill,
-    normalize_huobi_fill,
-    normalize_huobi_order,
-    normalize_huobi_orderbook,
-    normalize_huobi_trade,
     normalize_mexc_fill,
     normalize_mexc_order,
     normalize_mexc_orderbook,
@@ -55,11 +51,6 @@ __all__ = [
     "normalize_bitget_trade",
     # Deribit fill
     "normalize_deribit_fill",
-    # Huobi / HTX
-    "normalize_huobi_fill",
-    "normalize_huobi_order",
-    "normalize_huobi_orderbook",
-    "normalize_huobi_trade",
     # KuCoin
     "normalize_kucoin_fill",
     "normalize_kucoin_order",
