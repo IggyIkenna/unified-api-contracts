@@ -54,26 +54,19 @@ class TestPlanGatedCases:
     def test_cefi_with_ticks_resolves_l2_tick(self) -> None:
         """CeFi-with-ticks (Binance perp): flat data_types include
         ``book_snapshot_5`` → L2 book walk."""
-        assert (
-            execution_fidelity("cefi", "BINANCE-FUTURES", "PERPETUAL", "batch")
-            == ExecutionFidelityTier.L2_TICK
-        )
+        assert execution_fidelity("cefi", "BINANCE-FUTURES", "PERPETUAL", "batch") == ExecutionFidelityTier.L2_TICK
 
     def test_tradfi_1m_resolves_ohlc_bar(self) -> None:
         """TradFi 1m: CME FUTURE MVP data_types = ``{ohlcv_1m}`` only →
         plain OHLC bar fill (the e2e 1m determinism spine)."""
-        assert (
-            execution_fidelity("tradfi", "CME", "FUTURE", "batch")
-            == ExecutionFidelityTier.OHLC_BAR
-        )
+        assert execution_fidelity("tradfi", "CME", "FUTURE", "batch") == ExecutionFidelityTier.OHLC_BAR
 
     def test_candle_only_with_book_cols_resolves_candle_book_cols(self) -> None:
         """Candle-only instrument with book columns: a DeFi POOL cell has
         ``dex_pool_state + dex_pool_swaps`` in scope; the Plan-1 candle
         carries pool-reserve columns → CANDLE_BOOK_COLS matcher."""
         assert (
-            execution_fidelity("defi", "UNISWAP_V3-ETHEREUM", "POOL", "batch")
-            == ExecutionFidelityTier.CANDLE_BOOK_COLS
+            execution_fidelity("defi", "UNISWAP_V3-ETHEREUM", "POOL", "batch") == ExecutionFidelityTier.CANDLE_BOOK_COLS
         )
 
 
@@ -89,16 +82,10 @@ class TestCoinbaseTradesOnlyOverride:
     (no book → no L2 walk; the matcher uses bar-fill)."""
 
     def test_coinbase_spot_resolves_ohlc_bar(self) -> None:
-        assert (
-            execution_fidelity("cefi", "COINBASE-SPOT", "SPOT_PAIR", "batch")
-            == ExecutionFidelityTier.OHLC_BAR
-        )
+        assert execution_fidelity("cefi", "COINBASE-SPOT", "SPOT_PAIR", "batch") == ExecutionFidelityTier.OHLC_BAR
 
     def test_coinbase_futures_resolves_ohlc_bar(self) -> None:
-        assert (
-            execution_fidelity("cefi", "COINBASE-FUTURES", "PERPETUAL", "batch")
-            == ExecutionFidelityTier.OHLC_BAR
-        )
+        assert execution_fidelity("cefi", "COINBASE-FUTURES", "PERPETUAL", "batch") == ExecutionFidelityTier.OHLC_BAR
 
 
 # ---------------------------------------------------------------------------
@@ -112,18 +99,12 @@ class TestDeribitOptionOverride:
     matching engine has no L2 walk over options_chain marks → OHLC_BAR."""
 
     def test_deribit_option_resolves_ohlc_bar(self) -> None:
-        assert (
-            execution_fidelity("cefi", "DERIBIT", "OPTION", "batch")
-            == ExecutionFidelityTier.OHLC_BAR
-        )
+        assert execution_fidelity("cefi", "DERIBIT", "OPTION", "batch") == ExecutionFidelityTier.OHLC_BAR
 
     def test_deribit_perpetual_still_resolves_l2_tick(self) -> None:
         """The OPTION override does NOT cascade to DERIBIT PERPETUAL —
         the perp / future legs at Deribit keep ``book_snapshot_5``."""
-        assert (
-            execution_fidelity("cefi", "DERIBIT", "PERPETUAL", "batch")
-            == ExecutionFidelityTier.L2_TICK
-        )
+        assert execution_fidelity("cefi", "DERIBIT", "PERPETUAL", "batch") == ExecutionFidelityTier.L2_TICK
 
 
 # ---------------------------------------------------------------------------
@@ -142,34 +123,32 @@ class TestPerAgBreadth:
             ("HYPERLIQUID", "PERPETUAL"),
         ],
     )
-    def test_cefi_standard_venues_resolve_l2_tick(
-        self, venue: str, instrument_type: str
-    ) -> None:
+    def test_cefi_standard_venues_resolve_l2_tick(self, venue: str, instrument_type: str) -> None:
         """Every standard CeFi venue (no per-venue override) keeps the flat
         data_types set, which includes ``book_snapshot_5`` → L2_TICK."""
-        assert (
-            execution_fidelity("cefi", venue, instrument_type, "batch")
-            == ExecutionFidelityTier.L2_TICK
-        )
+        assert execution_fidelity("cefi", venue, instrument_type, "batch") == ExecutionFidelityTier.L2_TICK
 
     @pytest.mark.parametrize(
         ("venue", "instrument_type"),
         [
             ("UNISWAP_V3-ETHEREUM", "POOL"),
             ("CURVE-ETHEREUM", "POOL"),
-            ("ORCA-SOLANA", "DEX_POOL"),
-            ("RAYDIUM-SOLANA", "DEX_POOL"),
+            # ORCA-SOLANA / RAYDIUM-SOLANA are POOL, not DEX_POOL — verified
+            # 2026-07-09 against live adapter code (orca.py / raydium.py both
+            # build `instrument_type=InstrumentType.POOL`); DEX_POOL was
+            # aspirational-only in the pre-v13 DeFiMvpRule comment (no adapter
+            # ever emitted it) and was dropped from the v13 "everything we
+            # capture" instrument_types set. `_AMM_INSTRUMENT_TYPES` in
+            # execution_fidelity.py still accepts DEX_POOL too (harmless
+            # forward-compat), but POOL is the real, MVP-declared value.
+            ("ORCA-SOLANA", "POOL"),
+            ("RAYDIUM-SOLANA", "POOL"),
         ],
     )
-    def test_defi_amm_pools_resolve_candle_book_cols(
-        self, venue: str, instrument_type: str
-    ) -> None:
-        """DeFi AMM POOL / DEX_POOL cells carry pool state + swaps → the
-        candle's pool-reserve columns drive the matcher → CANDLE_BOOK_COLS."""
-        assert (
-            execution_fidelity("defi", venue, instrument_type, "batch")
-            == ExecutionFidelityTier.CANDLE_BOOK_COLS
-        )
+    def test_defi_amm_pools_resolve_candle_book_cols(self, venue: str, instrument_type: str) -> None:
+        """DeFi AMM POOL cells carry pool state + swaps → the candle's
+        pool-reserve columns drive the matcher → CANDLE_BOOK_COLS."""
+        assert execution_fidelity("defi", venue, instrument_type, "batch") == ExecutionFidelityTier.CANDLE_BOOK_COLS
 
     @pytest.mark.parametrize(
         ("venue", "instrument_type"),
@@ -179,16 +158,11 @@ class TestPerAgBreadth:
             ("COMPOUND_V3-ETHEREUM", "LENDING"),
         ],
     )
-    def test_defi_reference_rate_cells_resolve_ohlc_bar(
-        self, venue: str, instrument_type: str
-    ) -> None:
+    def test_defi_reference_rate_cells_resolve_ohlc_bar(self, venue: str, instrument_type: str) -> None:
         """LST / LENDING are reference-rate cells (``lst_rates`` /
         ``lending_indices``) — no AMM book; the matcher falls back to
         bar-fill on the rate time-series."""
-        assert (
-            execution_fidelity("defi", venue, instrument_type, "batch")
-            == ExecutionFidelityTier.OHLC_BAR
-        )
+        assert execution_fidelity("defi", venue, instrument_type, "batch") == ExecutionFidelityTier.OHLC_BAR
 
     @pytest.mark.parametrize(
         ("venue", "instrument_type"),
@@ -200,16 +174,11 @@ class TestPerAgBreadth:
             ("KRX", "EQUITY"),
         ],
     )
-    def test_tradfi_cells_resolve_ohlc_bar(
-        self, venue: str, instrument_type: str
-    ) -> None:
+    def test_tradfi_cells_resolve_ohlc_bar(self, venue: str, instrument_type: str) -> None:
         """TradFi MVP is ``ohlcv_1m`` only across the CME futures complex
         AND the equity-basis carve-out cells — every TradFi cell is
         OHLC_BAR."""
-        assert (
-            execution_fidelity("tradfi", venue, instrument_type, "batch")
-            == ExecutionFidelityTier.OHLC_BAR
-        )
+        assert execution_fidelity("tradfi", venue, instrument_type, "batch") == ExecutionFidelityTier.OHLC_BAR
 
 
 # ---------------------------------------------------------------------------
@@ -231,12 +200,10 @@ class TestModeParameter:
             ("defi", "UNISWAP_V3-ETHEREUM", "POOL"),
         ],
     )
-    def test_live_equals_batch_for_today_mvp(
-        self, asset_group: str, venue: str, instrument_type: str
-    ) -> None:
-        assert execution_fidelity(
-            asset_group, venue, instrument_type, "live"
-        ) == execution_fidelity(asset_group, venue, instrument_type, "batch")
+    def test_live_equals_batch_for_today_mvp(self, asset_group: str, venue: str, instrument_type: str) -> None:
+        assert execution_fidelity(asset_group, venue, instrument_type, "live") == execution_fidelity(
+            asset_group, venue, instrument_type, "batch"
+        )
 
 
 # ---------------------------------------------------------------------------
