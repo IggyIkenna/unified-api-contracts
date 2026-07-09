@@ -202,9 +202,9 @@ def test_classify_experiment_run_returns_ephemeral_experiment_for_any_run_id() -
 # ---------------------------------------------------------------------------
 
 
-def test_deployment_umbrella_has_exactly_four_members() -> None:
-    """Closed-set 4-umbrella taxonomy; a 5th umbrella must be a deliberate UAC change."""
-    assert {member.name for member in DeploymentUmbrella} == {"LIVE", "BATCH", "PAPER", "EXPERIMENT"}
+def test_deployment_umbrella_has_exactly_five_members() -> None:
+    """4 phase umbrellas + NONE (always-on services, no phase); a 6th must be deliberate."""
+    assert {member.name for member in DeploymentUmbrella} == {"LIVE", "BATCH", "PAPER", "EXPERIMENT", "NONE"}
 
 
 def test_deployment_umbrella_values_equal_names() -> None:
