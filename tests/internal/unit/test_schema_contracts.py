@@ -345,11 +345,14 @@ def test_defi_contracts_use_correct_per_source_symbol_columns() -> None:
     generic lending must key on ``market_id`` — no more guessing."""
     assert DEFI_AAVE_V3_LENDING_INDICES.symbol_column == "symbol"
     assert DEFI_LENDING_INDICES_MARKET_ID.symbol_column == "market_id"
-    # dex_pool_state currently keys on ``symbol`` for live-handler parity;
-    # dex_pool_swaps keys on ``pool_id`` for cross-protocol swap feeds.
+    # dex_pool_state AND dex_pool_swaps (instrument_type=pool — the 13 DEX-pool
+    # protocol writers) key on ``symbol`` (defi_dex_pool_symbol_shape_fix_2026_07_09):
+    # the canonical TOKEN0-TOKEN1[-FEE_TIER] MTDS resolves per row, not a bare
+    # address. DEFI_DEX_POOL_DEX_POOL_SWAPS (instrument_type=dex_pool — a distinct,
+    # unused-by-current-writers key) is untouched.
     assert DEFI_DEX_POOL_DEX_POOL_STATE.symbol_column == "symbol"
     assert DEFI_DEX_POOL_DEX_POOL_SWAPS.symbol_column == "pool_id"
-    assert DEFI_POOL_DEX_POOL_SWAPS.symbol_column == "pool_id"
+    assert DEFI_POOL_DEX_POOL_SWAPS.symbol_column == "symbol"
     assert DEFI_LST_LST_RATES.symbol_column == "symbol"
     assert DEFI_SPOT_ASSET_GAS_FEES.symbol_column == "symbol"
 
@@ -393,8 +396,9 @@ def test_lookup_contract_normalises_uppercase_data_type() -> None:
     registry key is lowercase (xg_shots). lookup_contract must case-normalise
     data_type (mirroring the instrument_type lowercase fallback).
     Regression: understat_bulk_download_backfill_2026_06_29 §9.1/§9.2."""
-    assert lookup_contract(asset_group="sports", instrument_type="shot", data_type="XG_SHOTS") is (
-        CONTRACT_REGISTRY[("sports", "shot", "xg_shots")]
+    assert (
+        lookup_contract(asset_group="sports", instrument_type="shot", data_type="XG_SHOTS")
+        is (CONTRACT_REGISTRY[("sports", "shot", "xg_shots")])
     )
 
 
@@ -403,11 +407,13 @@ def test_lookup_contract_resolves_blank_instrument_type_sports_alias() -> None:
     record_captured's write-time schema lookup queries ("sports", "", "XG" |
     "XG_SHOTS"). The blank-instrument_type aliases + data_type case-normalisation
     must resolve it (else MANIFEST_WRITE_SCHEMA_MISSING skips validation)."""
-    assert lookup_contract(asset_group="sports", instrument_type="", data_type="XG_SHOTS") is (
-        CONTRACT_REGISTRY[("sports", "shot", "xg_shots")]
+    assert (
+        lookup_contract(asset_group="sports", instrument_type="", data_type="XG_SHOTS")
+        is (CONTRACT_REGISTRY[("sports", "shot", "xg_shots")])
     )
-    assert lookup_contract(asset_group="sports", instrument_type="", data_type="XG") is (
-        CONTRACT_REGISTRY[("sports", "match", "xg")]
+    assert (
+        lookup_contract(asset_group="sports", instrument_type="", data_type="XG")
+        is (CONTRACT_REGISTRY[("sports", "match", "xg")])
     )
 
 

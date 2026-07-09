@@ -15,7 +15,6 @@ from unified_api_contracts.external.bybit.normalize import normalize_bybit_ticke
 from unified_api_contracts.external.ccxt.normalize import normalize_ccxt_ticker
 from unified_api_contracts.external.coinbase.normalize import normalize_coinbase_ticker
 from unified_api_contracts.external.deribit.normalize import normalize_deribit_ticker
-from unified_api_contracts.external.huobi.normalize import normalize_huobi_ticker
 from unified_api_contracts.external.hyperliquid.normalize import normalize_hyperliquid_ticker
 from unified_api_contracts.external.ibkr.normalize import normalize_ibkr_ticker
 from unified_api_contracts.external.kalshi.normalize import normalize_kalshi_ticker
@@ -32,7 +31,6 @@ __all__ = [
     "normalize_ccxt_ticker",
     "normalize_coinbase_ticker",
     "normalize_deribit_ticker",
-    "normalize_huobi_ticker",
     "normalize_hyperliquid_ticker",
     "normalize_ibkr_ticker",
     "normalize_kalshi_ticker",

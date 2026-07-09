@@ -26,8 +26,6 @@ _CEFI_TOKENS: frozenset[str] = frozenset(
         "coinbase",
         "cboe",
         "bitget",
-        "bitstamp",
-        "huobi",
         "kucoin",
         "mexc",
         "upbit",

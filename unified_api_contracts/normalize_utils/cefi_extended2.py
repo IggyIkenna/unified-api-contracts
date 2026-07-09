@@ -1,4 +1,4 @@
-"""CeFi extended normalizers (part 2): MEXC, Huobi/HTX, Bitget, OKX fill, Deribit fill, Upbit fill.
+"""CeFi extended normalizers (part 2): MEXC, Bitget, OKX fill, Deribit fill, Upbit fill.
 
 Split from cefi_extended.py to keep each file under the 900-line limit.
 
@@ -22,16 +22,6 @@ from ..external.bitget.normalize import (
 # Deribit fill — from external/deribit/normalize.py
 # ---------------------------------------------------------------------------
 from ..external.deribit.normalize import normalize_deribit_fill
-
-# ---------------------------------------------------------------------------
-# Huobi / HTX — from external/huobi/normalize.py
-# ---------------------------------------------------------------------------
-from ..external.huobi.normalize import (
-    normalize_huobi_fill,
-    normalize_huobi_order,
-    normalize_huobi_orderbook,
-    normalize_huobi_trade,
-)
 
 # ---------------------------------------------------------------------------
 # MEXC — from external/mexc/normalize.py
@@ -61,11 +51,6 @@ __all__ = [
     "normalize_bitget_trade",
     # Deribit fill (supplement)
     "normalize_deribit_fill",
-    # Huobi / HTX
-    "normalize_huobi_fill",
-    "normalize_huobi_order",
-    "normalize_huobi_orderbook",
-    "normalize_huobi_trade",
     # MEXC
     "normalize_mexc_fill",
     "normalize_mexc_order",

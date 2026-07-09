@@ -390,33 +390,6 @@ ENDPOINT_REGISTRY: list[EndpointSpec] = [
         requires_auth=True,
         cassette_status=CassetteStatus.AUTH_BLOCKED,
     ),
-    # --- Bitstamp ---
-    EndpointSpec(
-        venue="bitstamp",
-        endpoint_path="https://www.bitstamp.net/api/v2/ticker/{currency_pair}/",
-        http_method="GET",
-        schema_class="BitstampTicker",
-        access_mode=AccessMode.REST_POLLING,
-        data_availability=DataAvailability.LIVE_ONLY,
-        version="v2",
-        notes="Public ticker. No auth required.",
-        requires_auth=False,
-        cassette_status=CassetteStatus.RECORDED,
-    ),
-    EndpointSpec(
-        venue="bitstamp",
-        endpoint_path="https://www.bitstamp.net/api/v2/buy/{currency_pair}/",
-        http_method="POST",
-        schema_class="BitstampOrderResult",
-        access_mode=AccessMode.REST_POLLING,
-        data_availability=DataAvailability.LIVE_ONLY,
-        version="v2",
-        notes=(
-            "Private order placement. Auth: HMAC-SHA256 API key + secret. Secret Manager key: bitstamp-api-credentials."
-        ),
-        requires_auth=True,
-        cassette_status=CassetteStatus.AUTH_BLOCKED,
-    ),
     # --- Bitget ---
     EndpointSpec(
         venue="bitget",
@@ -495,34 +468,6 @@ ENDPOINT_REGISTRY: list[EndpointSpec] = [
         data_availability=DataAvailability.LIVE_ONLY,
         version="v3",
         notes=("Private order. Auth: X-MEXC-APIKEY + HMAC-SHA256 signature. Secret Manager key: mexc-api-credentials."),
-        requires_auth=True,
-        cassette_status=CassetteStatus.AUTH_BLOCKED,
-    ),
-    # --- Huobi ---
-    EndpointSpec(
-        venue="huobi",
-        endpoint_path="https://api.huobi.pro/market/detail/merged",
-        http_method="GET",
-        schema_class="HuobiTicker",
-        access_mode=AccessMode.REST_POLLING,
-        data_availability=DataAvailability.LIVE_ONLY,
-        version="v1",
-        notes="Public merged ticker. No auth required.",
-        requires_auth=False,
-        cassette_status=CassetteStatus.RECORDED,
-    ),
-    EndpointSpec(
-        venue="huobi",
-        endpoint_path="https://api.huobi.pro/v1/order/orders/place",
-        http_method="POST",
-        schema_class="HuobiOrderRequest",
-        access_mode=AccessMode.REST_POLLING,
-        data_availability=DataAvailability.LIVE_ONLY,
-        version="v1",
-        notes=(
-            "Private order. Auth: AccessKeyId + HMAC-SHA256 signature + Timestamp. "
-            "Secret Manager key: huobi-api-credentials."
-        ),
         requires_auth=True,
         cassette_status=CassetteStatus.AUTH_BLOCKED,
     ),

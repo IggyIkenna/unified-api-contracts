@@ -280,6 +280,14 @@ class DeploymentUmbrella(StrEnum):
     Derives from :attr:`LifecycleClass.EPHEMERAL_EXPERIMENT`. Folded under Batch
     in the UI by default."""
 
+    NONE = "NONE"
+    """No live/batch/paper/experiment phase — an always-on managed service (GCP
+    Cloud Run service / AWS ECS service) that has no execution lifecycle of its
+    own. Never derived from a VM ``lifecycle_class``; always an explicit override
+    at construction (the :class:`DeploymentKind` axis carries "this is a
+    service" — the UI Kind filter, not Mode, is how a user finds these). See
+    Open-Q1, ``deployment_observability_expansion_2026_07_08.md``."""
+
 
 class DeploymentCloud(StrEnum):
     """Cloud a deployment runs on. GCP first (operator), then AWS."""
@@ -292,11 +300,20 @@ class DeploymentKind(StrEnum):
     """The runtime kind of a compute unit.
 
     A ``VM`` is a GCE / EC2 instance; a ``CLOUD_RUN_JOB`` is a GCP Cloud Run
-    job (AWS equivalent is Batch Fargate, also modelled as a job kind).
+    job (AWS equivalent is Batch Fargate, also modelled as a job kind). The
+    four service/function kinds below (deployment_obs_backend_kinds_health_2026_07_09
+    WS-B) are always-on compute — they have no live/batch/paper phase, so a
+    ``DeploymentTarget`` for one of these carries ``umbrella`` as
+    :attr:`DeploymentUmbrella.NONE`, the honest "no phase" placeholder, rather
+    than a real lifecycle umbrella; the ``Kind`` axis alone identifies them.
     """
 
     VM = "VM"
     CLOUD_RUN_JOB = "CLOUD_RUN_JOB"
+    CLOUD_RUN_SERVICE = "CLOUD_RUN_SERVICE"
+    ECS_SERVICE = "ECS_SERVICE"
+    LAMBDA = "LAMBDA"
+    CLOUD_FUNCTION = "CLOUD_FUNCTION"
 
 
 @dataclass(frozen=True)

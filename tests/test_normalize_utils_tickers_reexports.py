@@ -11,8 +11,8 @@ from __future__ import annotations
 import importlib
 
 
-def test_all_15_venue_ticker_normalizers_reexported():
-    """The 15 expected venue ticker normalizers must be importable from
+def test_all_14_venue_ticker_normalizers_reexported():
+    """The 14 expected venue ticker normalizers must be importable from
     normalize_utils.tickers.
 
     If a new venue ticker is added (or one removed), update both this list
@@ -26,7 +26,6 @@ def test_all_15_venue_ticker_normalizers_reexported():
         "normalize_ccxt_ticker",
         "normalize_coinbase_ticker",
         "normalize_deribit_ticker",
-        "normalize_huobi_ticker",
         "normalize_hyperliquid_ticker",
         "normalize_ibkr_ticker",
         "normalize_kalshi_ticker",
@@ -58,7 +57,6 @@ def test_tickers_all_is_complete():
         "normalize_ccxt_ticker",
         "normalize_coinbase_ticker",
         "normalize_deribit_ticker",
-        "normalize_huobi_ticker",
         "normalize_hyperliquid_ticker",
         "normalize_ibkr_ticker",
         "normalize_kalshi_ticker",

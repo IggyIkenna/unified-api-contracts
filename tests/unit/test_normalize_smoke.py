@@ -203,16 +203,6 @@ class TestErrorNormalizersExchanges:
         assert isinstance(normalize_mexc_error(500), CanonicalInternalServerError)
         assert isinstance(normalize_mexc_error("NOCODE"), CanonicalError)
 
-    def test_huobi_known_and_http_fallback(self):
-        from unified_api_contracts.normalize_utils.errors import (
-            normalize_huobi_error,
-        )
-
-        assert isinstance(normalize_huobi_error("too-many-requests"), CanonicalRateLimitError)
-        assert isinstance(normalize_huobi_error("api-signature-not-valid"), CanonicalAuthenticationError)
-        assert isinstance(normalize_huobi_error(429), CanonicalRateLimitError)
-        assert isinstance(normalize_huobi_error("NOCODE"), CanonicalError)
-
     def test_bitget_known_and_http_fallback(self):
         from unified_api_contracts.normalize_utils.errors import (
             normalize_bitget_error,

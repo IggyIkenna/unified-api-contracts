@@ -41,6 +41,19 @@ CeFi::
     build_instrument_id("deribit", InstrumentType.OPTION, "BTC-9JUL26-56000-C", passthrough=True)
     # → "DERIBIT:OPTION:BTC-9JUL26-56000-C"
 
+    # margin_marker — the operator-decided ``@LIN``/``@INV`` settlement suffix
+    # (instrument_id_format_canonicalization_2026_07_08.md finding 1; applies
+    # to PERPETUAL and dated derivatives alike, per the 2026-07-09 scope
+    # expansion — margin type is NOT always inferrable from quote currency
+    # alone, e.g. Kraken-Futures' USD-quoted linear AND inverse perpetuals):
+    build_instrument_id("binance_futures", InstrumentType.PERPETUAL, "BTC-USDT", margin_marker="LIN")
+    # → "BINANCE_FUTURES:PERPETUAL:BTC-USDT@LIN"
+
+    build_instrument_id(
+        "binance_delivery", InstrumentType.FUTURE, "BTC-USD", expiry_date=date(2026, 9, 25), margin_marker="INV",
+    )
+    # → "BINANCE_DELIVERY:FUTURE:BTC-USD@INV-20260925"
+
 TradFi::
 
     build_instrument_id(
@@ -249,6 +262,80 @@ def _format_strike(strike: Decimal) -> str:
 def _build_cefi_simple(venue: str, itype: InstrumentType, symbol: str) -> str:
     """Build ``VENUE:TYPE:SYMBOL`` for CeFi spot/perpetual instruments."""
     return f"{_venue_token(venue, None)}:{itype.value}:{symbol.upper()}"
+
+
+# Instrument types eligible for the ``@LIN``/``@INV`` margin-marker suffix
+# (operator decision 2026-07-08/09 — instrument_id_format_canonicalization).
+# SPOT_PAIR has no margin dimension; dated derivatives and perpetuals both do.
+_MARGIN_MARKER_ELIGIBLE_TYPES: Final[frozenset[InstrumentType]] = frozenset(
+    {InstrumentType.PERPETUAL, InstrumentType.FUTURE, InstrumentType.OPTION}
+)
+
+
+def _normalize_margin_marker(value: str) -> str:
+    """Normalise a margin-marker input to its canonical ``LIN``/``INV`` token.
+
+    Accepts the marker itself (``"LIN"``/``"INV"``, any case) or the full
+    :class:`~unified_api_contracts._instrument_enums.MarginType`-style word
+    (``"linear"``/``"inverse"``, any case) — callers threading a raw
+    ``margin_type`` value straight through don't need to pre-translate it.
+    """
+    token = value.strip().upper()
+    if token in ("LIN", "LINEAR"):
+        return "LIN"
+    if token in ("INV", "INVERSE"):
+        return "INV"
+    msg = f"margin_marker must be 'LIN'/'linear' or 'INV'/'inverse', got {value!r}"
+    raise ValueError(msg)
+
+
+def _build_with_margin_marker(
+    venue: str,
+    instrument_type: InstrumentType,
+    symbol: str,
+    marker: str,
+    expiry_date: _dt.date | None,
+    strike: Decimal | None,
+    option_right: Literal["C", "P"] | None,
+) -> str:
+    """Build ``VENUE:TYPE:BASE-QUOTE@LIN|INV[-YYYYMMDD[-STRIKE-C|P]]``.
+
+    The margin marker rides directly on the ``symbol`` segment (e.g.
+    ``BTC-USDT@LIN``), immediately before any dated-derivative suffix — this
+    is the operator-decided target format
+    (``instrument_id_format_canonicalization_2026_07_08.md`` finding 1),
+    superseding the older ``-linear-``/``-inverse-`` word-form still produced
+    by :func:`_build_future`/:func:`_build_option` when their legacy
+    ``quote_asset``/``margin_type`` kwargs are used directly (kept unchanged
+    for existing callers — this is a purely additive, opt-in code path).
+    """
+    sym_up = symbol.upper()
+    venue_token = _venue_token(venue, None)
+
+    if instrument_type is InstrumentType.PERPETUAL:
+        return f"{venue_token}:{instrument_type.value}:{sym_up}@{marker}"
+
+    if instrument_type is InstrumentType.FUTURE:
+        if expiry_date is None:
+            msg = f"{instrument_type.value} requires expiry_date"
+            raise ValueError(msg)
+        return f"{venue_token}:{instrument_type.value}:{sym_up}@{marker}-{expiry_date.strftime('%Y%m%d')}"
+
+    # OPTION
+    if expiry_date is None or strike is None or option_right is None:
+        msg = (
+            "OPTION requires expiry_date, strike, and option_right "
+            f"(got expiry_date={expiry_date!r} strike={strike!r} option_right={option_right!r})"
+        )
+        raise ValueError(msg)
+    if option_right not in ("C", "P"):
+        msg = f"option_right must be 'C' or 'P', got {option_right!r}"
+        raise ValueError(msg)
+    strike_str = _format_strike(strike)
+    return (
+        f"{venue_token}:{InstrumentType.OPTION.value}:{sym_up}@{marker}"
+        f"-{expiry_date.strftime('%Y%m%d')}-{strike_str}-{option_right}"
+    )
 
 
 def _build_future(
@@ -561,6 +648,7 @@ def build_instrument_id(
     quote_asset: str = "",
     margin_type: str = "",
     passthrough: bool = False,
+    margin_marker: str = "",
 ) -> str:
     """Build a canonical instrument ID for any supported InstrumentType.
 
@@ -614,6 +702,16 @@ def build_instrument_id(
         that already encode their own expiry/strike/right (the Tardis/CCXT
         convention for dated derivatives), instead of supplying
         ``expiry_date``/``strike``/``option_right`` for reconstruction.
+    margin_marker:
+        Operator-decided settlement-type suffix — ``"LIN"``/``"linear"`` or
+        ``"INV"``/``"inverse"`` (any case) — embedded as ``@LIN``/``@INV``
+        directly on the symbol segment for :attr:`InstrumentType.PERPETUAL`,
+        :attr:`InstrumentType.FUTURE`, and :attr:`InstrumentType.OPTION`
+        (``instrument_id_format_canonicalization_2026_07_08.md`` finding 1).
+        Mutually exclusive with ``passthrough=True``. This supersedes the
+        older ``quote_asset``/``margin_type`` word-form suffix for NEW
+        callers — existing callers using ``quote_asset``/``margin_type``
+        keep their unchanged output since this parameter defaults to ``""``.
 
     Raises
     ------
@@ -634,6 +732,19 @@ def build_instrument_id(
             f"Add to SUPPORTED_INSTRUMENT_TYPES in canonical_id_builder.py."
         )
         raise ValueError(msg)
+
+    if margin_marker:
+        if passthrough:
+            msg = "margin_marker is not supported together with passthrough=True"
+            raise ValueError(msg)
+        if instrument_type not in _MARGIN_MARKER_ELIGIBLE_TYPES:
+            msg = (
+                "margin_marker is only supported for PERPETUAL/FUTURE/OPTION, "
+                f"got instrument_type={instrument_type.value}"
+            )
+            raise ValueError(msg)
+        marker = _normalize_margin_marker(margin_marker)
+        return _build_with_margin_marker(venue, instrument_type, symbol, marker, expiry_date, strike, option_right)
 
     if passthrough:
         return _build_passthrough(venue, instrument_type, symbol, chain)
@@ -698,6 +809,7 @@ def build_leg(
     chain: str | None = None,
     quote_asset: str = "",
     margin_type: str = "",
+    margin_marker: str = "",
 ) -> InstrumentLeg:
     """Build one multi-leg combo/spread :class:`InstrumentLeg` via the shared builder.
 
@@ -748,6 +860,7 @@ def build_leg(
         quote_asset=quote_asset,
         margin_type=margin_type,
         passthrough=passthrough,
+        margin_marker=margin_marker,
     )
     return InstrumentLeg(instrument_key=leg_key, side=side, ratio=ratio)
 
@@ -770,6 +883,7 @@ def build_canonical_instrument_id(
     quote_asset: str = "",
     margin_type: str = "",
     passthrough: bool = False,
+    margin_marker: str = "",
     league: str | None = None,
     home_team: str | None = None,
     away_team: str | None = None,
@@ -894,4 +1008,5 @@ def build_canonical_instrument_id(
         quote_asset=quote_asset,
         margin_type=margin_type,
         passthrough=passthrough,
+        margin_marker=margin_marker,
     )

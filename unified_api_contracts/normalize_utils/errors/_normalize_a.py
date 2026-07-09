@@ -78,42 +78,6 @@ def normalize_bitfinex_error(
 
 
 # ---------------------------------------------------------------------------
-# Bitstamp
-# ---------------------------------------------------------------------------
-
-BITSTAMP_MAP: dict[str, Callable[..., CanonicalError]] = {
-    "API0000": CanonicalInvalidRequestError,  # Missing parameters
-    "API0001": CanonicalAuthenticationError,  # Invalid API key
-    "API0002": CanonicalAuthorizationError,  # Invalid API secret
-    "API0005": CanonicalRateLimitError,  # Too many requests
-    "API0013": CanonicalInsufficientBalanceError,  # Insufficient balance
-    "API0020": CanonicalOrderRejectedError,  # Order rejected
-    "401": CanonicalAuthenticationError,
-    "403": CanonicalAuthorizationError,
-    "429": CanonicalRateLimitError,
-    "500": CanonicalInternalServerError,
-    "503": CanonicalServiceUnavailableError,
-}
-
-
-def normalize_bitstamp_error(
-    error_code: str | int,
-    message: str = "",
-    venue: str = "bitstamp",
-) -> CanonicalError:
-    """Map a Bitstamp REST error code to a CanonicalError subclass."""
-    code = str(error_code)
-    cls = BITSTAMP_MAP.get(code)
-    if cls is not None:
-        return cls(message=message or code, venue=venue)
-    try:
-        status = int(code)
-        return from_http_status(status, message, venue)
-    except ValueError:
-        return CanonicalError(code=code, message=message, action=ErrorAction.FAIL, venue=venue)
-
-
-# ---------------------------------------------------------------------------
 # Bybit
 # ---------------------------------------------------------------------------
 
@@ -614,44 +578,6 @@ def normalize_mexc_error(
     """Map a MEXC REST/WS error code to a CanonicalError subclass."""
     code = str(error_code)
     cls = MEXC_MAP.get(code)
-    if cls is not None:
-        return cls(message=message or code, venue=venue)
-    try:
-        status = int(code)
-        return from_http_status(status, message, venue)
-    except ValueError:
-        return CanonicalError(code=code, message=message, action=ErrorAction.FAIL, venue=venue)
-
-
-# ---------------------------------------------------------------------------
-# Huobi / HTX
-# ---------------------------------------------------------------------------
-
-HUOBI_MAP: dict[str, Callable[..., CanonicalError]] = {
-    "api-signature-not-valid": CanonicalAuthenticationError,
-    "api-not-support": CanonicalAuthorizationError,
-    "gateway-internal-error": CanonicalInternalServerError,
-    "too-many-requests": CanonicalRateLimitError,
-    "account-frozen-balance-insufficient-error": CanonicalInsufficientBalanceError,
-    "order-limitorder-amount-min-error": CanonicalSizeLimitError,
-    "order-limitorder-order-id-not-exist": CanonicalOrderRejectedError,
-    "base-symbol-error": CanonicalInvalidRequestError,
-    "system-maintenance": CanonicalServiceUnavailableError,
-    "429": CanonicalRateLimitError,
-    "401": CanonicalAuthenticationError,
-    "403": CanonicalAuthorizationError,
-    "500": CanonicalInternalServerError,
-}
-
-
-def normalize_huobi_error(
-    error_code: str | int,
-    message: str = "",
-    venue: str = "huobi",
-) -> CanonicalError:
-    """Map a Huobi/HTX REST/WS error code to a CanonicalError subclass."""
-    code = str(error_code)
-    cls = HUOBI_MAP.get(code)
     if cls is not None:
         return cls(message=message or code, venue=venue)
     try:

@@ -852,3 +852,133 @@ class TestCcxtTardisCompatibility:
         # expiry/strike/right rather than passing through the raw
         # exchange-native id like Tardis does").
         assert build_instrument_id(venue, instrument_type, raw_symbol, passthrough=True) == expected
+
+
+# ---------------------------------------------------------------------------
+# margin_marker — the operator-decided @LIN/@INV settlement suffix
+# (instrument_id_format_canonicalization_2026_07_08.md finding 1, SCOPE
+# EXPANDED 2026-07-09 to also cover PERPETUAL, not just dated derivatives).
+# Real target shapes verified against BINANCE-FUTURES/BINANCE-DELIVERY.
+# ---------------------------------------------------------------------------
+
+
+class TestMarginMarker:
+    def test_perpetual_linear(self) -> None:
+        assert (
+            build_instrument_id("binance-futures", InstrumentType.PERPETUAL, "BTC-USDT", margin_marker="LIN")
+            == "BINANCE-FUTURES:PERPETUAL:BTC-USDT@LIN"
+        )
+
+    def test_perpetual_inverse(self) -> None:
+        assert (
+            build_instrument_id("binance-delivery", InstrumentType.PERPETUAL, "BTC-USD", margin_marker="INV")
+            == "BINANCE-DELIVERY:PERPETUAL:BTC-USD@INV"
+        )
+
+    def test_future_linear(self) -> None:
+        assert (
+            build_instrument_id(
+                "binance-futures",
+                InstrumentType.FUTURE,
+                "BTC-USDT",
+                expiry_date=_dt.date(2026, 9, 25),
+                margin_marker="LIN",
+            )
+            == "BINANCE-FUTURES:FUTURE:BTC-USDT@LIN-20260925"
+        )
+
+    def test_future_inverse(self) -> None:
+        assert (
+            build_instrument_id(
+                "binance-delivery",
+                InstrumentType.FUTURE,
+                "ADA-USD",
+                expiry_date=_dt.date(2020, 9, 25),
+                margin_marker="INV",
+            )
+            == "BINANCE-DELIVERY:FUTURE:ADA-USD@INV-20200925"
+        )
+
+    def test_option_with_marker(self) -> None:
+        assert (
+            build_instrument_id(
+                "deribit",
+                InstrumentType.OPTION,
+                "BTC",
+                expiry_date=_dt.date(2026, 7, 10),
+                strike=Decimal("48000"),
+                option_right="C",
+                margin_marker="inverse",
+            )
+            == "DERIBIT:OPTION:BTC@INV-20260710-48000-C"
+        )
+
+    def test_marker_accepts_word_form_case_insensitive(self) -> None:
+        assert (
+            build_instrument_id("binance-futures", InstrumentType.PERPETUAL, "BTC-USDT", margin_marker="Linear")
+            == "BINANCE-FUTURES:PERPETUAL:BTC-USDT@LIN"
+        )
+        assert (
+            build_instrument_id("binance-delivery", InstrumentType.PERPETUAL, "BTC-USD", margin_marker="inv")
+            == "BINANCE-DELIVERY:PERPETUAL:BTC-USD@INV"
+        )
+
+    def test_future_requires_expiry_date(self) -> None:
+        with pytest.raises(ValueError, match="requires expiry_date"):
+            build_instrument_id("binance-futures", InstrumentType.FUTURE, "BTC-USDT", margin_marker="LIN")
+
+    def test_invalid_marker_value_raises(self) -> None:
+        with pytest.raises(ValueError, match="margin_marker must be"):
+            build_instrument_id("binance-futures", InstrumentType.PERPETUAL, "BTC-USDT", margin_marker="bogus")
+
+    def test_marker_rejects_passthrough_combo(self) -> None:
+        with pytest.raises(ValueError, match="not supported together with passthrough"):
+            build_instrument_id(
+                "binance-futures",
+                InstrumentType.PERPETUAL,
+                "BTC-USDT",
+                margin_marker="LIN",
+                passthrough=True,
+            )
+
+    def test_marker_rejects_ineligible_type(self) -> None:
+        with pytest.raises(ValueError, match="only supported for PERPETUAL/FUTURE/OPTION"):
+            build_instrument_id("binance-spot", InstrumentType.SPOT_PAIR, "BTC-USDT", margin_marker="LIN")
+
+    def test_marker_does_not_affect_legacy_quote_asset_margin_type_callers(self) -> None:
+        # Existing MTDS callers pass quote_asset+margin_type (the older
+        # -linear-/-inverse- word form) without margin_marker — that path
+        # must stay byte-for-byte unchanged by this addition.
+        assert (
+            build_instrument_id(
+                "deribit",
+                InstrumentType.FUTURE,
+                "BTC",
+                expiry_date=_dt.date(2026, 12, 26),
+                quote_asset="USD",
+                margin_type="inverse",
+            )
+            == "DERIBIT:FUTURE:BTC-USD-inverse-20261226"
+        )
+
+    def test_marker_forwarded_through_build_canonical_instrument_id(self) -> None:
+        assert (
+            build_canonical_instrument_id(
+                AssetGroup.CEFI,
+                "binance-futures",
+                InstrumentType.PERPETUAL,
+                "BTC-USDT",
+                margin_marker="LIN",
+            )
+            == "BINANCE-FUTURES:PERPETUAL:BTC-USDT@LIN"
+        )
+
+    def test_marker_forwarded_through_build_leg(self) -> None:
+        leg = build_leg(
+            "binance-futures",
+            InstrumentType.PERPETUAL,
+            "BTC-USDT",
+            side="BUY",
+            margin_marker="LIN",
+        )
+        assert leg.instrument_key == "BINANCE-FUTURES:PERPETUAL:BTC-USDT@LIN"

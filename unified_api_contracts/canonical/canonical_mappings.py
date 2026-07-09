@@ -36,8 +36,6 @@ DATA_SOURCE_TO_VENUES: dict[str, list[str]] = {
         "OKX-SPOT",
         "OKX-FUTURES",
         "OKX-SWAP",
-        "HUOBI-SPOT",
-        "HUOBI-FUTURES",
         "PHEMEX-FUTURES",
     ],
     "databento": [
@@ -66,7 +64,6 @@ DATA_SOURCE_TO_VENUES: dict[str, list[str]] = {
         "COINBASE-SPOT",
         "UPBIT",
         "KUCOIN",
-        "HUOBI-SPOT",
     ],
     "ibkr": [
         "NASDAQ",
@@ -108,8 +105,6 @@ VENUE_TO_DATA_SOURCE: dict[str, str] = {
     "OKX-SPOT": "tardis",
     "OKX-FUTURES": "tardis",
     "OKX-SWAP": "tardis",
-    "HUOBI-SPOT": "tardis",
-    "HUOBI-FUTURES": "tardis",
     "PHEMEX-FUTURES": "tardis",
     "CME": "databento",
     "CBOT": "databento",

@@ -64,12 +64,6 @@ providers:
     last_verified: "2026-03-06"
     status: yellow
 
-  bitstamp:
-    api_version: "v2"
-    spec_url: "https://www.bitstamp.net/api/"
-    last_verified: "2026-03-06"
-    status: yellow
-
   bybit:
     api_version: "v5"
     spec_url: "https://bybit-exchange.github.io/docs/v5/intro"
@@ -163,12 +157,6 @@ providers:
   glassnode:
     api_version: "v1"
     spec_url: "https://docs.glassnode.com/"
-    last_verified: "2026-03-06"
-    status: yellow
-
-  huobi:
-    api_version: "v1"
-    spec_url: "https://huobiapi.github.io/docs/spot/v1/en/"
     last_verified: "2026-03-06"
     status: yellow
 

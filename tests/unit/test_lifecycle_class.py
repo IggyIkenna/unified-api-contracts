@@ -202,9 +202,9 @@ def test_classify_experiment_run_returns_ephemeral_experiment_for_any_run_id() -
 # ---------------------------------------------------------------------------
 
 
-def test_deployment_umbrella_has_exactly_four_members() -> None:
-    """Closed-set 4-umbrella taxonomy; a 5th umbrella must be a deliberate UAC change."""
-    assert {member.name for member in DeploymentUmbrella} == {"LIVE", "BATCH", "PAPER", "EXPERIMENT"}
+def test_deployment_umbrella_has_exactly_five_members() -> None:
+    """4 phase umbrellas + NONE (always-on services, no phase); a 6th must be deliberate."""
+    assert {member.name for member in DeploymentUmbrella} == {"LIVE", "BATCH", "PAPER", "EXPERIMENT", "NONE"}
 
 
 def test_deployment_umbrella_values_equal_names() -> None:
@@ -217,7 +217,14 @@ def test_deployment_cloud_members() -> None:
 
 
 def test_deployment_kind_members() -> None:
-    assert {member.name for member in DeploymentKind} == {"VM", "CLOUD_RUN_JOB"}
+    assert {member.name for member in DeploymentKind} == {
+        "VM",
+        "CLOUD_RUN_JOB",
+        "CLOUD_RUN_SERVICE",
+        "ECS_SERVICE",
+        "LAMBDA",
+        "CLOUD_FUNCTION",
+    }
 
 
 def test_umbrella_for_lifecycle_class_maps_all_four_lifecycle_classes() -> None:
