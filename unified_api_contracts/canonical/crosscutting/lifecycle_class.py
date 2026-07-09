@@ -292,11 +292,20 @@ class DeploymentKind(StrEnum):
     """The runtime kind of a compute unit.
 
     A ``VM`` is a GCE / EC2 instance; a ``CLOUD_RUN_JOB`` is a GCP Cloud Run
-    job (AWS equivalent is Batch Fargate, also modelled as a job kind).
+    job (AWS equivalent is Batch Fargate, also modelled as a job kind). The
+    four service/function kinds below (deployment_obs_backend_kinds_health_2026_07_09
+    WS-B) are always-on compute — they have no live/batch/paper phase, so a
+    ``DeploymentTarget`` for one of these carries ``umbrella`` as the honest
+    "no phase" placeholder rather than a real lifecycle umbrella; the ``Kind``
+    axis alone identifies them.
     """
 
     VM = "VM"
     CLOUD_RUN_JOB = "CLOUD_RUN_JOB"
+    CLOUD_RUN_SERVICE = "CLOUD_RUN_SERVICE"
+    ECS_SERVICE = "ECS_SERVICE"
+    LAMBDA = "LAMBDA"
+    CLOUD_FUNCTION = "CLOUD_FUNCTION"
 
 
 @dataclass(frozen=True)

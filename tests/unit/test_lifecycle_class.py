@@ -217,7 +217,14 @@ def test_deployment_cloud_members() -> None:
 
 
 def test_deployment_kind_members() -> None:
-    assert {member.name for member in DeploymentKind} == {"VM", "CLOUD_RUN_JOB"}
+    assert {member.name for member in DeploymentKind} == {
+        "VM",
+        "CLOUD_RUN_JOB",
+        "CLOUD_RUN_SERVICE",
+        "ECS_SERVICE",
+        "LAMBDA",
+        "CLOUD_FUNCTION",
+    }
 
 
 def test_umbrella_for_lifecycle_class_maps_all_four_lifecycle_classes() -> None:
