@@ -233,6 +233,22 @@ VENUES_BY_ASSET_GROUP: dict[str, list[str]] = {
         "BINANCE-DELIVERY",
         "BYBIT",
         "OKX",
+        # OKX-SPOT declared its own distinct cefi venue (Option A,
+        # 2026-07-10 operator decision — mirrors the BYBIT-SPOT precedent
+        # below): bare "OKX" has ZERO real SPOT_PAIR captures in production
+        # (confirmed via a direct GCS availability_index read,
+        # unified-api-contracts@23fa3a99) — Tardis's own routing table
+        # already sends (OKX, SPOT_PAIR) to the same "okex" source as
+        # canonical OKX-SPOT, so the bare-OKX capability was a redundant
+        # alias, not a distinct real capability. Declaring OKX-SPOT here
+        # (instead of relying on instruments-service's _CEFI_VENUE_FOLD to
+        # fold captured OKX-SPOT rows up to bare "OKX") makes the real
+        # captured OKX spot data visible to Layer-1/Layer-2 honest-coverage
+        # directly, matching BYBIT/BYBIT-SPOT's shape. SSOT:
+        # unified-trading-pm/plans/active/issues/
+        # instruments_service_cefi_qg_red_on_ldr_head_2026_07_08.md,
+        # cefi_layer1_denominator_gaps_2026_07_03.md.
+        "OKX-SPOT",
         "DERIBIT",
         # DERIBIT-COMBO: multi-leg combo/spread instruments fetched from Deribit's
         # public get_instruments (future_combo + option_combo kinds). Registered as a
@@ -242,18 +258,28 @@ VENUES_BY_ASSET_GROUP: dict[str, list[str]] = {
         # until the kind-split + venue-tag fixes 2026-06-18). instrument_key stays DERIBIT:COMBO:*.
         "DERIBIT-COMBO",
         "UPBIT",
-        # RE-KEYED from bare "COINBASE" 2026-07-10 (coinbase_bare_name_migration
-        # S3, D2a naming reconciliation) — COINBASE-SPOT is now the sole
-        # canonical cefi spot venue token; DataTypeCapability["COINBASE-SPOT"]
-        # already existed as a duplicate of the bare entry (see below), so this
-        # is a pure rename, not a removal — VENUES_BY_ASSET_GROUP has no other
-        # COINBASE-SPOT member, unlike venue_constants.py's per-dict tables.
+        # RE-KEYED from bare "COINBASE" (coinbase_bare_name_migration_2026_07_06.md
+        # S3, 2026-07-10). Real bug found during execution: this list had NO
+        # separate "COINBASE-SPOT" entry — INSTRUMENT_TYPES_BY_VENUE's
+        # COINBASE_SPOT key was declared but unreachable because
+        # expected_universe._expected_generic("cefi") iterates THIS list
+        # (VENUES_BY_ASSET_GROUP.get(ag, [])), not INSTRUMENT_TYPES_BY_VENUE's
+        # keys directly. Deleting bare COINBASE without adding this entry would
+        # have silently zeroed COINBASE's entire cefi EXPECTED set — exactly
+        # the D2a regression the migration plan exists to prevent.
         "COINBASE-SPOT",
         # 2026-06-23: Bybit spot + Coinbase Derivatives (perps) as DISTINCT
         # canonical venues so the perp-gate pairs BYBIT-SPOT↔BYBIT perps and
         # COINBASE-SPOT↔COINBASE-FUTURES (cefi_universe_capture_rule).
         "BYBIT-SPOT",
         "COINBASE-FUTURES",
+        # Coinbase Derivatives Exchange (CDE) — 2026-07-10, COINBASE-FUTURES/#3-vs-#8
+        # resolution. Real dated futures + far-dated "nano perpetual" contracts, zero
+        # Tardis coverage under any name — native Advanced Trade REST source (see
+        # venue_adapter_keys.py "coinbase_cde"). SEPARATE product from COINBASE-FUTURES
+        # (Coinbase INTX). SSOT: unified-trading-pm/plans/active/issues/
+        # instruments_remaining_work_audit_2026_07_10.md Progress Log.
+        "COINBASE-CDE",
         # 2026-05-01: Tardis Tier-3 expansion (cefi_venue_universe_expansion plan)
         "BITFINEX-SPOT",
         "BITFINEX-FUTURES",
@@ -1132,6 +1158,9 @@ VENUE_DATA_TYPE_CAPABILITIES: dict[str, dict[str, str]] = {
         "trades": "2021-03-03",
         "book_snapshot_5": "2021-03-03",
     },
+    # bare "COINBASE" REMOVED (coinbase_bare_name_migration_2026_07_06.md S3,
+    # 2026-07-10) — was a byte-identical duplicate of the COINBASE-SPOT entry
+    # below; COINBASE-SPOT is the sole canonical cefi spot key now.
     "COINBASE-SPOT": {
         "trades": "2020-01-01",
         "book_snapshot_5": "2020-01-01",
@@ -1204,6 +1233,26 @@ VENUE_DATA_TYPE_CAPABILITIES: dict[str, dict[str, str]] = {
         "derivative_ticker": "2020-01-01",
         "liquidations": "2020-01-01",
     },
+    # DERIBIT-COMBO (operator 2026-07-10, decision #6 on
+    # cefi_layer1_denominator_gaps_2026_07_03.md) — a DISTINCT venue from bare
+    # DERIBIT (multi-leg combo/spread instruments, see VENUES_BY_ASSET_GROUP
+    # comment). Was wholly absent from this dict — Carve-out 1 zeroed every
+    # data_type regardless of the itype-gate fix (INSTRUMENT_TYPES_BY_VENUE
+    # already admits it -> {"OPTION"}). Its base venue token "DERIBIT" IS a
+    # FUTURE_BUNDLE_VENUES member, so DERIBIT-COMBO's leaf OPTION itype rolls
+    # up to the options_chain bundle grain at the itype-gate stage
+    # (_get_cefi_venue_itypes) same as bare DERIBIT — the bundle grain's only
+    # valid data_type is ``trades`` (VALID_DATA_TYPES_BY_AG_AND_INSTRUMENT_TYPE
+    # [("cefi","options_chain")]). book_snapshot_5 is declared here too (matches
+    # its real DataTypeCapability entries, data_type_capability.py) but never
+    # actually surfaces as an EXPECTED cell at this bundle grain — harmless,
+    # honest superset. Start date = venue_launch_dates.py["DERIBIT-COMBO"].
+    # Verified dynamically: build_expected("cefi") yields
+    # (DERIBIT-COMBO, options_chain, trades) — no longer silently zero.
+    "DERIBIT-COMBO": {
+        "trades": "2019-01-01",
+        "book_snapshot_5": "2019-01-01",
+    },
     # ── DEX-perp on-chain CLOBs (D2b, honest_coverage cefi gate-authority fix,
     # 2026-07-06) — PACIFICA-SOLANA / EXTENDED-STARKNET / LIGHTER-ZKSYNC are
     # declared cefi venues (VENUES_BY_ASSET_GROUP["cefi"]) whose itype-gate the
@@ -1250,6 +1299,15 @@ VENUE_DATA_TYPE_CAPABILITIES: dict[str, dict[str, str]] = {
         "book_snapshot_5": "2024-10-31",
         "derivative_ticker": "2024-10-31",
         "liquidations": "2024-10-31",
+    },
+    # Coinbase Derivatives Exchange (CDE) — 2026-07-10. Live-only for now: Tardis has
+    # ZERO coverage of this venue under any name, so there is no historical/batch
+    # source — only the re-keyed coinbase_cde_ws.py live connector (Advanced Trade
+    # WS market_trades channel) captures real data. Start date = the date this venue
+    # was registered (honest floor — no fabricated pre-registration history; see
+    # honest-absence-downstream-handling.md).
+    "COINBASE-CDE": {
+        "trades": "2026-07-10",
     },
     # ── TradFi — Databento (OHLCV-only MVP per operator direction 2026-05-15) ──
     # Operator: "lets [do] ohlcv 1m for all the tradfi mvp instruments only please …

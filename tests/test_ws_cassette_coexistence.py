@@ -69,7 +69,8 @@ _CONNECTOR_TO_VENUE: Final[dict[str, str]] = {
     "bybit_ws": "bybit",
     "bybit_spot_ws": "bybit",
     "coinbase_book_ws": "coinbase",
-    "coinbase_futures_ws": "coinbase",
+    "coinbase_futures_ws": "coinbase",  # kept for rollout-window safety
+    "coinbase_cde_ws": "coinbase_cde",  # re-keyed 2026-07-10, own venue dir
     "coinbase_spot_ws": "coinbase",
     "databento_tradfi_ws": "databento",
     "defi_lending_scaffold_ws": "defi_lending_scaffold",

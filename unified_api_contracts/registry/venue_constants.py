@@ -15,6 +15,11 @@ OKX_FUTURES = "OKX-FUTURES"
 BYBIT_SPOT = "BYBIT-SPOT"
 BYBIT_FUTURES = "BYBIT-FUTURES"
 COINBASE_SPOT = "COINBASE-SPOT"
+# Coinbase Derivatives Exchange (CDE) — 2026-07-10, resolved COINBASE-FUTURES/#3-vs-#8
+# conflict. Real dated futures + far-dated "nano perpetual" contracts, confirmed live
+# via api.coinbase.com Advanced Trade REST (product_type=FUTURE, 99 real contracts).
+# SEPARATE Coinbase product from COINBASE-FUTURES/INTX, zero Tardis coverage.
+COINBASE_CDE = "COINBASE-CDE"
 DERIBIT = "DERIBIT"
 HYPERLIQUID = "HYPERLIQUID"
 ASTER = "ASTER"
@@ -418,7 +423,9 @@ INSTRUMENT_TYPES_BY_VENUE: dict[str, set[str]] = {
     # a dedicated module constant (grepped) — string literals match the style
     # of the other unconstant-ed cefi entries above ("OKX", "BYBIT").
     "BINANCE-DELIVERY": {"PERPETUAL", "FUTURE"},  # COIN-M inverse perps + dated delivery futures
-    "COINBASE-FUTURES": {"PERPETUAL", "FUTURE"},  # Coinbase Derivatives via Tardis coinbase-international
+    # RESCOPED 2026-07-10 (COINBASE-FUTURES/#3-vs-#8): INTX-only, zero dated futures confirmed live.
+    "COINBASE-FUTURES": {"PERPETUAL", "SPOT_PAIR"},
+    COINBASE_CDE: {"FUTURE"},  # CDE — all 99 real live products are FUTURE (confirmed live)
     "BITFINEX-FUTURES": {"PERPETUAL", "FUTURE"},
     "BITGET-FUTURES": {"PERPETUAL", "FUTURE"},
     "BITFINEX-SPOT": {"SPOT_PAIR"},

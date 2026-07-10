@@ -1,0 +1,14 @@
+ws_url: wss://advanced-trade-ws.coinbase.com
+subscription:
+  type: subscribe
+  product_ids:
+    - BIT-31JUL26-CDE
+  channel: market_trades
+frames:
+  - direction: recv
+    payload: '{"channel":"market_trades","timestamp":"2026-07-10T11:28:28.467467647Z","sequence_num":0,"events":[{"type":"snapshot","trades":[{"product_id":"BIT-31JUL26-CDE","trade_id":"103200687947","price":"64735","size":"25","time":"2026-07-10T11:27:40.443055Z","side":"SELL"},{"product_id":"BIT-31JUL26-CDE","trade_id":"103200537790","price":"64700","size":"1","time":"2026-07-10T11:26:40.877288Z","side":"BUY"}]}]}'
+  - direction: recv
+    payload: '{"channel":"subscriptions","timestamp":"2026-07-10T11:28:28.467544052Z","sequence_num":1,"events":[{"subscriptions":{"market_trades":["BIT-31JUL26-CDE"]}}]}'
+  - direction: recv
+    payload: '{"channel":"market_trades","timestamp":"2026-07-10T11:28:28.923381587Z","sequence_num":2,"events":[{"type":"update","trades":[{"product_id":"BIT-31JUL26-CDE","trade_id":"103200774376","price":"64755","size":"1","time":"2026-07-10T11:28:28.871082Z","side":"SELL"}]}]}'
+version: 1
