@@ -372,27 +372,26 @@ INSTRUMENT_TYPES_BY_VENUE: dict[str, set[str]] = {
     COINBASE_SPOT: {"SPOT_PAIR"},
     OKX_SPOT: {"SPOT_PAIR"},
     OKX_FUTURES: {"PERPETUAL", "FUTURE", "OPTION"},
-    # bare "OKX" keeps SPOT_PAIR (reverted 2026-07-08, commit 23fa3a99 had
-    # dropped it as "phantom"): VENUES_BY_ASSET_GROUP["cefi"] never declares
-    # "OKX-SPOT" as a distinct cefi venue (only bare "OKX" is registered) —
-    # OKX was never split like BINANCE-SPOT/BINANCE-FUTURES or BYBIT/
-    # BYBIT-SPOT, so bare "OKX" is the ONLY cefi venue token that can carry
-    # OKX spot_pair capability in the EXPECTED denominator. Removing it left
-    # OKX spot_pair permanently unenumerable, dropping build_expected('cefi')
-    # 75→71 tuples and failing the golden-byte-identical test (blocked ALL
-    # instruments-service shipping). See
-    # plans/active/issues/instruments_service_cefi_qg_red_on_ldr_head_2026_07_08.md.
-    "OKX": {"SPOT_PAIR", "PERPETUAL", "FUTURE", "OPTION"},
+    # bare "OKX" DROPS SPOT_PAIR again (Option A follow-through, 2026-07-10):
+    # OKX-SPOT is now declared its own distinct cefi venue in
+    # VENUES_BY_ASSET_GROUP["cefi"] (market_data_categories.py, 2026-07-10
+    # operator decision) with its own VENUE_DATA_TYPE_CAPABILITIES entry, so
+    # bare-OKX SPOT_PAIR is a duplicate EXPECTED cell (production-verified:
+    # bare OKX has ZERO real SPOT_PAIR rows — see the 2026-07-07 23fa3a99
+    # rationale). The 2026-07-08 revert (1771d59a) that restored this entry
+    # predates OKX-SPOT's venue declaration; now that OKX-SPOT exists as its
+    # own venue, restoring bare-OKX SPOT_PAIR would double-count instead of
+    # filling a real hole. See
+    # plans/active/issues/instruments_service_cefi_qg_red_on_ldr_head_2026_07_08.md
+    # Option A + plans/active/issues/instruments_service_qg_red_golden_drift_2026_07_10.md.
+    "OKX": {"PERPETUAL", "FUTURE", "OPTION"},
     BYBIT_SPOT: {"SPOT_PAIR"},
     BYBIT_FUTURES: {"PERPETUAL", "FUTURE"},
-    # bare "BYBIT" keeps SPOT_PAIR too (same 2026-07-08 revert) — unlike OKX,
-    # BYBIT-SPOT IS a separately declared cefi venue, but the checked-in
-    # golden (tests/unit/scripts/goldens/expected_universe/cefi.json) expects
-    # BOTH ('BYBIT', 'spot_pair', ...) and ('BYBIT-SPOT', 'spot_pair', ...) as
-    # distinct EXPECTED cells; per the golden test's own docstring, a real
-    # coverage regression must not be laundered into a fixture update, so the
-    # source-of-truth capability declaration is restored to match instead.
-    "BYBIT": {"SPOT_PAIR", "PERPETUAL", "FUTURE"},
+    # bare "BYBIT" DROPS SPOT_PAIR too (same Option A follow-through) —
+    # BYBIT-SPOT already covers real captures, so bare-BYBIT SPOT_PAIR is the
+    # same phantom-duplicate pattern as bare-OKX above, not a distinct real
+    # capability.
+    "BYBIT": {"PERPETUAL", "FUTURE"},
     UPBIT: {"SPOT_PAIR"},
     BINANCE_FUTURES: {"PERPETUAL", "FUTURE"},
     # SPOT_PAIR added 2026-07-06 (D2a regression fix): the OLD tardis-routing

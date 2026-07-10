@@ -783,7 +783,7 @@ VALID_DATA_TYPES_BY_AG_AND_INSTRUMENT_TYPE: dict[tuple[str, str], frozenset[str]
 # including ``ohlcv_1s`` — a live, provably-wrong cell (finding 1).
 #
 # Live-verified 2026-07-10 against
-# gs://market-data-tick-tradfi-prd-central-element-323112/_index/
+# gs://market-data-tick-tradfi-prd-<project>/_index/
 # availability_index.parquet: CME/futures_chain/ohlcv_1s has 151,153 real
 # ``captured`` rows; ICE/futures_chain/ohlcv_1s (2,108 rows) + ICE/combo/
 # ohlcv_1s (360,270 rows) + bare-ICE/ohlcv_1s are ALL 100% ``empty_confirmed``

@@ -357,7 +357,7 @@ PROTOCOL_CAPABILITIES: dict[str, _ProtocolCapability] = {
             # DEFI_VENUE_DATA_TYPE_CAPABILITIES declares an oracle_prices genesis
             # date for every AAVE_V3-* chain and it IS genuinely captured (3,160
             # real `captured` rows on AAVE_V3-ETHEREUM alone, live-verified
-            # 2026-07-10 against gs://market-data-tick-defi-prd-central-element-323112/
+            # 2026-07-10 against gs://market-data-tick-defi-prd-<project>/
             # _index/availability_index.parquet) — this was the "actual has a real
             # captured data_type the theoretical layer doesn't recognise" direction
             # of the two-layer join's `actual ⊄ theoretical` check. NOTE: the same

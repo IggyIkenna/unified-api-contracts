@@ -41,8 +41,11 @@ class TestAllCefiVenuesDeduplicated:
         # split from BYBIT) + COINBASE-FUTURES (Tardis coinbase-international). Total = 22.
         # 2026-06-24 (cefi_universe_capture_rule): + BINANCE-DELIVERY (COIN-M inverse).
         # Total = 23.
-        assert len(vm.all_cefi_venues) == 23, (
-            f"expected 23 unique CEFI venues, got {len(vm.all_cefi_venues)}: {sorted(vm.all_cefi_venues)}"
+        # 2026-07-10 (COINBASE-FUTURES/#3-vs-#8 resolution): + COINBASE-CDE (Coinbase
+        # Derivatives Exchange dated futures, native Advanced Trade REST, zero Tardis
+        # coverage — see unified-api-contracts@1cafb3c5). Total = 24.
+        assert len(vm.all_cefi_venues) == 24, (
+            f"expected 24 unique CEFI venues, got {len(vm.all_cefi_venues)}: {sorted(vm.all_cefi_venues)}"
         )
 
     def test_includes_all_suffixed_variants(self) -> None:
