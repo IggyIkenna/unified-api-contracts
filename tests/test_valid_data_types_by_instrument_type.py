@@ -6,6 +6,10 @@ Tests cover:
   - valid_data_types_for_instrument_type() accessor
   - DeFi derivation from PROTOCOL_CAPABILITIES (lazy-built cache)
   - Unmapped instrument_type returns None (fallback path)
+  - Two-layer combinator redesign (uac_data_type_validity_combinator_fragmentation_2026_07_07.md):
+    VALID_DATA_TYPES_VENUE_EXCLUSIONS (Layer-1 venue axis, finding 1's CME/ICE
+    fix) + defi_actual_data_types_not_declared_valid (Layer-3 join/audit,
+    finding 2's DeFi registry-drift reconciliation)
 
 Plan: expected_universe_v2_design_2026_05_08.md Phase 1.C [TEST] P0 (G1-ENUM)
 """
@@ -17,7 +21,9 @@ from unified_api_contracts.registry.market_data_categories import (
     GRAIN_BUNDLE_BY_UNDERLYING,
     GRAIN_LEAF,
     VALID_DATA_TYPES_BY_AG_AND_INSTRUMENT_TYPE,
+    VALID_DATA_TYPES_VENUE_EXCLUSIONS,
     bundle_instrument_type_for_leaf,
+    defi_actual_data_types_not_declared_valid,
     grain_for_instrument_type,
     valid_data_types_for_instrument_type,
     valid_data_types_for_venue_instrument_type,
@@ -472,11 +478,17 @@ class TestValidDataTypesForVenueInstrumentType:
         assert unknown == union
 
     def test_non_defi_delegates_unchanged(self) -> None:
-        # For every non-DeFi asset_group the venue-aware accessor is identical
-        # to the instrument_type-grain matrix (venue is ignored).
+        # For a non-DeFi (asset_group, venue, instrument_type) with NO declared
+        # venue-axis exclusion (VALID_DATA_TYPES_VENUE_EXCLUSIONS), the
+        # venue-aware accessor is identical to the instrument_type-grain
+        # matrix — this is the byte-identical-to-pre-fix non-regression
+        # guarantee for every venue except the explicitly-listed ICE cells
+        # (see TestValidDataTypesVenueAxisExclusions below).
         for ag, venue, it in (
             ("cefi", "BINANCE-FUTURES", "perpetual"),
             ("tradfi", "CME", "future"),
+            ("tradfi", "CME", "futures_chain"),
+            ("tradfi", "NASDAQ", "equity"),
         ):
             assert valid_data_types_for_venue_instrument_type(ag, venue, it) == valid_data_types_for_instrument_type(
                 ag, it
@@ -487,3 +499,119 @@ class TestValidDataTypesForVenueInstrumentType:
         assert valid_data_types_for_venue_instrument_type("defi", None, "pool") == valid_data_types_for_instrument_type(
             "defi", "pool"
         )
+
+
+class TestValidDataTypesVenueAxisExclusions:
+    """Finding 1 fix (uac_data_type_validity_combinator_fragmentation_2026_07_07.md):
+    CME and ICE both stamp ``futures_chain``/``combo`` but are NOT
+    interchangeable data providers — ICE has zero Databento sub-second
+    coverage. Live-verified 2026-07-10 against the prod tradfi manifest: CME
+    has 151,153 real `captured` ``futures_chain``/``ohlcv_1s`` rows; ICE has
+    ZERO `captured` ``ohlcv_1s`` rows anywhere (100% `empty_confirmed`) while
+    ICE's ``trades``/``ohlcv_1m``/``tbbo`` genuinely ARE captured at the same
+    grain.
+    """
+
+    def test_ice_futures_chain_excludes_ohlcv_1s(self) -> None:
+        valid = valid_data_types_for_venue_instrument_type("tradfi", "ICE", "futures_chain")
+        assert valid is not None
+        assert "ohlcv_1s" not in valid
+
+    def test_ice_combo_excludes_ohlcv_1s(self) -> None:
+        valid = valid_data_types_for_venue_instrument_type("tradfi", "ICE", "combo")
+        assert valid is not None
+        assert "ohlcv_1s" not in valid
+
+    def test_ice_futures_chain_retains_proven_real_data_types(self) -> None:
+        # The fix SUBTRACTS only the proven-wrong cell — it must not silently
+        # drop the data_types ICE genuinely does capture (real evidence:
+        # 110 trades + 135 ohlcv_1m + real tbbo rows at this grain).
+        valid = valid_data_types_for_venue_instrument_type("tradfi", "ICE", "futures_chain")
+        assert valid is not None
+        assert {"trades", "ohlcv_1m", "tbbo"}.issubset(valid)
+
+    def test_cme_futures_chain_still_includes_ohlcv_1s(self) -> None:
+        # Non-regression: CME (the venue WITH real Databento ohlcv_1s
+        # coverage) is untouched by the ICE-only exclusion table.
+        valid = valid_data_types_for_venue_instrument_type("tradfi", "CME", "futures_chain")
+        assert valid is not None
+        assert "ohlcv_1s" in valid
+
+    def test_ice_and_cme_no_longer_share_an_identical_set(self) -> None:
+        # The exact regression finding 1 documented: before the fix, CME and
+        # ICE returned byte-identical valid-data_types sets for futures_chain.
+        cme = valid_data_types_for_venue_instrument_type("tradfi", "CME", "futures_chain")
+        ice = valid_data_types_for_venue_instrument_type("tradfi", "ICE", "futures_chain")
+        assert cme != ice
+
+    def test_venue_suffix_variants_resolve_via_base_venue(self) -> None:
+        # VALID_DATA_TYPES_VENUE_EXCLUSIONS is keyed on the base venue token
+        # (before the first "-"), matching _base_venue's OKX-FUTURES-style
+        # resolution convention used elsewhere in this module.
+        suffixed = valid_data_types_for_venue_instrument_type("tradfi", "ICE-FUTURES", "futures_chain")
+        bare = valid_data_types_for_venue_instrument_type("tradfi", "ICE", "futures_chain")
+        assert suffixed == bare
+
+    def test_no_venue_falls_back_to_full_ag_level_set(self) -> None:
+        # Without a venue, the accessor cannot know to exclude ICE's
+        # ohlcv_1s — it must return the unnarrowed AG-level set (never
+        # under-report when the caller has no venue context).
+        no_venue = valid_data_types_for_venue_instrument_type("tradfi", None, "futures_chain")
+        assert no_venue == valid_data_types_for_instrument_type("tradfi", "futures_chain")
+        assert "ohlcv_1s" in no_venue
+
+    def test_exclusion_table_is_ice_only_today(self) -> None:
+        # Documents the current, intentionally-narrow scope: every exclusion
+        # key names ICE — no other venue's theoretical set is touched by this
+        # mechanism yet (a future venue-specific bug would add its own row,
+        # not widen this table's meaning).
+        assert {venue for (_, venue, _) in VALID_DATA_TYPES_VENUE_EXCLUSIONS} == {"ICE"}
+
+
+class TestDefiActualNotDeclaredValidJoin:
+    """Layer-3 ``actual ⊆ theoretical`` join/audit (finding 2's DeFi registry-
+    drift class — uac_data_type_validity_combinator_fragmentation_2026_07_07.md).
+    """
+
+    def test_returns_a_dict_of_frozensets(self) -> None:
+        violations = defi_actual_data_types_not_declared_valid()
+        assert isinstance(violations, dict)
+        for venue, undeclared in violations.items():
+            assert isinstance(venue, str)
+            assert isinstance(undeclared, frozenset)
+            assert undeclared  # never an empty-but-present entry
+
+    def test_aave_v3_oracle_prices_no_longer_a_violation(self) -> None:
+        # Finding 2's headline example, fixed 2026-07-10: oracle_prices is
+        # captured on every AAVE_V3-* chain (3,160 real rows on
+        # AAVE_V3-ETHEREUM alone, live-verified) and is now declared valid on
+        # aave_v3's PROTOCOL_CAPABILITIES entry — the join must no longer flag it.
+        violations = defi_actual_data_types_not_declared_valid()
+        assert "oracle_prices" not in violations.get("AAVE_V3-ETHEREUM", frozenset())
+        assert "oracle_prices" not in violations.get("AAVE_V3-ARBITRUM", frozenset())
+
+    def test_a_genuine_undeclared_violation_is_still_caught(self) -> None:
+        # COMPOUND_V3 was NOT part of the 2026-07-10 fix (its oracle_prices
+        # genesis date has zero real captured rows in prod — a different bug
+        # class, intentionally left alone). The join must still catch it —
+        # demonstrating the audit function actually discriminates instead of
+        # trivially passing everything.
+        violations = defi_actual_data_types_not_declared_valid()
+        assert "oracle_prices" in violations.get("COMPOUND_V3-ETHEREUM", frozenset())
+
+    def test_fully_reconciled_protocol_has_no_entry(self) -> None:
+        # UNISWAP_V3-ETHEREUM's actual declaration (dex_pool_swaps/dex_pool_state/
+        # position_data) is a subset of uniswap_v3's theoretical data_types —
+        # a clean protocol must not appear in the violations dict at all.
+        violations = defi_actual_data_types_not_declared_valid()
+        assert "UNISWAP_V3-ETHEREUM" not in violations
+
+    def test_liquidations_and_risk_params_are_not_flagged(self) -> None:
+        # The MIRROR direction (theoretical-declared-but-never-captured, e.g.
+        # Euler/Radiant's liquidations/risk_params) is legitimately EXPECTED
+        # for aspirational entries and must NOT be flagged by this
+        # actual-⊆-theoretical check — only actual-⊄-theoretical is a bug.
+        violations = defi_actual_data_types_not_declared_valid()
+        for undeclared in violations.values():
+            assert "liquidations" not in undeclared
+            assert "risk_params" not in undeclared

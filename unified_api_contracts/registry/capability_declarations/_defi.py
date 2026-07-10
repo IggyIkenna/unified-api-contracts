@@ -352,6 +352,22 @@ PROTOCOL_CAPABILITIES: dict[str, _ProtocolCapability] = {
             "liquidation_events",  # LiquidationCall events via subgraph (AAVE_V3-ETHEREUM/ARBITRUM/POLYGON)
             "flash_loan_events",  # FlashLoan events via subgraph (AAVE_V3-ETHEREUM/ARBITRUM/POLYGON)
             "position_data",  # Top-500 user positions by supplied_usd (AAVE_V3-ETHEREUM/ARBITRUM/POLYGON)
+            # oracle_prices — real fix, finding 2,
+            # uac_data_type_validity_combinator_fragmentation_2026_07_07.md:
+            # DEFI_VENUE_DATA_TYPE_CAPABILITIES declares an oracle_prices genesis
+            # date for every AAVE_V3-* chain and it IS genuinely captured (3,160
+            # real `captured` rows on AAVE_V3-ETHEREUM alone, live-verified
+            # 2026-07-10 against gs://market-data-tick-defi-prd-central-element-323112/
+            # _index/availability_index.parquet) — this was the "actual has a real
+            # captured data_type the theoretical layer doesn't recognise" direction
+            # of the two-layer join's `actual ⊄ theoretical` check. NOTE: the same
+            # check flags oracle_prices/rewards as undeclared-genesis on ~30 other
+            # DeFi venues too, but with ZERO real captured rows for any of them
+            # (100% empty_confirmed) — that is a DIFFERENT bug class (the ACTUAL
+            # layer over-claiming a genesis date that was never fulfilled, not a
+            # theoretical under-declaration) and is intentionally NOT fixed here;
+            # see the issue doc's Progress Log for the full live-verified list.
+            "oracle_prices",
         ],
         mtds_operations=[
             "collect-lending-indices",
@@ -359,6 +375,7 @@ PROTOCOL_CAPABILITIES: dict[str, _ProtocolCapability] = {
             "collect-liquidation-events",
             "collect-flash-loan-events",
             "collect-position-data",
+            "collect-oracle-prices",
         ],
         required_tokens=frozenset({"AAVE", "GHO"}),
     ),
@@ -423,6 +440,17 @@ PROTOCOL_CAPABILITIES: dict[str, _ProtocolCapability] = {
     # Radiant: Messari Lending schema — exposes liquidations + risk params
     # (maximumLTV/liquidationThreshold/liquidationPenalty) + marketDailySnapshots
     # history → full lending data-type set (gas is per-chain, see note above).
+    # ASPIRATIONAL (liquidations/risk_params, per this module's own convention —
+    # finding 2, uac_data_type_validity_combinator_fragmentation_2026_07_07.md):
+    # live-verified 2026-07-10 — RADIANT-ARBITRUM/BSC have NO genesis-date entry
+    # for either in DEFI_VENUE_DATA_TYPE_CAPABILITIES at all (never even
+    # attempted), and the prod manifest shows 100% empty_confirmed, zero
+    # captured/attempted_failed, for both. The subgraph schema supports it
+    # (per the comment above) but no capture path is wired yet — tracked as
+    # its own orchestrator-wiring item (see the "instruments remaining-work"
+    # audit's CODE_PATH #4, VENUS/BENQI/RADIANT/EULER_V2 wiring). lending_indices
+    # IS real (declared + captured); leaving the shape here so wiring the
+    # capture path doesn't also require a UAC change.
     "radiant": _ProtocolCapability(
         venue_prefix="RADIANT",
         protocol_class=ProtocolClass.LENDING,
@@ -433,6 +461,13 @@ PROTOCOL_CAPABILITIES: dict[str, _ProtocolCapability] = {
     ),
     # Euler V2: Goldsky subgraph — eulerVaults (live state) + vaultStatuses
     # (history) + liquidates entity → full lending data-type set (gas per-chain).
+    # ASPIRATIONAL (the WHOLE data_types set, per this module's own convention —
+    # finding 2, uac_data_type_validity_combinator_fragmentation_2026_07_07.md):
+    # live-verified 2026-07-10 — EULER_V2 has NO entry AT ALL in
+    # DEFI_VENUE_DATA_TYPE_CAPABILITIES (not even lending_indices), and the prod
+    # manifest shows 100% empty_confirmed across every declared data_type —
+    # the capture path is genuinely unwired, not a registry-declaration bug.
+    # Same tracked wiring item as radiant above.
     "euler_v2": _ProtocolCapability(
         venue_prefix="EULER_V2",
         protocol_class=ProtocolClass.LENDING,
