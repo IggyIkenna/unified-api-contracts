@@ -104,6 +104,40 @@ def test_cefi_perp_query_returns_expected_archetypes() -> None:
     assert StrategyArchetype.ML_DIRECTIONAL_CONTINUOUS in result_ids
 
 
+def test_carry_staked_basis_and_perp_inv_have_cefi_cells() -> None:
+    # Regression guard for archetype_venue_universe_cefi_vs_registry_no_cefi_cells_2026_06_30:
+    # both archetypes' codex venue_universe frontmatter declares CEFI hedge venues
+    # (BYBIT / OKX / DERIBIT) but the registry had no CEFI capability cells for them
+    # (two-sided audit venue-category contradiction, baseline 2 -> 0 on 2026-07-10).
+    perp_inv = capability_for(StrategyArchetype.CARRY_BASIS_PERP_INV)
+    staked_basis = capability_for(StrategyArchetype.CARRY_STAKED_BASIS)
+    assert perp_inv is not None
+    assert staked_basis is not None
+
+    perp_inv_cefi = next(
+        c
+        for c in perp_inv.cells
+        if c.asset_group == VenueCategoryV2.CEFI and c.instrument_type == ArchetypeInstrumentType.PERP
+    )
+    assert perp_inv_cefi.status == CoverageStatus.SUPPORTED
+    assert set(perp_inv_cefi.venue_ids) >= {"hyperliquid", "bybit"}
+
+    staked_basis_cefi = next(
+        c
+        for c in staked_basis.cells
+        if c.asset_group == VenueCategoryV2.CEFI and c.instrument_type == ArchetypeInstrumentType.PERP
+    )
+    assert staked_basis_cefi.status == CoverageStatus.SUPPORTED
+    assert set(staked_basis_cefi.venue_ids) >= {"deribit", "bybit", "okx"}
+
+    # (CeFi, Perp) query must now surface both archetypes.
+    result_ids = {
+        entry.archetype_id for entry in archetypes_for_pair(VenueCategoryV2.CEFI, ArchetypeInstrumentType.PERP)
+    }
+    assert StrategyArchetype.CARRY_BASIS_PERP_INV in result_ids
+    assert StrategyArchetype.CARRY_STAKED_BASIS in result_ids
+
+
 def test_archetypes_for_pair_excludes_partial_when_requested() -> None:
     supported_only = archetypes_for_pair(
         VenueCategoryV2.DEFI,
