@@ -111,6 +111,7 @@ VENUE_TO_ADAPTER_KEY: dict[str, str] = {
     # Non-Tardis CeFi
     "HYPERLIQUID": "hyperliquid",
     "ASTER": "aster",
+    "COINBASE-CDE": "coinbase_cde",  # 2026-07-10, native Advanced Trade REST, zero Tardis coverage
     # TradFi
     "CME": "databento",
     "NASDAQ": "databento",
@@ -194,6 +195,15 @@ VENUE_TO_ADAPTER_KEY: dict[str, str] = {
     # Solana lending adapters (2026-07-09) — real public REST/JSON APIs.
     "MARGINFI-SOLANA": "marginfi",
     "SOLEND-SOLANA": "solend",
+    # RADIANT-BSC (2026-07-10): the auto-gen loop below only covers chains with
+    # a registered subgraph_id (SUBGRAPH_IDS["radiant"] = ARBITRUM+ETHEREUM
+    # only — Radiant's BSC deployment has no verified subgraph). The IS
+    # reference-data adapter (radiant.py) is NOT subgraph-based for instrument
+    # DISCOVERY though — it uses a curated per-chain markets dict that DOES
+    # include BSC — so this venue is genuinely IS-producible via that curated
+    # path even without a subgraph_id. Explicit entry since the auto-gen loop
+    # can't infer it. mtds_is_full_adapter_smoketest_findings_2026_07_07.md P1.
+    "RADIANT-BSC": "radiant",
     # Jupiter is execution-only (swap aggregator), not instrument discovery.
     # DEX perp venues (L2 + StarkNet + Solana clone)
     "LIGHTER-ZKSYNC": "lighter",

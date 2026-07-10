@@ -67,13 +67,28 @@ class PolymarketMarket(BaseModel):
     seconds_delay: int | None = None
 
 
+class PolymarketBookLevel(BaseModel):
+    """One price level of a Polymarket CLOB order book.
+
+    Real ``GET /book`` response shape (docs.polymarket.com/developers/CLOB/orders/orderbook):
+    each level is an object ``{"price": "0.48", "size": "300"}`` (both strings), NOT a
+    ``[price, size]`` tuple/list. Prior to 2026-07-10 ``PolymarketOrderBook.bids``/``asks``
+    were typed ``list[list[float]]``, which raised a pydantic ``ValidationError`` on every
+    real order-book fetch — uncaught through the full call chain, crashing the entire date's
+    ``book_snapshot_5`` capture (mtds_is_full_adapter_smoketest_findings_2026_07_07.md P0).
+    """
+
+    price: float
+    size: float
+
+
 class PolymarketOrderBook(BaseModel):
     """Order book for a Polymarket market/token."""
 
     market: str | None = None
     asset_id: str | None = Field(None, alias="assetId")
-    bids: list[list[float]] | None = None
-    asks: list[list[float]] | None = None
+    bids: list[PolymarketBookLevel] | None = None
+    asks: list[PolymarketBookLevel] | None = None
 
 
 class PolymarketTrade(BaseModel):
