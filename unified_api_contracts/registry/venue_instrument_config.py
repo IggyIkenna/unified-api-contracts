@@ -35,7 +35,7 @@ class ExchangeInstrumentConfig:
             "BYBIT": ["SPOT_PAIR", "PERPETUAL"],  # Combined
             "OKX": ["SPOT_PAIR", "PERPETUAL", "FUTURE"],  # Combined
             "UPBIT": ["SPOT_PAIR"],  # Spot only (Korean exchange for kimchi premium)
-            "COINBASE": ["SPOT_PAIR"],  # Spot only (for coinbase premium)
+            "COINBASE-SPOT": ["SPOT_PAIR"],  # Spot only (for coinbase premium)
             # CeFi - On-chain CLOBs
             "HYPERLIQUID": ["PERPETUAL"],
             "ASTER": ["PERPETUAL"],
@@ -67,7 +67,7 @@ class ExchangeInstrumentConfig:
             "BYBIT": ["USDT"],  # STRICT: Only USDT
             "OKX": ["USDT"],  # STRICT: Only USDT
             "UPBIT": ["KRW"],  # Korean Won (for kimchi premium calculations)
-            "COINBASE": ["USD"],  # US Dollar (for coinbase premium calculations)
+            "COINBASE-SPOT": ["USD"],  # US Dollar (for coinbase premium calculations)
         }
     )
 

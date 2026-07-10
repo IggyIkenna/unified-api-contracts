@@ -280,6 +280,14 @@ EXCHANGE_NAME_MAP: dict[str, str] = {
     "deribit": "DERIBIT",
     "okx": "OKX",
     "okex": "OKX",
+    # KEPT BARE (coinbase_bare_name_migration S3, 2026-07-10) — this dict's
+    # VALUES are NautilusTrader venue names, not UAC canonical venue tokens
+    # (see module docstring: "canonical -> NautilusTrader format"). Nautilus
+    # itself uses bare "COINBASE" as its venue identifier (same as bare
+    # "BINANCE" above), so re-keying to "COINBASE-SPOT" would break Nautilus
+    # instrument-ID conversion — analogous to the execution-service Nautilus
+    # callers (nautilus_compatibility.py / utils.py) that intentionally keep
+    # bare COINBASE.
     "coinbase": "COINBASE",
     "upbit": "UPBIT",
     "ftx": "FTX",

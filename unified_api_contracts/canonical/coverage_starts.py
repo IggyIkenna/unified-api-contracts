@@ -35,13 +35,13 @@ from unified_api_contracts.canonical.gcs_paths import AssetGroup
 # CeFi
 # ---------------------------------------------------------------------------
 # Keys are venue tokens (uppercase) matching the GCS partition value, e.g.
-# ``BINANCE``, ``DERIBIT``, ``COINBASE`` — same casing as the
+# ``BINANCE``, ``DERIBIT``, ``COINBASE-SPOT`` — same casing as the
 # canonical/partition_paths build_*_partition_path output.
 
 CEFI_SOURCE_COVERAGE_START: dict[str, date] = {
     "BITFINEX": date(2013, 4, 30),
     "KRAKEN": date(2013, 9, 10),
-    "COINBASE": date(2014, 12, 8),
+    "COINBASE-SPOT": date(2014, 12, 8),
     "DERIBIT": date(2016, 6, 13),
     "OKX": date(2017, 5, 31),
     "BINANCE": date(2017, 8, 17),

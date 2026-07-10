@@ -28,9 +28,6 @@ from unified_api_contracts.registry import (
 # artifact, expand-only bare form) — never a shortcut for a missing adapter.
 EXPECTED_SENTINEL_VENUES: frozenset[str] = frozenset(
     {
-        # Bare execution-context alias; IS expands to COINBASE-SPOT/-FUTURES
-        # before adapter lookup.
-        "COINBASE",
         # Legacy source-as-venue artifact (Yahoo data provider).
         "YAHOO_FINANCE",
         # MTDS-owned sports odds venues (Decision C, 2026-06-29).
@@ -52,8 +49,7 @@ class TestVenueAdapterKeyCoverage:
 
     def test_every_canonical_venue_has_an_entry(self) -> None:
         missing = {
-            ag: [v for v in venues if v not in VENUE_TO_ADAPTER_KEY]
-            for ag, venues in VENUES_BY_ASSET_GROUP.items()
+            ag: [v for v in venues if v not in VENUE_TO_ADAPTER_KEY] for ag, venues in VENUES_BY_ASSET_GROUP.items()
         }
         missing = {ag: m for ag, m in missing.items() if m}
         assert not missing, (
@@ -75,8 +71,11 @@ class TestVenueAdapterKeyCoverage:
         sentineled = [v for v in VENUES_BY_ASSET_GROUP["defi"] if VENUE_TO_ADAPTER_KEY[v] == NO_ADAPTER_YET]
         assert not sentineled, f"defi producible venues cannot be sentinel: {sentineled}"
 
-    def test_prediction_and_cefi_resolve_modulo_bare_coinbase(self) -> None:
-        for ag, allowed_sentinels in (("prediction", set()), ("cefi", {"COINBASE"})):
+    def test_prediction_and_cefi_resolve_with_no_sentinels(self) -> None:
+        # cefi has no sentinel venues since coinbase_bare_name_migration S3
+        # (2026-07-10) removed the bare-COINBASE alias entry; COINBASE-SPOT
+        # resolves to a real adapter ("tardis").
+        for ag, allowed_sentinels in (("prediction", set()), ("cefi", set())):
             sentineled = {v for v in VENUES_BY_ASSET_GROUP[ag] if VENUE_TO_ADAPTER_KEY[v] == NO_ADAPTER_YET}
             assert sentineled == allowed_sentinels, (
                 f"{ag}: sentinel venues {sorted(sentineled)} != allowed {sorted(allowed_sentinels)}"

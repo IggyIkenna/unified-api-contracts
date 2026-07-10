@@ -242,7 +242,13 @@ VENUES_BY_ASSET_GROUP: dict[str, list[str]] = {
         # until the kind-split + venue-tag fixes 2026-06-18). instrument_key stays DERIBIT:COMBO:*.
         "DERIBIT-COMBO",
         "UPBIT",
-        "COINBASE",
+        # RE-KEYED from bare "COINBASE" 2026-07-10 (coinbase_bare_name_migration
+        # S3, D2a naming reconciliation) — COINBASE-SPOT is now the sole
+        # canonical cefi spot venue token; DataTypeCapability["COINBASE-SPOT"]
+        # already existed as a duplicate of the bare entry (see below), so this
+        # is a pure rename, not a removal — VENUES_BY_ASSET_GROUP has no other
+        # COINBASE-SPOT member, unlike venue_constants.py's per-dict tables.
+        "COINBASE-SPOT",
         # 2026-06-23: Bybit spot + Coinbase Derivatives (perps) as DISTINCT
         # canonical venues so the perp-gate pairs BYBIT-SPOT↔BYBIT perps and
         # COINBASE-SPOT↔COINBASE-FUTURES (cefi_universe_capture_rule).
@@ -1125,10 +1131,6 @@ VENUE_DATA_TYPE_CAPABILITIES: dict[str, dict[str, str]] = {
     "UPBIT": {
         "trades": "2021-03-03",
         "book_snapshot_5": "2021-03-03",
-    },
-    "COINBASE": {
-        "trades": "2020-01-01",
-        "book_snapshot_5": "2020-01-01",
     },
     "COINBASE-SPOT": {
         "trades": "2020-01-01",

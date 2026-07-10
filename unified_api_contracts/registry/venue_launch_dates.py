@@ -61,7 +61,7 @@ CEFI_VENUE_LAUNCH_DATES: dict[str, str] = {
     # default window) — keeps the venue list ↔ launch-date registry consistent.
     "DERIBIT-COMBO": "2019-01-01",
     "UPBIT": "2017-10-24",  # KRW market launch
-    "COINBASE": "2014-12-08",  # GDAX launch (rebranded Coinbase Pro 2018)
+    "COINBASE-SPOT": "2014-12-08",  # GDAX launch (rebranded Coinbase Pro 2018)
     "BITFINEX-SPOT": "2012-12-27",  # founded
     "BITFINEX-FUTURES": "2019-08-01",  # perp launch
     "BITGET-SPOT": "2018-04-01",  # founded

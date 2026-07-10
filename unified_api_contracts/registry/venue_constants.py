@@ -365,16 +365,6 @@ VENUE_CATEGORY_MAP.update(dict.fromkeys(SPORTS_VENUES, "sports"))
 INSTRUMENT_TYPES_BY_VENUE: dict[str, set[str]] = {
     BINANCE_SPOT: {"SPOT_PAIR"},
     COINBASE_SPOT: {"SPOT_PAIR"},
-    # VENUES_BY_ASSET_GROUP["cefi"] (market_data_categories.py) declares the
-    # BARE "COINBASE" token (not "COINBASE-SPOT") as the canonical cefi spot
-    # venue; the writer stamps "COINBASE-SPOT" (folded back to "COINBASE" by
-    # the Layer-1 checker's _CEFI_VENUE_FOLD for the EXPECTED/ENUMERATED
-    # comparison — check_enumeration_completeness.py). The EXPECTED-side
-    # lookup is keyed by the VENUES_BY_ASSET_GROUP token, i.e. bare
-    # "COINBASE", so it needs its OWN key here too (D2a naming reconciliation,
-    # 2026-07-06) — without it the itype-gate authority switch silently zeroes
-    # COINBASE's entire EXPECTED set.
-    "COINBASE": {"SPOT_PAIR"},
     OKX_SPOT: {"SPOT_PAIR"},
     OKX_FUTURES: {"PERPETUAL", "FUTURE", "OPTION"},
     # bare "OKX" keeps SPOT_PAIR (reverted 2026-07-08, commit 23fa3a99 had

@@ -107,7 +107,7 @@ class RewardTokenEconomics(BaseModel):
         default_factory=list,
         description=(
             "Centralised venues that list this token (e.g. ['BINANCE', "
-            "'COINBASE', 'BYBIT']). Router considers each for conversion "
+            "'COINBASE-SPOT', 'BYBIT']). Router considers each for conversion "
             "quotes via market-tick-data-service spot tick feeds. Empty "
             "list = no CEX listing yet (points / pre-TGE)."
         ),
@@ -654,13 +654,13 @@ REWARD_TOKEN_ECONOMICS: dict[str, RewardTokenEconomics] = {
         token_symbol="ETHFI",
         token_address="0xfe0c30065B384F05761f15d0CC899D4F9F9Cc0eB",
         chain="ETHEREUM",
-        cex_listings=["BINANCE", "COINBASE", "BYBIT", "OKX"],
+        cex_listings=["BINANCE", "COINBASE-SPOT", "BYBIT", "OKX"],
     ),
     "EIGEN": RewardTokenEconomics(
         token_symbol="EIGEN",
         token_address="0xec53bf9167f50cdeb3ae105f56099aaab9061f83",
         chain="ETHEREUM",
-        cex_listings=["BINANCE", "COINBASE", "BYBIT"],
+        cex_listings=["BINANCE", "COINBASE-SPOT", "BYBIT"],
         expected_vesting_months=48,
     ),
     "PUFFER": RewardTokenEconomics(
@@ -673,7 +673,7 @@ REWARD_TOKEN_ECONOMICS: dict[str, RewardTokenEconomics] = {
         token_symbol="ANKR",
         token_address="0x8290333ceF9e6D528dD5618Fb97a76f268f3EDD4",
         chain="ETHEREUM",
-        cex_listings=["BINANCE", "COINBASE", "OKX"],
+        cex_listings=["BINANCE", "COINBASE-SPOT", "OKX"],
     ),
     "SD": RewardTokenEconomics(
         token_symbol="SD",
@@ -715,7 +715,7 @@ REWARD_TOKEN_ECONOMICS: dict[str, RewardTokenEconomics] = {
         token_symbol="JTO",
         token_address="jtojtomepa8beP8AuQc6eXt5FriJwfFMwQx2v2f9mCL",
         chain="SOLANA",
-        cex_listings=["BINANCE", "COINBASE", "BYBIT"],
+        cex_listings=["BINANCE", "COINBASE-SPOT", "BYBIT"],
     ),
     "MNDE": RewardTokenEconomics(
         token_symbol="MNDE",

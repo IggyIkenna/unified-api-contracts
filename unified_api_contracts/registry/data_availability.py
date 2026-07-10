@@ -346,7 +346,7 @@ _TARDIS_VENUES: frozenset[str] = frozenset(
         "OKX",
         "DERIBIT",
         "UPBIT",
-        "COINBASE",
+        "COINBASE-SPOT",
     }
 )
 

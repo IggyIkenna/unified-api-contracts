@@ -50,7 +50,7 @@ CEFI_SPOT_SPECS: list[dict[str, str]] = [
         "available_from": "2020-04-10",
     },
     {
-        "venue": "COINBASE",
+        "venue": "COINBASE-SPOT",
         "symbol": "BTC-USD",
         "base": "BTC",
         "quote": "USD",

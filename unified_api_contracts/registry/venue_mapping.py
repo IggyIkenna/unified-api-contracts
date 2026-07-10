@@ -150,7 +150,10 @@ class VenueMapping:
             "OKX": "okx",  # Unified
             "HYPERLIQUID": "hyperliquid",
             "UPBIT": "upbit",
-            "COINBASE": "coinbase",
+            # RE-KEYED from bare "COINBASE" 2026-07-10 (coinbase_bare_name_migration
+            # S3) — no "COINBASE-SPOT" entry pre-existed in this dict (unlike
+            # tardis_to_venue, a different direction), so this is a rename.
+            "COINBASE-SPOT": "coinbase",
             # Note: ASTER not in CCXT yet
         }
     )
@@ -810,7 +813,6 @@ class VenueMapping:
             # Upbit (spot only - Korean exchange for kimchi premium)
             ("UPBIT", "SPOT_PAIR"): "upbit",
             # Coinbase (spot only - for coinbase premium)
-            ("COINBASE", "SPOT_PAIR"): "coinbase",
             ("COINBASE-SPOT", "SPOT_PAIR"): "coinbase",
             # Coinbase Derivatives (perps) via Tardis coinbase-international
             ("COINBASE-FUTURES", "PERPETUAL"): "coinbase-international",
@@ -851,7 +853,7 @@ class VenueMapping:
     spot_mvp_filtered_venues: list[str] = field(
         default_factory=lambda: [
             "UPBIT",  # Korean exchange - for kimchi premium
-            "COINBASE",  # Coinbase - for coinbase premium
+            "COINBASE-SPOT",  # Coinbase - for coinbase premium
         ]
     )
 

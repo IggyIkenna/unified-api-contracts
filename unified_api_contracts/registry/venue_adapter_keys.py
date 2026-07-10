@@ -97,11 +97,6 @@ VENUE_TO_ADAPTER_KEY: dict[str, str] = {
     "DERIBIT-COMBO": "deribit_combo",
     # DERIBIT-OPTIONS: live option-chain enumeration + mark IV via Deribit public REST.
     "DERIBIT-OPTIONS": "deribit_options",
-    # Bare COINBASE is an execution-context alias; IS enumeration expands it to
-    # COINBASE-SPOT/-FUTURES via expand_cefi_tardis_endpoints() BEFORE adapter
-    # lookup, so no direct adapter is registered (parity with the pre-move dict,
-    # where bare COINBASE was absent and resolving it raised).
-    "COINBASE": NO_ADAPTER_YET,
     "COINBASE-SPOT": "tardis",
     # Coinbase Derivatives (perps) via Tardis ``coinbase-international``.
     "COINBASE-FUTURES": "tardis",
