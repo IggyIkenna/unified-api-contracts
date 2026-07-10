@@ -116,6 +116,47 @@ DEFI_VENUE_DATA_TYPE_CAPABILITIES: dict[str, dict[str, str]] = {
     # cross_asset Phase 1B(b) — Radiant UAC back-fill (was orphan adapter, now declared)
     "RADIANT-ARBITRUM": {"lending_indices": "2022-07-25", "oracle_prices": "2022-07-25"},
     "RADIANT-BSC": {"lending_indices": "2022-09-21", "oracle_prices": "2022-09-21"},
+    # RADIANT-ETHEREUM + EULER_V2/VENUS/BENQI (operator 2026-07-10, decision #9 —
+    # defi_code_codex_drift_2026_05_27.md D10). These 4 protocols already have
+    # real PROTOCOL_CAPABILITIES + SUBGRAPH_IDS entries (unified-api-contracts
+    # @cd65ff76, 2026-06-02) and MTDS collector wiring
+    # (market-tick-data-service@d98f5726) — the ORIGINAL D10 "no capability"
+    # premise (filed 2026-05-27, before cd65ff76 landed) is stale for those two
+    # registries. What was GENUINELY still missing is exactly this dict — this
+    # module is the honest-coverage denominator's per-(venue,data_type)
+    # capability gate (the DeFi analog of cefi/tradfi's
+    # VENUE_DATA_TYPE_CAPABILITIES), and these 4 venues had ZERO entries here.
+    # Start dates from the researched PROTOCOL_LAUNCH_DATES SSOT (chain_env.py)
+    # — the same source that already drives these venues' pre-genesis
+    # empty_confirmed boundary in the enumerator (verified against the prod
+    # availability manifest: RADIANT-ETHEREUM's empty_confirmed max_date=
+    # 2023-07-17, one day before this 2023-07-18 floor; same 1-day-offset
+    # pattern for BENQI/VENUS-BSC). data_types kept to the MINIMAL real capture
+    # surface (lending_indices only, NOT the full aspirational LENDING_DATA set
+    # used by _ProtocolCapability) — matching the SOLEND-SOLANA/MARGINFI-SOLANA
+    # convention above ("declared the data_type ACTUALLY captured... declaring
+    # more would inflate the could-exist denominator with cells that have no
+    # data") — the prod manifest shows ZERO real captured/attempted_failed rows
+    # for ANY data_type on ANY of these 4 venues, ever (only pre-genesis
+    # empty_confirmed stamps); the capture orchestrator-wiring is a separate,
+    # already-tracked gap (mtds_is_full_adapter_smoketest_findings_2026_07_07.md
+    # P1: "Wire VENUS/BENQI/RADIANT/EULER_V2's already-functional adapters into
+    # the production orchestrator — code works, it's just never invoked").
+    # DEFI_VENUE_PHASE for all 4 stays "pipeline" (re-phasing to "live" is
+    # deliberately NOT part of this change — VENUES_BY_ASSET_GROUP["defi"] only
+    # admits phase=="live" venues, so this entry is inert until the
+    # orchestrator-wiring item lands and phase flips for real) — it exists so
+    # the declaration is honest + ready the moment a real capture path lands.
+    # Live-network-probe verification (2026-07-10): the EULER_V2 Goldsky
+    # subgraph IS reachable but its indexed HEAD is ~271K blocks (~38 days)
+    # behind current Ethereum mainnet — a dead/stalled upstream that should be
+    # re-verified before any future phase flip to "live".
+    "RADIANT-ETHEREUM": {"lending_indices": "2023-07-18", "oracle_prices": "2023-07-18"},
+    "EULER_V2-ETHEREUM": {"lending_indices": "2024-08-01"},
+    "EULER_V2-ARBITRUM": {"lending_indices": "2024-08-01"},
+    "VENUS-BSC": {"lending_indices": "2020-10-08"},
+    "VENUS-ETHEREUM": {"lending_indices": "2023-06-01"},
+    "BENQI-AVALANCHE": {"lending_indices": "2021-08-19"},
     # ── DeFi — Additional DEX protocols (dex_pool_swaps + dex_pool_state only) ──
     "SUSHISWAP_V3-ETHEREUM": {"dex_pool_swaps": "2021-11-01", "dex_pool_state": "2021-11-01"},
     "SUSHISWAP_V3-BASE": {"dex_pool_swaps": "2023-08-15", "dex_pool_state": "2023-08-15"},
@@ -216,6 +257,25 @@ DEFI_VENUE_DATA_TYPE_CAPABILITIES: dict[str, dict[str, str]] = {
     "IDLE-POLYGON": {"staking_yields": "2021-11-11"},
     # ── DeFi — Additional LSTs (Phase 1A) ──
     "ROCKETPOOL-ETHEREUM": {"lst_rates": "2021-11-08", "oracle_prices": "2021-11-08"},
+    # 2026-07-10 DeFi turbo-API read-path bug fix (defi_turbo_api_hides_real_captured_data_2026_07_07.md):
+    # these 5 venues were in ALL_DEFI_VENUES (declared "pipeline" phase) with real
+    # captured ``lst_rates`` shards in the prod availability index but NO
+    # VENUE_DATA_TYPE_CAPABILITIES entry at all -> get_expected_data_types_for_venue
+    # returned [] -> the MTDS honest-coverage override short-circuited to
+    # expected_shards=0 -> the turbo API either showed 0/0 or silently dropped the
+    # UAC-driven annotations, masking real data. data_type + earliest-captured floor
+    # verified directly against the live GCS manifest (market-data-tick-defi bucket,
+    # capture_status=='captured' rows only; empty_confirmed/expected_unattempted
+    # excluded) -- no oracle_prices/staking_yields captured for any of these 5, so
+    # only lst_rates is declared (mirrors the DATA-001 precedent: declaring an
+    # uncaptured dt would inflate the could-exist denominator with empty cells).
+    "MANTLE-ETHEREUM": {"lst_rates": "2023-10-06"},  # 990 captured rows through 2026-06-21
+    "STADER-ETHEREUM": {"lst_rates": "2023-07-10"},  # 1,078 captured rows through 2026-06-21
+    "STAKEWISE-ETHEREUM": {"lst_rates": "2023-11-28"},  # 937 captured rows through 2026-06-21
+    "SWELL-ETHEREUM": {"lst_rates": "2023-04-17"},  # 1,162 captured rows through 2026-06-21
+    "ANKR-ETHEREUM": {
+        "lst_rates": "2020-12-30"
+    },  # 2,000 captured rows through 2026-06-21 (same gap, not previously flagged)
     "SOLBLAZE-SOLANA": {"lst_rates": "2022-10-15", "oracle_prices": "2022-10-15"},
     # ── DeFi — Restaking / LRTs (Phase 1A) ──
     # staking_yields = restaking APY; oracle_prices = LRT token price (via Chainlink/Pyth)
@@ -225,7 +285,12 @@ DEFI_VENUE_DATA_TYPE_CAPABILITIES: dict[str, dict[str, str]] = {
     "RENZO-ETHEREUM": {"staking_yields": "2024-04-29", "oracle_prices": "2024-04-29"},
     "RENZO-ARBITRUM": {"staking_yields": "2024-02-29", "oracle_prices": "2024-02-29"},
     "KELPDAO-ETHEREUM": {"staking_yields": "2023-11-09", "oracle_prices": "2023-11-09"},
-    "PUFFER-ETHEREUM": {"staking_yields": "2024-05-09", "oracle_prices": "2024-05-09"},
+    # PUFFER's declared staking_yields/oracle_prices are roadmap dts (0 captured
+    # rows as of 2026-07-10 verification) -- kept as-is. lst_rates added 2026-07-10
+    # (defi_turbo_api_hides_real_captured_data_2026_07_07.md): 871 real captured
+    # rows through 2026-06-21 under this data_type were previously undeclared,
+    # so honest-coverage always matched against the wrong column and reported 0%.
+    "PUFFER-ETHEREUM": {"staking_yields": "2024-05-09", "oracle_prices": "2024-05-09", "lst_rates": "2024-02-01"},
     "JITORESTAKING-SOLANA": {"staking_yields": "2024-08-01"},
     # ── DeFi — Solana DEX aggregator (Phase 1A) ──
     "JUPITER-SOLANA": {"dex_pool_swaps": "2021-10-13"},
