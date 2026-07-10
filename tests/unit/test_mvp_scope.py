@@ -1129,6 +1129,60 @@ class TestCoinbaseVenueOverrideV11:
         assert "trades" in dt
         assert "book_snapshot_5" in dt
 
+
+# ---------------------------------------------------------------------------
+# v12 — DERIBIT-COMBO MVP_SCOPE.venues membership (operator
+# 2026-07-10, decision #6 — cefi_layer1_denominator_gaps_2026_07_03.md's
+# BLOCKED-OPERATOR-DECISION). DERIBIT-COMBO was a declared cefi venue
+# (VENUES_BY_ASSET_GROUP["cefi"]) with real captured data but absent from
+# MVP_SCOPE["cefi"].venues, silently zeroing its Layer-1 EXPECTED
+# regardless of the itype/capability gates. (Decision #6 also named bare
+# "COINBASE" for the same treatment, but that was deliberately NOT added —
+# see test_coinbase_spot_is_mvp_in_base_rule above / the active
+# coinbase_bare_name_migration_2026_07_06.md plan.)
+# ---------------------------------------------------------------------------
+
+
+class TestDeribitComboMvpScopeV12:
+    """v12: DERIBIT-COMBO added to MVP_SCOPE['cefi'].venues."""
+
+    def test_deribit_combo_option_trades_is_mvp(self) -> None:
+        """DERIBIT-COMBO OPTION trades -> MVP (its real capture surface)."""
+        assert is_mvp("cefi", "DERIBIT-COMBO", "OPTION", "trades", base_ccy="BTC")
+
+    def test_deribit_combo_option_book_snapshot_5_is_mvp(self) -> None:
+        """DERIBIT-COMBO OPTION book_snapshot_5 -> MVP (its real capture surface)."""
+        assert is_mvp("cefi", "DERIBIT-COMBO", "OPTION", "book_snapshot_5", base_ccy="BTC")
+
+    def test_deribit_combo_does_not_inherit_options_chain_override(self) -> None:
+        """DERIBIT-COMBO OPTION options_chain -> NOT MVP.
+
+        Without the venue_data_types override, DERIBIT-COMBO would silently
+        inherit the bare-DERIBIT instrument_type_data_types["OPTION"] ->
+        {options_chain} rule -- a phantom cell DERIBIT-COMBO cannot actually
+        produce (its real DataTypeCapability declarations are trades +
+        book_snapshot_5, not options_chain).
+        """
+        assert not is_mvp("cefi", "DERIBIT-COMBO", "OPTION", "options_chain", base_ccy="BTC")
+
+    def test_get_mvp_data_types_deribit_combo(self) -> None:
+        """get_mvp_data_types_for_cefi_venue returns trades+book5 (not options_chain) for DERIBIT-COMBO."""
+        from unified_api_contracts import get_mvp_data_types_for_cefi_venue
+
+        dt = get_mvp_data_types_for_cefi_venue("DERIBIT-COMBO")
+        assert dt == frozenset({"trades", "book_snapshot_5"})
+        assert "options_chain" not in dt
+
+    def test_deribit_bare_option_override_unaffected(self) -> None:
+        """Bare DERIBIT's OPTION -> {options_chain} override is unchanged by the
+        DERIBIT-COMBO override (the two venues are distinct dict keys)."""
+        assert is_mvp("cefi", "DERIBIT", "OPTION", "options_chain", base_ccy="BTC")
+        assert not is_mvp("cefi", "DERIBIT", "OPTION", "trades", base_ccy="BTC")
+
+
+class TestCoinbaseVenueOverrideV11Continued:
+    """Continuation of TestCoinbaseVenueOverrideV11 (split by the v12 class insert above)."""
+
     def test_get_mvp_data_types_non_mvp_venue_empty(self) -> None:
         """get_mvp_data_types_for_cefi_venue returns empty frozenset for non-MVP venue."""
         from unified_api_contracts import get_mvp_data_types_for_cefi_venue
