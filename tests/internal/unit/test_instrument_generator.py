@@ -57,7 +57,7 @@ class TestCefiSpot:
         instruments = gen.generate_cefi_spot(REF_DATE)
         venues = {i.venue for i in instruments}
         assert "BINANCE-SPOT" in venues
-        assert "COINBASE" in venues
+        assert "COINBASE-SPOT" in venues
         assert "BYBIT" in venues
         assert "OKX" in venues
         assert "UPBIT" in venues

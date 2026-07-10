@@ -375,6 +375,41 @@ MVP_SCOPE: Final[dict[str, object]] = {
                 # set — the operator accepts COIN-M delivery is NOT MVP. Other
                 # venues' dated/quarterly fixed-delivery futures STAY MVP (the
                 # FUTURE instrument_type below + the dated-future capture path).
+                # DERIBIT-COMBO (operator 2026-07-10, decision #6 on
+                # cefi_layer1_denominator_gaps_2026_07_03.md's
+                # BLOCKED-OPERATOR-DECISION): a declared cefi venue
+                # (VENUES_BY_ASSET_GROUP["cefi"]) with real captured data but
+                # previously ABSENT from this rule's ``venues`` set, so
+                # ``get_mvp_data_types_for_cefi_venue()`` silently returned
+                # frozenset() and its Layer-1 EXPECTED was always 0 — the exact
+                # "entire venue absent from the denominator" dishonesty class
+                # honest-coverage v2 exists to kill. Operator decision: keep it
+                # declared (add it), not confirm out-of-MVP. See the
+                # ``venue_data_types`` override below for its per-venue
+                # data_type scoping.
+                #
+                # NOTE: the same decision #6 also named bare "COINBASE" for this
+                # treatment. NOT added here — `coinbase_bare_name_migration_
+                # 2026_07_06.md` (operator decision #3, same 12-decision batch)
+                # is an ACTIVE, dispatched 7-step plan whose explicit goal is to
+                # retire bare "COINBASE" workspace-wide in favor of the sole
+                # canonical "COINBASE-SPOT" key (already declared here, already
+                # trades-only scoped below) — adding a new dependency on the
+                # bare key here would work directly against that migration.
+                # COINBASE-SPOT already satisfies decision #6's real intent
+                # (denominator correctness + trades-only cost control for the
+                # Coinbase spot product).
+                "DERIBIT-COMBO",
+                # Coinbase Derivatives Exchange (CDE) — 2026-07-10,
+                # COINBASE-FUTURES/#3-vs-#8 resolution (instruments_remaining_work_audit_
+                # 2026_07_10.md Progress Log). FUTURE-only venue (real dated futures +
+                # far-dated "nano perpetual" contracts, 99 live products confirmed via
+                # api.coinbase.com Advanced Trade REST); rides base-membership + venue
+                # via the dated-future rule (NOT perp-gated — no PERPETUAL sibling
+                # needed, see _mvp_scope_capture.py _CEFI_DATED_FUTURE_TYPES). A
+                # SEPARATE venue from COINBASE-FUTURES (Coinbase INTX) — zero Tardis
+                # coverage under any name.
+                "COINBASE-CDE",
             }
         ),
         instrument_types=frozenset(
@@ -434,6 +469,34 @@ MVP_SCOPE: Final[dict[str, object]] = {
             # COINBASE sub-venues: trades-only (no book5).
             "COINBASE-SPOT": frozenset({"trades"}),
             "COINBASE-FUTURES": frozenset({"trades"}),
+            # DERIBIT-COMBO (operator 2026-07-10, decision #6): a DISTINCT venue
+            # from bare DERIBIT (multi-leg combo/spread instruments — see
+            # VENUES_BY_ASSET_GROUP["cefi"] comment). Its real declared capture
+            # capability (data_type_capability.py DataTypeCapability entries,
+            # VENUE_DATA_TYPE_CAPABILITIES["DERIBIT-COMBO"]) is trades +
+            # book_snapshot_5 — NOT options_chain. An explicit override is
+            # REQUIRED here: without one, DERIBIT-COMBO would inherit the
+            # instrument_type_data_types["OPTION"] -> {options_chain} override
+            # from the flat DERIBIT-shaped rule above (DERIBIT-COMBO's only
+            # valid instrument_type is OPTION per INSTRUMENT_TYPES_BY_VENUE),
+            # minting a phantom options_chain EXPECTED cell DERIBIT-COMBO can
+            # never actually produce. Verified dynamically: DERIBIT-COMBO's
+            # base venue token "DERIBIT" IS a FUTURE_BUNDLE_VENUES member, so
+            # its leaf OPTION itype rolls up to the options_chain bundle grain
+            # at the itype-gate stage (same as bare DERIBIT); with this
+            # override + the matching VENUE_DATA_TYPE_CAPABILITIES entry,
+            # build_expected("cefi") yields (DERIBIT-COMBO, options_chain,
+            # trades) — no longer silently zero. book_snapshot_5 is declared
+            # here too (matches its real DataTypeCapability entries) but never
+            # surfaces as an EXPECTED cell at this bundle grain (the bundle's
+            # only valid data_type is trades) — harmless, honest superset.
+            "DERIBIT-COMBO": frozenset({"trades", "book_snapshot_5"}),
+            # COINBASE-CDE (2026-07-10) — trades-only: the only real capture surface
+            # today is the re-keyed live connector (Advanced Trade WS market_trades
+            # channel); no book-depth channel is wired and there is no Tardis/batch
+            # source at all for this venue (see VENUE_DATA_TYPE_CAPABILITIES
+            # ["COINBASE-CDE"] in market_data_categories.py).
+            "COINBASE-CDE": frozenset({"trades"}),
         },
         # Curated CeFi capture universe (operator-confirmed SSOT, ~490 base assets,
         # survivorship-bias-free). Spot + perp legs.

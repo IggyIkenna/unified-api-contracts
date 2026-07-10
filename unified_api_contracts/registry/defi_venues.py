@@ -440,6 +440,10 @@ DEFI_VENUE_PHASE: dict[str, str] = {
     "SUSHISWAP-ARBITRUM": "live",
     "CAMELOT_V3-ARBITRUM": "live",
     "GMX-ARBITRUM": "live",
+    # RADIANT-ARBITRUM: 2026-07-10 — wired into _build_defi_venues() (mtds_is_full_
+    # adapter_smoketest_findings_2026_07_07.md P1, adapter was functional but never
+    # invoked). Flipped pipeline→live per the phase=="live" ⟺ IS-producible invariant.
+    "RADIANT-ARBITRUM": "live",
     # ── Pipeline (Arbitrum — NOT IS-producible) ──
     "PANCAKESWAP_V3-ARBITRUM": "pipeline",
     # ── Pipeline (Arbitrum catalogue Phase 1A, slot 5 2026-05-11) ──
@@ -447,7 +451,6 @@ DEFI_VENUE_PHASE: dict[str, str] = {
     "BEEFY-ARBITRUM": "pipeline",
     "PENDLE-ARBITRUM": "pipeline",
     "IDLE-ARBITRUM": "pipeline",
-    "RADIANT-ARBITRUM": "pipeline",
     "KARAK-ARBITRUM": "pipeline",
     "RENZO-ARBITRUM": "pipeline",
     # ── Pipeline (Arbitrum lending — not IS-producible) ──
@@ -495,20 +498,23 @@ DEFI_VENUE_PHASE: dict[str, str] = {
     "GMX-AVALANCHE": "live",
     "SUSHISWAP_V3-AVALANCHE": "live",
     "TRADER_JOE_V2-AVALANCHE": "live",
+    # BENQI-AVALANCHE: 2026-07-10 — wired into _build_defi_venues() (mtds_is_full_
+    # adapter_smoketest_findings_2026_07_07.md P1). Flipped pipeline→live.
+    "BENQI-AVALANCHE": "live",
     # ── Pipeline (Avalanche catalogue Phase 1A, slot 5 2026-05-11) ──
     "BEEFY-AVALANCHE": "pipeline",
-    # ── Pipeline (Avalanche lending — NOT IS-producible) ──
-    "BENQI-AVALANCHE": "pipeline",
     # ── Live (BSC — IS-producible per _build_defi_venues()) ──
     "AAVE_V3-BSC": "live",
     "PANCAKESWAP_V3-BSC": "live",
+    # RADIANT-BSC / VENUS-BSC / VENUS-ETHEREUM / RADIANT-ETHEREUM: 2026-07-10 —
+    # wired into _build_defi_venues() (mtds_is_full_adapter_smoketest_findings_
+    # 2026_07_07.md P1, adapters functional but never invoked). Flipped pipeline→live.
+    "RADIANT-BSC": "live",
+    "VENUS-BSC": "live",
+    "VENUS-ETHEREUM": "live",
+    "RADIANT-ETHEREUM": "live",
     # ── Pipeline (BSC catalogue Phase 1A, slot 5 2026-05-11) ──
     "BEEFY-BSC": "pipeline",
-    "RADIANT-BSC": "pipeline",
-    # ── Pipeline (multi-chain — NOT IS-producible) ──
-    "VENUS-BSC": "pipeline",
-    "VENUS-ETHEREUM": "pipeline",
-    "RADIANT-ETHEREUM": "pipeline",
     # ── Pipeline (Ethereum analytics / governance / MEV — NOT IS-producible) ──
     "AAVE-ETHEREUM": "pipeline",
     "COMPOUND-ETHEREUM": "pipeline",
@@ -516,8 +522,10 @@ DEFI_VENUE_PHASE: dict[str, str] = {
     "FLASHBOTS-ETHEREUM": "pipeline",
     "ACROSS-ETHEREUM": "pipeline",
     "STARGATE-ETHEREUM": "pipeline",
-    # ── Pipeline (Euler V2 — no UAC subgraph_id → 0 rows) ──
-    "EULER_V2-ETHEREUM": "pipeline",
+    # EULER_V2-ETHEREUM: 2026-07-10 — wired into _build_defi_venues() (same finding
+    # doc). EULER_V2-ARBITRUM stays pipeline: euler_v2.py's adapter only supports
+    # ETHEREUM (_DEFAULT_CHAIN, single flat _MVP_MARKETS list, no per-chain dict).
+    "EULER_V2-ETHEREUM": "live",
     # ── Pipeline (Alchemy multi-chain gas-fee oracles — NOT IS-producible) ──
     "ALCHEMY-ARBITRUM": "pipeline",
     "ALCHEMY-BASE": "pipeline",

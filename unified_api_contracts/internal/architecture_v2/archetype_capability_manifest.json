@@ -695,6 +695,27 @@
             "CARRY_STAKED_BASIS@jito-kamino-bybit-sol-usdt-prod"
           ],
           "notes": "3-leg ATOMIC (stake + lending + perp). Ethereum (Lido/RocketPool + Aave + HL/GMX) and Solana (Jito/Marinade + Kamino + Drift). CeFi-perp hedge legs (Binance/Bybit/Deribit/OKX) added 2026-05-08 for May-23 cutover (master_to_live_defi_2026_05_23 \u00a71 \u2014 6-venue hedge universe). Aster pending venue onboarding \u2014 track in defi_master."
+        },
+        {
+          "asset_group": "CEFI",
+          "instrument_type": "perp",
+          "status": "SUPPORTED",
+          "venue_ids": [
+            "deribit",
+            "bybit",
+            "okx"
+          ],
+          "signal_variants": [
+            "staking_yield",
+            "funding_rate"
+          ],
+          "roll_mode": "n/a",
+          "block_list_refs": [],
+          "representative_slot_labels": [
+            "CARRY_STAKED_BASIS@lido-deribit-f100-usdc-1h-usdc-v2-prod",
+            "CARRY_STAKED_BASIS@lido-bybit-f100-usdt-1h-usdt-v2-prod"
+          ],
+          "notes": "CeFi perp hedge leg (LST_AS_MARGIN): stETH/wstETH posted as cross-margin, short equal-and-opposite ETH-PERP. Deribit + Bybit UTA live (4 catalog slots 2026-05-20 per VENUE_COLLATERAL_MATRIX); OKX wstETH acceptance confirmed in venue_collateral.py (2026-05-08 Stream A) but no catalog slot generated yet (_STAKED_BASIS_ETH_PERP_VENUES pending). Registry gap closed 2026-07-10 per archetype_venue_universe_cefi_vs_registry_no_cefi_cells_2026_06_30."
         }
       ]
     },
@@ -1930,6 +1951,25 @@
             "CARRY_BASIS_PERP_INV@lido-aave-bybit-eth-usdc-prod"
           ],
           "notes": "Family 2 recursive borrow: lend ETH/stETH on Aave (USDC margin), short USDC-margined perp on Hyperliquid/Bybit to neutralise ETH-correlated delta. Renamed from CARRY_RECURSIVE_BORROW_PERP_HEDGED 2026-05-12. Per defi_recursive_borrow_archetypes \u00a7Family-2."
+        },
+        {
+          "asset_group": "CEFI",
+          "instrument_type": "perp",
+          "status": "SUPPORTED",
+          "venue_ids": [
+            "hyperliquid",
+            "bybit"
+          ],
+          "signal_variants": [
+            "funding_rate"
+          ],
+          "roll_mode": "n/a",
+          "block_list_refs": [],
+          "representative_slot_labels": [
+            "CARRY_BASIS_PERP_INV@aave-hyperliquid-eth-usdt-prod",
+            "CARRY_BASIS_PERP_INV@morpho-bybit-eth-usdt-prod"
+          ],
+          "notes": "CeFi perp hedge leg (Phase 2): USDC-margined ETH-PERP short sized to E_actual for delta neutrality. Hyperliquid PRIMARY (USDC-margin); Bybit BACKUP capped at <=50% of Hyperliquid notional (Feb-2025 hack counterparty-trust discount, ARCHETYPE_CONCENTRATION_MULTIPLIER). Registry gap closed 2026-07-10 per archetype_venue_universe_cefi_vs_registry_no_cefi_cells_2026_06_30."
         }
       ]
     },

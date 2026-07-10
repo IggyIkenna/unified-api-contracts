@@ -41,8 +41,11 @@ class TestAllCefiVenuesDeduplicated:
         # split from BYBIT) + COINBASE-FUTURES (Tardis coinbase-international). Total = 22.
         # 2026-06-24 (cefi_universe_capture_rule): + BINANCE-DELIVERY (COIN-M inverse).
         # Total = 23.
-        assert len(vm.all_cefi_venues) == 23, (
-            f"expected 23 unique CEFI venues, got {len(vm.all_cefi_venues)}: {sorted(vm.all_cefi_venues)}"
+        # 2026-07-10 (COINBASE-FUTURES/#3-vs-#8 resolution): + COINBASE-CDE (Coinbase
+        # Derivatives Exchange dated futures, native Advanced Trade REST, zero Tardis
+        # coverage — see unified-api-contracts@1cafb3c5). Total = 24.
+        assert len(vm.all_cefi_venues) == 24, (
+            f"expected 24 unique CEFI venues, got {len(vm.all_cefi_venues)}: {sorted(vm.all_cefi_venues)}"
         )
 
     def test_includes_all_suffixed_variants(self) -> None:
@@ -741,3 +744,88 @@ class TestNewlyCapabilitiedDefiVenues:
         assert LEGACY_DEFI_VENUE_ALIASES.get("SUSHISWAP") == "SUSHISWAP_V3-ETHEREUM", (
             "LEGACY_DEFI_VENUE_ALIASES['SUSHISWAP'] was changed; verify downstream normalisation before modifying"
         )
+
+
+class TestDefiTurboApiHiddenVenuesFix:
+    """defi_turbo_api_hides_real_captured_data_2026_07_07.md — regression guard.
+
+    Two distinct read-path bugs found real, captured DeFi manifest data being
+    reported as 0/0 (or omitted entirely) by deployment-api's ``/turbo``
+    endpoint, even though the data genuinely exists in the prod availability
+    index:
+
+    1. 5 LST/staking-yield venues (MANTLE/STADER/STAKEWISE/SWELL/ANKR-ETHEREUM)
+       were declared in ``ALL_DEFI_VENUES`` with real captured ``lst_rates``
+       shards but had NO ``DEFI_VENUE_DATA_TYPE_CAPABILITIES`` entry at all —
+       ``get_expected_data_types_for_venue`` returned ``[]``, which short-
+       circuits the MTDS honest-coverage override before it ever looks at the
+       manifest rows.
+    2. PUFFER-ETHEREUM had a capabilities entry, but for the WRONG data_types
+       (``staking_yields``/``oracle_prices``, 0 captured rows) — its real 871
+       captured rows are all ``lst_rates``, so honest-coverage matched against
+       an empty column and always reported 0%.
+    3. SPARK-ETHEREUM was flagged in ``DEFI_INSTRUMENTS_NOT_YET_COLLECTED``
+       (stale since 2026-04-29) despite 7,405 real captured ``lending_indices``
+       rows, 2023-03-07 -> 2026-06-21 — ``venue_has_no_expected_defi_coverage``
+       forced every expected-dates lookup for the venue to an empty set.
+
+    Row/date-range figures verified directly against the live GCS DEFI
+    availability index (``capture_status == "captured"`` rows only) on
+    2026-07-10.
+    """
+
+    _LST_VENUES_EXPECTED_DT: ClassVar[list[tuple[str, str]]] = [
+        ("MANTLE-ETHEREUM", "lst_rates"),
+        ("STADER-ETHEREUM", "lst_rates"),
+        ("STAKEWISE-ETHEREUM", "lst_rates"),
+        ("SWELL-ETHEREUM", "lst_rates"),
+        ("ANKR-ETHEREUM", "lst_rates"),
+        ("PUFFER-ETHEREUM", "lst_rates"),
+    ]
+
+    def test_lst_venues_return_nonempty(self) -> None:
+        """Each previously-uncapabilitied LST venue returns a non-empty dt list."""
+        for venue, _ in self._LST_VENUES_EXPECTED_DT:
+            dts = get_expected_data_types_for_venue(venue)
+            assert dts, (
+                f"{venue} still returns [] from get_expected_data_types_for_venue "
+                f"— entry is missing from DEFI_VENUE_DATA_TYPE_CAPABILITIES"
+            )
+
+    def test_lst_venues_declare_captured_data_type(self) -> None:
+        """Each venue must declare ``lst_rates`` — the data_type actually
+        captured in the prod index — asserted against the registry directly
+        (not the ``get_valid_data_types_for_venue`` fallback, which would
+        pass vacuously for an unmapped venue)."""
+        from unified_api_contracts.registry.market_data_categories import (
+            VENUE_DATA_TYPE_CAPABILITIES,
+        )
+
+        for venue, expected_dt in self._LST_VENUES_EXPECTED_DT:
+            caps = VENUE_DATA_TYPE_CAPABILITIES.get(venue, {})
+            assert caps, (
+                f"{venue}: missing from VENUE_DATA_TYPE_CAPABILITIES — its captured "
+                f"shards are uncredited in the could-exist denominator"
+            )
+            assert expected_dt in caps, (
+                f"{venue}: expected '{expected_dt}' declared in VENUE_DATA_TYPE_CAPABILITIES but got {sorted(caps)}"
+            )
+
+    def test_spark_ethereum_no_longer_flagged_no_coverage(self) -> None:
+        """SPARK-ETHEREUM must NOT be treated as having zero expected DeFi
+        coverage — its stale ``DEFI_INSTRUMENTS_NOT_YET_COLLECTED`` entry
+        (removed 2026-07-10) forced this to True and zeroed its honest-
+        coverage denominator despite 7,405 real captured rows."""
+        from unified_api_contracts.registry import venue_has_no_expected_defi_coverage
+
+        assert not venue_has_no_expected_defi_coverage("SPARK-ETHEREUM"), (
+            "SPARK-ETHEREUM is still flagged as having no expected DeFi coverage — "
+            "check EMPTY_OR_DEPRECATED_DEFI_VENUES / DEFI_INSTRUMENTS_NOT_YET_COLLECTED "
+            "/ DEPRECATED_DEFI_GHOST_VENUE_NAMES for a reintroduced stale entry"
+        )
+
+    def test_spark_ethereum_declares_lending_indices(self) -> None:
+        """SPARK-ETHEREUM's real captured data_type (lending_indices, 7,405
+        rows) must remain declared."""
+        dts = get_expected_data_types_for_venue("SPARK-ETHEREUM")
+        assert "lending_indices" in dts, f"SPARK-ETHEREUM lost its lending_indices capability entry, got {dts}"

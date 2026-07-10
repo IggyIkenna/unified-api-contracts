@@ -343,6 +343,10 @@ allowed:
     reason: recording-template
     detail: "Coinbase Advanced Trade REST products (api.coinbase.com/api/v3/brokerage/products). IS CCXTReferenceDataAdapter(exchange_id='coinbase'). UAC external/coinbase schemas not yet imported by CCXT adapter. Phase 2 QG task."
     acked_by: slot-1 2026-05-26
+  - path: coinbase_cde/mocks/market_trades_ws.yaml
+    reason: recording-template
+    detail: "Coinbase Derivatives Exchange (CDE) market_trades WS (wss://advanced-trade-ws.coinbase.com), registered unified-api-contracts@1cafb3c5 (COINBASE-FUTURES/#3-vs-#8 resolution, 2026-07-10). Native Advanced Trade REST/WS source, zero Tardis coverage — MTDS coinbase_cde adapter not yet built."
+    acked_by: slot-2 2026-07-10
   - path: deribit/mocks/auth_test.yaml
     reason: recording-template
     detail: "Deribit auth/test RPC (www.deribit.com/api/v2/public/test). execution-service deribit connector uses auth handshake. UAC external/deribit schemas not yet imported by execution adapter. Phase 2 QG task."

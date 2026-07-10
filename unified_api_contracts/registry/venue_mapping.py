@@ -102,6 +102,7 @@ class VenueMapping:
             "LIGHTER-ZKSYNC",
             # DRIFT removed 2026-05-14: operator revised 2026-05-13 — GMX/DRIFT are
             # DeFi-only (on-chain settlement). DRIFT-SOLANA lives in MTDS_DEFI_VENUES.
+            "COINBASE-CDE",  # 2026-07-10, zero Tardis coverage, native REST source
         ]
     )
 
@@ -150,7 +151,10 @@ class VenueMapping:
             "OKX": "okx",  # Unified
             "HYPERLIQUID": "hyperliquid",
             "UPBIT": "upbit",
-            "COINBASE": "coinbase",
+            # RE-KEYED from bare "COINBASE" 2026-07-10 (coinbase_bare_name_migration
+            # S3) — no "COINBASE-SPOT" entry pre-existed in this dict (unlike
+            # tardis_to_venue, a different direction), so this is a rename.
+            "COINBASE-SPOT": "coinbase",
             # Note: ASTER not in CCXT yet
         }
     )
@@ -217,6 +221,7 @@ class VenueMapping:
             "EXTENDED-STARKNET": "extended_api",
             "LIGHTER-ZKSYNC": "lighter_api",  # pre-2026-04-17; post routes to Tardis
             "DRIFT": "drift_api",  # S3 archive (2022-2025) + Data API (2025-present)
+            "COINBASE-CDE": "coinbase_advanced_trade_api",
             # DeFi venues — canonical PROTOCOL-CHAIN format
             "UNISWAP_V2-ETHEREUM": "the_graph",
             "UNISWAP_V3-ETHEREUM": "the_graph",
@@ -252,6 +257,7 @@ class VenueMapping:
             # Coinbase Derivatives (perps) — Tardis ``coinbase-international``
             # availableSince 2024-10-31.
             "COINBASE-FUTURES": "2024-10-31",
+            "COINBASE-CDE": "2026-07-10",  # brand-new venue, no historical archive
             "OKX-SPOT": "2020-01-01",
             "OKX-FUTURES": "2020-01-01",
             "OKX-SWAP": "2020-01-01",
@@ -810,11 +816,10 @@ class VenueMapping:
             # Upbit (spot only - Korean exchange for kimchi premium)
             ("UPBIT", "SPOT_PAIR"): "upbit",
             # Coinbase (spot only - for coinbase premium)
-            ("COINBASE", "SPOT_PAIR"): "coinbase",
             ("COINBASE-SPOT", "SPOT_PAIR"): "coinbase",
             # Coinbase Derivatives (perps) via Tardis coinbase-international
             ("COINBASE-FUTURES", "PERPETUAL"): "coinbase-international",
-            ("COINBASE-FUTURES", "FUTURE"): "coinbase-international",
+            ("COINBASE-FUTURES", "SPOT_PAIR"): "coinbase-international",
             # DEX perps with Tardis routing (2026-05-12)
             # Tardis exchange slug is "lighter" (NOT "lighter-zksync").
             ("LIGHTER-ZKSYNC", "PERPETUAL"): "lighter",
@@ -838,7 +843,7 @@ class VenueMapping:
             "bybit-spot": ["SPOT_PAIR"],
             "deribit": ["SPOT_PAIR", "PERPETUAL", "FUTURE", "OPTION"],
             "coinbase": ["SPOT_PAIR"],
-            "coinbase-international": ["PERPETUAL", "FUTURE"],
+            "coinbase-international": ["PERPETUAL", "SPOT_PAIR"],
             # Tier 2
             "upbit": ["SPOT_PAIR"],
             # 2026-06-24: Binance COIN-M (inverse/delivery)
@@ -851,7 +856,7 @@ class VenueMapping:
     spot_mvp_filtered_venues: list[str] = field(
         default_factory=lambda: [
             "UPBIT",  # Korean exchange - for kimchi premium
-            "COINBASE",  # Coinbase - for coinbase premium
+            "COINBASE-SPOT",  # Coinbase - for coinbase premium
         ]
     )
 

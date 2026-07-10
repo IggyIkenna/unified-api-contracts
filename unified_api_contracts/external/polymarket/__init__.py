@@ -12,6 +12,7 @@ from .crypto_macro_mappings import (
     get_polymarket_tags_for_underlying,
 )
 from .schemas import (
+    PolymarketBookLevel,
     PolymarketCLOBOrder,
     PolymarketError,
     PolymarketFill,
@@ -59,6 +60,7 @@ __all__ = [
     "POLYMARKET_TEAM_TO_CANONICAL",
     "POLYMARKET_TIMEFRAMES",
     "SETTLEMENT_REGISTRY",
+    "PolymarketBookLevel",
     "PolymarketCLOBOrder",
     "PolymarketError",
     "PolymarketFill",

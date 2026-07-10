@@ -27,7 +27,7 @@ _VENUE_TO_TARDIS: dict[str, str] = {
     "BYBIT": "bybit",
     "OKX": "okex",
     "UPBIT": "upbit",
-    "COINBASE": "coinbase",
+    "COINBASE-SPOT": "coinbase",
 }
 
 

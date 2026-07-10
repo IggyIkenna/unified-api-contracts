@@ -15,6 +15,11 @@ OKX_FUTURES = "OKX-FUTURES"
 BYBIT_SPOT = "BYBIT-SPOT"
 BYBIT_FUTURES = "BYBIT-FUTURES"
 COINBASE_SPOT = "COINBASE-SPOT"
+# Coinbase Derivatives Exchange (CDE) — 2026-07-10, resolved COINBASE-FUTURES/#3-vs-#8
+# conflict. Real dated futures + far-dated "nano perpetual" contracts, confirmed live
+# via api.coinbase.com Advanced Trade REST (product_type=FUTURE, 99 real contracts).
+# SEPARATE Coinbase product from COINBASE-FUTURES/INTX, zero Tardis coverage.
+COINBASE_CDE = "COINBASE-CDE"
 DERIBIT = "DERIBIT"
 HYPERLIQUID = "HYPERLIQUID"
 ASTER = "ASTER"
@@ -365,39 +370,28 @@ VENUE_CATEGORY_MAP.update(dict.fromkeys(SPORTS_VENUES, "sports"))
 INSTRUMENT_TYPES_BY_VENUE: dict[str, set[str]] = {
     BINANCE_SPOT: {"SPOT_PAIR"},
     COINBASE_SPOT: {"SPOT_PAIR"},
-    # VENUES_BY_ASSET_GROUP["cefi"] (market_data_categories.py) declares the
-    # BARE "COINBASE" token (not "COINBASE-SPOT") as the canonical cefi spot
-    # venue; the writer stamps "COINBASE-SPOT" (folded back to "COINBASE" by
-    # the Layer-1 checker's _CEFI_VENUE_FOLD for the EXPECTED/ENUMERATED
-    # comparison — check_enumeration_completeness.py). The EXPECTED-side
-    # lookup is keyed by the VENUES_BY_ASSET_GROUP token, i.e. bare
-    # "COINBASE", so it needs its OWN key here too (D2a naming reconciliation,
-    # 2026-07-06) — without it the itype-gate authority switch silently zeroes
-    # COINBASE's entire EXPECTED set.
-    "COINBASE": {"SPOT_PAIR"},
     OKX_SPOT: {"SPOT_PAIR"},
     OKX_FUTURES: {"PERPETUAL", "FUTURE", "OPTION"},
-    # bare "OKX" keeps SPOT_PAIR (reverted 2026-07-08, commit 23fa3a99 had
-    # dropped it as "phantom"): VENUES_BY_ASSET_GROUP["cefi"] never declares
-    # "OKX-SPOT" as a distinct cefi venue (only bare "OKX" is registered) —
-    # OKX was never split like BINANCE-SPOT/BINANCE-FUTURES or BYBIT/
-    # BYBIT-SPOT, so bare "OKX" is the ONLY cefi venue token that can carry
-    # OKX spot_pair capability in the EXPECTED denominator. Removing it left
-    # OKX spot_pair permanently unenumerable, dropping build_expected('cefi')
-    # 75→71 tuples and failing the golden-byte-identical test (blocked ALL
-    # instruments-service shipping). See
-    # plans/active/issues/instruments_service_cefi_qg_red_on_ldr_head_2026_07_08.md.
-    "OKX": {"SPOT_PAIR", "PERPETUAL", "FUTURE", "OPTION"},
+    # bare "OKX" DROPS SPOT_PAIR again (Option A follow-through, 2026-07-10):
+    # OKX-SPOT is now declared its own distinct cefi venue in
+    # VENUES_BY_ASSET_GROUP["cefi"] (market_data_categories.py, 2026-07-10
+    # operator decision) with its own VENUE_DATA_TYPE_CAPABILITIES entry, so
+    # bare-OKX SPOT_PAIR is a duplicate EXPECTED cell (production-verified:
+    # bare OKX has ZERO real SPOT_PAIR rows — see the 2026-07-07 23fa3a99
+    # rationale). The 2026-07-08 revert (1771d59a) that restored this entry
+    # predates OKX-SPOT's venue declaration; now that OKX-SPOT exists as its
+    # own venue, restoring bare-OKX SPOT_PAIR would double-count instead of
+    # filling a real hole. See
+    # plans/active/issues/instruments_service_cefi_qg_red_on_ldr_head_2026_07_08.md
+    # Option A + plans/active/issues/instruments_service_qg_red_golden_drift_2026_07_10.md.
+    "OKX": {"PERPETUAL", "FUTURE", "OPTION"},
     BYBIT_SPOT: {"SPOT_PAIR"},
     BYBIT_FUTURES: {"PERPETUAL", "FUTURE"},
-    # bare "BYBIT" keeps SPOT_PAIR too (same 2026-07-08 revert) — unlike OKX,
-    # BYBIT-SPOT IS a separately declared cefi venue, but the checked-in
-    # golden (tests/unit/scripts/goldens/expected_universe/cefi.json) expects
-    # BOTH ('BYBIT', 'spot_pair', ...) and ('BYBIT-SPOT', 'spot_pair', ...) as
-    # distinct EXPECTED cells; per the golden test's own docstring, a real
-    # coverage regression must not be laundered into a fixture update, so the
-    # source-of-truth capability declaration is restored to match instead.
-    "BYBIT": {"SPOT_PAIR", "PERPETUAL", "FUTURE"},
+    # bare "BYBIT" DROPS SPOT_PAIR too (same Option A follow-through) —
+    # BYBIT-SPOT already covers real captures, so bare-BYBIT SPOT_PAIR is the
+    # same phantom-duplicate pattern as bare-OKX above, not a distinct real
+    # capability.
+    "BYBIT": {"PERPETUAL", "FUTURE"},
     UPBIT: {"SPOT_PAIR"},
     BINANCE_FUTURES: {"PERPETUAL", "FUTURE"},
     # SPOT_PAIR added 2026-07-06 (D2a regression fix): the OLD tardis-routing
@@ -428,7 +422,9 @@ INSTRUMENT_TYPES_BY_VENUE: dict[str, set[str]] = {
     # a dedicated module constant (grepped) — string literals match the style
     # of the other unconstant-ed cefi entries above ("OKX", "BYBIT").
     "BINANCE-DELIVERY": {"PERPETUAL", "FUTURE"},  # COIN-M inverse perps + dated delivery futures
-    "COINBASE-FUTURES": {"PERPETUAL", "FUTURE"},  # Coinbase Derivatives via Tardis coinbase-international
+    # RESCOPED 2026-07-10 (COINBASE-FUTURES/#3-vs-#8): INTX-only, zero dated futures confirmed live.
+    "COINBASE-FUTURES": {"PERPETUAL", "SPOT_PAIR"},
+    COINBASE_CDE: {"FUTURE"},  # CDE — all 99 real live products are FUTURE (confirmed live)
     "BITFINEX-FUTURES": {"PERPETUAL", "FUTURE"},
     "BITGET-FUTURES": {"PERPETUAL", "FUTURE"},
     "BITFINEX-SPOT": {"SPOT_PAIR"},

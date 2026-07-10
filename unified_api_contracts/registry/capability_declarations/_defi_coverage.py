@@ -45,14 +45,19 @@ DEPRECATED_DEFI_GHOST_VENUE_NAMES: frozenset[str] = frozenset(
 # Venues that have a subgraph (and may receive future coverage) but have not been
 # collected by instruments-service yet. data-status should not flag historical
 # days as missing until the venue's first parquet write.
+#
+# SPARK-ETHEREUM removed 2026-07-10 (defi_turbo_api_hides_real_captured_data_2026_07_07.md):
+# this entry was stale — it claimed "instruments-service has never written historical
+# parquets for this venue" as of 2026-04-29, but a live GCS manifest read on
+# 2026-07-07/2026-07-10 found 7,405 real captured lending_indices rows,
+# 2023-03-07 -> 2026-06-21 (current). venue_has_no_expected_defi_coverage() short-
+# circuited every mtds_expected_dates_cached() call for this venue to an empty
+# frozenset, so the MTDS honest-coverage override always computed
+# expected_shards=0 -> the turbo API left SPARK-ETHEREUM off the UAC-annotated
+# response path entirely, masking the real captured data instead of reporting it.
 DEFI_INSTRUMENTS_NOT_YET_COLLECTED: frozenset[str] = frozenset(
     {
         "VELODROME_V2-OPTIMISM",  # subgraph: 881 instruments; bucket: 0 parquets as of 2026-04-29
-        # Spark adapter shipped 2026-04-29 (separate from aave_v3); subgraph
-        # returns 17 markets but instruments-service has never written
-        # historical parquets for this venue — until first scheduled run lands
-        # on bucket, data-status should NOT flag historical days as missing.
-        "SPARK-ETHEREUM",
         # SANCTUM: instruments-service adapter not yet created (Phase 2 of
         # solana_lst_native_staking_adapters_2026_05_14.md). Remove when
         # Phase 2 ships + first backfill completes.

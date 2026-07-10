@@ -233,6 +233,22 @@ VENUES_BY_ASSET_GROUP: dict[str, list[str]] = {
         "BINANCE-DELIVERY",
         "BYBIT",
         "OKX",
+        # OKX-SPOT declared its own distinct cefi venue (Option A,
+        # 2026-07-10 operator decision — mirrors the BYBIT-SPOT precedent
+        # below): bare "OKX" has ZERO real SPOT_PAIR captures in production
+        # (confirmed via a direct GCS availability_index read,
+        # unified-api-contracts@23fa3a99) — Tardis's own routing table
+        # already sends (OKX, SPOT_PAIR) to the same "okex" source as
+        # canonical OKX-SPOT, so the bare-OKX capability was a redundant
+        # alias, not a distinct real capability. Declaring OKX-SPOT here
+        # (instead of relying on instruments-service's _CEFI_VENUE_FOLD to
+        # fold captured OKX-SPOT rows up to bare "OKX") makes the real
+        # captured OKX spot data visible to Layer-1/Layer-2 honest-coverage
+        # directly, matching BYBIT/BYBIT-SPOT's shape. SSOT:
+        # unified-trading-pm/plans/active/issues/
+        # instruments_service_cefi_qg_red_on_ldr_head_2026_07_08.md,
+        # cefi_layer1_denominator_gaps_2026_07_03.md.
+        "OKX-SPOT",
         "DERIBIT",
         # DERIBIT-COMBO: multi-leg combo/spread instruments fetched from Deribit's
         # public get_instruments (future_combo + option_combo kinds). Registered as a
@@ -242,12 +258,28 @@ VENUES_BY_ASSET_GROUP: dict[str, list[str]] = {
         # until the kind-split + venue-tag fixes 2026-06-18). instrument_key stays DERIBIT:COMBO:*.
         "DERIBIT-COMBO",
         "UPBIT",
-        "COINBASE",
+        # RE-KEYED from bare "COINBASE" (coinbase_bare_name_migration_2026_07_06.md
+        # S3, 2026-07-10). Real bug found during execution: this list had NO
+        # separate "COINBASE-SPOT" entry — INSTRUMENT_TYPES_BY_VENUE's
+        # COINBASE_SPOT key was declared but unreachable because
+        # expected_universe._expected_generic("cefi") iterates THIS list
+        # (VENUES_BY_ASSET_GROUP.get(ag, [])), not INSTRUMENT_TYPES_BY_VENUE's
+        # keys directly. Deleting bare COINBASE without adding this entry would
+        # have silently zeroed COINBASE's entire cefi EXPECTED set — exactly
+        # the D2a regression the migration plan exists to prevent.
+        "COINBASE-SPOT",
         # 2026-06-23: Bybit spot + Coinbase Derivatives (perps) as DISTINCT
         # canonical venues so the perp-gate pairs BYBIT-SPOT↔BYBIT perps and
         # COINBASE-SPOT↔COINBASE-FUTURES (cefi_universe_capture_rule).
         "BYBIT-SPOT",
         "COINBASE-FUTURES",
+        # Coinbase Derivatives Exchange (CDE) — 2026-07-10, COINBASE-FUTURES/#3-vs-#8
+        # resolution. Real dated futures + far-dated "nano perpetual" contracts, zero
+        # Tardis coverage under any name — native Advanced Trade REST source (see
+        # venue_adapter_keys.py "coinbase_cde"). SEPARATE product from COINBASE-FUTURES
+        # (Coinbase INTX). SSOT: unified-trading-pm/plans/active/issues/
+        # instruments_remaining_work_audit_2026_07_10.md Progress Log.
+        "COINBASE-CDE",
         # 2026-05-01: Tardis Tier-3 expansion (cefi_venue_universe_expansion plan)
         "BITFINEX-SPOT",
         "BITFINEX-FUTURES",
@@ -738,6 +770,37 @@ VALID_DATA_TYPES_BY_AG_AND_INSTRUMENT_TYPE: dict[tuple[str, str], frozenset[str]
 }
 
 
+# ── Layer-1 venue-axis exclusions (two-layer combinator redesign, finding 1) ──
+# uac_data_type_validity_combinator_fragmentation_2026_07_07.md's target shape
+# generalises theoretical validity to (asset_group, protocol, instrument_type);
+# for TradFi, "venue" plays the protocol role — CME and ICE are NOT
+# interchangeable data providers despite sharing an instrument_type (CME =
+# Databento GLBX.MDP3 full tick; ICE has ZERO Databento coverage — see
+# VENUES_BY_ASSET_GROUP's "Yahoo-sourced ICE/NYBOT DXY index only" comment
+# above). Before this table, ``valid_data_types_for_venue_instrument_type``
+# discarded ``venue`` for every non-DeFi asset_group (:1019 old behaviour),
+# so ICE silently inherited CME's AG-level ``("tradfi","futures_chain")`` set
+# including ``ohlcv_1s`` — a live, provably-wrong cell (finding 1).
+#
+# Live-verified 2026-07-10 against
+# gs://market-data-tick-tradfi-prd-<project>/_index/
+# availability_index.parquet: CME/futures_chain/ohlcv_1s has 151,153 real
+# ``captured`` rows; ICE/futures_chain/ohlcv_1s (2,108 rows) + ICE/combo/
+# ohlcv_1s (360,270 rows) + bare-ICE/ohlcv_1s are ALL 100% ``empty_confirmed``
+# (ZERO ``captured`` anywhere) while ICE's ``trades``/``ohlcv_1m``/``tbbo`` DO
+# have real captured rows at the same grains (ICE/futures_chain: 110 trades +
+# 135 ohlcv_1m captured; ICE/combo: 83 trades + 95 ohlcv_1m captured) — so the
+# fix SUBTRACTS only the proven-wrong ``ohlcv_1s`` cell, not a hand-authored
+# replacement set (avoids silently dropping a real, unverified cell like tbbo
+# at this grain). Keyed ``(asset_group, base_venue, instrument_type)`` — empty
+# for every venue but ICE, so every other TradFi/CeFi/DeFi venue (CME
+# included) is byte-identical to pre-fix behaviour (no regression).
+VALID_DATA_TYPES_VENUE_EXCLUSIONS: dict[tuple[str, str, str], frozenset[str]] = {
+    ("tradfi", "ICE", "futures_chain"): frozenset({"ohlcv_1s"}),
+    ("tradfi", "ICE", "combo"): frozenset({"ohlcv_1s"}),
+}
+
+
 # ── G1-ENUM bundle-grain axis ────────────────────────────────────────────────
 # Per-(asset_group, instrument_type) capture GRAIN — the second half of the
 # G1-ENUM shape-aware producer (validity FILTER above + GRAIN here). It tells the
@@ -998,53 +1061,79 @@ def valid_data_types_for_instrument_type(asset_group: str, instrument_type: str)
 def valid_data_types_for_venue_instrument_type(
     asset_group: str, venue: str | None, instrument_type: str
 ) -> frozenset[str] | None:
-    """Per-``(venue, instrument_type)`` valid data_types — DeFi protocol-grain.
+    """Per-``(venue, instrument_type)`` valid data_types — the combinator JOIN.
 
-    :func:`valid_data_types_for_instrument_type` builds the DeFi validity set as
-    the UNION across every protocol that declares an instrument_type, so a
-    hybrid protocol's data_types leak to every instrument of that type — e.g.
-    GMX declares both ``pool`` and ``perp_funding`` → ``perp_funding`` reads as
-    valid for ALL pools incl. Uniswap → residual false ``expected_unattempted``
-    for non-GMX pools.
+    Two-layer redesign (uac_data_type_validity_combinator_fragmentation_2026_07_07.md):
+    this is the single accessor that composes Layer 1 (theoretical validity,
+    chain/protocol-agnostic — :func:`valid_data_types_for_instrument_type`) with
+    the venue axis, in two ways:
 
-    This narrows DeFi validity to the SPECIFIC protocol named by ``venue`` (the
-    ``PROTOCOL`` segment of the canonical ``PROTOCOL-CHAIN`` id, e.g.
-    ``UNISWAP_V3-ETHEREUM`` → ``uniswap_v3``): it returns ONLY that protocol's
-    declared data_types. For every NON-DeFi asset_group, a missing ``venue``, an
-    unmapped protocol, OR an instrument_type the protocol does not declare, it
-    DELEGATES to :func:`valid_data_types_for_instrument_type` — i.e. it only ever
-    narrows in the clearly-safe case and never under-reports a real cell.
+    1. **DeFi protocol narrowing** (pre-existing). :func:`valid_data_types_for_instrument_type`
+       builds the DeFi validity set as the UNION across every protocol that
+       declares an instrument_type, so a hybrid protocol's data_types leak to
+       every instrument of that type — e.g. GMX declares both ``pool`` and
+       ``perp_funding`` → ``perp_funding`` reads as valid for ALL pools incl.
+       Uniswap → residual false ``expected_unattempted`` for non-GMX pools.
+       This narrows DeFi validity to the SPECIFIC protocol named by ``venue``
+       (the ``PROTOCOL`` segment of the canonical ``PROTOCOL-CHAIN`` id, e.g.
+       ``UNISWAP_V3-ETHEREUM`` → ``uniswap_v3``): it returns ONLY that
+       protocol's declared data_types.
+    2. **Venue-axis exclusions** (finding 1 fix — ``VALID_DATA_TYPES_VENUE_EXCLUSIONS``,
+       any asset_group). Some venues sharing an instrument_type are NOT
+       interchangeable data providers (CME vs ICE both stamp ``futures_chain``
+       but only CME has Databento sub-second coverage) — venue no longer
+       silently discarded for non-DeFi asset_groups (the pre-fix bug: CME/ICE
+       shared an identical valid-set despite ICE having zero real coverage
+       for part of it).
+
+    For a missing ``venue``, an unmapped DeFi protocol, or an instrument_type
+    the protocol does not declare, DeFi narrowing DELEGATES to
+    :func:`valid_data_types_for_instrument_type` — i.e. it only ever narrows in
+    the clearly-safe case and never under-reports a real cell. The exclusion
+    layer only ever SUBTRACTS explicitly-proven-wrong cells (empty for any
+    venue not in the table) — same non-regression guarantee.
 
     Returns:
-        frozenset[str] — the valid data_types (narrowed for a known DeFi protocol).
+        frozenset[str] — the valid data_types (narrowed for a known DeFi
+                          protocol and/or a declared venue exclusion).
         None           — unmapped (delegated) → caller falls back to ALL.
     """
-    if asset_group.lower() != "defi" or not venue:
-        return valid_data_types_for_instrument_type(asset_group, instrument_type)
-
-    from .capability_declarations._defi import PROTOCOL_CAPABILITIES  # noqa: imports-inside-functions
-
-    # Venue id is ``PROTOCOL-CHAIN``; the protocol segment keys PROTOCOL_CAPABILITIES.
-    protocol = venue.split("-", 1)[0].strip().lower()
-    cap = PROTOCOL_CAPABILITIES.get(protocol)
-    if cap is None:
-        # Belt-and-suspenders: match on the declared ``venue_prefix`` too.
-        for candidate in PROTOCOL_CAPABILITIES.values():
-            if candidate.venue_prefix.strip().lower() == protocol:
-                cap = candidate
-                break
-    if cap is None:
-        # Unmapped protocol → preserve the union behaviour (no regression).
-        return valid_data_types_for_instrument_type(asset_group, instrument_type)
-
+    ag = asset_group.lower()
     normalised_it = instrument_type.strip().lower() if instrument_type else ""
     normalised_it = _INSTRUMENT_TYPE_ALIASES.get(normalised_it, normalised_it)
-    cap_its = {_INSTRUMENT_TYPE_ALIASES.get(_it.strip().lower(), _it.strip().lower()) for _it in cap.instrument_types}
-    if normalised_it not in cap_its:
-        # The protocol does not declare this instrument_type → fall back to the
-        # union rather than risk dropping a real cell on an incomplete cap.
-        return valid_data_types_for_instrument_type(asset_group, instrument_type)
-    return frozenset(cap.data_types)
+
+    if ag == "defi" and venue:
+        from .capability_declarations._defi import PROTOCOL_CAPABILITIES  # noqa: imports-inside-functions
+
+        # Venue id is ``PROTOCOL-CHAIN``; the protocol segment keys PROTOCOL_CAPABILITIES.
+        protocol = venue.split("-", 1)[0].strip().lower()
+        cap = PROTOCOL_CAPABILITIES.get(protocol)
+        if cap is None:
+            # Belt-and-suspenders: match on the declared ``venue_prefix`` too.
+            for candidate in PROTOCOL_CAPABILITIES.values():
+                if candidate.venue_prefix.strip().lower() == protocol:
+                    cap = candidate
+                    break
+        cap_its: set[str] = (
+            {_INSTRUMENT_TYPE_ALIASES.get(_it.strip().lower(), _it.strip().lower()) for _it in cap.instrument_types}
+            if cap is not None
+            else set()
+        )
+        if cap is not None and normalised_it in cap_its:
+            result: frozenset[str] | None = frozenset(cap.data_types)
+        else:
+            # Unmapped protocol, or the protocol does not declare this
+            # instrument_type → fall back to the union rather than risk
+            # dropping a real cell on an incomplete cap.
+            result = valid_data_types_for_instrument_type(asset_group, instrument_type)
+    else:
+        result = valid_data_types_for_instrument_type(asset_group, instrument_type)
+
+    if result is None or not venue:
+        return result
+
+    excluded = VALID_DATA_TYPES_VENUE_EXCLUSIONS.get((ag, _base_venue(venue), normalised_it))
+    return (result - excluded) if excluded else result
 
 
 # Override entries needed when:
@@ -1126,10 +1215,9 @@ VENUE_DATA_TYPE_CAPABILITIES: dict[str, dict[str, str]] = {
         "trades": "2021-03-03",
         "book_snapshot_5": "2021-03-03",
     },
-    "COINBASE": {
-        "trades": "2020-01-01",
-        "book_snapshot_5": "2020-01-01",
-    },
+    # bare "COINBASE" REMOVED (coinbase_bare_name_migration_2026_07_06.md S3,
+    # 2026-07-10) — was a byte-identical duplicate of the COINBASE-SPOT entry
+    # below; COINBASE-SPOT is the sole canonical cefi spot key now.
     "COINBASE-SPOT": {
         "trades": "2020-01-01",
         "book_snapshot_5": "2020-01-01",
@@ -1202,6 +1290,26 @@ VENUE_DATA_TYPE_CAPABILITIES: dict[str, dict[str, str]] = {
         "derivative_ticker": "2020-01-01",
         "liquidations": "2020-01-01",
     },
+    # DERIBIT-COMBO (operator 2026-07-10, decision #6 on
+    # cefi_layer1_denominator_gaps_2026_07_03.md) — a DISTINCT venue from bare
+    # DERIBIT (multi-leg combo/spread instruments, see VENUES_BY_ASSET_GROUP
+    # comment). Was wholly absent from this dict — Carve-out 1 zeroed every
+    # data_type regardless of the itype-gate fix (INSTRUMENT_TYPES_BY_VENUE
+    # already admits it -> {"OPTION"}). Its base venue token "DERIBIT" IS a
+    # FUTURE_BUNDLE_VENUES member, so DERIBIT-COMBO's leaf OPTION itype rolls
+    # up to the options_chain bundle grain at the itype-gate stage
+    # (_get_cefi_venue_itypes) same as bare DERIBIT — the bundle grain's only
+    # valid data_type is ``trades`` (VALID_DATA_TYPES_BY_AG_AND_INSTRUMENT_TYPE
+    # [("cefi","options_chain")]). book_snapshot_5 is declared here too (matches
+    # its real DataTypeCapability entries, data_type_capability.py) but never
+    # actually surfaces as an EXPECTED cell at this bundle grain — harmless,
+    # honest superset. Start date = venue_launch_dates.py["DERIBIT-COMBO"].
+    # Verified dynamically: build_expected("cefi") yields
+    # (DERIBIT-COMBO, options_chain, trades) — no longer silently zero.
+    "DERIBIT-COMBO": {
+        "trades": "2019-01-01",
+        "book_snapshot_5": "2019-01-01",
+    },
     # ── DEX-perp on-chain CLOBs (D2b, honest_coverage cefi gate-authority fix,
     # 2026-07-06) — PACIFICA-SOLANA / EXTENDED-STARKNET / LIGHTER-ZKSYNC are
     # declared cefi venues (VENUES_BY_ASSET_GROUP["cefi"]) whose itype-gate the
@@ -1248,6 +1356,15 @@ VENUE_DATA_TYPE_CAPABILITIES: dict[str, dict[str, str]] = {
         "book_snapshot_5": "2024-10-31",
         "derivative_ticker": "2024-10-31",
         "liquidations": "2024-10-31",
+    },
+    # Coinbase Derivatives Exchange (CDE) — 2026-07-10. Live-only for now: Tardis has
+    # ZERO coverage of this venue under any name, so there is no historical/batch
+    # source — only the re-keyed coinbase_cde_ws.py live connector (Advanced Trade
+    # WS market_trades channel) captures real data. Start date = the date this venue
+    # was registered (honest floor — no fabricated pre-registration history; see
+    # honest-absence-downstream-handling.md).
+    "COINBASE-CDE": {
+        "trades": "2026-07-10",
     },
     # ── TradFi — Databento (OHLCV-only MVP per operator direction 2026-05-15) ──
     # Operator: "lets [do] ohlcv 1m for all the tradfi mvp instruments only please …
@@ -1374,6 +1491,62 @@ from unified_api_contracts.registry.defi_venue_capabilities import (
 )
 
 VENUE_DATA_TYPE_CAPABILITIES.update(DEFI_VENUE_DATA_TYPE_CAPABILITIES)
+
+
+def defi_actual_data_types_not_declared_valid() -> dict[str, frozenset[str]]:
+    """DeFi Layer-3 JOIN — ``actual ⊆ theoretical`` audit (two-layer redesign,
+    uac_data_type_validity_combinator_fragmentation_2026_07_07.md § "The target
+    shape").
+
+    For every ``PROTOCOL-CHAIN`` venue in ``DEFI_VENUE_DATA_TYPE_CAPABILITIES``
+    (Layer 2 — actual/genesis: what's declared as genuinely captured, with a
+    start date), returns any data_type that is NOT in that protocol's
+    ``PROTOCOL_CAPABILITIES`` entry (Layer 1 — theoretical validity: what the
+    protocol conceptually CAN produce). A non-empty result means the two
+    registries have drifted: something is declared captured that was never
+    declared theoretically possible — exactly what finding 2 identified for
+    ``oracle_prices`` on the AAVE_V3 family (a real, live-verified 3,160-row
+    gap, fixed 2026-07-10 by adding ``oracle_prices`` to ``aave_v3``'s
+    declared data_types).
+
+    Scoped to DeFi only (NOT a general CeFi/TradFi ``VENUE_DATA_TYPE_CAPABILITIES``
+    checker): unlike DeFi's per-chain dict, the CeFi/TradFi portion of
+    ``VENUE_DATA_TYPE_CAPABILITIES`` is a SPARSE start-date OVERRIDE table (a
+    venue's dict entry omits any data_type whose start date equals the venue's
+    own default launch date — see the module docstring above), so an entry's
+    ABSENCE there does not mean "not captured". DeFi's per-chain dict has no
+    such default-omission convention (every genuinely-declared data_type for a
+    venue is a literal dict key), so the subset check is sound there.
+
+    NOT wired into any runtime hot path — a pure audit/CI helper (see tests).
+    A caller wanting the mirror direction (theoretical-declared-but-never-
+    captured — finding 2's ``liquidations``/``risk_params`` on Euler/Radiant)
+    should cross-reference this function's output against a live manifest
+    read; that direction is legitimately EXPECTED for aspirational entries
+    (declared-but-not-yet-wired, per this module's own convention) so it is
+    NOT flagged as a violation by this function.
+
+    Returns:
+        {venue: frozenset[undeclared_data_type]} — empty when Layer 1 and
+        Layer 2 are fully reconciled for every DeFi venue.
+    """
+    from .capability_declarations._defi import PROTOCOL_CAPABILITIES  # noqa: imports-inside-functions
+
+    violations: dict[str, frozenset[str]] = {}
+    for venue, actual in DEFI_VENUE_DATA_TYPE_CAPABILITIES.items():
+        protocol = venue.split("-", 1)[0].strip().lower()
+        cap = PROTOCOL_CAPABILITIES.get(protocol)
+        if cap is None:
+            for candidate in PROTOCOL_CAPABILITIES.values():
+                if candidate.venue_prefix.strip().lower() == protocol:
+                    cap = candidate
+                    break
+        if cap is None:
+            continue  # unmapped protocol -- not this audit's concern
+        undeclared = frozenset(actual) - frozenset(cap.data_types)
+        if undeclared:
+            violations[venue] = undeclared
+    return violations
 
 
 # TradFi venue → the writer-grain instrument_types the MTDS writer stamps for it.

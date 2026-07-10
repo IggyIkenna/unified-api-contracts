@@ -37,7 +37,7 @@ def _dt(year: int, month: int, day: int, hour: int = 12, minute: int = 0, tz: ti
         "BYBIT",
         "OKX",
         "DERIBIT",
-        "COINBASE",
+        "COINBASE-SPOT",
         "HYPERLIQUID",
         "POLYMARKET",
         "KALSHI",

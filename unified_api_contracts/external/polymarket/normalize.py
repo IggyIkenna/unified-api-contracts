@@ -187,19 +187,18 @@ def normalize_polymarket_orderbook(
 ) -> CanonicalOrderBook:
     """Convert PolymarketOrderBook to CanonicalOrderBook.
 
-    Polymarket bids/asks: [[price, size], ...] as float lists.
+    Real CLOB API shape: bids/asks are lists of {"price": ..., "size": ...} objects
+    (``PolymarketBookLevel``), not [price, size] tuples.
     """
     sym = symbol or raw.market or raw.asset_id or ""
     bids: list[tuple[Decimal, Decimal]] = []
     asks: list[tuple[Decimal, Decimal]] = []
     for entry in raw.bids or []:
-        if len(entry) >= 2:
-            with contextlib.suppress(Exception):
-                bids.append((Decimal(str(entry[0])), Decimal(str(entry[1]))))
+        with contextlib.suppress(Exception):
+            bids.append((Decimal(str(entry.price)), Decimal(str(entry.size))))
     for entry in raw.asks or []:
-        if len(entry) >= 2:
-            with contextlib.suppress(Exception):
-                asks.append((Decimal(str(entry[0])), Decimal(str(entry[1]))))
+        with contextlib.suppress(Exception):
+            asks.append((Decimal(str(entry.price)), Decimal(str(entry.size))))
     return CanonicalOrderBook(
         venue=venue,
         symbol=sym,
