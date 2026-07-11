@@ -26,6 +26,19 @@ from __future__ import annotations
 from dataclasses import dataclass
 from datetime import date
 
+# Leaf-to-leaf import of the canonical MVP SSOT (crosscutting/_mvp_scope_rules.py).
+# Safe direction: crosscutting.mvp_scope already imports FROM registry leaves
+# (cefi_instrument_universe.py, market_data_categories.py) — NEITHER of those
+# leaves imports tradfi_instrument_universe.py back, so this import can never
+# complete a cycle regardless of which module a caller touches first (verified
+# empirically for both orderings: package-mediated via registry/__init__.py's
+# sequential imports, and a direct leaf-first import bypassing __init__.py
+# entirely — the shape test_cme_options_universe.py itself uses).
+from unified_api_contracts.canonical.crosscutting._mvp_scope_rules import (
+    MVP_SCOPE,
+    TradFiMvpRule,
+)
+
 
 @dataclass(frozen=True, slots=True)
 class DatabentoInstrumentDef:
@@ -661,15 +674,23 @@ def get_required_datasets() -> list[str]:
 # ---------------------------------------------------------------------------
 # MVP CME exchange codes — the parent symbols downloaded in MVP mode.
 #
-# Scope (operator 2026-06-27): CME roots whose underlying futures have a
-# Binance perp leg (the tradfi-perp basis archetype), including:
-#  - SP500 complex: ES.FUT + all ES option surfaces (ES.OPT, EW/EW1-4/E1A-5A/EOM)
-#  - NQ: NQ.FUT + NQ.OPT (Nasdaq 100 options-on-futures)
-#  - Commodity futures + options-on-futures backing Binance perps:
-#    GC (gold) + OG.OPT, CL (crude) + LO.OPT, NG (natgas) + ON.OPT,
-#    HG (copper) + HXE.OPT, SI (silver) + SO.OPT, PL (platinum) + PO.OPT,
-#    PA (palladium) + PAO.OPT
-#  - CME event contracts for the above underlyings (ECES, ECNQ, ECGC, ECCL, ECNG)
+# tradfi_mvp_mode_unreachable_dead_gate_2026_07_08.md / mvp_universal_fetch_mode
+# (2026-07-10): this set is now DERIVED from the canonical cross-asset-group MVP
+# SSOT (``unified_api_contracts.canonical.crosscutting.mvp_scope.MVP_SCOPE["tradfi"]``
+# — a ``TradFiMvpRule`` whose ``underliers`` frozenset is ES/NQ/VX + the 7
+# commodity roots backing a Binance tradfi-perp), NOT a hand-maintained parallel
+# literal. Before this fix the two lists had already drifted (this file's old
+# hand list omitted "VX", present in the canonical rule since v10) — deriving the
+# BASE root set here means a future canonical-rule change (new/removed root)
+# propagates automatically instead of silently drifting again.
+#
+# Databento's symbology has finer per-product-family granularity than the
+# canonical rule's (venue, instrument_type, underlier) grain — a single MVP
+# root like "ES" fans out to weekly/day-of-week 0DTE option roots (EW/EW1-4/
+# E1A-5A/EOM) and CME event contracts (ECES) that the canonical rule has no
+# notion of. That Databento-specific expansion is NECESSARILY hand-listed
+# (there is no coarser SSOT for it) in ``_MVP_ROOT_DATABENTO_SUBCODES`` below;
+# only the ROOT keys driving the expansion come from the canonical rule.
 #
 # NOTE: the options-on-futures use DIFFERENT exchange codes from their
 # underlying futures (e.g. OG ≠ GC, LO ≠ CL). Both the future AND the
@@ -677,48 +698,70 @@ def get_required_datasets() -> list[str]:
 # the full options-on-futures universe. The adapter uses TRADFI_DATABENTO_INSTRUMENTS
 # directly (no MVP filter), so this set gates only get_mvp_databento_symbols_for_venue.
 # ---------------------------------------------------------------------------
-MVP_CME_EXCHANGE_CODES: frozenset[str] = frozenset(
-    {
-        # ----- SP500 complex (ES futures + all option surfaces) -----
-        "ES",  # ES.FUT (quarterly E-mini S&P 500 futures) + ES.OPT (quarterly options)
-        "MES",  # MES.FUT (Micro E-mini S&P 500 futures)
-        "EW",  # EW.OPT  (weekly Friday options)
-        "EW1",  # EW1.OPT (Monday weekly options)
-        "EW2",  # EW2.OPT (Wednesday weekly options)
-        "EW4",  # EW4.OPT (Tuesday weekly options)
-        "E1A",  # E1A.OPT (Monday 0DTE)
-        "E2A",  # E2A.OPT (Tuesday 0DTE)
-        "E3A",  # E3A.OPT (Wednesday 0DTE)
-        "E4A",  # E4A.OPT (Thursday 0DTE)
-        "E5A",  # E5A.OPT (Friday 0DTE)
-        "EOM",  # EOM.OPT (end-of-month options)
-        # ----- Nasdaq 100 (NQ futures + options) -----
-        "NQ",  # NQ.FUT + NQ.OPT (options-on-NQ-futures)
-        # ----- Commodity futures (Binance perp basis) -----
-        "GC",  # GC.FUT (gold futures)
-        "CL",  # CL.FUT (WTI crude futures)
-        "NG",  # NG.FUT (natural gas futures)
-        "HG",  # HG.FUT (copper futures)
-        "SI",  # SI.FUT (silver futures)
-        "PL",  # PL.FUT (platinum futures)
-        "PA",  # PA.FUT (palladium futures)
-        # ----- Commodity options-on-futures (CME GLBX.MDP3, live-probed 2026-06-24) -----
-        "OG",  # OG.OPT (gold options — underlying GC)
-        "LO",  # LO.OPT (crude oil options — underlying CL)
-        "ON",  # ON.OPT (natural gas options — underlying NG)
-        "HXE",  # HXE.OPT (copper options — underlying HG)
-        "SO",  # SO.OPT (silver options — underlying SI)
-        "PO",  # PO.OPT (platinum options — underlying PL)
-        "PAO",  # PAO.OPT (palladium options — underlying PA)
-        # ----- CME event contracts (binary YES/NO on MVP underlyings) -----
-        "ECES",  # ECES.OPT (S&P 500 event contract)
-        "ECNQ",  # ECNQ.OPT (Nasdaq 100 event contract)
-        "ECGC",  # ECGC.OPT (gold event contract)
-        "ECCL",  # ECCL.OPT (crude oil event contract)
-        "ECNG",  # ECNG.OPT (natural gas event contract)
-        "ECBTC",  # ECBTC.OPT (Bitcoin event contract)
-    }
-)
+
+# Databento sub-codes each canonical MVP root (``TradFiMvpRule.underliers``)
+# expands to: the root's own micro-contract + option-surface + event-contract
+# exchange codes that don't share the root's own code. Keyed by canonical
+# root so a root that disappears from the canonical rule silently drops its
+# sub-codes too (no orphaned entries to hand-prune).
+_MVP_ROOT_DATABENTO_SUBCODES: dict[str, frozenset[str]] = {
+    "ES": frozenset(
+        {
+            "MES",  # MES.FUT (Micro E-mini S&P 500 futures)
+            "EW",  # EW.OPT  (weekly Friday options)
+            "EW1",  # EW1.OPT (Monday weekly options)
+            "EW2",  # EW2.OPT (Wednesday weekly options)
+            "EW4",  # EW4.OPT (Tuesday weekly options)
+            "E1A",  # E1A.OPT (Monday 0DTE)
+            "E2A",  # E2A.OPT (Tuesday 0DTE)
+            "E3A",  # E3A.OPT (Wednesday 0DTE)
+            "E4A",  # E4A.OPT (Thursday 0DTE)
+            "E5A",  # E5A.OPT (Friday 0DTE)
+            "EOM",  # EOM.OPT (end-of-month options)
+            "ECES",  # ECES.OPT (S&P 500 event contract)
+        }
+    ),
+    "NQ": frozenset({"ECNQ"}),  # ECNQ.OPT (Nasdaq 100 event contract)
+    "GC": frozenset({"OG", "ECGC"}),  # OG.OPT (gold options); ECGC.OPT (gold event contract)
+    "CL": frozenset({"LO", "ECCL"}),  # LO.OPT (crude oil options); ECCL.OPT (crude event contract)
+    "NG": frozenset({"ON", "ECNG"}),  # ON.OPT (natgas options); ECNG.OPT (natgas event contract)
+    "HG": frozenset({"HXE"}),  # HXE.OPT (copper options)
+    "SI": frozenset({"SO"}),  # SO.OPT (silver options)
+    "PL": frozenset({"PO"}),  # PO.OPT (platinum options)
+    "PA": frozenset({"PAO"}),  # PAO.OPT (palladium options)
+}
+
+# Codes with no canonical MVP underlier of their own — ECBTC (Bitcoin event
+# contract) rides the ES/commodity event-contract family but BTC isn't a
+# TradFi underlier root, so it can't be derived from ``TradFiMvpRule.underliers``.
+_MVP_ALWAYS_ON_CODES: frozenset[str] = frozenset({"ECBTC"})
+
+
+def _mvp_tradfi_underliers() -> frozenset[str]:
+    """Return the canonical TradFi MVP underlier roots (ES/NQ/VX + commodities).
+
+    Reads ``MVP_SCOPE["tradfi"]`` — the SAME cross-asset-group SSOT CeFi's
+    ``get_mvp_data_types_for_cefi_venue`` reads — so this file carries zero
+    independent MVP membership judgment; it only derives Databento
+    exchange-code granularity from a rule this module doesn't own.
+    """
+    rule = MVP_SCOPE.get("tradfi")
+    if not isinstance(rule, TradFiMvpRule):
+        return frozenset()  # pragma: no cover — defensive; MVP_SCOPE always declares tradfi
+    return rule.underliers
+
+
+def _compute_mvp_cme_exchange_codes() -> frozenset[str]:
+    """Derive the full CME MVP exchange-code allowlist from the canonical roots."""
+    roots = _mvp_tradfi_underliers()
+    codes: set[str] = set(roots)
+    for root in roots:
+        codes.update(_MVP_ROOT_DATABENTO_SUBCODES.get(root, frozenset()))
+    codes.update(_MVP_ALWAYS_ON_CODES)
+    return frozenset(codes)
+
+
+MVP_CME_EXCHANGE_CODES: frozenset[str] = _compute_mvp_cme_exchange_codes()
 
 
 def get_mvp_databento_symbols_for_venue(venue: str) -> list[DatabentoInstrumentDef]:

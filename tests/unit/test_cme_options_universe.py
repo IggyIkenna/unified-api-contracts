@@ -302,3 +302,53 @@ def test_cme_option_def_fields(symbol: str, expected_base_asset: str, expected_a
     assert d.asset_group == expected_asset_group, (
         f"{symbol}: wrong asset_group {d.asset_group!r}, expected {expected_asset_group!r}"
     )
+
+
+# ---------------------------------------------------------------------------
+# 6. MVP_CME_EXCHANGE_CODES is DERIVED from the canonical cross-asset-group
+#    MVP SSOT (MVP_SCOPE["tradfi"].underliers), not a hand-maintained parallel
+#    literal — mvp_universal_fetch_mode 2026-07-10 / tradfi_mvp_mode_
+#    unreachable_dead_gate_2026_07_08.md. Root-cause regression: the two lists
+#    HAD already drifted (this file's old hand list omitted "VX").
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.unit
+def test_mvp_cme_exchange_codes_contains_every_canonical_underlier() -> None:
+    """Every canonical TradFi MVP underlier root is present in MVP_CME_EXCHANGE_CODES.
+
+    Drift regression: before the derivation fix, "VX" (declared in the canonical
+    MVP_SCOPE["tradfi"] rule since v10) was silently absent from the hand-maintained
+    MVP_CME_EXCHANGE_CODES literal.
+    """
+    from unified_api_contracts.canonical.crosscutting.mvp_scope import MVP_SCOPE, TradFiMvpRule
+
+    rule = MVP_SCOPE["tradfi"]
+    assert isinstance(rule, TradFiMvpRule)
+    for root in rule.underliers:
+        assert root in MVP_CME_EXCHANGE_CODES, (
+            f"Canonical MVP underlier '{root}' (MVP_SCOPE['tradfi'].underliers) missing "
+            f"from MVP_CME_EXCHANGE_CODES — the two lists have drifted apart again."
+        )
+
+
+@pytest.mark.unit
+def test_mvp_cme_exchange_codes_vx_present() -> None:
+    """VX (CBOE VIX futures) — the specific code that had drifted out — is present."""
+    assert "VX" in MVP_CME_EXCHANGE_CODES
+
+
+@pytest.mark.unit
+def test_mvp_cme_exchange_codes_is_live_derived_not_a_frozen_snapshot() -> None:
+    """MVP_CME_EXCHANGE_CODES is computed from MVP_SCOPE at import time (not a stale copy).
+
+    Recomputing via the module's own derivation function must reproduce the
+    same value the module-level constant was assigned — proving the constant
+    really is the derivation's output, not a value that happened to match once
+    and was then hand-frozen.
+    """
+    from unified_api_contracts.registry.tradfi_instrument_universe import (
+        _compute_mvp_cme_exchange_codes,
+    )
+
+    assert _compute_mvp_cme_exchange_codes() == MVP_CME_EXCHANGE_CODES
