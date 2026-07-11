@@ -62,6 +62,23 @@ class TestCanonicalPathTemplates:
             assert needle in joined, f"{asset_group}: template set missing {needle}"
 
     @pytest.mark.parametrize("asset_group", ["cefi", "defi", "tradfi", "prediction"])
+    def test_live_pipeline_mode_prefixes_present(self, asset_group: str) -> None:
+        """CF-15 (2026-07-11): the phantom-existence probe must ALSO enumerate
+        ``pipeline_mode=live_<source>/`` — a ``captured`` cell has data whether written by
+        the batch backfill or the live writer (live=batch spine; CF-12). Batch-only
+        templates false-phantomed 13,292 LIVE-captured prediction cells."""
+        from unified_api_contracts.canonical.crosscutting.pipeline_mode import Mode, pipeline_mode_for_source
+
+        joined = "\n".join(canonical_path_templates(asset_group))
+        for source in _EXPECTED_BATCH_SOURCES[asset_group]:
+            try:
+                live_val = pipeline_mode_for_source(source, Mode.LIVE).value
+            except ValueError:
+                continue  # source has no live pipeline_mode (e.g. polymarket_gamma_api)
+            needle = f"pipeline_mode={live_val}/asset_group={asset_group}/"
+            assert needle in joined, f"{asset_group}: template set missing live prefix {needle}"
+
+    @pytest.mark.parametrize("asset_group", ["cefi", "defi", "tradfi", "prediction"])
     def test_legacy_hive_shapes_present(self, asset_group: str) -> None:
         """Bare ``asset_group=`` (no pipeline_mode), legacy ``category=`` hive, and the
         top-level ``day=`` shapes must all be probed (pre-migration on-disk shapes)."""
