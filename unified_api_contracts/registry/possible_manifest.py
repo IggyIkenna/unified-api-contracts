@@ -269,26 +269,38 @@ def _canonical_pipeline_mode_prefixes(asset_group: str) -> list[str]:
     sources = set(external_batch_sources_for_asset_group(ag)) | legacy
     prefixes: list[str] = []
     for source in sorted(sources):
+        pmodes: list[str] = []
         if source in legacy:
             # Legacy/transitional token (e.g. ``hyperliquid_rest``) — retired from the
             # canonical ``PipelineMode`` enum by R4, so ``pipeline_mode_for_source``
             # would raise. The on-disk objects still carry ``batch_<token>`` until the
             # gated migrator rewrites them, so emit the raw legacy prefix directly.
-            pmode_value = f"{Mode.BATCH.value}_{source}"
+            pmodes.append(f"{Mode.BATCH.value}_{source}")
         else:
-            try:
-                pmode_value = pipeline_mode_for_source(source, Mode.BATCH).value
-            except ValueError:
-                # Source has no batch pipeline_mode (live-only / unregistered batch) —
-                # it cannot own a batch GCS object, so it owns no batch prefix.
-                logger.debug(
-                    "possible_manifest: source %r for asset_group %r has no batch "
-                    "pipeline_mode — skipping batch prefix",
-                    source,
-                    ag,
-                )
-                continue
-        prefixes.append(f"{_DAY_PREFIX}pipeline_mode={pmode_value}/asset_group={ag}/{seg}")
+            # BOTH batch AND live prefixes: the phantom-existence probe must find an
+            # object at EITHER — a ``captured`` cell has data whether it was written by
+            # the batch backfill or the live writer (live=batch spine; CF-12 batch=live
+            # symmetry says the CELL has data either way). Enumerating ONLY ``batch_``
+            # false-phantomed every LIVE-captured cell whose object lives under
+            # ``pipeline_mode=live_<source>/`` (the 2026-07-11 prediction CF-15 finding:
+            # 13,292 KALSHI/POLYMARKET ``book_snapshot_5``/``trades`` rows). Adding a
+            # probe prefix can only REDUCE false-demotion (never introduce one), so this
+            # is safe cross-AG.
+            for mode in (Mode.BATCH, Mode.LIVE):
+                try:
+                    pmodes.append(pipeline_mode_for_source(source, mode).value)
+                except ValueError:
+                    # Source has no pipeline_mode for this mode (live-only / batch-only /
+                    # unregistered) — it cannot own an object there, so it owns no prefix.
+                    logger.debug(
+                        "possible_manifest: source %r for asset_group %r has no %s "
+                        "pipeline_mode — skipping that prefix",
+                        source,
+                        ag,
+                        mode.name,
+                    )
+        for pmode_value in pmodes:
+            prefixes.append(f"{_DAY_PREFIX}pipeline_mode={pmode_value}/asset_group={ag}/{seg}")
     return prefixes
 
 
