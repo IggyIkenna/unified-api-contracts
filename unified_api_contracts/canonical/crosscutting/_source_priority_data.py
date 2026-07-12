@@ -73,13 +73,26 @@ SOURCE_PRIORITY: Final[dict[tuple[str, str], list[str]]] = {
     # source on batch rows (like aster/hyperliquid — native REST, not Tardis).
     # polymarket_perp is BLOCKED-UPSTREAM-OUTAGE (DNS NXDOMAIN 2026-06-21); scaffold
     # registered for when the endpoint recovers. SSOT: prediction-perps-sourcing.md.
-    ("cefi", "trades"): ["tardis", "aster", "hyperliquid", "kalshi_perp", "polymarket_perp", "extended"],
+    # pacifica: PACIFICA-SOLANA (Solana on-chain CeFi perp CLOB, Hyperliquid clone)
+    # self-archives trades + funding over its own public REST (api.pacifica.fi) —
+    # same self-archiving-venue pattern as aster/extended (2-source registration
+    # closes the closed-set round-trip for batch_pacifica + lets the handler stamp
+    # per-venue source). SSOT: cefi_onchain_perp_batch_venue_allowlist_gap_2026_07_12.md.
+    ("cefi", "trades"): [
+        "tardis",
+        "aster",
+        "hyperliquid",
+        "kalshi_perp",
+        "polymarket_perp",
+        "extended",
+        "pacifica",
+    ],
     ("cefi", "ohlcv_1m"): ["tardis", "aster", "hyperliquid", "extended"],
     # ("cefi", "ohlcv_15m") RETIRED 2026-06-09 (operator-directed): cefi has no
     # 15m candles — the tardis entry was a planning placeholder. tradfi ohlcv_15m
     # remains (databento/massive/yahoo/barchart produce it). Exclusion entry in
     # test_validity_matrix_completeness.py removed alongside.
-    ("cefi", "book_snapshot"): ["tardis", "aster", "hyperliquid", "extended"],
+    ("cefi", "book_snapshot"): ["tardis", "aster", "hyperliquid", "extended", "pacifica"],
     ("cefi", "liquidations"): ["tardis", "aster", "hyperliquid", "extended"],
     # derivative_ticker (perp mark/index/OI/funding). tardis is the multi-venue T+1
     # archive BATCH primary for every Tardis-covered CeFi perp venue (binance/okx/
@@ -94,7 +107,7 @@ SOURCE_PRIORITY: Final[dict[tuple[str, str], list[str]]] = {
     # venue-override Aster shard). source_required becomes True, but every
     # derivative_ticker writer already passes an explicit source. SSOT:
     # ``perp_funding_data_semantics_and_cadence_2026_06_16.md`` §genesis.
-    ("cefi", "derivative_ticker"): ["tardis", "aster", "hyperliquid", "extended"],
+    ("cefi", "derivative_ticker"): ["tardis", "aster", "hyperliquid", "extended", "pacifica"],
     # ERA-B (operator 2026-06-07): options_chain / futures_chain are
     # INSTRUMENT_TYPES (per-underlying chain bundles), captured as data_type=trades
     # — so the Era-B writer resolves source via ``(cefi, "trades")`` above (same
@@ -490,6 +503,16 @@ SOURCE_MODE_CAPABILITY: Final[dict[str, frozenset[Mode]]] = {
     # funding tape → batch + replay capable. WS live stream = LIVE capable. Same pattern
     # as aster. SSOT: data_completion_to_100_all_ag_2026_06_21.md task-085.
     "extended": frozenset({Mode.BATCH, Mode.LIVE, Mode.REPLAY}),
+    # Pacifica (PACIFICA-SOLANA on-chain CeFi perp CLOB, Hyperliquid clone on Solana,
+    # mainnet 2025-06) uses its own public REST API (api.pacifica.fi) — NOT
+    # Tardis-archived. Self-archives trades + funding history → BATCH capable via
+    # ``collect-onchain-perp-batch``. Registered BATCH-only for now (no LIVE_/
+    # REPLAY_ member yet) — a live WS connector exists
+    # (``live/connectors/pacifica_solana_perp_ws.py``) but is not yet wired to a
+    # source-aware pipeline_mode; add {Mode.LIVE, Mode.REPLAY} + the matching
+    # PipelineMode members when that lands. SSOT: cefi_onchain_perp_batch_venue_
+    # allowlist_gap_2026_07_12.md.
+    "pacifica": frozenset({Mode.BATCH}),
     # Kalshi-perp (CFTC crypto perps, launched 2026-05-29): public-read REST
     # (GET /markets/{ticker}/trades + /funding_rates, cursor-paginated).
     # Self-archives its own trade + funding tape → batch + replay capable.
@@ -596,6 +619,7 @@ EMISSION_LATENCY_MS_BY_SOURCE: Final[dict[str, int]] = {
     "hyperliquid": 1_000,  # 1s: HL REST API polling cadence (source=hyperliquid, transport=rest)
     "aster": 1_000,  # 1s: Aster native REST polling cadence (source=aster, transport=rest)
     "extended": 1_000,  # 1s: EXTENDED-STARKNET native REST polling cadence (source=extended, transport=rest)
+    "pacifica": 1_000,  # 1s: PACIFICA-SOLANA native REST polling cadence (source=pacifica, transport=rest)
     "pyth_hermes": 1_000,  # 1s: Pyth Hermes batch endpoint
     "chainlink": 200,  # 200ms: on-chain EVM oracle aggregator round (RPC-style)
     # Solana native-staking sources — epoch-granularity (~2.5 day cadence).

@@ -109,6 +109,14 @@ class PipelineMode(StrEnum):
     # like ASTER/HYPERLIQUID → batch_extended via UTL ``_VENUE_OVERRIDES["EXTENDED-STARKNET"]``.
     # SSOT: data_completion_to_100_all_ag_2026_06_21.md task-085.
     BATCH_EXTENDED = "batch_extended"
+    # PACIFICA-SOLANA (Solana on-chain CeFi perp CLOB, Hyperliquid clone) uses its own
+    # public REST API (api.pacifica.fi/api/v1 — no Tardis archive). Self-archiving
+    # venue like ASTER/HYPERLIQUID/EXTENDED-STARKNET → batch_pacifica via UTL/handler
+    # venue overrides. Registered BATCH-only for now (no LIVE_/REPLAY_ member) —
+    # `collect-onchain-perp-batch` (OnchainPerpBatchHandler) is the sole batch
+    # consumer; live-mode capture is a separate WS connector not yet pipeline_mode-
+    # registered. SSOT: cefi_onchain_perp_batch_venue_allowlist_gap_2026_07_12.md.
+    BATCH_PACIFICA = "batch_pacifica"
     BATCH_MASSIVE = "batch_massive"
     # MTDS L2 microstructure computed outputs (depth_of_book_10 / queue_position;
     # order_flow_imbalance RETIRED 2026-07-08 — zero real consumers, zero

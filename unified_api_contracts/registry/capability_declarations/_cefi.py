@@ -1199,6 +1199,79 @@ _POLYMARKET_PERP = SourceCapability(
 )
 
 
+# Pacifica (Solana on-chain CeFi perp CLOB, Hyperliquid clone, mainnet 2025-06).
+# Public REST API at api.pacifica.fi — no auth required for market data reads
+# (confirmed via market_tick_data_service/adapters/_umi_pacifica.py). Batch-wired
+# via OnchainPerpBatchHandler (collect-onchain-perp-batch): trades (cursor-paginated
+# /trades/history) + funding_rates (cursor-paginated /funding_rate/history, from
+# venue mainnet launch) are genuinely historical-range-capable. orderbook (/book)
+# is a CURRENT-SNAPSHOT-ONLY endpoint (no historical range param) — declared here
+# for completeness but NOT wired into the batch handler (excluded as live-only;
+# a live WS connector exists at live/connectors/pacifica_solana_perp_ws.py but is
+# not yet capability-registered, so supports_live stays False here until that
+# lands). SSOT: cefi_onchain_perp_batch_venue_allowlist_gap_2026_07_12.md.
+_PACIFICA = SourceCapability(
+    source="pacifica",
+    domains=["market", "reference"],
+    crosscutting=["errors", "rate_limits", "latency", "connectivity"],
+    supports_live=False,
+    supports_batch=True,
+    supports_historical=True,
+    supports_testnet=False,
+    supports_mainnet=True,
+    auth_scope=["none"],  # public-read for market data (no auth required)
+    auth_environments={"prod": "none"},
+    operations={
+        "market": [
+            "trades",  # GET /trades/history?symbol=X&cursor=... (cursor-paginated, historical)
+            "orderbook",  # GET /book?symbol=X — CURRENT SNAPSHOT ONLY, no historical range
+            "funding_rates",  # GET /funding_rate/history?symbol=X (cursor-paginated, from 2025-06-01)
+        ],
+        "reference": [
+            "markets",  # top-volume coin universe (no dedicated discovery endpoint verified)
+        ],
+    },
+    base_urls={"mainnet": "https://api.pacifica.fi/api/v1"},
+    operation_details={
+        "trades": OperationDetail(
+            environments={
+                "mainnet": OperationEnvDetail(
+                    signing_scheme="none",
+                    required_credential="none",
+                    notes="Cursor-paginated descending walk; genuinely historical (any past day reachable).",
+                ),
+            }
+        ),
+        "orderbook": OperationDetail(
+            environments={
+                "mainnet": OperationEnvDetail(
+                    signing_scheme="none",
+                    required_credential="none",
+                    notes=(
+                        "Single-call CURRENT snapshot — no start/end params, so a request for a "
+                        "historical day returns today's book (filtered out by the batch handler's "
+                        "day-window check, honest zero). Batch-excluded as live-only; see "
+                        "_LIVE_ONLY_DATA_TYPES in onchain_perp_batch_handler.py."
+                    ),
+                ),
+            }
+        ),
+        "funding_rates": OperationDetail(
+            environments={
+                "mainnet": OperationEnvDetail(
+                    signing_scheme="none",
+                    required_credential="none",
+                    notes="Cursor-paginated; genuinely historical from venue mainnet launch (2025-06-01).",
+                ),
+            }
+        ),
+    },
+    chain="solana",
+    kind="perp_dex",
+    coverage_start={"trades": date(2025, 6, 1), "funding_rates": date(2025, 6, 1)},
+)
+
+
 # ---------------------------------------------------------------------------
 # Ordered list -- CeFi
 # ---------------------------------------------------------------------------
@@ -1223,6 +1296,7 @@ CEFI_CAPABILITIES: list[SourceCapability] = [
     _TARDIS,
     _ASTER,
     _EXTENDED,
+    _PACIFICA,
     # FIX protocol / trading connectors
     _FIX,
     _NAUTILUS,
