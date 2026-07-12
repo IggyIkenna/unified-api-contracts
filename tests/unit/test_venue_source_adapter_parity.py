@@ -235,7 +235,12 @@ def _tradfi_mvp_equity_cells() -> list[tuple[str, str, str]]:
             continue
         provider = vm.venue_to_data_provider.get(venue)
         source = "yahoo" if provider == "yahoo_finance" else "databento"
-        for data_type in sorted(rule.data_types):
+        # KRX (2026-07-12, operator decision): narrowed to ohlcv_24h only --
+        # Yahoo has no reliable intraday backfill, unlike the US-listed
+        # equity-basis venues which stay on the shared rule.data_types (ohlcv_1m).
+        # Mirrors the is_mvp() predicate's KRX special-case.
+        venue_data_types = {"ohlcv_24h"} if venue == "KRX" else rule.data_types
+        for data_type in sorted(venue_data_types):
             # Only pair a cell with a data_type the venue's source can actually
             # serve: the source must be in SOURCE_PRIORITY[(tradfi, data_type)] AND
             # not venue-excluded. (Yahoo serves ohlcv_* but NOT trades — so a
@@ -268,15 +273,17 @@ def test_tradfi_mvp_equity_cell_is_fetchable(venue: str, data_type: str, source:
 
 
 def test_krx_basis_cells_are_mvp() -> None:
-    """The 3 KRX stocks (venue=KRX, source=yahoo) are MVP for the equity data_types
-    (the close-out 103/103). A non-basis KRX ticker is NOT mvp."""
-    rule = MVP_SCOPE["tradfi"]
+    """The 3 KRX stocks (venue=KRX, source=yahoo) are MVP for ohlcv_24h (2026-07-12,
+    operator decision -- narrowed from ohlcv_1m/15m/24h, Yahoo has no reliable
+    intraday backfill). A non-basis KRX ticker is NOT mvp."""
     for symbol in ("005380", "005930", "000660"):
-        for data_type in rule.data_types:
-            assert is_mvp("tradfi", "KRX", "EQUITY", data_type, base_ccy=symbol, source="yahoo"), (
-                f"KRX {symbol} ({data_type}) should be MVP"
-            )
-    assert not is_mvp("tradfi", "KRX", "EQUITY", "ohlcv_1m", base_ccy="999999", source="yahoo"), (
+        assert is_mvp("tradfi", "KRX", "EQUITY", "ohlcv_24h", base_ccy=symbol, source="yahoo"), (
+            f"KRX {symbol} (ohlcv_24h) should be MVP"
+        )
+    assert not is_mvp("tradfi", "KRX", "EQUITY", "ohlcv_1m", base_ccy="005380", source="yahoo"), (
+        "KRX ohlcv_1m is no longer MVP (2026-07-12 narrowing) even for a real basis symbol"
+    )
+    assert not is_mvp("tradfi", "KRX", "EQUITY", "ohlcv_24h", base_ccy="999999", source="yahoo"), (
         "a non-basis KRX ticker must NOT be MVP"
     )
 
