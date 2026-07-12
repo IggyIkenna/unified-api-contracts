@@ -802,6 +802,16 @@ class VenueMapping:
             ("OKX", "SPOT_PAIR"): "okex",
             ("OKX", "PERPETUAL"): "okex-swap",
             ("OKX", "FUTURE"): "okex-futures",
+            # OKX options — distinct Tardis exchange "okex-options" (247,539
+            # real option symbols since 2020-02-01, confirmed live 2026-07-12).
+            # NOTE: this dict entry alone is not sufficient to route real
+            # options_chain bulk-download requests — the call site
+            # (market_tick_data_service umi_tick_provider._route_tardis) uses
+            # the venue-only VenueMapping.get_tardis_exchange_for_venue(),
+            # which is not instrument-type-aware, so it will NOT pick this up
+            # until that call site is made itype-aware (see
+            # cefi_deribit_combo_and_okx_bare_venue_gaps_2026_07_12.md todo 2).
+            ("OKX", "OPTION"): "okex-options",
             # Bybit mappings
             ("BYBIT", "SPOT_PAIR"): "bybit-spot",
             ("BYBIT", "PERPETUAL"): "bybit",
@@ -820,7 +830,11 @@ class VenueMapping:
             # MUST pass canonical_venue="DERIBIT-COMBO" explicitly downstream
             # (never re-derive it from the exchange slug via ``tardis_to_venue``,
             # which is a 1:1 map already claimed by "DERIBIT" — see
-            # ``_resolve_canonical_venue`` in tardis_adapter.py).
+            # ``_resolve_canonical_venue`` in tardis_adapter.py). This dict entry
+            # alone is also not sufficient — the caller must filter to
+            # combo-type symbols only and the instrument catalogue's
+            # venue-tagging for combo instruments needs separate verification
+            # (see cefi_deribit_combo_and_okx_bare_venue_gaps_2026_07_12.md todo 1).
             ("DERIBIT-COMBO", "OPTION"): "deribit",
             # Upbit (spot only - Korean exchange for kimchi premium)
             ("UPBIT", "SPOT_PAIR"): "upbit",
