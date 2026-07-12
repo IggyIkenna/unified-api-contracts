@@ -1199,6 +1199,14 @@ VENUE_DATA_TYPE_CAPABILITIES: dict[str, dict[str, str]] = {
         "book_snapshot_5": "2020-01-01",
         "derivative_ticker": "2020-01-01",
         "liquidations": "2020-01-01",
+        # options_chain added 2026-07-12 (cefi_deribit_combo_and_okx_bare_venue_gaps_2026_07_12.md
+        # Bug C) — real Tardis okex-options data confirmed live (247,540 option
+        # symbols, availableSince verified via api.tardis.dev/v1/exchanges/okex-options
+        # this session, NOT assumed). This closes the UAC-capability half of Bug C;
+        # the venue->adapter-class routing half (bare OKX resolving to OKXAdapter,
+        # which has no download_batch) still needs a fix in
+        # market_tick_data_service/adapters/umi_tick_provider.py.
+        "options_chain": "2020-02-01",
     },
     # Canonical suffixed variants (VenueMapping.tardis_to_venue returns
     # these forms — OKX-SPOT/OKX-FUTURES/OKX-SWAP — to disambiguate market
@@ -1312,12 +1320,30 @@ VENUE_DATA_TYPE_CAPABILITIES: dict[str, dict[str, str]] = {
     # [("cefi","options_chain")]). book_snapshot_5 is declared here too (matches
     # its real DataTypeCapability entries, data_type_capability.py) but never
     # actually surfaces as an EXPECTED cell at this bundle grain — harmless,
-    # honest superset. Start date = venue_launch_dates.py["DERIBIT-COMBO"].
-    # Verified dynamically: build_expected("cefi") yields
+    # honest superset. Verified dynamically: build_expected("cefi") yields
     # (DERIBIT-COMBO, options_chain, trades) — no longer silently zero.
+    #
+    # "options_chain" key added 2026-07-12 (cefi_deribit_combo_and_okx_bare_
+    # venue_gaps_2026_07_12.md Bug D) — DISTINCT concern from the Layer-1
+    # bundle-grain EXPECTED-denominator role of "trades" above. MTDS's own
+    # `--data-types options_chain` preflight (deployment-service's
+    # launch-targeted-options-chain-backfill.sh always requests literal
+    # VM_DATA_TYPES=options_chain, mirroring bare DERIBIT's working G1
+    # backfill) does a direct key lookup against this same dict and silently
+    # dropped the request with no "options_chain" key present ("dropping
+    # data_types not supported per UAC" — confirmed live via a real VM this
+    # session, zero rows captured on every date). Start date verified via
+    # api.tardis.dev/v1/exchanges/deribit this session — Deribit's
+    # `type=='combo'` symbols only go back to 2022-08-23 (NOT bare DERIBIT's
+    # 2019-03-30 — combo/spread products launched years after bare options).
+    # trades/book_snapshot_5 corrected from the prior 2019-01-01 placeholder
+    # (never verified against real combo-type availability) to the same
+    # verified 2022-08-23 date for consistency — independently confirmed by
+    # two slots this session via the same live Tardis lookup.
     "DERIBIT-COMBO": {
-        "trades": "2019-01-01",
-        "book_snapshot_5": "2019-01-01",
+        "trades": "2022-08-23",
+        "book_snapshot_5": "2022-08-23",
+        "options_chain": "2022-08-23",
     },
     # ── DEX-perp on-chain CLOBs (D2b, honest_coverage cefi gate-authority fix,
     # 2026-07-06) — PACIFICA-SOLANA / EXTENDED-STARKNET / LIGHTER-ZKSYNC are

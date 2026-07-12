@@ -56,10 +56,14 @@ CEFI_VENUE_LAUNCH_DATES: dict[str, str] = {
     "OKX": "2017-01-01",  # OKEx founded; rebranded OKX 2022
     "DERIBIT": "2016-06-29",  # mainnet
     # Deribit combo/spread instruments (future_combo + option_combo) — distinct
-    # manifest venue; combos rode the options product. Conservative launch ≈ when
-    # combo/strategy quoting became broadly available. Informational (pre-2018
-    # default window) — keeps the venue list ↔ launch-date registry consistent.
-    "DERIBIT-COMBO": "2019-01-01",
+    # manifest venue. Verified 2026-07-12 (cefi_deribit_combo_and_okx_bare_venue_
+    # gaps issue) against live Tardis ``deribit`` exchange metadata
+    # (api.tardis.dev/v1/exchanges/deribit): the earliest ``availableSince``
+    # across all 68,720 ``type=='combo'`` symbols is 2022-08-23 — combos are a
+    # materially newer product than plain options (bare DERIBIT launched
+    # 2016-06-29), so the prior 2019-01-01 placeholder undercounted the
+    # pre-launch window by ~3.5 years.
+    "DERIBIT-COMBO": "2022-08-23",
     "UPBIT": "2017-10-24",  # KRW market launch
     "COINBASE-SPOT": "2014-12-08",  # GDAX launch (rebranded Coinbase Pro 2018)
     "BITFINEX-SPOT": "2012-12-27",  # founded
