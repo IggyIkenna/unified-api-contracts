@@ -303,8 +303,6 @@ omit = [
     # Testing utilities — standalone CLI/helpers used by dev workflows, not unit-testable
     "unified_api_contracts/testing/detect_cassette_drift.py",
     "unified_api_contracts/testing/mock_replay.py",
-    # External vendor schema stubs (no logic — pure Pydantic models, verified by grep)
-    "unified_api_contracts/external/bitstamp/schemas.py",
     # Registry schemas (pure Pydantic request/response shapes, no business logic)
     "unified_api_contracts/registry/quota_broker.py",
     # Sports mapping resolver — loads DataFrames from external CSV/parquet files;

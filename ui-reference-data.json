@@ -4425,7 +4425,7 @@
   "capability_declarations": {
     "registry_name": "capability_declarations",
     "version": "0.1.20",
-    "entry_count": 60,
+    "entry_count": 58,
     "entries": [
       {
         "source": "aave",
@@ -4626,33 +4626,6 @@
           ],
           "position": ["account", "fills", "positions"],
           "reference": ["server_time", "symbols"]
-        }
-      },
-      {
-        "source": "bitstamp",
-        "domains": ["execution", "market", "position", "reference"],
-        "supports_live": true,
-        "supports_batch": true,
-        "supports_testnet": false,
-        "operations": {
-          "execution": [
-            "buy_market",
-            "cancel_order",
-            "open_orders",
-            "order_status",
-            "sell_market"
-          ],
-          "market": [
-            "ohlc",
-            "orderbook",
-            "ticker",
-            "transactions",
-            "ws_live_trades",
-            "ws_order_book",
-            "ws_ticker"
-          ],
-          "position": ["balance", "user_transactions"],
-          "reference": ["trading_pairs_info"]
         }
       },
       {
@@ -4970,32 +4943,6 @@
             "transaction_count"
           ],
           "reference": ["supported_assets", "supported_metrics"]
-        }
-      },
-      {
-        "source": "huobi",
-        "domains": ["execution", "market", "position", "reference"],
-        "supports_live": true,
-        "supports_batch": true,
-        "supports_testnet": false,
-        "operations": {
-          "execution": [
-            "cancel_order",
-            "open_orders",
-            "orders_list",
-            "place_order"
-          ],
-          "market": [
-            "depth",
-            "kline",
-            "tickers",
-            "trade",
-            "ws_depth",
-            "ws_market_detail",
-            "ws_trade_detail"
-          ],
-          "position": ["account_balance", "account_history", "accounts"],
-          "reference": ["common_symbols", "common_timestamp"]
         }
       },
       {
