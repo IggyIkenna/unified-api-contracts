@@ -813,6 +813,15 @@ class VenueMapping:
             ("DERIBIT", "PERPETUAL"): "deribit",
             ("DERIBIT", "FUTURE"): "deribit",
             ("DERIBIT", "OPTION"): "deribit",
+            # DERIBIT-COMBO: multi-leg combo/spread instruments (Tardis ``deribit``
+            # exchange has a distinct ``type=='combo'`` alongside option/future/
+            # perpetual/spot, confirmed live 2026-07-12, 68,720 symbols). Routes
+            # through the SAME Tardis exchange slug as bare DERIBIT — the caller
+            # MUST pass canonical_venue="DERIBIT-COMBO" explicitly downstream
+            # (never re-derive it from the exchange slug via ``tardis_to_venue``,
+            # which is a 1:1 map already claimed by "DERIBIT" — see
+            # ``_resolve_canonical_venue`` in tardis_adapter.py).
+            ("DERIBIT-COMBO", "OPTION"): "deribit",
             # Upbit (spot only - Korean exchange for kimchi premium)
             ("UPBIT", "SPOT_PAIR"): "upbit",
             # Coinbase (spot only - for coinbase premium)

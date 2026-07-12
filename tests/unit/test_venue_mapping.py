@@ -180,6 +180,23 @@ class TestGetTardisExchangeForVenue:
         assert result is not None
         assert result == result.lower()
 
+    def test_deribit_combo_resolves_to_deribit(self, vm: VenueMapping) -> None:
+        # DERIBIT-COMBO routing-gap fix (2026-07-12): combo instruments are
+        # real Tardis data (type=='combo' on the "deribit" exchange, 68,720
+        # symbols confirmed live) — the venue must resolve to a real Tardis
+        # exchange slug, not None (which previously left the capture path
+        # entirely unwired).
+        result = vm.get_tardis_exchange_for_venue("DERIBIT-COMBO")
+        assert result == "deribit"
+
+
+class TestVenueInstrumentTypeToTardis:
+    def test_deribit_combo_option_entry_present(self, vm: VenueMapping) -> None:
+        # Forward routing entry: DERIBIT-COMBO's only declared instrument_type
+        # is OPTION (venue_constants.py INSTRUMENT_TYPES_BY_VENUE), and it
+        # shares the "deribit" Tardis exchange slug with bare DERIBIT.
+        assert vm.venue_instrument_type_to_tardis[("DERIBIT-COMBO", "OPTION")] == "deribit"
+
 
 class TestGetDefiMvpTokens:
     def test_returns_non_empty_list(self, vm: VenueMapping) -> None:
