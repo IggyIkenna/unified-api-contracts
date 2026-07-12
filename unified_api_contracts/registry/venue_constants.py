@@ -425,7 +425,13 @@ INSTRUMENT_TYPES_BY_VENUE: dict[str, set[str]] = {
     # RESCOPED 2026-07-10 (COINBASE-FUTURES/#3-vs-#8): INTX-only, zero dated futures confirmed live.
     "COINBASE-FUTURES": {"PERPETUAL", "SPOT_PAIR"},
     COINBASE_CDE: {"FUTURE"},  # CDE — all 99 real live products are FUTURE (confirmed live)
-    "BITFINEX-FUTURES": {"PERPETUAL", "FUTURE"},
+    # RESCOPED 2026-07-12 (cefi G4 Layer-1 gap): live Tardis metadata
+    # (api.tardis.dev/v1/exchanges/bitfinex-derivatives) returns
+    # availableSymbols type=={"perpetual"} only — zero FUTURE-typed
+    # instruments confirmed live. Mirrors the COINBASE-FUTURES/#3-vs-#8
+    # precedent (1cafb3c5, 2026-07-10): a whole-venue itype declared
+    # generically at the D2a fold (2026-07-06) without a live-data check.
+    "BITFINEX-FUTURES": {"PERPETUAL"},
     "BITGET-FUTURES": {"PERPETUAL", "FUTURE"},
     "BITFINEX-SPOT": {"SPOT_PAIR"},
     "BITGET-SPOT": {"SPOT_PAIR"},
