@@ -322,7 +322,14 @@ def is_mvp(
         _itype = (instrument_type or "").strip().upper()
         _venue_root = (venue or "").strip().upper().split("-", 1)[0]
         if _itype in ("EQUITY", "ETF") and _venue_root in ("NASDAQ", "NYSE", "ARCA", "AMEX", "BATS", "KRX"):
-            if not _data_type_in_rule(data_type, rule.data_types):
+            # KRX (2026-07-12, operator decision): Yahoo-sourced with no reliable
+            # intraday backfill over long historical windows -- narrowed to
+            # ohlcv_24h only, separately from the US-listed equity-basis venues'
+            # shared rule.data_types (ohlcv_1m). Keeps this MVP gate in sync with
+            # expected_coverage.py's KRX entry (also narrowed the same day). See
+            # krx_intraday_ohlcv_registry_vs_adapter_mismatch_2026_07_12.md.
+            _basis_data_types = frozenset({"ohlcv_24h"}) if _venue_root == "KRX" else rule.data_types
+            if not _data_type_in_rule(data_type, _basis_data_types):
                 return False
             if (base_ccy or "").strip().upper() not in {t.upper() for t in TRADFI_EQUITY_PERP_BASIS_UNIVERSE}:
                 return False
