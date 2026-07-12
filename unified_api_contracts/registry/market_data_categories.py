@@ -1320,8 +1320,7 @@ VENUE_DATA_TYPE_CAPABILITIES: dict[str, dict[str, str]] = {
     # [("cefi","options_chain")]). book_snapshot_5 is declared here too (matches
     # its real DataTypeCapability entries, data_type_capability.py) but never
     # actually surfaces as an EXPECTED cell at this bundle grain — harmless,
-    # honest superset. Start date = venue_launch_dates.py["DERIBIT-COMBO"].
-    # Verified dynamically: build_expected("cefi") yields
+    # honest superset. Verified dynamically: build_expected("cefi") yields
     # (DERIBIT-COMBO, options_chain, trades) — no longer silently zero.
     #
     # "options_chain" key added 2026-07-12 (cefi_deribit_combo_and_okx_bare_
@@ -1337,9 +1336,13 @@ VENUE_DATA_TYPE_CAPABILITIES: dict[str, dict[str, str]] = {
     # api.tardis.dev/v1/exchanges/deribit this session — Deribit's
     # `type=='combo'` symbols only go back to 2022-08-23 (NOT bare DERIBIT's
     # 2019-03-30 — combo/spread products launched years after bare options).
+    # trades/book_snapshot_5 corrected from the prior 2019-01-01 placeholder
+    # (never verified against real combo-type availability) to the same
+    # verified 2022-08-23 date for consistency — independently confirmed by
+    # two slots this session via the same live Tardis lookup.
     "DERIBIT-COMBO": {
-        "trades": "2019-01-01",
-        "book_snapshot_5": "2019-01-01",
+        "trades": "2022-08-23",
+        "book_snapshot_5": "2022-08-23",
         "options_chain": "2022-08-23",
     },
     # ── DEX-perp on-chain CLOBs (D2b, honest_coverage cefi gate-authority fix,

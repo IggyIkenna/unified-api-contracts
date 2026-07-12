@@ -265,3 +265,10 @@ class TestOkxAndDeribitComboOptionsChainCapability:
             VENUE_DATA_TYPE_CAPABILITIES["DERIBIT-COMBO"]["options_chain"]
             != VENUE_DATA_TYPE_CAPABILITIES["DERIBIT"]["options_chain"]
         )
+
+    def test_get_expected_data_types_for_venue_includes_options_chain(self) -> None:
+        from unified_api_contracts.registry.market_data_categories import (
+            get_expected_data_types_for_venue,
+        )
+
+        assert "options_chain" in get_expected_data_types_for_venue("DERIBIT-COMBO")
