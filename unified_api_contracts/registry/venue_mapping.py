@@ -826,7 +826,10 @@ class VenueMapping:
             ("KRAKEN-FUTURES", "PERPETUAL"): "cryptofacilities",
             ("KRAKEN-FUTURES", "FUTURE"): "cryptofacilities",
             ("BITFINEX-FUTURES", "PERPETUAL"): "bitfinex-derivatives",
-            ("BITFINEX-FUTURES", "FUTURE"): "bitfinex-derivatives",
+            # ("BITFINEX-FUTURES", "FUTURE") REMOVED 2026-07-12 (cefi G4 Layer-1
+            # gap): live Tardis metadata confirms bitfinex-derivatives serves
+            # perpetual only, zero FUTURE-typed instruments — see
+            # venue_constants.py INSTRUMENT_TYPES_BY_VENUE["BITFINEX-FUTURES"].
         }
     )
 
