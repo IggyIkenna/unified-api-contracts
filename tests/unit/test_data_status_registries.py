@@ -236,3 +236,32 @@ class TestRegistryConsistencyWithCapabilities:
                         f"EXPECTED_COVERAGE[{asset_group}][{venue}] — it is "
                         f"computed by MDPS, not emitted by any venue"
                     )
+
+
+class TestOkxAndDeribitComboOptionsChainCapability:
+    """Regression for cefi_deribit_combo_and_okx_bare_venue_gaps_2026_07_12.md Bugs C/D.
+
+    Before this fix, ``VENUE_DATA_TYPE_CAPABILITIES`` had no ``options_chain``
+    key for ``OKX`` and no entry at all for ``DERIBIT-COMBO`` — the MTDS
+    preflight silently dropped the (only) requested data_type on every date,
+    with zero rows captured for either venue despite the underlying Tardis
+    routing being wired correctly.
+    """
+
+    def test_okx_declares_options_chain(self) -> None:
+        assert "options_chain" in VENUE_DATA_TYPE_CAPABILITIES["OKX"]
+        assert VENUE_DATA_TYPE_CAPABILITIES["OKX"]["options_chain"] == "2020-02-01"
+
+    def test_deribit_combo_declares_options_chain(self) -> None:
+        assert "DERIBIT-COMBO" in VENUE_DATA_TYPE_CAPABILITIES
+        assert VENUE_DATA_TYPE_CAPABILITIES["DERIBIT-COMBO"]["options_chain"] == "2022-08-23"
+
+    def test_deribit_combo_start_date_not_copied_from_bare_deribit(self) -> None:
+        """The two venues' real Tardis coverage genuinely differs — combo/spread
+        products launched years after bare Deribit options did (verified live
+        via api.tardis.dev/v1/exchanges/deribit this session, not assumed).
+        """
+        assert (
+            VENUE_DATA_TYPE_CAPABILITIES["DERIBIT-COMBO"]["options_chain"]
+            != VENUE_DATA_TYPE_CAPABILITIES["DERIBIT"]["options_chain"]
+        )
