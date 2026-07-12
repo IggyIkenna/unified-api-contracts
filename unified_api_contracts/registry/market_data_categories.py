@@ -798,6 +798,15 @@ VALID_DATA_TYPES_BY_AG_AND_INSTRUMENT_TYPE: dict[tuple[str, str], frozenset[str]
 VALID_DATA_TYPES_VENUE_EXCLUSIONS: dict[tuple[str, str, str], frozenset[str]] = {
     ("tradfi", "ICE", "futures_chain"): frozenset({"ohlcv_1s"}),
     ("tradfi", "ICE", "combo"): frozenset({"ohlcv_1s"}),
+    # DRIFT's capability declaration (_defi.py) bundles PERPETUAL + SPOT_PAIR
+    # under one _ProtocolCapability entry (instrument_types has no per-type
+    # data_types split), so perp_funding leaks onto every DRIFT-SOLANA SPOT
+    # market — SPOT instruments structurally cannot have a funding rate.
+    # Found investigating mvp_backfill_defi_onchain_v10-010 (2026-07-11):
+    # 51,301 expected_unattempted perp_funding cells across 41 instrument_ids,
+    # most of them DRIFT SPOT markets. oracle_prices legitimately still
+    # applies to SPOT (price feed), so only perp_funding is excluded here.
+    ("defi", "DRIFT", "spot_pair"): frozenset({"perp_funding"}),
 }
 
 
