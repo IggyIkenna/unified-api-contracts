@@ -71,6 +71,42 @@ class TestAllTradfiVenues:
         assert isinstance(vm.all_tradfi_venues, list)
 
 
+class TestVenueInstrumentTypeToTardisNewEntries:
+    """cefi_deribit_combo_and_okx_bare_venue_gaps_2026_07_12.md — routing-table
+    scaffolding for two Layer-1 gaps. Neither entry alone fully wires capture
+    (see the doc for the remaining open questions); these tests only lock in
+    the dict entries themselves.
+    """
+
+    def test_deribit_combo_option_entry_present(self, vm: VenueMapping) -> None:
+        assert vm.venue_instrument_type_to_tardis.get(("DERIBIT-COMBO", "OPTION")) == "deribit"
+
+    def test_deribit_combo_bare_venue_already_resolves_via_fallback(self, vm: VenueMapping) -> None:
+        """Confirms DERIBIT-COMBO's exchange-name resolution was NEVER actually
+        blocked: _get_suffixed_tardis_match's base-venue fallback already
+        resolves any "DERIBIT-<suffix>" to "deribit" since bare DERIBIT has a
+        direct tardis_to_venue entry — independent of the new dict entry
+        above. The real DERIBIT-COMBO gap is symbol-filtering / catalogue
+        venue-tagging, not exchange-name routing."""
+        assert vm.get_tardis_exchange_for_venue("DERIBIT-COMBO") == "deribit"
+
+    def test_okx_option_entry_present(self, vm: VenueMapping) -> None:
+        assert vm.venue_instrument_type_to_tardis.get(("OKX", "OPTION")) == "okex-options"
+
+    def test_okx_options_suffixed_venue_resolves(self, vm: VenueMapping) -> None:
+        """Reachable today via the suffixed-venue lookup path; whether the
+        real options_chain call site constructs a suffixed venue string like
+        this is the open question in todo 2 of the issue doc."""
+        assert vm.get_tardis_exchange_for_venue("OKX-OPTIONS") == "okex-options"
+
+    def test_okx_bare_venue_still_unresolved(self, vm: VenueMapping) -> None:
+        """Confirms the real gap for OKX: bare "OKX" (no instrument-type
+        suffix) still can't resolve to an exchange at all, because OKX maps
+        to multiple exchanges and get_tardis_exchange_for_venue is venue-only.
+        This is the call-site itype-awareness gap todo 2 describes."""
+        assert vm.get_tardis_exchange_for_venue("OKX") is None
+
+
 class TestIsTardisExchange:
     def test_binance_is_tardis(self, vm: VenueMapping) -> None:
         assert vm.is_tardis_exchange("binance") is True
@@ -179,6 +215,23 @@ class TestGetTardisExchangeForVenue:
         result = vm.get_tardis_exchange_for_venue("BINANCE-SPOT")
         assert result is not None
         assert result == result.lower()
+
+    def test_deribit_combo_resolves_to_deribit(self, vm: VenueMapping) -> None:
+        # DERIBIT-COMBO routing-gap fix (2026-07-12): combo instruments are
+        # real Tardis data (type=='combo' on the "deribit" exchange, 68,720
+        # symbols confirmed live) — the venue must resolve to a real Tardis
+        # exchange slug, not None (which previously left the capture path
+        # entirely unwired).
+        result = vm.get_tardis_exchange_for_venue("DERIBIT-COMBO")
+        assert result == "deribit"
+
+
+class TestVenueInstrumentTypeToTardis:
+    def test_deribit_combo_option_entry_present(self, vm: VenueMapping) -> None:
+        # Forward routing entry: DERIBIT-COMBO's only declared instrument_type
+        # is OPTION (venue_constants.py INSTRUMENT_TYPES_BY_VENUE), and it
+        # shares the "deribit" Tardis exchange slug with bare DERIBIT.
+        assert vm.venue_instrument_type_to_tardis[("DERIBIT-COMBO", "OPTION")] == "deribit"
 
 
 class TestGetDefiMvpTokens:
