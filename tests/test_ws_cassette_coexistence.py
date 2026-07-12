@@ -41,6 +41,7 @@ _MTDS_CONNECTORS: Final[Path] = (
 _REST_POLLER_CONNECTORS: Final[frozenset[str]] = frozenset(
     {
         "curve_defi_ws",
+        "dex_swap_uniswap_v3_ws",
         "jito_defi_ws",
         "morpho_defi_ws",
         "odds_api_ws",

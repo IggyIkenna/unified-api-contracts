@@ -292,11 +292,29 @@ class DeploymentKind(StrEnum):
     """The runtime kind of a compute unit.
 
     A ``VM`` is a GCE / EC2 instance; a ``CLOUD_RUN_JOB`` is a GCP Cloud Run
-    job (AWS equivalent is Batch Fargate, also modelled as a job kind).
+    job (AWS equivalent is Batch Fargate, also modelled as a job kind). The
+    remaining four kinds are always-on SERVICES with no live/batch/paper
+    phase — a service's :attr:`DeploymentTarget.umbrella` carries no
+    meaningful mode, so a service surface filters/badges on Kind instead.
     """
 
     VM = "VM"
     CLOUD_RUN_JOB = "CLOUD_RUN_JOB"
+    CLOUD_RUN_SERVICE = "CLOUD_RUN_SERVICE"
+    """GCP Cloud Run managed service (``run_v2.ServicesClient``) — ready-state
+    + revision + region, no live/batch/paper phase."""
+
+    ECS_SERVICE = "ECS_SERVICE"
+    """AWS ECS service (Fargate or EC2 launch type) — state derives from
+    desired-vs-running task count; always emits a row even at 0 running."""
+
+    LAMBDA = "LAMBDA"
+    """AWS Lambda function — existence/config only (invocation/error stats
+    are CloudWatch-only; no host/cgroup to sample on Lambda)."""
+
+    CLOUD_FUNCTION = "CLOUD_FUNCTION"
+    """GCP Cloud Function (gen2) — existence/config census; gen2 runs on
+    Cloud Run underneath."""
 
 
 @dataclass(frozen=True)
