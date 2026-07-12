@@ -52,6 +52,19 @@ _DEFI_VENUE_PREFIXES = frozenset(
         "SPARK",
         # Governance / restaking
         "EIGENLAYER",
+        # Phase-4 lending protocols (2026-07-09/07-10 rollout) — wired into
+        # instruments-service's factory + orchestrator venue lists
+        # (defi_venues.py DEFI_VENUE_PHASE) but never added here, so every
+        # real record these adapters produced was rejected at schema
+        # validation with "unknown venue" (found via a live pipeline_e2e_check
+        # force-leg re-verification, 2026-07-12).
+        "VENUS",
+        "RADIANT",
+        "BENQI",
+        "EULER_V2",
+        # Solana lending adapters (2026-07-09) — same gap as above.
+        "MARGINFI",
+        "SOLEND",
     }
 )
 
