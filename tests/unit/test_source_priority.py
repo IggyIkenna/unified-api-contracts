@@ -184,7 +184,8 @@ def test_external_sources_for_external_vendors() -> None:
         "kalshi_perp",
         "polymarket_perp",
         "extended",
-    ]  # HL/ASTER cefi onchain perps + kalshi_perp/polymarket_perp CFTC perp venues + EXTENDED-STARKNET
+        "pacifica",
+    ]  # HL/ASTER cefi onchain perps + kalshi_perp/polymarket_perp CFTC perp venues + EXTENDED-STARKNET/PACIFICA-SOLANA
     assert external_sources_for("defi", "oracle_prices") == ["pyth_hermes", "chainlink"]
     assert external_sources_for("prediction", "trades") == ["polymarket_clob", "kalshi"]
 
@@ -385,7 +386,8 @@ def test_is_valid_manifest_source_rejects_batch_only_non_member() -> None:
 
 
 def test_get_source_priority_cefi_trades_unchanged() -> None:
-    # The batch read-priority list — 5 original sources + EXTENDED-STARKNET (added 2026-06-24).
+    # The batch read-priority list — 5 original sources + EXTENDED-STARKNET (2026-06-24)
+    # + PACIFICA-SOLANA (2026-07-12).
     assert get_source_priority("cefi", "trades") == [
         "tardis",
         "aster",
@@ -393,6 +395,7 @@ def test_get_source_priority_cefi_trades_unchanged() -> None:
         "kalshi_perp",
         "polymarket_perp",
         "extended",
+        "pacifica",
     ]
 
 
