@@ -272,3 +272,27 @@ class TestOkxAndDeribitComboOptionsChainCapability:
         )
 
         assert "options_chain" in get_expected_data_types_for_venue("DERIBIT-COMBO")
+
+
+class TestKrxVenueDataTypeCapabilitiesRegistryGap:
+    """Regression for a real registry-gap bug (2026-07-13 pipeline_e2e_check
+    TRADFI diagnostic pass): KRX had NO entry at all in
+    ``VENUE_DATA_TYPE_CAPABILITIES``, even though every OTHER TradFi venue
+    (NASDAQ/NYSE/CME/ICE/CBOE/FX/YAHOO_FINANCE) has one. ``get_expected_data_
+    types_for_venue`` falls through to ``get_valid_data_types_for_venue`` (a
+    blanket cross-product of ALL 10 TradFi data_types) whenever a venue is
+    absent here — directly contradicting the SAME-day narrowed
+    ``expected_coverage.py`` KRX entry (``["ohlcv_24h"]``, operator decision:
+    Yahoo has no reliable intraday backfill).
+    """
+
+    def test_krx_declares_ohlcv_24h_only(self) -> None:
+        assert "KRX" in VENUE_DATA_TYPE_CAPABILITIES
+        assert set(VENUE_DATA_TYPE_CAPABILITIES["KRX"]) == {"ohlcv_24h"}
+
+    def test_get_expected_data_types_for_venue_krx_is_narrowed(self) -> None:
+        from unified_api_contracts.registry.market_data_categories import (
+            get_expected_data_types_for_venue,
+        )
+
+        assert get_expected_data_types_for_venue("KRX") == ["ohlcv_24h"]
