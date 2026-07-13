@@ -74,7 +74,7 @@ _GLOBAL_RULES: tuple[RiskRule, ...] = (
         rule_id=RiskRuleId.GLOBAL_DATA_STALENESS_HALT,
         scope=RiskRuleScope.GLOBAL,
         applies_to="*",
-        trigger=MaxDrawdownTrigger(cap_bps=1),
+        trigger=BinaryEventTrigger(event_source="data_staleness"),
         consequence=RiskRuleConsequence.BLOCK,
         alerting_severity=AlertSeverity.CRITICAL,
         description=(
