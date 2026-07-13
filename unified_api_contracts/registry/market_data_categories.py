@@ -1428,8 +1428,18 @@ VENUE_DATA_TYPE_CAPABILITIES: dict[str, dict[str, str]] = {
         "ohlcv_1s": "2019-01-01",
         "ohlcv_1m": "2019-01-01",
     },
+    # ICE — narrowed to ohlcv_24h only (2026-07-13, operator decision). No ICE
+    # Databento datasets are in the 3-dataset subscription (IFEU.IMPACT/
+    # IFUS.IMPACT dropped 2026-06-18), so ohlcv_1m was declared capable with
+    # ZERO working fetch path. The only real ICE instrument is the Yahoo-
+    # sourced ICE/NYBOT DXY index (ICE:INDEX:DXY-USD), a DAILY series — start
+    # date matches YAHOO_INDICES' DXY genesis (tradfi_instrument_universe.py:
+    # YahooIndexDef("DXY", "ICE", "DXY", "DX-Y.NYB", date(2019, 1, 2), "fx")),
+    # mirroring the KRX convention (both Yahoo-daily, both dated to their
+    # registry's real genesis date). See
+    # tradfi_ice_ohlcv_1m_no_working_fetch_path_2026_07_13.md.
     "ICE": {
-        "ohlcv_1m": "2019-01-01",
+        "ohlcv_24h": "2019-01-02",
     },
     "CBOE": {
         "ohlcv_15m": "2020-01-07",  # VIX cash INDEX — Barchart/Yahoo (not Databento)

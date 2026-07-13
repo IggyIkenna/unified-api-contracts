@@ -109,7 +109,10 @@ class TestExpectedCoverageByAssetGroup:
         # Futures venues: CME gains ohlcv_1s (Databento lockdown 2026-06-18 —
         # fetches both ohlcv-1s + ohlcv-1m from GLBX.MDP3).
         assert tradfi["CME"] == ["trades", "ohlcv_1s", "ohlcv_1m", "tbbo"]
-        assert tradfi["ICE"] == ["trades", "ohlcv_1m", "tbbo"]
+        # ICE narrowed to ohlcv_24h only (2026-07-13, operator decision) — ICE
+        # Databento datasets are out of the 3-dataset subscription; the only real
+        # ICE instrument (Yahoo-sourced DXY index) is a daily series.
+        assert tradfi["ICE"] == ["ohlcv_24h"]
         # CBOE: VX index cash = ohlcv_15m; CBOE Futures Exchange (XCBF.PITCH / Databento
         # CFE dataset 2026-06-19) adds ohlcv_1s + ohlcv_1m for VX futures.
         assert tradfi["CBOE"] == ["ohlcv_15m", "ohlcv_1s", "ohlcv_1m"]
@@ -296,3 +299,37 @@ class TestKrxVenueDataTypeCapabilitiesRegistryGap:
         )
 
         assert get_expected_data_types_for_venue("KRX") == ["ohlcv_24h"]
+
+
+class TestIceExpectedCoverageNarrowedToDailyDxy:
+    """Regression for tradfi_ice_ohlcv_1m_no_working_fetch_path_2026_07_13.md:
+    ICE's ``expected_coverage.py``/``VENUE_DATA_TYPE_CAPABILITIES`` entries
+    declared ``trades``/``ohlcv_1m``/``tbbo`` expected + capable via Databento,
+    but the ICE Databento datasets (IFEU.IMPACT/IFUS.IMPACT) were dropped from
+    the 3-dataset subscription lockdown (operator 2026-06-18) — ZERO working
+    fetch path existed for any of those data_types. The only real ICE
+    instrument is the Yahoo-sourced ICE/NYBOT DXY index (``ICE:INDEX:DXY-USD``),
+    a DAILY series. Operator decision (2026-07-13): narrow to ``ohlcv_24h``
+    only, mirroring the same-day-precedent KRX narrowing
+    (krx_intraday_ohlcv_registry_vs_adapter_mismatch_2026_07_12.md).
+    """
+
+    def test_ice_declares_ohlcv_24h_only(self) -> None:
+        assert "ICE" in VENUE_DATA_TYPE_CAPABILITIES
+        assert set(VENUE_DATA_TYPE_CAPABILITIES["ICE"]) == {"ohlcv_24h"}
+
+    def test_ice_start_date_matches_yahoo_indices_dxy_genesis(self) -> None:
+        """YAHOO_INDICES' DXY entry (tradfi_instrument_universe.py) genesis is
+        date(2019, 1, 2) — VENUE_DATA_TYPE_CAPABILITIES must match, not the
+        stale Databento-era 2019-01-01 floor."""
+        assert VENUE_DATA_TYPE_CAPABILITIES["ICE"]["ohlcv_24h"] == "2019-01-02"
+
+    def test_get_expected_data_types_for_venue_ice_is_narrowed(self) -> None:
+        from unified_api_contracts.registry.market_data_categories import (
+            get_expected_data_types_for_venue,
+        )
+
+        assert get_expected_data_types_for_venue("ICE") == ["ohlcv_24h"]
+
+    def test_ice_expected_coverage_narrowed(self) -> None:
+        assert EXPECTED_COVERAGE_BY_ASSET_GROUP["tradfi"]["ICE"] == ["ohlcv_24h"]
