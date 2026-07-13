@@ -3,9 +3,11 @@
 Validates that deployment-service's key surfaces remain stable for its consumers:
 - deployment-api's deployments_inventory.py imports `classify_deployment_target`,
   `UnclassifiedDeploymentError` from deployment_service.deployment_classification and
-  `ACTIVE_PREFIX`, `ARCHIVE_PREFIX`, `DEFAULT_BUCKET`, `DeploymentRegistryEntry`,
-  `vm_run_log_rolling_uri` from deployment_service.deployments_registry and
   `CLOUD_RUN_JOBS` from deployment_service.cloud_run_job_registry — all by name.
+- deployment-api's deployments_inventory.py imports `ACTIVE_PREFIX`, `ARCHIVE_PREFIX`,
+  `DEFAULT_BUCKET`, `DeploymentRegistryEntry`, `vm_run_log_rolling_uri` from
+  unified_trading_library.deployment_registry (relocated from deployment_service.
+  deployments_registry — deployment-service@b665123e / unified-trading-library@5926c6f0).
 - deployment-api's deployment_service_client.py calls:
   POST /api/v1/shards/calculate, POST /api/v1/deployments, GET /api/v1/data-status,
   POST /api/v1/vm-jobs/cancel, POST /api/v1/vm-jobs/status-batch,
@@ -42,6 +44,10 @@ def _ds_root() -> Path:
 
 def _ds_scripts_vm() -> Path:
     return _workspace_root() / "deployment-service" / "scripts" / "vm"
+
+
+def _utl_root() -> Path:
+    return _workspace_root() / "unified-trading-library" / "unified_trading_library"
 
 
 # ---------------------------------------------------------------------------
@@ -235,24 +241,33 @@ def test_deployment_service_classification_surface_stable() -> None:
 
 
 def test_deployment_service_registry_surface_stable() -> None:
-    """deployments_registry.py names that deployment-api imports by name are stable.
+    """deployment_registry.py names that deployment-api imports by name are stable.
 
-    deployment-api's deployments_inventory.py imports:
-        from deployment_service.deployments_registry import (
+    Relocated from ``deployment_service.deployments_registry`` to
+    ``unified_trading_library.deployment_registry`` (Phase 9 of
+    utl_uac_reuse_consolidation_remediation_2026_06_10 — deployment-service@b665123e /
+    unified-trading-library@5926c6f0) — it depended only on UTL primitives, no
+    service-specific logic. deployment-api's deployments_inventory.py now imports:
+        from unified_trading_library import (
             ACTIVE_PREFIX, ARCHIVE_PREFIX, DEFAULT_BUCKET,
             DeploymentRegistryEntry, vm_run_log_rolling_uri,
         )
     Removing any of these breaks the deployment registry read path.
     """
-    _skip_if_absent()
+    utl_sibling = _workspace_root() / "unified-trading-library"
+    if not utl_sibling.is_dir():
+        pytest.skip(
+            f"per-repo CI checkout: unified-trading-library not present at {utl_sibling}; "
+            "cross-repo deployment-registry invariant runs in full-workspace SIT only"
+        )
 
-    registry_py = _ds_root() / "deployments_registry.py"
-    assert registry_py.is_file(), f"deployment_service/deployments_registry.py missing at {registry_py}"
+    registry_py = _utl_root() / "deployment_registry.py"
+    assert registry_py.is_file(), f"unified_trading_library/deployment_registry.py missing at {registry_py}"
 
     names = _module_level_assign_names(registry_py) | _function_names(registry_py) | _class_names(registry_py)
     missing = sorted(EXPECTED_REGISTRY_NAMES - names)
     assert not missing, (
-        f"deployments_registry.py is MISSING names that deployment-api imports:\n"
+        f"deployment_registry.py is MISSING names that deployment-api imports:\n"
         f"  {missing}\n\n"
         "deployment-api deployments_inventory.py reads ACTIVE_PREFIX, ARCHIVE_PREFIX, "
         "DEFAULT_BUCKET, DeploymentRegistryEntry, vm_run_log_rolling_uri by name — "
