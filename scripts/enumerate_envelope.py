@@ -1046,11 +1046,18 @@ def main() -> None:
 # GCS upload
 # ---------------------------------------------------------------------------
 
-# Canonical SSOT location for the catalogue envelope. Lives in the cefi
-# central-region strategy bucket because no generic workspace bucket exists;
-# the path makes it clear the file is the unified-catalogue snapshot, not
-# CEFI-specific.
-GCS_BUCKET = "strategy-store-cefi-central-element-323112"
+# Canonical SSOT location for the catalogue envelope: the unified FLAT
+# `strategy-store` bucket (cloud-providers.yaml storage kind `strategy-store`
+# — asset-group-agnostic, no `-cefi-`/`-tradfi-`/`-defi-` suffix). Per the
+# operator-ratified 2026-05-20 (D6 Phase 4) decision the yaml is canonical and
+# every live strategy-service writer already resolves this flat bucket; this
+# catalogue writer previously drifted onto the stale per-AG
+# `strategy-store-cefi-{project_id}` bucket — see
+# plans/active/issues/strategy_store_split_brain_2026_07_13.md. UAC is a
+# lower tier than unified-trading-library, so UTL's `resolve_bucket_name()`
+# can't be imported here; derive the flat name directly from the project id.
+_PROJECT_ID = "central-element-323112"
+GCS_BUCKET = f"strategy-store-{_PROJECT_ID}"
 GCS_OBJECT_PATH = "catalogue/envelope.md"
 
 

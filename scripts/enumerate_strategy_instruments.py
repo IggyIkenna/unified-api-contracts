@@ -9,9 +9,11 @@ with the latest instrument-definitions records from the per-category
 
     { slot_label_or_archetype_dim_key: { ..., instruments: [instrument_key, ...] } }
 
-Output: gs://strategy-store-cefi-central-element-323112/catalogue/
-strategy_instruments.json. UI / terminal / order-booking consumers read this
-to answer "which concrete instruments can I trade for this strategy slot today?"
+Output: gs://strategy-store-central-element-323112/catalogue/
+strategy_instruments.json (unified FLAT strategy-store bucket — see
+plans/active/issues/strategy_store_split_brain_2026_07_13.md). UI / terminal /
+order-booking consumers read this to answer "which concrete instruments can I
+trade for this strategy slot today?"
 
 The instruments-service writes per-(category, day, venue) parquet rolls to
 ``gs://instruments-store-{category}-central-element-323112/
@@ -149,7 +151,16 @@ _INSTRUMENT_TYPE_TO_PARQUET: dict[str, set[str]] = {
     "perp": {"PERPETUAL", "PERP"},
     "dated_future": {"FUTURE", "DATED_FUTURE"},
     "option": {"OPTION", "CALL", "PUT"},
-    "lending": {"LENDING"},
+    # 2026-07-13: all 9 DeFi lending protocols (AAVE_V3, SPARK, COMPOUND_V3,
+    # MORPHO, FLUID, VENUS, RADIANT, EULER_V2, BENQI) now emit A_TOKEN
+    # (supply)/DEBT_TOKEN (borrow) per reserve/market — LENDING is retired on
+    # every LIVE row (see defi_lending_atoken_debttoken_instrument_split_
+    # 2026_07_07.md). LENDING is kept alongside the canonical pair for
+    # delisted/historical rows and any not-yet-flipped venue path
+    # (e.g. venue_constants.py::INSTRUMENT_TYPES_BY_VENUE still declares
+    # {"LENDING"}-only for MORPHO_ETHEREUM/FLUID_PLASMA/AAVE_PLASMA) — cheap
+    # to keep, zero cost on the active-status-filtered live path below.
+    "lending": {"A_TOKEN", "DEBT_TOKEN", "LENDING"},
     "lp": {"POOL", "LP"},
     "staking": {"STAKING", "YIELD_BEARING"},
     "event_settled": {"EVENT_SETTLED", "EVENT"},

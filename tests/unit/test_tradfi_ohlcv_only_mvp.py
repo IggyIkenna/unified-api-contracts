@@ -94,7 +94,13 @@ def test_deferred_coverage_windows_preserves_cme_tbbo_mbp10() -> None:
 
 
 @pytest.mark.unit
-@pytest.mark.parametrize("venue", ["CME", "ICE", "NASDAQ", "NYSE"])
+# ICE removed from this Databento-OHLCV-only-MVP parametrize (2026-07-13,
+# tradfi_ice_ohlcv_1m_no_working_fetch_path_2026_07_13.md, operator decision):
+# ICE's Databento datasets were dropped from the 3-dataset subscription lockdown
+# (2026-06-18) and it never had a working ohlcv_1m fetch path at all — it now
+# advertises Yahoo-sourced ohlcv_24h only (the real DXY-index daily series),
+# not the Databento ohlcv_1m grain this test pins for CME/NASDAQ/NYSE.
+@pytest.mark.parametrize("venue", ["CME", "NASDAQ", "NYSE"])
 def test_live_tradfi_venues_advertise_ohlcv_only(venue: str) -> None:
     """Live VENUE_DATA_TYPE_CAPABILITIES MUST NOT regress: TradFi venues advertise ONLY ohlcv_1m.
 
@@ -106,3 +112,15 @@ def test_live_tradfi_venues_advertise_ohlcv_only(venue: str) -> None:
     assert "ohlcv_1m" in caps
     assert "trades" not in caps, f"{venue}: trades MUST NOT be in live capabilities (OHLCV-only MVP)"
     assert "tbbo" not in caps, f"{venue}: tbbo MUST NOT be in live capabilities (OHLCV-only MVP)"
+
+
+@pytest.mark.unit
+def test_ice_advertises_ohlcv_24h_only_not_ohlcv_1m() -> None:
+    """ICE narrowed off the Databento ohlcv_1m grain entirely (2026-07-13) —
+    it now advertises the real Yahoo-sourced ohlcv_24h DXY-index series only.
+    See tradfi_ice_ohlcv_1m_no_working_fetch_path_2026_07_13.md."""
+    caps = VENUE_DATA_TYPE_CAPABILITIES["ICE"]
+    assert "ohlcv_24h" in caps
+    assert "ohlcv_1m" not in caps
+    assert "trades" not in caps
+    assert "tbbo" not in caps

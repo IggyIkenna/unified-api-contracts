@@ -21,7 +21,9 @@ Wire-format SSOT (matches deployed Terraform at
 - Test-mode buckets: insert ``test-`` before ``{project_id}``
   (``...-prd-test-{project_id}``).
 - Strategy catalogue bucket (single, cross-asset):
-    ``strategy-store-cefi-{project_id}`` (no env segment — legacy, cross-cutting).
+    ``strategy-store-{project_id}`` (unified FLAT bucket, no asset-group or env
+    segment — cloud-providers.yaml kind ``strategy-store``; see
+    plans/active/issues/strategy_store_split_brain_2026_07_13.md).
 
 The canonical resolver (UTL ``resolve_bucket_name``) reads the live process env
 for DEPLOYMENT_ENV_SHORT and GCP_PROJECT_ID; this facade is the UAC-layer helper
@@ -115,7 +117,13 @@ BUCKET_TEMPLATES_BY_ASSET_GROUP_KIND: dict[tuple[AssetGroup, BucketKind], str | 
 # Catalogue artefacts (envelope, instrument-catalogue, shard-dynamics) all live
 # in this single bucket regardless of asset_group. Sub-prefixes inside the
 # bucket carve up by artefact family (catalogue/strategy/, catalogue/instrument/, …).
-STRATEGY_STORE_BUCKET_TEMPLATE = "strategy-store-cefi-{project_id}"
+# Unified FLAT bucket (cloud-providers.yaml storage kind `strategy-store` — no
+# `-cefi-`/`-tradfi-`/`-defi-` segment): per the operator-ratified 2026-05-20
+# (D6 Phase 4) decision the yaml is canonical and every live strategy-service
+# writer resolves the flat name; this template previously drifted onto the
+# stale per-AG `strategy-store-cefi-{project_id}` bucket — see
+# plans/active/issues/strategy_store_split_brain_2026_07_13.md.
+STRATEGY_STORE_BUCKET_TEMPLATE = "strategy-store-{project_id}"
 
 
 # ---------------------------------------------------------------------------

@@ -117,6 +117,14 @@ class PipelineMode(StrEnum):
     # consumer; live-mode capture is a separate WS connector not yet pipeline_mode-
     # registered. SSOT: cefi_onchain_perp_batch_venue_allowlist_gap_2026_07_12.md.
     BATCH_PACIFICA = "batch_pacifica"
+    # deribit already carries LIVE_DERIBIT / REPLAY_DERIBIT (the per-venue
+    # live/replay override for OTHER CeFi data_types, tardis is those data_types'
+    # batch archive). It ALSO self-archives (cefi, volatility_index) — Deribit's
+    # public REST DVOL-history endpoint, no creds, back to 2021-03-24 — so it is
+    # a BATCH_CAPABLE_CEFI_VENUES exception for that one data_type, same pattern
+    # as BATCH_ASTER/BATCH_EXTENDED/BATCH_PACIFICA above. SSOT:
+    # vol_dvol_backtestable_engines_2026_07_13.md.
+    BATCH_DERIBIT = "batch_deribit"
     BATCH_MASSIVE = "batch_massive"
     # MTDS L2 microstructure computed outputs (depth_of_book_10 / queue_position;
     # order_flow_imbalance RETIRED 2026-07-08 — zero real consumers, zero

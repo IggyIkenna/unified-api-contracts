@@ -269,6 +269,7 @@ def _basis_perp_structure(archetype: StrategyArchetype, *, inverse: bool, notes:
                 asset_groups=(VenueCategoryV2.CEFI, VenueCategoryV2.DEFI),
                 eligible_venue_ids=(
                     "binance",
+                    "bitfinex",  # bitfinex_native.py:167 (BITFINEX-SPOT adapter — spot only, no futures adapter exists)
                     "bitget",  # F39: bitget_native.py:125 (BITGET-SPOT adapter — spot leg)
                     "bybit",
                     "coinbase",  # F39: coinbase_ccxt.py:32 (COINBASE-SPOT adapter)
@@ -378,12 +379,15 @@ def _basis_dated_structure(archetype: StrategyArchetype, *, inverse: bool, notes
                 asset_groups=(VenueCategoryV2.CEFI, VenueCategoryV2.TRADFI),
                 eligible_venue_ids=(
                     "binance",
+                    "bitfinex",  # bitfinex_native.py:167 (BITFINEX-SPOT adapter — spot only, no futures adapter exists)
                     "bitget",  # F39: bitget_native.py:125 (BITGET-SPOT adapter — spot leg)
                     "bybit",  # F39: bybit_native.py:138 (BYBIT-SPOT adapter — spot leg)
                     "coinbase",
                     "deribit",
                     "ibkr",
                     "kraken",  # F39: kraken_rest_adapter.py:159 (KRAKEN-SPOT adapter — spot leg)
+                    "nasdaq",  # codex category-instrument-coverage.md §5 slot ibkr-cme-qqq-nq-dated-usd-prod (QQQ)
+                    "nyse",  # codex category-instrument-coverage.md §5 slot ibkr-cme-spy-es-dated-usd-prod (SPY)
                     "okx",  # F39: okx_native.py:151 (OKX-SPOT adapter — spot leg)
                 ),
                 source_of_truth=(
@@ -939,7 +943,10 @@ def _stat_arb_pairs_structure() -> ArchetypeLegStructure:
     )
     groups = (VenueCategoryV2.CEFI, VenueCategoryV2.DEFI, VenueCategoryV2.TRADFI)
     instr = (ArchetypeInstrumentType.SPOT, ArchetypeInstrumentType.PERP)
-    venues = ("binance", "okx", "bybit", "hyperliquid", "ibkr", "cme")
+    # nasdaq/nyse: codex .../stat-arb-pairs-fixed.md sector-pair slot labels ibkr-goog-meta/
+    # ibkr-aapl-msft (NASDAQ), ibkr-xom-cvx/ibkr-jpm-bac (NYSE) — equities are spot-only so the
+    # combined SPOT+PERP `instr` above doesn't misclaim a PERP capability for either exchange.
+    venues = ("binance", "okx", "bybit", "hyperliquid", "ibkr", "cme", "nasdaq", "nyse")
     return ArchetypeLegStructure(
         archetype_id=StrategyArchetype.STAT_ARB_PAIRS_FIXED,
         legs=(
@@ -979,7 +986,11 @@ def _stat_arb_cross_sectional_structure() -> ArchetypeLegStructure:
     )
     groups = (VenueCategoryV2.CEFI, VenueCategoryV2.DEFI, VenueCategoryV2.TRADFI)
     instr = (ArchetypeInstrumentType.SPOT, ArchetypeInstrumentType.PERP)
-    venues = ("binance", "hyperliquid", "bybit", "gmx_v2", "drift", "ibkr")
+    # nasdaq/nyse: codex .../stat-arb-cross-sectional.md slot labels ibkr-sp500-momentum /
+    # ibkr-sp500-sector-rotation / ibkr-russell2000-mr — S&P 500 + Russell 2000 baskets span
+    # both exchanges; equities are spot-only so the combined SPOT+PERP `instr` above doesn't
+    # misclaim a PERP capability for either exchange.
+    venues = ("binance", "hyperliquid", "bybit", "gmx_v2", "drift", "ibkr", "nasdaq", "nyse")
     return ArchetypeLegStructure(
         archetype_id=StrategyArchetype.STAT_ARB_CROSS_SECTIONAL,
         legs=(
@@ -1193,7 +1204,15 @@ def _defi_lp_seeds() -> tuple[ArchetypeLegStructure, ...]:
 def _directional_seeds() -> tuple[ArchetypeLegStructure, ...]:
     cefi_defi_tradfi = (VenueCategoryV2.CEFI, VenueCategoryV2.DEFI, VenueCategoryV2.TRADFI)
     continuous_instr = (ArchetypeInstrumentType.SPOT, ArchetypeInstrumentType.PERP)
+    # Shared by 3 archetypes below (ML/RULES_DIRECTIONAL_CONTINUOUS + TSMOM_BTC_CTA) — do NOT
+    # add fx/nasdaq/nyse here, TSMOM_BTC_CTA's own codex doc states "BTC-only CeFi archetype by
+    # design", so a TradFi-equity/FX addition to this shared tuple would leak into it.
     continuous_venues = ("binance", "okx", "bybit", "hyperliquid", "gmx_v2", "drift", "ibkr", "cme")
+    # ML/RULES_DIRECTIONAL_CONTINUOUS-only extension: codex ml-directional-continuous.md /
+    # rules-directional-continuous.md example instances ibkr-spy-1m-usd-prod (NYSE),
+    # ibkr-aapl-daily-usd-prod / ibkr-qqq-15m-breakout (NASDAQ), ibkr-eurusd-fx-15m-usd-prod /
+    # ibkr-eurusd-5m-usd-prod (FX).
+    continuous_tradfi_venues = (*continuous_venues, "fx", "nasdaq", "nyse")
     event_venues = ("unity", "betfair_direct", "smarkets_direct", "polymarket")
     event_groups = (VenueCategoryV2.SPORTS, VenueCategoryV2.PREDICTION)
     return (
@@ -1206,7 +1225,11 @@ def _directional_seeds() -> tuple[ArchetypeLegStructure, ...]:
                 ArchetypeInstrumentType.OPTION,
             ),
             asset_groups=cefi_defi_tradfi,
-            venues=("binance", "okx", "hyperliquid", "deribit", "ibkr", "cme"),
+            # fx: codex event-driven.md example instance ibkr-eurusd-macro-usd-prod (Macro US
+            # events). nasdaq: coverage.md §15 slot labels ibkr-aapl-earnings-usd-prod /
+            # -msft-earnings- / -nvda-earnings- (all NASDAQ-listed). No NYSE-specific ticker
+            # example found in either doc — not added, would be inventing.
+            venues=("binance", "okx", "hyperliquid", "deribit", "ibkr", "cme", "fx", "nasdaq"),
             engine_desc=(
                 "strategy-service EventDrivenEngine (event_driven/event_driven.py, TradeInstruction "
                 "directional LONG/SHORT on event surprise, time-boxed FLAT exit); manifest cell EVENT_DRIVEN"
@@ -1218,7 +1241,7 @@ def _directional_seeds() -> tuple[ArchetypeLegStructure, ...]:
             role=ArchetypeLegRole.SPOT_LONG,
             instrument_types=continuous_instr,
             asset_groups=cefi_defi_tradfi,
-            venues=continuous_venues,
+            venues=continuous_tradfi_venues,
             engine_desc=(
                 "strategy-service MLDirectionalContinuousEngine (ml_directional/continuous.py, "
                 "TradeInstruction LONG/SHORT from ML class, Kelly-sized); manifest cell ML_DIRECTIONAL_CONTINUOUS"
@@ -1242,7 +1265,7 @@ def _directional_seeds() -> tuple[ArchetypeLegStructure, ...]:
             role=ArchetypeLegRole.SPOT_LONG,
             instrument_types=continuous_instr,
             asset_groups=cefi_defi_tradfi,
-            venues=continuous_venues,
+            venues=continuous_tradfi_venues,
             engine_desc=(
                 "strategy-service RulesDirectionalContinuousEngine (rules_directional/continuous.py, "
                 "TradeInstruction signed LONG/SHORT on rule fire); manifest cell RULES_DIRECTIONAL_CONTINUOUS"

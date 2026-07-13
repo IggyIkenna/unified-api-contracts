@@ -1428,8 +1428,18 @@ VENUE_DATA_TYPE_CAPABILITIES: dict[str, dict[str, str]] = {
         "ohlcv_1s": "2019-01-01",
         "ohlcv_1m": "2019-01-01",
     },
+    # ICE — narrowed to ohlcv_24h only (2026-07-13, operator decision). No ICE
+    # Databento datasets are in the 3-dataset subscription (IFEU.IMPACT/
+    # IFUS.IMPACT dropped 2026-06-18), so ohlcv_1m was declared capable with
+    # ZERO working fetch path. The only real ICE instrument is the Yahoo-
+    # sourced ICE/NYBOT DXY index (ICE:INDEX:DXY-USD), a DAILY series — start
+    # date matches YAHOO_INDICES' DXY genesis (tradfi_instrument_universe.py:
+    # YahooIndexDef("DXY", "ICE", "DXY", "DX-Y.NYB", date(2019, 1, 2), "fx")),
+    # mirroring the KRX convention (both Yahoo-daily, both dated to their
+    # registry's real genesis date). See
+    # tradfi_ice_ohlcv_1m_no_working_fetch_path_2026_07_13.md.
     "ICE": {
-        "ohlcv_1m": "2019-01-01",
+        "ohlcv_24h": "2019-01-02",
     },
     "CBOE": {
         "ohlcv_15m": "2020-01-07",  # VIX cash INDEX — Barchart/Yahoo (not Databento)
@@ -1444,6 +1454,22 @@ VENUE_DATA_TYPE_CAPABILITIES: dict[str, dict[str, str]] = {
     },
     "FX": {
         "ohlcv_24h": "2020-01-01",  # KRW/USD daily via Yahoo Finance
+    },
+    # KRX (Korea Exchange) single stocks — Yahoo-sourced (.KS tickers). Real
+    # registry gap (2026-07-13, pipeline_e2e_check TRADFI diagnostic pass):
+    # this venue had NO entry here at all, so get_expected_data_types_for_venue
+    # fell through to a cross-product of ALL 10 TradFi data_types
+    # (get_valid_data_types_for_venue), contradicting expected_coverage.py's
+    # narrowed KRX entry (below) and the equity-basis MVP carve-out
+    # (_mvp_scope_predicate.py), both already scoped to ohlcv_24h-only
+    # (2026-07-12/13 operator decision: the only real fetch path,
+    # _fetch_yahoo_equities -> YahooFinanceAdapter.download_daily, has no
+    # intraday capability — see
+    # krx_intraday_ohlcv_registry_vs_adapter_mismatch_2026_07_12.md, resolved).
+    # Start date matches venue_mapping.py's KRX floor (2019-01-02, Yahoo daily
+    # history probed 2026-06-24).
+    "KRX": {
+        "ohlcv_24h": "2019-01-02",
     },
     "BARCHART": {
         "ohlcv_15m": "2020-01-02",  # VIX 15m historical CSV (discontinued 2025-11-12)

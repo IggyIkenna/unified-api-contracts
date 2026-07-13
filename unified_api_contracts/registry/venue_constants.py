@@ -333,6 +333,12 @@ VENUE_CATEGORY_MAP: dict[str, str] = {
     "BYBIT": "cefi",
     BYBIT_SPOT: "cefi",
     BYBIT_FUTURES: "cefi",
+    "BITFINEX-SPOT": "cefi",
+    "BITFINEX-FUTURES": "cefi",
+    "BITGET-SPOT": "cefi",
+    "BITGET-FUTURES": "cefi",
+    KRAKEN_SPOT: "cefi",
+    KRAKEN_FUTURES: "cefi",
     COINBASE_SPOT: "cefi",
     HYPERLIQUID: "cefi",
     DERIBIT: "cefi",
@@ -340,6 +346,7 @@ VENUE_CATEGORY_MAP: dict[str, str] = {
     UPBIT: "cefi",
     NASDAQ: "tradfi",
     NYSE: "tradfi",
+    "FX": "tradfi",
     CME: "tradfi",
     CBOT: "tradfi",
     NYMEX: "tradfi",
@@ -559,12 +566,21 @@ VENUE_CAPABILITIES: dict[str, set[VenueCapability]] = {
     BINANCE_FUTURES: {VenueCapability.PERP_TRADE, VenueCapability.FUTURES_TRADE},
     OKX_FUTURES: {VenueCapability.PERP_TRADE, VenueCapability.FUTURES_TRADE, VenueCapability.OPTIONS_TRADE},
     BYBIT_FUTURES: {VenueCapability.PERP_TRADE, VenueCapability.FUTURES_TRADE},
+    "BITFINEX-SPOT": {VenueCapability.SPOT_TRADE},
+    "BITFINEX-FUTURES": {VenueCapability.PERP_TRADE, VenueCapability.FUTURES_TRADE},
+    "BITGET-SPOT": {VenueCapability.SPOT_TRADE},
+    "BITGET-FUTURES": {VenueCapability.PERP_TRADE, VenueCapability.FUTURES_TRADE},
+    KRAKEN_SPOT: {VenueCapability.SPOT_TRADE},
+    KRAKEN_FUTURES: {VenueCapability.PERP_TRADE, VenueCapability.FUTURES_TRADE},
     DERIBIT: {VenueCapability.PERP_TRADE, VenueCapability.FUTURES_TRADE, VenueCapability.OPTIONS_TRADE},
     HYPERLIQUID: {VenueCapability.PERP_TRADE},
     ASTER: {VenueCapability.PERP_TRADE},
     UPBIT: {VenueCapability.SPOT_TRADE},
     NASDAQ: {VenueCapability.SPOT_TRADE},
     NYSE: {VenueCapability.SPOT_TRADE},
+    # FXAdapter (execution-service) routes via IbkrTradFiAdapter's IDEALPRO exchange using
+    # secType="CASH" contracts only (no FUT/OPT) — spot OTC forex, matching NASDAQ/NYSE's pattern.
+    "FX": {VenueCapability.SPOT_TRADE},
     CME: {VenueCapability.FUTURES_TRADE, VenueCapability.OPTIONS_TRADE},
     CBOT: {VenueCapability.FUTURES_TRADE, VenueCapability.OPTIONS_TRADE},
     NYMEX: {VenueCapability.FUTURES_TRADE, VenueCapability.OPTIONS_TRADE},
@@ -687,6 +703,23 @@ VENUE_ORDER_CAPABILITIES: dict[str, frozenset[VenueOrderCapability]] = {
     OKX_FUTURES: _CEFI_FULL,
     BYBIT_SPOT: _CEFI_FULL,
     BYBIT_FUTURES: _CEFI_FULL,
+    # BitfinexCeFiAdapter/BitgetCeFiAdapter are both BLOCKED-CREDENTIALS: every trading
+    # method (place_order, cancel_order, etc.) raises NotImplementedError before any HTTP
+    # round-trip, so no order-level sub-capability is genuinely live yet — empty set, not
+    # _CEFI_FULL.
+    "BITFINEX-SPOT": frozenset[VenueOrderCapability](),
+    "BITFINEX-FUTURES": frozenset[VenueOrderCapability](),
+    "BITGET-SPOT": frozenset[VenueOrderCapability](),
+    "BITGET-FUTURES": frozenset[VenueOrderCapability](),
+    # KrakenCeFiAdapter (kraken_rest_adapter.py) is a REAL implementation (unlike the
+    # Bitfinex/Bitget stubs above) — place_order genuinely POSTs to Kraken's AddOrder
+    # endpoint. Its outbound _order_type_to_kraken mapping supports MARKET/LIMIT/
+    # STOP_LIMIT/STOP_LOSS/TAKE_PROFIT only; _build_add_order_payload never sends
+    # Kraken's post-only/reduce-only oflags, and there's no batch or amend/cancel-replace
+    # endpoint wired. So STOP_LIMIT is the one genuine sub-capability — not empty, and not
+    # any of the _CEFI_* tiers (all require POST_ONLY, which isn't implemented).
+    KRAKEN_SPOT: frozenset({VenueOrderCapability.STOP_LIMIT}),
+    KRAKEN_FUTURES: frozenset({VenueOrderCapability.STOP_LIMIT}),
     COINBASE_SPOT: _CEFI_STANDARD,
     DERIBIT: frozenset(
         {
@@ -719,6 +752,7 @@ VENUE_ORDER_CAPABILITIES: dict[str, frozenset[VenueOrderCapability]] = {
     # TradFi exchanges
     NASDAQ: _TRADFI_EXCHANGE,
     NYSE: _TRADFI_EXCHANGE,
+    "FX": _TRADFI_EXCHANGE,
     CME: _TRADFI_DERIVATIVES,
     CBOT: _TRADFI_DERIVATIVES,
     NYMEX: _TRADFI_DERIVATIVES,

@@ -148,7 +148,17 @@ _TRADFI: dict[str, list[str]] = {
     # data-status denominator must count 1s cells too. SSOT:
     # codex/02-data/tradfi-databento-sourcing-ssot.md.
     "CME": ["trades", "ohlcv_1s", "ohlcv_1m", "tbbo"],
-    "ICE": ["trades", "ohlcv_1m", "tbbo"],
+    # ICE — narrowed to ohlcv_24h only (2026-07-13, operator decision). The ICE
+    # Databento datasets (IFEU.IMPACT/IFUS.IMPACT) are OUT of the 3-dataset
+    # subscription lockdown (operator 2026-06-18), so trades/ohlcv_1m/tbbo were
+    # declared expected with ZERO working fetch path (Databento routing is dead
+    # for ICE — TRADFI_DATABENTO_INSTRUMENTS has no venue="ICE" rows). The only
+    # real ICE instrument is the Yahoo-sourced ICE/NYBOT DXY index
+    # (ICE:INDEX:DXY-USD, YAHOO_INDICES), which Yahoo serves as a DAILY series
+    # only — matches the same KRX narrowing pattern (2026-07-12,
+    # krx_intraday_ohlcv_registry_vs_adapter_mismatch_2026_07_12.md). See
+    # tradfi_ice_ohlcv_1m_no_working_fetch_path_2026_07_13.md.
+    "ICE": ["ohlcv_24h"],
     # CBOE: ohlcv_15m = VIX cash INDEX (Barchart/Yahoo). ohlcv_1s + ohlcv_1m =
     # VX FUTURES via Databento XCBF.PITCH (operator's "CFE" subscription, 2026-06-19;
     # both L0/free 16y). The denominator must count the futures 1s/1m cells too.

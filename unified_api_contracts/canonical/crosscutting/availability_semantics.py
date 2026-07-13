@@ -113,6 +113,10 @@ AVAILABILITY_AT_SEMANTICS: Final[dict[tuple[str, str], AvailabilitySemantic]] = 
     # timestamp IS available_at — same tick_timestamp semantic as the chain.
     ("cefi", "greeks_snapshot"): "tick_timestamp",
     ("cefi", "implied_vol_surface"): "tick_timestamp",
+    # volatility_index (DVOL) — Deribit public REST index history; each OHLC bar's
+    # own timestamp IS available_at (same semantic as the other tick-shaped CeFi
+    # data_types above). SSOT: vol_dvol_backtestable_engines_2026_07_13.md.
+    ("cefi", "volatility_index"): "tick_timestamp",
     # depth_of_book_10 / queue_position — MTDS derives these inline at the
     # book_snapshot_5 capture tick (latency 0), so the row's own snapshot
     # timestamp IS available_at — same tick_timestamp semantic as the upstream

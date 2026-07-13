@@ -205,6 +205,7 @@ SERVICE_CONTRACT_MAP: Final[dict[str, ServiceContract]] = {
                 "strategy_service.position",
                 "strategy_service.risk",
                 "strategy_service.pnl",
+                "market_tick_data_service",
             }
         ),
         forbidden_exceptions=frozenset(
@@ -214,6 +215,15 @@ SERVICE_CONTRACT_MAP: Final[dict[str, ServiceContract]] = {
                 # recommender's universe. Should move to UAC `registry/` long-
                 # term — tracked in deprecation_ledger.yaml.
                 "strategy_service.engine.strategies.v2.target_universe.catalog",
+                # MtdsBookDataProvider reads canonical tick parquets for the
+                # dust-quote matching engine; execution-service also declares
+                # ../market-tick-data-service as a pyproject path dep (same
+                # no-service<->service violation class the 2026-06-11 MDPS/
+                # deployment-api removals fixed). Needs CanonicalParquetReader's
+                # shard-read surface promoted to UTL or the read path flipped to
+                # a UAC contract + direct GCS — tracked in deprecation_ledger.yaml
+                # (id: execution_service_mtds_reader_dep).
+                "market_tick_data_service.reader",
             }
         ),
     ),

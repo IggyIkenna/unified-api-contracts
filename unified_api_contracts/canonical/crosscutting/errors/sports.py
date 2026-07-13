@@ -79,6 +79,38 @@ VENUE_ERRORS_SPORTS: dict[str, list[VenueErrorClassification]] = {
             action=ErrorAction.FAIL,
             desc="No fixtures for date/league combination",
         ),
+        # ── Raw JSON-envelope error-dict KEYS (root-cause fix, 2026-07-13) ──
+        # API-Football signals plan/quota/auth/param errors as HTTP 200 +
+        # {"errors": {<key>: "<message>"}, "response": []} — the dict's own
+        # KEY (not the codes above, which nothing in instruments-service ever
+        # actually produced) is what api_football.py's ``_raise_on_api_errors``
+        # now threads through as ``error_key`` (see ApiFootballAdapter
+        # ApiFootballResponseError.error_key). These are the keys API-Football
+        # itself documents/emits.
+        ve(
+            "api_football",
+            "plan",
+            retry=False,
+            reconnect=False,
+            action=ErrorAction.FAIL,
+            desc="Current plan does not have access to this endpoint/date range",
+        ),
+        ve(
+            "api_football",
+            "token",
+            retry=False,
+            reconnect=False,
+            action=ErrorAction.FAIL,
+            desc="Invalid or missing API token",
+        ),
+        ve(
+            "api_football",
+            "requests",
+            retry=True,
+            reconnect=False,
+            action=ErrorAction.RETRY,
+            desc="Daily request quota exceeded",
+        ),
     ],
     "odds_api": [
         ve(
