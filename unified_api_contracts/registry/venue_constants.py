@@ -461,8 +461,12 @@ INSTRUMENT_TYPES_BY_VENUE: dict[str, set[str]] = {
     UNISWAP_V4_ETH: {"POOL"},
     CURVE_ETH: {"POOL"},
     AERODROME_BASE: {"POOL"},
-    AAVE_V3: {"LENDING"},
-    AAVE_V3_ETH: {"LENDING"},
+    # AAVE_V3/AAVE_V3_ETH canonicalized to A_TOKEN/DEBT_TOKEN 2026-07-13
+    # (defi_lending_atoken_debttoken_instrument_split_2026_07_07.md stage 1).
+    # MORPHO_ETHEREUM/FLUID_PLASMA/AAVE_PLASMA stay LENDING pending their own
+    # stage of the same migration — do not flip until their writers ship.
+    AAVE_V3: {"A_TOKEN", "DEBT_TOKEN"},
+    AAVE_V3_ETH: {"A_TOKEN", "DEBT_TOKEN"},
     MORPHO_ETHEREUM: {"LENDING"},
     FLUID_PLASMA: {"LENDING"},
     AAVE_PLASMA: {"LENDING"},
@@ -897,8 +901,10 @@ INSTRUCTION_VALID_INSTRUMENT_TYPES: dict[str, set[str]] = {
         "CDS",
     },
     "SWAP": {"POOL"},
-    "LEND": {"LENDING"},
-    "BORROW": {"LENDING"},
+    # LENDING kept alongside A_TOKEN/DEBT_TOKEN — protocols not yet migrated to
+    # the canonical split (Morpho, Fluid, ...) still emit LENDING.
+    "LEND": {"LENDING", "A_TOKEN"},
+    "BORROW": {"LENDING", "DEBT_TOKEN"},
     "STAKE": {"STAKING"},
     "UNSTAKE": {"STAKING"},
     "FLASH_LOAN": {"LENDING"},

@@ -642,6 +642,16 @@ class TestSeedDispatcherVenueClassification:
         # so seed is empty by design even when the capability is declared
         assert get_expected_instruments_for_venue("ASTER", "liquidations") == []
 
+    def test_hyperliquid_liquidations_resolves_empty_no_crash_finding77(self) -> None:
+        """Finding-77 (2026-07-13 operator ruling): HYPERLIQUID has no liquidations
+        feed — VENUE_DATA_TYPE_CAPABILITIES["HYPERLIQUID"] never declared a
+        ``liquidations`` key (unlike ASTER), and the corresponding
+        SOURCE_PRIORITY(``cefi``, ``liquidations``) entry no longer lists
+        hyperliquid either (removed 2026-07-13). The MVP seeder must honestly
+        resolve this to an empty (no-source) instrument list, same as any other
+        venue-level dt gap — never raise for a consumer that asks."""
+        assert get_expected_instruments_for_venue("HYPERLIQUID", "liquidations") == []
+
     def test_capability_gate_does_not_break_known_venues(self) -> None:
         """Regression guard: BINANCE-FUTURES / BYBIT / DERIBIT / OKX-SWAP
         / HYPERLIQUID all declare trades + book_snapshot_5 + derivative_
