@@ -333,6 +333,9 @@ VENUE_CATEGORY_MAP: dict[str, str] = {
     "BYBIT": "cefi",
     BYBIT_SPOT: "cefi",
     BYBIT_FUTURES: "cefi",
+    # No dedicated module constant (matches BINANCE-DELIVERY/COINBASE-FUTURES style above).
+    "BITFINEX-SPOT": "cefi",
+    "BITFINEX-FUTURES": "cefi",
     COINBASE_SPOT: "cefi",
     HYPERLIQUID: "cefi",
     DERIBIT: "cefi",
@@ -560,6 +563,12 @@ VENUE_CAPABILITIES: dict[str, set[VenueCapability]] = {
     BINANCE_FUTURES: {VenueCapability.PERP_TRADE, VenueCapability.FUTURES_TRADE},
     OKX_FUTURES: {VenueCapability.PERP_TRADE, VenueCapability.FUTURES_TRADE, VenueCapability.OPTIONS_TRADE},
     BYBIT_FUTURES: {VenueCapability.PERP_TRADE, VenueCapability.FUTURES_TRADE},
+    "BITFINEX-SPOT": {VenueCapability.SPOT_TRADE},
+    # PERP_TRADE only, not FUTURES_TRADE: live Tardis metadata confirms zero FUTURE-typed
+    # instruments for bitfinex-derivatives (see INSTRUMENT_TYPES_BY_VENUE["BITFINEX-FUTURES"]
+    # above, cefi G4 Layer-1 fix 2026-07-12 — mirrors venue_mapping.py's matching removal of
+    # the ("BITFINEX-FUTURES", "FUTURE") sourcing entry the same day).
+    "BITFINEX-FUTURES": {VenueCapability.PERP_TRADE},
     DERIBIT: {VenueCapability.PERP_TRADE, VenueCapability.FUTURES_TRADE, VenueCapability.OPTIONS_TRADE},
     HYPERLIQUID: {VenueCapability.PERP_TRADE},
     ASTER: {VenueCapability.PERP_TRADE},
@@ -691,6 +700,8 @@ VENUE_ORDER_CAPABILITIES: dict[str, frozenset[VenueOrderCapability]] = {
     OKX_FUTURES: _CEFI_FULL,
     BYBIT_SPOT: _CEFI_FULL,
     BYBIT_FUTURES: _CEFI_FULL,
+    "BITFINEX-SPOT": _CEFI_STANDARD,
+    "BITFINEX-FUTURES": _CEFI_STANDARD,
     COINBASE_SPOT: _CEFI_STANDARD,
     DERIBIT: frozenset(
         {
