@@ -24,24 +24,26 @@
 
 # Total venues: 145
 
-# wired: 22
+# wired: 28
 
-# adapter-no-eligibility: 6
+# adapter-no-eligibility: 2
 
-# registered-no-adapter: 15
+# registered-no-adapter: 12
 
-# orphan: 102
+# orphan: 103
 
-## WIRED (22)
+## WIRED (28)
 
 # execution adapter exists + venue appears in >= 1 archetype leg eligible_venue_ids
 
 BINANCE category=cefi adapter=binance_ccxt.py, binance_native.py endpoint_registry=yes leg_eligible=yes
 BINANCE-FUTURES category=cefi adapter=binance_ccxt.py, binance_native.py endpoint_registry=no leg_eligible=yes
 BINANCE-SPOT category=cefi adapter=binance_ccxt.py, binance_native.py endpoint_registry=no leg_eligible=yes
+BITFINEX-FUTURES category=cefi adapter=bitfinex_native.py endpoint_registry=no leg_eligible=yes
+BITFINEX-SPOT category=cefi adapter=bitfinex_native.py endpoint_registry=no leg_eligible=yes
 BITGET category=(unknown) adapter=bitget_native.py endpoint_registry=yes leg_eligible=yes
-BITGET-FUTURES category=(unknown) adapter=bitget_native.py endpoint_registry=no leg_eligible=yes
-BITGET-SPOT category=(unknown) adapter=bitget_native.py endpoint_registry=no leg_eligible=yes
+BITGET-FUTURES category=cefi adapter=bitget_native.py endpoint_registry=no leg_eligible=yes
+BITGET-SPOT category=cefi adapter=bitget_native.py endpoint_registry=no leg_eligible=yes
 BYBIT category=cefi adapter=bybit_ccxt.py, bybit_native.py endpoint_registry=yes leg_eligible=yes
 BYBIT-FUTURES category=cefi adapter=bybit_ccxt.py, bybit_native.py endpoint_registry=no leg_eligible=yes
 BYBIT-SPOT category=cefi adapter=bybit_ccxt.py, bybit_native.py endpoint_registry=no leg_eligible=yes
@@ -50,36 +52,33 @@ CME category=tradfi adapter=cme_adapter.py endpoint_registry=no leg_eligible=yes
 COINBASE category=(unknown) adapter=coinbase_ccxt.py endpoint_registry=yes leg_eligible=yes
 COINBASE-SPOT category=cefi adapter=coinbase_ccxt.py endpoint_registry=no leg_eligible=yes
 DERIBIT category=cefi adapter=deribit_ccxt.py endpoint_registry=yes leg_eligible=yes
+FX category=tradfi adapter=fx_adapter.py endpoint_registry=no leg_eligible=yes
 HYPERLIQUID category=cefi adapter=hyperliquid_ccxt.py endpoint_registry=yes leg_eligible=yes
 ICE category=tradfi adapter=ice_adapter.py endpoint_registry=no leg_eligible=yes
-KRAKEN-FUTURES category=(unknown) adapter=kraken_rest_adapter.py endpoint_registry=no leg_eligible=yes
-KRAKEN-SPOT category=(unknown) adapter=kraken_rest_adapter.py endpoint_registry=no leg_eligible=yes
+KRAKEN-FUTURES category=cefi adapter=kraken_rest_adapter.py endpoint_registry=no leg_eligible=yes
+KRAKEN-SPOT category=cefi adapter=kraken_rest_adapter.py endpoint_registry=no leg_eligible=yes
+NASDAQ category=tradfi adapter=nasdaq_adapter.py endpoint_registry=no leg_eligible=yes
+NYSE category=tradfi adapter=nyse_adapter.py endpoint_registry=no leg_eligible=yes
 OKX category=cefi adapter=okx_ccxt.py, okx_native.py endpoint_registry=yes leg_eligible=yes
 OKX-FUTURES category=cefi adapter=okx_ccxt.py, okx_native.py endpoint_registry=no leg_eligible=yes
 OKX-SPOT category=cefi adapter=okx_ccxt.py, okx_native.py endpoint_registry=no leg_eligible=yes
 POLYMARKET category=sports adapter=polymarket_adapter.py endpoint_registry=yes leg_eligible=yes
+POLYMARKET-PERP category=cefi adapter=polymarket_adapter.py endpoint_registry=no leg_eligible=yes
 
-## ADAPTER-NO-ELIGIBILITY (6)
+## ADAPTER-NO-ELIGIBILITY (2)
 
 # execution adapter exists but venue NOT in any archetype leg eligible_venue_ids
 
 BETFAIR category=sports adapter=sports_adapter.py endpoint_registry=yes leg_eligible=no
-BITFINEX-SPOT category=(unknown) adapter=bitfinex_native.py endpoint_registry=no leg_eligible=no
-FX category=(unknown) adapter=fx_adapter.py endpoint_registry=no leg_eligible=no
-NASDAQ category=tradfi adapter=nasdaq_adapter.py endpoint_registry=no leg_eligible=no
-NYSE category=tradfi adapter=nyse_adapter.py endpoint_registry=no leg_eligible=no
 UPBIT category=cefi adapter=upbit_ccxt.py endpoint_registry=yes leg_eligible=no
 
-## REGISTERED-NO-ADAPTER (15)
+## REGISTERED-NO-ADAPTER (12)
 
 # venue in ENDPOINT_REGISTRY (data/API access) but NO execution adapter
 
 API_FOOTBALL category=sports adapter=(none) endpoint_registry=yes leg_eligible=no
-BARCHART category=(unknown) adapter=(none) endpoint_registry=yes leg_eligible=no
-BITSTAMP category=(unknown) adapter=(none) endpoint_registry=yes leg_eligible=no
 DATABENTO category=(unknown) adapter=(none) endpoint_registry=yes leg_eligible=no
 DEFILLAMA category=(unknown) adapter=(none) endpoint_registry=yes leg_eligible=no
-HUOBI category=(unknown) adapter=(none) endpoint_registry=yes leg_eligible=no
 IBKR category=(unknown) adapter=(none) endpoint_registry=yes leg_eligible=yes
 KALSHI category=sports adapter=(none) endpoint_registry=yes leg_eligible=yes
 KUCOIN category=(unknown) adapter=(none) endpoint_registry=yes leg_eligible=no
@@ -90,7 +89,7 @@ PINNACLE category=sports adapter=(none) endpoint_registry=yes leg_eligible=no
 TARDIS category=(unknown) adapter=(none) endpoint_registry=yes leg_eligible=no
 THEGRAPH category=(unknown) adapter=(none) endpoint_registry=yes leg_eligible=no
 
-## ORPHAN (102)
+## ORPHAN (103)
 
 # venue in manifest/registry but NO execution adapter AND not in ENDPOINT_REGISTRY
 
@@ -147,6 +146,7 @@ FOOTYSTATS category=sports adapter=(none) endpoint_registry=no leg_eligible=no
 GROSVENOR category=sports adapter=(none) endpoint_registry=no leg_eligible=no
 GTBETS category=sports adapter=(none) endpoint_registry=no leg_eligible=no
 HARDROCKBET category=sports adapter=(none) endpoint_registry=no leg_eligible=no
+KALSHI-PERP category=cefi adapter=(none) endpoint_registry=no leg_eligible=yes
 LADBROKES category=sports adapter=(none) endpoint_registry=no leg_eligible=no
 LEOVEGAS category=sports adapter=(none) endpoint_registry=no leg_eligible=no
 LIDO category=defi adapter=(none) endpoint_registry=no leg_eligible=yes

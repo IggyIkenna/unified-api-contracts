@@ -51,6 +51,12 @@ _TRADFI_TOKENS: frozenset[str] = frozenset(
         "cbot",
         "nymex",
         "comex",
+        # 2026-07-13 uac_venue_registry_completion: FX was missing from this
+        # set entirely (found while verifying split_scope_tokens doesn't raise
+        # for it, per that plan's own success criterion) — FXAdapter (IBKR
+        # IDEALPRO) is a real, already-routed venue, same family as the other
+        # IBKR-routed entries above.
+        "fx",
     }
 )
 
