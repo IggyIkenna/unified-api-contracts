@@ -340,6 +340,7 @@ VENUE_CATEGORY_MAP: dict[str, str] = {
     UPBIT: "cefi",
     NASDAQ: "tradfi",
     NYSE: "tradfi",
+    "FX": "tradfi",
     CME: "tradfi",
     CBOT: "tradfi",
     NYMEX: "tradfi",
@@ -565,6 +566,9 @@ VENUE_CAPABILITIES: dict[str, set[VenueCapability]] = {
     UPBIT: {VenueCapability.SPOT_TRADE},
     NASDAQ: {VenueCapability.SPOT_TRADE},
     NYSE: {VenueCapability.SPOT_TRADE},
+    # FXAdapter (execution-service) routes via IbkrTradFiAdapter's IDEALPRO exchange using
+    # secType="CASH" contracts only (no FUT/OPT) — spot OTC forex, matching NASDAQ/NYSE's pattern.
+    "FX": {VenueCapability.SPOT_TRADE},
     CME: {VenueCapability.FUTURES_TRADE, VenueCapability.OPTIONS_TRADE},
     CBOT: {VenueCapability.FUTURES_TRADE, VenueCapability.OPTIONS_TRADE},
     NYMEX: {VenueCapability.FUTURES_TRADE, VenueCapability.OPTIONS_TRADE},
@@ -719,6 +723,7 @@ VENUE_ORDER_CAPABILITIES: dict[str, frozenset[VenueOrderCapability]] = {
     # TradFi exchanges
     NASDAQ: _TRADFI_EXCHANGE,
     NYSE: _TRADFI_EXCHANGE,
+    "FX": _TRADFI_EXCHANGE,
     CME: _TRADFI_DERIVATIVES,
     CBOT: _TRADFI_DERIVATIVES,
     NYMEX: _TRADFI_DERIVATIVES,
