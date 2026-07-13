@@ -333,6 +333,8 @@ VENUE_CATEGORY_MAP: dict[str, str] = {
     "BYBIT": "cefi",
     BYBIT_SPOT: "cefi",
     BYBIT_FUTURES: "cefi",
+    "BITFINEX-SPOT": "cefi",
+    "BITFINEX-FUTURES": "cefi",
     COINBASE_SPOT: "cefi",
     HYPERLIQUID: "cefi",
     DERIBIT: "cefi",
@@ -560,6 +562,8 @@ VENUE_CAPABILITIES: dict[str, set[VenueCapability]] = {
     BINANCE_FUTURES: {VenueCapability.PERP_TRADE, VenueCapability.FUTURES_TRADE},
     OKX_FUTURES: {VenueCapability.PERP_TRADE, VenueCapability.FUTURES_TRADE, VenueCapability.OPTIONS_TRADE},
     BYBIT_FUTURES: {VenueCapability.PERP_TRADE, VenueCapability.FUTURES_TRADE},
+    "BITFINEX-SPOT": {VenueCapability.SPOT_TRADE},
+    "BITFINEX-FUTURES": {VenueCapability.PERP_TRADE, VenueCapability.FUTURES_TRADE},
     DERIBIT: {VenueCapability.PERP_TRADE, VenueCapability.FUTURES_TRADE, VenueCapability.OPTIONS_TRADE},
     HYPERLIQUID: {VenueCapability.PERP_TRADE},
     ASTER: {VenueCapability.PERP_TRADE},
@@ -691,6 +695,11 @@ VENUE_ORDER_CAPABILITIES: dict[str, frozenset[VenueOrderCapability]] = {
     OKX_FUTURES: _CEFI_FULL,
     BYBIT_SPOT: _CEFI_FULL,
     BYBIT_FUTURES: _CEFI_FULL,
+    # BitfinexCeFiAdapter is BLOCKED-CREDENTIALS: every trading method (place_order,
+    # cancel_order, etc.) raises NotImplementedError before any HTTP round-trip, so no
+    # order-level sub-capability is genuinely live yet — empty set, not _CEFI_FULL.
+    "BITFINEX-SPOT": frozenset[VenueOrderCapability](),
+    "BITFINEX-FUTURES": frozenset[VenueOrderCapability](),
     COINBASE_SPOT: _CEFI_STANDARD,
     DERIBIT: frozenset(
         {
