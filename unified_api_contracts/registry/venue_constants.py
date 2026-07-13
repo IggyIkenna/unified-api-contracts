@@ -337,6 +337,8 @@ VENUE_CATEGORY_MAP: dict[str, str] = {
     "BITFINEX-FUTURES": "cefi",
     "BITGET-SPOT": "cefi",
     "BITGET-FUTURES": "cefi",
+    KRAKEN_SPOT: "cefi",
+    KRAKEN_FUTURES: "cefi",
     COINBASE_SPOT: "cefi",
     HYPERLIQUID: "cefi",
     DERIBIT: "cefi",
@@ -568,6 +570,8 @@ VENUE_CAPABILITIES: dict[str, set[VenueCapability]] = {
     "BITFINEX-FUTURES": {VenueCapability.PERP_TRADE, VenueCapability.FUTURES_TRADE},
     "BITGET-SPOT": {VenueCapability.SPOT_TRADE},
     "BITGET-FUTURES": {VenueCapability.PERP_TRADE, VenueCapability.FUTURES_TRADE},
+    KRAKEN_SPOT: {VenueCapability.SPOT_TRADE},
+    KRAKEN_FUTURES: {VenueCapability.PERP_TRADE, VenueCapability.FUTURES_TRADE},
     DERIBIT: {VenueCapability.PERP_TRADE, VenueCapability.FUTURES_TRADE, VenueCapability.OPTIONS_TRADE},
     HYPERLIQUID: {VenueCapability.PERP_TRADE},
     ASTER: {VenueCapability.PERP_TRADE},
@@ -707,6 +711,15 @@ VENUE_ORDER_CAPABILITIES: dict[str, frozenset[VenueOrderCapability]] = {
     "BITFINEX-FUTURES": frozenset[VenueOrderCapability](),
     "BITGET-SPOT": frozenset[VenueOrderCapability](),
     "BITGET-FUTURES": frozenset[VenueOrderCapability](),
+    # KrakenCeFiAdapter (kraken_rest_adapter.py) is a REAL implementation (unlike the
+    # Bitfinex/Bitget stubs above) — place_order genuinely POSTs to Kraken's AddOrder
+    # endpoint. Its outbound _order_type_to_kraken mapping supports MARKET/LIMIT/
+    # STOP_LIMIT/STOP_LOSS/TAKE_PROFIT only; _build_add_order_payload never sends
+    # Kraken's post-only/reduce-only oflags, and there's no batch or amend/cancel-replace
+    # endpoint wired. So STOP_LIMIT is the one genuine sub-capability — not empty, and not
+    # any of the _CEFI_* tiers (all require POST_ONLY, which isn't implemented).
+    KRAKEN_SPOT: frozenset({VenueOrderCapability.STOP_LIMIT}),
+    KRAKEN_FUTURES: frozenset({VenueOrderCapability.STOP_LIMIT}),
     COINBASE_SPOT: _CEFI_STANDARD,
     DERIBIT: frozenset(
         {
