@@ -115,11 +115,12 @@ _SOLANA_ADDRESS_RE = re.compile(r"^[1-9A-HJ-NP-Za-km-z]{32,44}$")
 # (single-asset lending, staking, yield-bearing tokens).
 _SINGLE_ASSET_DEFI_TYPES = frozenset(
     {
-        InstrumentType.LENDING.value,  # "LENDING" — Aave, Fluid, Compound
+        InstrumentType.LENDING.value,  # "LENDING" — Fluid + other not-yet-canonicalized protocols
         InstrumentType.LST.value,  # "LST"
         InstrumentType.YIELD_BEARING.value,  # "YIELD_BEARING" — Ethena sUSDe, Lido stETH, EtherFi eETH
         InstrumentType.STAKING.value,  # "STAKING" — Marinade mSOL
-        InstrumentType.A_TOKEN.value,  # "A_TOKEN"
+        InstrumentType.A_TOKEN.value,  # "A_TOKEN" — Aave V3, Spark, Compound V3 supply side
+        InstrumentType.DEBT_TOKEN.value,  # "DEBT_TOKEN" — Aave V3, Spark, Compound V3 borrow side
     }
 )
 
