@@ -109,6 +109,38 @@ def test_has_source_priority_returns_false_for_unregistered() -> None:
 
 
 # ---------------------------------------------------------------------------
+# Finding-77 (2026-07-13 operator ruling, option A / narrowed scope) —
+# (HYPERLIQUID, liquidations) SOURCE_PRIORITY removal
+# (plans/active/issues/fleet_data_acquisition_health_2026_06_21.md)
+# ---------------------------------------------------------------------------
+
+
+def test_cefi_liquidations_excludes_hyperliquid_finding77() -> None:
+    """Hyperliquid does not publish a liquidations feed (no S3 prefix, no Tardis
+    channel — VENUE_DATA_TYPE_CAPABILITIES["HYPERLIQUID"] has no ``liquidations``
+    key), so it was removed from ``("cefi", "liquidations")``. tardis/aster/extended
+    (real feeds) stay registered — the pair itself is NOT deregistered, it simply
+    resolves without hyperliquid, so consumers get an ordinary (non-empty) source
+    list rather than a crash."""
+    assert get_source_priority("cefi", "liquidations") == ["tardis", "aster", "extended"]
+    assert "hyperliquid" not in get_source_priority("cefi", "liquidations")
+    # The pair stays registered (has_source_priority does NOT flip to False) —
+    # "no-source" applies only to the hyperliquid vendor, not the whole cell.
+    assert has_source_priority("cefi", "liquidations") is True
+
+
+def test_cefi_book_liq_pairs_kept_by_finding77_narrowed_ruling() -> None:
+    """The other three pairs finding-77 originally targeted are REAL, wired,
+    tested feeds (uac@3652f99f + the pre-existing HYPERLIQUID book_snapshot_5 S3
+    archive) and were explicitly kept by the 2026-07-13 ruling: (ASTER,
+    book_snapshot_5), (ASTER, liquidations), (HYPERLIQUID, book_snapshot_5).
+    Regression guard against a future over-broad removal sweep."""
+    assert "aster" in get_source_priority("cefi", "book_snapshot")
+    assert "hyperliquid" in get_source_priority("cefi", "book_snapshot")
+    assert "aster" in get_source_priority("cefi", "liquidations")
+
+
+# ---------------------------------------------------------------------------
 # source_required — registry-driven multi-source gate
 # (data_source_provenance_all_asset_groups_2026_06_01.md Phase 1)
 # ---------------------------------------------------------------------------

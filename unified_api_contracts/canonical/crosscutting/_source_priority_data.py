@@ -92,8 +92,19 @@ SOURCE_PRIORITY: Final[dict[tuple[str, str], list[str]]] = {
     # 15m candles — the tardis entry was a planning placeholder. tradfi ohlcv_15m
     # remains (databento/massive/yahoo/barchart produce it). Exclusion entry in
     # test_validity_matrix_completeness.py removed alongside.
+    # OPERATOR RULING 2026-07-13 (finding-77 escalation, resolved via option A — see
+    # plans/active/issues/fleet_data_acquisition_health_2026_06_21.md): ONLY
+    # (HYPERLIQUID, liquidations) is removed below. Hyperliquid publishes no
+    # liquidations feed (no S3 prefix, no Tardis channel — VENUE_DATA_TYPE_
+    # CAPABILITIES["HYPERLIQUID"] in market_data_categories.py carries no
+    # ``liquidations`` key). The other three pairs originally targeted by
+    # finding-77 STAY registered: (ASTER, book_snapshot_5), (ASTER, liquidations),
+    # and (HYPERLIQUID, book_snapshot_5) are real, wired, tested live feeds
+    # (uac@3652f99f "ASTER book_snapshot_5 + liquidations live-wire capability";
+    # HYPERLIQUID book_snapshot_5 S3-archived since 2023-04-15) — removing them
+    # would reopen bug#8 (MissingSourceError) for real live traffic.
     ("cefi", "book_snapshot"): ["tardis", "aster", "hyperliquid", "extended", "pacifica"],
-    ("cefi", "liquidations"): ["tardis", "aster", "hyperliquid", "extended"],
+    ("cefi", "liquidations"): ["tardis", "aster", "extended"],  # hyperliquid removed 2026-07-13 (no real feed)
     # derivative_ticker (perp mark/index/OI/funding). tardis is the multi-venue T+1
     # archive BATCH primary for every Tardis-covered CeFi perp venue (binance/okx/
     # bybit/deribit → batch_tardis, resolved via this index-0 entry). **aster** is the
