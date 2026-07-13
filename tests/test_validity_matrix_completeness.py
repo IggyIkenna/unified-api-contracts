@@ -151,6 +151,12 @@ _SOURCE_PRIORITY_EXCLUSION_REASONS: dict[tuple[str, str], str] = {
     # third L2-microstructure data_type, RETIRED 2026-07-08.
     ("cefi", "depth_of_book_10"): _COMPUTED_SERVICE_OUTPUT,
     ("cefi", "queue_position"): _COMPUTED_SERVICE_OUTPUT,
+    # volatility_index (DVOL) — Deribit's own venue-level implied-vol index
+    # (public REST history, no creds). One index value per venue/day, not
+    # produced per-instrument by any instrument_type (unlike greeks_snapshot/
+    # implied_vol_surface above, it is NOT internally computed either — it is
+    # ingested as-is from Deribit). SSOT: vol_dvol_backtestable_engines_2026_07_13.md.
+    ("cefi", "volatility_index"): _REFERENCE_NOT_INSTRUMENT_GRAIN,
     # ── DeFi computed/service outputs (no instrument produces these) ──
     ("defi", "execution_fills"): _COMPUTED_SERVICE_OUTPUT,
     ("defi", "hedge_ratio_snapshot"): _COMPUTED_SERVICE_OUTPUT,

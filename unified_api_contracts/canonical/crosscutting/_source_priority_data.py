@@ -138,6 +138,15 @@ SOURCE_PRIORITY: Final[dict[tuple[str, str], list[str]]] = {
     ("cefi", "futures_chain"): ["tardis"],
     ("cefi", "perpetual"): ["tardis"],
     ("cefi", "funding_rate"): ["tardis"],
+    # volatility_index (DVOL) — Deribit's public REST history endpoint
+    # (``/public/get_volatility_index_data``) SELF-ARCHIVES the DVOL index back
+    # to 2021-03-24, no credentials — a genuine BATCH primary, unlike deribit's
+    # other CeFi data_types (trades/derivative_ticker/options_chain/...) where
+    # deribit is only the LIVE/REPLAY per-venue override and tardis is the batch
+    # archive. deribit is therefore a BATCH_CAPABLE_CEFI_VENUES exception for
+    # THIS data_type only (same "self-archiving vendor" pattern as
+    # aster/extended/pacifica). SSOT: vol_dvol_backtestable_engines_2026_07_13.md.
+    ("cefi", "volatility_index"): ["deribit"],
     # perp_funding (periodic funding settlements) for the new CFTC-regulated crypto
     # perp venues. kalshi_perp + polymarket_perp each expose a dedicated
     # /markets/{ticker}/funding_rates endpoint (cursor-paginated, public-read).
@@ -498,7 +507,15 @@ SOURCE_MODE_CAPABILITY: Final[dict[str, frozenset[Mode]]] = {
     # vendor). The other venues stay live/replay-only (CeFi batch = tardis).
     "binance": frozenset({Mode.LIVE, Mode.REPLAY}),
     "okx": frozenset({Mode.LIVE, Mode.REPLAY}),
-    "deribit": frozenset({Mode.LIVE, Mode.REPLAY}),
+    # deribit carries BATCH here (unlike binance/okx/kraken) because it is ALSO
+    # the self-archiving batch source for (cefi, volatility_index) — Deribit's
+    # public REST DVOL-history endpoint, no creds, back to 2021-03-24. For
+    # every OTHER CeFi data_type deribit still serves only live/replay (tardis
+    # is those data_types' batch archive) — the extra Mode.BATCH here is a
+    # per-source coarse capability (mirrors the aster/extended/pacifica unified
+    # -vendor exceptions), refined per-data_type by ``modes_for()`` at the call
+    # site. SSOT: vol_dvol_backtestable_engines_2026_07_13.md.
+    "deribit": frozenset({Mode.BATCH, Mode.LIVE, Mode.REPLAY}),
     "kraken": frozenset({Mode.LIVE, Mode.REPLAY}),
     "hyperliquid": frozenset({Mode.BATCH, Mode.LIVE, Mode.REPLAY}),
     "bybit": frozenset({Mode.LIVE}),
@@ -552,7 +569,7 @@ CEFI_LIVE_VENUES: Final[frozenset[str]] = frozenset(
 )
 
 BATCH_CAPABLE_CEFI_VENUES: Final[frozenset[str]] = frozenset(
-    {"hyperliquid", "aster", "kalshi_perp", "polymarket_perp", "extended"}
+    {"hyperliquid", "aster", "kalshi_perp", "polymarket_perp", "extended", "deribit"}
 )
 """CeFi live venues that are ALSO a batch source (operator R4 2026-06-07 + Aster
 2026-06-16).
@@ -631,6 +648,10 @@ EMISSION_LATENCY_MS_BY_SOURCE: Final[dict[str, int]] = {
     "aster": 1_000,  # 1s: Aster native REST polling cadence (source=aster, transport=rest)
     "extended": 1_000,  # 1s: EXTENDED-STARKNET native REST polling cadence (source=extended, transport=rest)
     "pacifica": 1_000,  # 1s: PACIFICA-SOLANA native REST polling cadence (source=pacifica, transport=rest)
+    # DVOL history endpoint serves hourly/daily OHLC resolutions (no sub-minute
+    # tick stream) — conservative hourly cadence, same class as the other
+    # periodic-series REST sources below (footystats/mdps_odds_horizon_bucket).
+    "deribit": 3_600_000,  # 1h: Deribit public DVOL-history REST cadence (source=deribit, transport=rest)
     "pyth_hermes": 1_000,  # 1s: Pyth Hermes batch endpoint
     "chainlink": 200,  # 200ms: on-chain EVM oracle aggregator round (RPC-style)
     # Solana native-staking sources — epoch-granularity (~2.5 day cadence).

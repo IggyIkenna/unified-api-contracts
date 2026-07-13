@@ -89,7 +89,12 @@ EXPECTED_SOURCE_MODE_CAPABILITY: dict[str, frozenset[Mode]] = {
     # (REST candleSnapshot) → {BATCH, LIVE, REPLAY} (the unified vendor, R4).
     "binance": frozenset({Mode.LIVE, Mode.REPLAY}),
     "okx": frozenset({Mode.LIVE, Mode.REPLAY}),
-    "deribit": frozenset({Mode.LIVE, Mode.REPLAY}),
+    # deribit is ALSO the self-archiving batch source for (cefi, volatility_index)
+    # — the public DVOL-history REST endpoint, no creds (vol_dvol_backtestable_
+    # engines_2026_07_13.md) — a BATCH_CAPABLE_CEFI_VENUES exception like
+    # hyperliquid/aster/extended, even though every OTHER CeFi data_type it
+    # serves is still live/replay-only (tardis is those data_types' batch archive).
+    "deribit": _BLR,
     "kraken": frozenset({Mode.LIVE, Mode.REPLAY}),
     "hyperliquid": _BLR,
     "bybit": frozenset({Mode.LIVE}),
@@ -350,10 +355,11 @@ def test_source_aware_live_member_has_concrete_source() -> None:
 
 
 def test_cefi_replay_venues_are_live_and_replay() -> None:
-    """binance/okx/deribit/kraken re-fetch a same-day window via REST (live+replay,
-    no batch — CeFi batch = tardis). hyperliquid is live+replay too but ALSO batch
-    (the unified DeFi+CeFi vendor) → asserted as a superset, not exact-equality."""
-    for venue in ("binance", "okx", "deribit", "kraken"):
+    """binance/okx/kraken re-fetch a same-day window via REST (live+replay,
+    no batch — CeFi batch = tardis). hyperliquid/deribit are live+replay too but
+    ALSO batch (unified-vendor exceptions) → asserted as a superset, not
+    exact-equality."""
+    for venue in ("binance", "okx", "kraken"):
         assert modes_for_source(venue) == frozenset({Mode.LIVE, Mode.REPLAY})
         assert pipeline_mode_for_source(venue, Mode.LIVE).value == f"live_{venue}"
         assert pipeline_mode_for_source(venue, Mode.REPLAY).value == f"replay_{venue}"
@@ -361,6 +367,11 @@ def test_cefi_replay_venues_are_live_and_replay() -> None:
     assert {Mode.LIVE, Mode.REPLAY} <= modes_for_source("hyperliquid")
     assert pipeline_mode_for_source("hyperliquid", Mode.LIVE).value == "live_hyperliquid"
     assert pipeline_mode_for_source("hyperliquid", Mode.REPLAY).value == "replay_hyperliquid"
+    # deribit: live + replay (+ batch, for volatility_index only) — the
+    # vol_dvol_backtestable_engines_2026_07_13.md exception.
+    assert {Mode.LIVE, Mode.REPLAY} <= modes_for_source("deribit")
+    assert pipeline_mode_for_source("deribit", Mode.LIVE).value == "live_deribit"
+    assert pipeline_mode_for_source("deribit", Mode.REPLAY).value == "replay_deribit"
 
 
 def test_bybit_is_live_only_replay_absent() -> None:

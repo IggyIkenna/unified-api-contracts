@@ -413,6 +413,25 @@ DATA_TYPE_CAPABILITY_REGISTRY: Final[tuple[DataTypeCapability, ...]] = (
         sources=("greeks_service/kernels/iv_surface.py",),
         notes="CanonicalImpliedVolSurface of CanonicalIVSurfacePoint; honest-absence empty surface.",
     ),
+    # volatility_index — Deribit DVOL implied-vol index, public REST history
+    # (``/public/get_volatility_index_data``), no credentials. REST-polled, not
+    # a WS stream — live_capable=True still holds (a live consumer can re-poll
+    # the same endpoint for the current value), so no ``streaming_protocol`` is
+    # declared (mirrors the ``prediction_canonical_question_group`` REST-derived
+    # pattern below). Feeds the DVOL-backtestable VOL_CARRY / VOL_ARB_RV_IV
+    # engines (``vol_dvol_backtestable_engines_2026_07_13.md`` Todo 1 — registry
+    # only; the MTDS capture handler + historical pull are that plan's separate,
+    # not-yet-built Todo 2/3 — no handler file exists yet, so no ``sources``
+    # entry is cited here until one lands).
+    DataTypeCapability(
+        asset_group=AssetGroup.CEFI,
+        data_type="volatility_index",
+        venue="DERIBIT",
+        instrument_type="",
+        live_capable=True,
+        batch_capable=True,
+        notes="Deribit BTC/ETH DVOL implied-vol index OHLC; public REST, no creds.",
+    ),
     # Futures chain bundle
     DataTypeCapability(
         asset_group=AssetGroup.CEFI,
