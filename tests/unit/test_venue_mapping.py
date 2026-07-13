@@ -282,6 +282,36 @@ class TestGetVenueToTardisExchanges:
         assert "binance" in result["BINANCE-SPOT"]
 
 
+class TestGetAllTardisExchangesForVenue:
+    """Regression for instruments-service's factory.py bare-OKX 404 bug
+    (cefi_deribit_combo_and_okx_bare_venue_gaps_2026_07_12.md): bare OKX has
+    NO single direct/suffixed Tardis exchange match (it splits across 4 by
+    instrument type), so get_tardis_exchange_for_venue("OKX") returns None
+    and IS's factory.py raised ValueError, blocking instrument_availability
+    capture for the venue entirely.
+    """
+
+    def test_okx_returns_all_itype_exchanges(self, vm: VenueMapping) -> None:
+        result = vm.get_all_tardis_exchanges_for_venue("OKX")
+        assert set(result) == {"okex", "okex-swap", "okex-futures", "okex-options"}
+
+    def test_single_exchange_venue_returns_one_element_list(self, vm: VenueMapping) -> None:
+        # DERIBIT has a direct tardis_to_venue match — must stay a 1-element list,
+        # identical coverage to get_tardis_exchange_for_venue, not the itype fan-out.
+        single = vm.get_tardis_exchange_for_venue("DERIBIT")
+        assert single is not None
+        result = vm.get_all_tardis_exchanges_for_venue("DERIBIT")
+        assert result == [single]
+
+    def test_suffixed_venue_returns_one_element_list(self, vm: VenueMapping) -> None:
+        result = vm.get_all_tardis_exchanges_for_venue("OKX-SWAP")
+        assert result == ["okex-swap"]
+
+    def test_unknown_venue_returns_empty_list(self, vm: VenueMapping) -> None:
+        result = vm.get_all_tardis_exchanges_for_venue("COMPLETELY_UNKNOWN_VENUE_XY_ZZ")
+        assert result == []
+
+
 class TestConvertToTardisExchange:
     def test_uppercase_canonical_venue(self, vm: VenueMapping) -> None:
         result = vm.convert_to_tardis_exchange("BINANCE-SPOT")

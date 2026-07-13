@@ -743,6 +743,38 @@ class VenueMapping:
             return direct_match
         return self._get_suffixed_tardis_match(upper)
 
+    def get_all_tardis_exchanges_for_venue(self, canonical_venue: str) -> list[str]:
+        """Get ALL Tardis exchanges a bare canonical venue's instrument universe spans.
+
+        Some venues (OKX) have no single "the" Tardis exchange — they split
+        across several exchanges by instrument type (okex/okex-swap/okex-futures/
+        okex-options), each declared as a separate ``venue_instrument_type_to_tardis``
+        entry keyed on the SAME bare venue. ``get_tardis_exchange_for_venue``
+        (single-answer) returns None for these; this method returns every
+        exchange, for callers (e.g. IS's ``TardisReferenceDataAdapter``) that
+        enumerate multiple exchanges natively via ``exchanges=[...]``.
+
+        For venues WITH a single direct/suffixed match, returns a 1-element list
+        (identical coverage to ``get_tardis_exchange_for_venue``, just wrapped).
+        """
+        single = self.get_tardis_exchange_for_venue(canonical_venue)
+        if single:
+            return [single]
+        upper = canonical_venue.upper()
+        by_itype = sorted(
+            {
+                exchange
+                for (venue_key, _itype), exchange in self.venue_instrument_type_to_tardis.items()
+                if venue_key == upper
+            }
+        )
+        if by_itype:
+            return by_itype
+        candidate = canonical_venue.lower()
+        if candidate in self.tardis_to_venue:
+            return [candidate]
+        return []
+
     def convert_to_tardis_exchange(self, exchange_or_venue: str) -> str:
         """
         Convert exchange name to Tardis API format (lowercase).
