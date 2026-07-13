@@ -430,6 +430,18 @@ class AlertCode(StrEnum):
     Composes with ``BATCH_VS_LIVE_RECON_DRIFTED`` (the T+1 determinism verdict).
     SSOT: ``codex/09-strategy/operational/paper-batch-live-reconciliation.md`` §6."""
 
+    # ── Deployment-estate daily digest (parity #5 — per-umbrella rollup) ─────
+    DEPLOYMENT_DIGEST = "DEPLOYMENT_DIGEST"
+    """Daily INFO digest of the deployment estate rolled up per umbrella: LIVE
+    targets running/up, BATCH completions + failures, PAPER run status, plus the
+    most-recent failing target per umbrella. Emitter: deployment-api
+    ``routes/deployment_digest.py`` (the ``/api/deployments/digest/run`` cron
+    endpoint) → alerting-service → Slack. Always INFO (informational operator
+    eyeball surface, never a paged alert) — the deployment-estate companion to
+    ``DAILY_LEDGER_DIGEST`` (the per-client book). Routed by the catch-all INFO
+    rule (no dedicated ``AlertRule`` — same posture as ``DAILY_LEDGER_DIGEST``).
+    SSOT: ``plans/active/deployment_observability_parity_live_batch_paper_2026_06_22.md`` #5."""
+
     # ── QG / infra staleness (2026-05-15, B-018 Phase 4.A monitoring) ────────
     QG_SNAPSHOT_STALE = "QG_SNAPSHOT_STALE"
     """Daily QG snapshot not written to GCS for N consecutive days (default 2).
