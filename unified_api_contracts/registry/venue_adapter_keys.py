@@ -118,7 +118,12 @@ VENUE_TO_ADAPTER_KEY: dict[str, str] = {
     "NYSE": "databento",
     "CBOE": "databento",
     "ICE": "databento",
-    "FX": "databento",
+    # FX never touches Databento — execution is FXAdapter (IBKR IDEALPRO), market data is
+    # Yahoo Finance fetched via a hardcoded venue_upper == "FX" branch in MTDS's
+    # umi_tick_provider.py, bypassing VENUE_TO_ADAPTER_KEY/URDI entirely. No URDI reference-data
+    # adapter class exists for Yahoo Finance (checked instruments-service's _ADAPTERS) — FX
+    # genuinely has no URDI adapter, so this is NO_ADAPTER_YET, not a phantom vendor key.
+    "FX": NO_ADAPTER_YET,
     "KRX": "databento",
     # Legacy source-as-venue artifact (rolling VIX 15m / KRW-USD daily via the
     # Yahoo data provider) — deliberately adapterless; IS excludes it from its
