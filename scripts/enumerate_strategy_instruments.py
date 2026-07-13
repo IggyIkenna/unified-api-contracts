@@ -9,9 +9,11 @@ with the latest instrument-definitions records from the per-category
 
     { slot_label_or_archetype_dim_key: { ..., instruments: [instrument_key, ...] } }
 
-Output: gs://strategy-store-cefi-central-element-323112/catalogue/
-strategy_instruments.json. UI / terminal / order-booking consumers read this
-to answer "which concrete instruments can I trade for this strategy slot today?"
+Output: gs://strategy-store-central-element-323112/catalogue/
+strategy_instruments.json (unified FLAT strategy-store bucket — see
+plans/active/issues/strategy_store_split_brain_2026_07_13.md). UI / terminal /
+order-booking consumers read this to answer "which concrete instruments can I
+trade for this strategy slot today?"
 
 The instruments-service writes per-(category, day, venue) parquet rolls to
 ``gs://instruments-store-{category}-central-element-323112/

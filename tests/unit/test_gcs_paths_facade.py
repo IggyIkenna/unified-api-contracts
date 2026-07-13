@@ -94,8 +94,10 @@ def test_sports_facade_parity() -> None:
 
 
 def test_strategy_store_bucket() -> None:
-    """Catalogue artefacts always live in the cefi-suffixed strategy-store bucket."""
-    assert strategy_store_bucket(PID) == f"strategy-store-cefi-{PID}"
+    """Catalogue artefacts live in the unified FLAT strategy-store bucket
+    (cloud-providers.yaml kind ``strategy-store`` — no asset-group segment; see
+    plans/active/issues/strategy_store_split_brain_2026_07_13.md)."""
+    assert strategy_store_bucket(PID) == f"strategy-store-{PID}"
 
 
 def test_generic_bucket_template_keeps_both_placeholders() -> None:

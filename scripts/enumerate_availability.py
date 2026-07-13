@@ -40,7 +40,14 @@ from enumerate_envelope import (  # noqa: E402  # placed after conditional setup
     _timeframes_for,
 )
 
-GCS_BUCKET = "strategy-store-cefi-central-element-323112"
+# Unified FLAT strategy-store bucket (cloud-providers.yaml storage kind
+# `strategy-store` — asset-group-agnostic). Per the operator-ratified
+# 2026-05-20 (D6 Phase 4) decision + the split-brain fix
+# (plans/active/issues/strategy_store_split_brain_2026_07_13.md); UAC is a
+# lower tier than unified-trading-library, so UTL's `resolve_bucket_name()`
+# can't be imported here — derive the flat name from the project id.
+_PROJECT_ID = "central-element-323112"
+GCS_BUCKET = f"strategy-store-{_PROJECT_ID}"
 GCS_OBJECT_PATH = "catalogue/availability.json"
 
 
