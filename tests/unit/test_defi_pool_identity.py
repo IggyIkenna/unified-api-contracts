@@ -18,18 +18,19 @@ from unified_api_contracts import (
 
 
 class TestGluedVenuePrefix:
-    def test_strips_version_underscore_and_uppercases_chain(self) -> None:
-        assert glued_venue_prefix("UNISWAP_V3", "ARBITRUM") == "UNISWAPV3-ARBITRUM"
+    def test_preserves_version_underscore_and_uppercases_chain(self) -> None:
+        assert glued_venue_prefix("UNISWAP_V3", "ARBITRUM") == "UNISWAP_V3-ARBITRUM"
 
-    def test_idempotent_on_already_stripped_protocol(self) -> None:
-        assert glued_venue_prefix("AERODROME_V3", "base") == "AERODROMEV3-BASE"
+    def test_idempotent_on_already_canonical_protocol(self) -> None:
+        assert glued_venue_prefix("AERODROME_V3", "base") == "AERODROME_V3-BASE"
 
     def test_protocol_without_version_token(self) -> None:
         assert glued_venue_prefix("CURVE", "ETHEREUM") == "CURVE-ETHEREUM"
 
     def test_glued_venue_passed_as_venue_is_split(self) -> None:
-        # Defensive: a caller that passes the glued venue with empty chain.
-        assert glued_venue_prefix("UNISWAPV3-ARBITRUM", "") == "UNISWAPV3-ARBITRUM"
+        # Defensive: a caller that passes the LEGACY no-underscore glued venue with
+        # empty chain -- self-heals to the with-underscore canonical form.
+        assert glued_venue_prefix("UNISWAPV3-ARBITRUM", "") == "UNISWAP_V3-ARBITRUM"
 
 
 class TestSplitGluedVenueChain:
@@ -69,7 +70,7 @@ class TestBuildPoolIdentity:
             quote_asset="USDC",
             fee=100,
         )
-        assert pid.glued_pair_id == "UNISWAPV3-ARBITRUM:POOL:AAVE-USDC:100"
+        assert pid.glued_pair_id == "UNISWAP_V3-ARBITRUM:POOL:AAVE-USDC:100"
 
     def test_glued_venue_input_is_split(self) -> None:
         pid = build_pool_identity(
@@ -82,7 +83,7 @@ class TestBuildPoolIdentity:
         )
         assert pid.venue == "UNISWAP_V3"
         assert pid.chain == "POLYGON"
-        assert pid.glued_pair_id == "UNISWAPV3-POLYGON:POOL:COMP-USDC:10000"
+        assert pid.glued_pair_id == "UNISWAP_V3-POLYGON:POOL:COMP-USDC:10000"
 
     def test_explicit_chain_wins_over_derived(self) -> None:
         pid = build_pool_identity(
@@ -100,7 +101,7 @@ class TestBuildPoolIdentity:
         pid = build_pool_identity(
             venue="UNISWAP_V3", chain="BASE", pool_address="0x1", base_asset="WETH", quote_asset="DAI", fee=None
         )
-        assert pid.glued_pair_id == "UNISWAPV3-BASE:POOL:WETH-DAI"
+        assert pid.glued_pair_id == "UNISWAP_V3-BASE:POOL:WETH-DAI"
 
 
 class TestParseGluedPoolId:
