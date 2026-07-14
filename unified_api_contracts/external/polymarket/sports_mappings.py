@@ -144,6 +144,14 @@ POLYMARKET_SERIES_TO_LEAGUE: dict[str, str] = {
     "j1-league-2025": "J1_LEAGUE",
     "k-league": "K_LEAGUE_1",
     "k-league-2025": "K_LEAGUE_1",
+    # Continental — canonical league_id from LEAGUE_REGISTRY (tier 0 / Reference,
+    # not in POLYMARKET_PREDICTION_LEAGUES: unlike the domestic leagues above,
+    # UCL coverage on Polymarket has not been re-verified against live scan data).
+    # "champions-league-2025" follows the established tag+year slug convention
+    # (POLYMARKET_SPORTS_TAG_SLUGS already carries "champions-league"); "ucl-2025"
+    # is kept as an alias since it's the slug assumed by the existing e2e test.
+    "champions-league-2025": "UCL",
+    "ucl-2025": "UCL",
 }
 
 # Reverse lookup: canonical league_id → Polymarket series slug (first match)

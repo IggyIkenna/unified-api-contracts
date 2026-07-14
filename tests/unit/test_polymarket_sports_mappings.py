@@ -70,6 +70,12 @@ class TestPolymarketSeriesToLeague:
     def test_efl_championship_maps_correctly(self) -> None:
         assert POLYMARKET_SERIES_TO_LEAGUE["efl-championship"] == "ENG_CHAMPIONSHIP"
 
+    def test_champions_league_maps_to_ucl(self) -> None:
+        assert POLYMARKET_SERIES_TO_LEAGUE["champions-league-2025"] == "UCL"
+
+    def test_ucl_alias_maps_to_ucl(self) -> None:
+        assert POLYMARKET_SERIES_TO_LEAGUE["ucl-2025"] == "UCL"
+
     def test_non_empty(self) -> None:
         assert len(POLYMARKET_SERIES_TO_LEAGUE) > 0
 
@@ -117,6 +123,14 @@ class TestGetCanonicalLeagueForPolymarketSeries:
     def test_efl_championship(self) -> None:
         result = get_canonical_league_for_polymarket_series("efl-championship")
         assert result == "ENG_CHAMPIONSHIP"
+
+    def test_champions_league_2025(self) -> None:
+        result = get_canonical_league_for_polymarket_series("champions-league-2025")
+        assert result == "UCL"
+
+    def test_ucl_2025_alias(self) -> None:
+        result = get_canonical_league_for_polymarket_series("ucl-2025")
+        assert result == "UCL"
 
     def test_unknown_series_returns_none(self) -> None:
         result = get_canonical_league_for_polymarket_series("unknown-series-xyz")
