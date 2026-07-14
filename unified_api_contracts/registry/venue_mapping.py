@@ -298,7 +298,7 @@ class VenueMapping:
             "CBOE": "2020-06-01",  # VX futures (XCBF.PITCH) captured history floor
             "NASDAQ": "2023-04-15",
             "NYSE": "2023-04-15",
-            "ICE": "2020-01-01",
+            "ICE": "2019-01-02",  # DXY genesis parity (YAHOO_INDICES + VENUE_DATA_TYPE_CAPABILITIES, 2026-07-14)
             "FX": "2020-01-01",
             # KRX (Korea Exchange) single stocks — Yahoo-sourced (.KS). Daily
             # history confirmed back to 2019 (probed 2026-06-24). Floor = our
