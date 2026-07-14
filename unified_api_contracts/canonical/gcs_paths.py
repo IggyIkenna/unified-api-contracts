@@ -100,17 +100,13 @@ BUCKET_TEMPLATES_BY_ASSET_GROUP_KIND: dict[tuple[AssetGroup, BucketKind], str | 
     # unified-trading-pm/plans/active/issues/instrument_id_format_canonicalization_2026_07_08.md
     # finding 8 and instruments-service/docs/PREDICTION_INSTRUMENTS.md.
     (AssetGroup.PREDICTION, BucketKind.INSTRUMENTS): "instruments-store-pred-{env}-{project_id}",
-    # MARKET_DATA: deliberately LEFT AS THE LONG FORM, unlike INSTRUMENTS above — this
-    # is NOT the same bug. `market-data-tick-prediction-{pid}` is a REAL, currently-live
-    # legacy bucket mid-migration to the canonical `market-data-tick-pred-prd-{pid}` (see
-    # market-tick-data-service/scripts/migrate_prediction_to_pred_prd_v9.py +
-    # prediction_manifest_canonicalisation_2026_06_01.md §C — as of that migration's last
-    # audit the legacy bucket held 2,822 captured cells vs. canonical's 805, with cells
-    # unique to EACH side). Flipping this template to the abbreviated form before that
-    # migration's `--drop-stale` step completes would silently point every consumer of
-    # this facade at the less-complete bucket. Re-evaluate once that migration's
-    # Progress Log confirms `pred-prd` is the sole, complete SSOT.
-    (AssetGroup.PREDICTION, BucketKind.MARKET_DATA): "market-data-tick-prediction-{env}-{project_id}",
+    # MARKET_DATA: FLIPPED 2026-07-14 to the abbreviated `pred` token — the
+    # migration to `market-data-tick-pred-prd-{pid}` completed (plan
+    # prediction_manifest_canonicalisation_2026_06_01.md archived), and the legacy
+    # long-form bucket `market-data-tick-prediction-{pid}` was deleted 2026-07-12
+    # (confirmed 404 against production). `pred-prd` is now the sole, complete SSOT.
+    # See unified-trading-pm/plans/active/issues/mdps_prediction_tick_bucket_uac_ssot_404_2026_07_14.md.
+    (AssetGroup.PREDICTION, BucketKind.MARKET_DATA): "market-data-tick-pred-{env}-{project_id}",
 }
 
 
