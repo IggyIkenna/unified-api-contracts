@@ -7,6 +7,8 @@ Provenance: URLs verified from public venue API documentation (2026-05-22).
   - Hyperliquid: https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api
   - Aster: https://docs.asterdex.com
   - Pacifica: https://docs.pacifica.fi
+  - Kalshi-perp: https://docs.kalshi.com/margin (perps_openapi.yaml), re-verified
+    2026-07-14 with a live GET against external-api.kalshi.com/trade-api/v2/margin/markets.
 
 Graph (gateway.thegraph.com) and Tardis (datasets.tardis.dev) are data-provider
 infrastructure, not venue endpoints — they are exempt from this registry.
@@ -25,11 +27,16 @@ CEFI_PERP_VENUE_API_ENDPOINTS: Final[dict[str, str]] = {
     "PACIFICA": "https://api.pacifica.fi/api/v1",
     # Kalshi-perp: CFTC-regulated crypto perpetuals (launched 2026-05-29).
     # Public-read REST (no auth for market data). History from 2026-05-29.
-    # Endpoint: GET /markets?category=CRYPTO&status=active (list)
-    #           GET /markets/{ticker}/trades (cursor-paginated, ≤1000/call)
-    #           GET /markets/{ticker}/funding_rates (periodic funding)
+    # CONFIRMED 2026-07-14 (mtds_perp_funding_backfill_hang_2026_07_14.md
+    # endpoint-research todo, live repro): this is a SEPARATE margin/perps API
+    # (docs.kalshi.com/margin, perps_openapi.yaml) — NOT the prediction-markets
+    # host (api.elections.kalshi.com) the collector used before this fix, which
+    # has no perps product at all and caused a catastrophic ticker-list churn.
+    # Endpoint: GET /margin/markets[?status=active] (list, no pagination)
+    #           GET /margin/trades?ticker=...  (cursor-paginated, <=1000/call)
+    #           GET /margin/funding_rates/historical?ticker=...&start_ts=...&end_ts=...
     # SSOT: prediction-perps-sourcing.md
-    "KALSHI_PERP": "https://api.elections.kalshi.com/trade-api/v2",
+    "KALSHI_PERP": "https://external-api.kalshi.com/trade-api/v2",
     # Polymarket-perp: CFTC-regulated crypto perpetuals (launched 2026-04-21).
     # BLOCKED-UPSTREAM-OUTAGE: DNS NXDOMAIN for perps-api.polymarket.com as of
     # 2026-06-21. Endpoint registered for when the service recovers.
