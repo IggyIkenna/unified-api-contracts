@@ -262,29 +262,68 @@ DATA_TYPE_CAPABILITY_REGISTRY: Final[tuple[DataTypeCapability, ...]] = (
     # imbalance_ratio feature family. MTDS deleted book_microstructure_handler.py's
     # order_flow_imbalance computation (market-tick-data-service@a4fb3d13); this
     # UAC capability declaration retired to match.
-    # ``depth_of_book_10`` (L10 ladder) + ``queue_position`` (per-level resting
-    # queue / order-by-order) — need a DEEPER book than the captured L5 snapshot.
-    # The canonical ``CanonicalBookMicrostructure`` shape carries the fields, but
-    # they are HONESTLY ABSENT (live_capable=False, batch_capable=False) until an
-    # L10 / full-L2 capture lands. Marked here so the matrix never claims them
-    # available from L5. Honest gap — NOT a hollow capability.
+    # ``depth_of_book_10`` (L10 ladder) — raw-captured directly by a WS connector
+    # (mirrors book_snapshot_5's connector pattern, NOT computed from it). Live
+    # WS feeds now genuinely exist for 5 venues
+    # (market-tick-data-service@15f5657b): COINBASE-SPOT, BYBIT, DERIBIT,
+    # BINANCE-FUTURES, OKX-SWAP. The remaining 4 (BINANCE-SPOT, OKX-FUTURES,
+    # OKX-SPOT, UPBIT) have NO live book_snapshot_5 at all (trades-only /
+    # batch-only) — see
+    # plans/active/issues/l2_book_depth10_missing_l5_prerequisite_venues_2026_07_13.md
+    # — stay honest-absent. No batch/replay path built (live-only todo).
     *(
         DataTypeCapability(
             asset_group=AssetGroup.CEFI,
-            data_type=_dt,
+            data_type="depth_of_book_10",
+            venue=_venue,
+            instrument_type="",
+            live_capable=True,
+            batch_capable=False,
+            streaming_protocol="ws",
+            sources=("market_tick_data_service/live/connectors/",),
+            notes="Live L10 WS feed (extends the existing book_snapshot_5 connector per venue).",
+        )
+        for _venue in ("COINBASE-SPOT", "BYBIT", "DERIBIT", "BINANCE-FUTURES", "OKX-SWAP")
+    ),
+    *(
+        DataTypeCapability(
+            asset_group=AssetGroup.CEFI,
+            data_type="depth_of_book_10",
             venue=_venue,
             instrument_type="",
             live_capable=False,
             batch_capable=False,
             streaming_protocol="ws",
-            sources=("market_tick_data_service/cli/handlers/book_microstructure_handler.py",),
+            sources=("market_tick_data_service/live/connectors/",),
+            notes="No live book_snapshot_5 for this venue at all (trades-only/batch-only) — honest gap.",
+        )
+        for _venue in ("BINANCE-SPOT", "OKX-FUTURES", "OKX-SPOT", "UPBIT")
+    ),
+    # ``queue_position`` (per-level resting queue) — COMPUTED, not raw-captured
+    # (unlike depth_of_book_10 above). `compute_book_microstructure`
+    # (market_tick_data_service/derived/book_microstructure_compute.py) can
+    # derive it from a depth_of_book_10 input, but NO handler dispatches that
+    # function against a live/replay input and writes the result yet (the
+    # pre-retirement handler, book_microstructure_handler.py, was deleted in
+    # a4fb3d13 and has not been rebuilt) — still HONESTLY ABSENT for every
+    # venue, including the 5 with a live depth_of_book_10 feed. Do not flip
+    # until that handler+CLI wiring lands (tracked as a new todo in this plan).
+    *(
+        DataTypeCapability(
+            asset_group=AssetGroup.CEFI,
+            data_type="queue_position",
+            venue=_venue,
+            instrument_type="",
+            live_capable=False,
+            batch_capable=False,
+            streaming_protocol="ws",
+            sources=("market_tick_data_service/derived/book_microstructure_compute.py",),
             notes=(
-                "Needs an L10 / full-L2 book capture deeper than book_snapshot_5; "
-                "honest gap until the deeper-book capture lands (scaffolded handler "
-                "marks the shard expected_unattempted, never a silent placeholder)."
+                "compute_book_microstructure() can derive this from a depth_of_book_10 "
+                "input, but no handler dispatches it against a live feed yet — honest "
+                "gap until that wiring lands."
             ),
         )
-        for _dt in ("depth_of_book_10", "queue_position")
         for _venue in (
             "BINANCE-FUTURES",
             "BINANCE-SPOT",

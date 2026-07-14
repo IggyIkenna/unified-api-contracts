@@ -5,9 +5,11 @@ book source (venue live WebSocket + Tardis batch archive) converges on, derived
 by MTDS from the canonical ``book_snapshot_5``. The tests assert (a) the public
 export surface, (b) batch==live (the same instance round-trips identically
 regardless of source), (c) honest-absence of the deeper-book fields (queue /
-depth-10) that an L5 source cannot fill, and (d) the data_type / SOURCE_PRIORITY
-registrations: queue_position / depth_of_book_10 are an honest gap (need a
-deeper book).
+depth-10) that an L5 source cannot fill, and (d) the data_type registrations:
+``depth_of_book_10`` is a genuine live WS feed for the 5 venues with a deeper
+capture (market-tick-data-service@15f5657b), honest gap elsewhere;
+``queue_position`` is COMPUTED (no handler dispatches
+``compute_book_microstructure`` yet) and stays an honest gap everywhere.
 
 order_flow_imbalance (the third L2-microstructure data_type, formerly
 live-capable from L5 alone) RETIRED 2026-07-08 — zero real consumers, zero
@@ -92,19 +94,38 @@ def test_batch_equals_live_identical_dump() -> None:
     assert from_live.model_dump() == from_batch.model_dump()
 
 
-def test_queue_and_depth_are_honest_gap() -> None:
-    """queue_position + depth_of_book_10 need a deeper book than L5 -> honest gap
-    (neither live nor batch capable until a deeper capture lands)."""
+_DEPTH10_CAPABLE_VENUES = frozenset({"COINBASE-SPOT", "BYBIT", "DERIBIT", "BINANCE-FUTURES", "OKX-SWAP"})
+
+
+def test_queue_position_is_honest_gap_everywhere() -> None:
+    """queue_position is COMPUTED (needs a handler dispatching
+    compute_book_microstructure that does not exist yet) -> honest gap on every
+    venue, even the 5 with a live depth_of_book_10 feed."""
     from unified_api_contracts.registry.data_type_capability import (
         DATA_TYPE_CAPABILITY_REGISTRY,
     )
 
-    for dt in ("queue_position", "depth_of_book_10"):
-        rows = [c for c in DATA_TYPE_CAPABILITY_REGISTRY if c.data_type == dt]
-        assert rows, f"no rows registered for {dt}"
-        for c in rows:
-            assert c.live_capable is False, f"{dt}/{c.venue} must be an honest gap"
-            assert c.batch_capable is False, f"{dt}/{c.venue} must be an honest gap"
+    rows = [c for c in DATA_TYPE_CAPABILITY_REGISTRY if c.data_type == "queue_position"]
+    assert rows, "no rows registered for queue_position"
+    for c in rows:
+        assert c.live_capable is False, f"queue_position/{c.venue} must be an honest gap"
+        assert c.batch_capable is False, f"queue_position/{c.venue} must be an honest gap"
+
+
+def test_depth_of_book_10_live_only_for_capable_venues() -> None:
+    """depth_of_book_10 is raw-captured directly by a WS connector (unlike
+    queue_position) -> live_capable=True for the 5 venues with a genuine live
+    feed (market-tick-data-service@15f5657b), honest gap for the rest."""
+    from unified_api_contracts.registry.data_type_capability import (
+        DATA_TYPE_CAPABILITY_REGISTRY,
+    )
+
+    rows = [c for c in DATA_TYPE_CAPABILITY_REGISTRY if c.data_type == "depth_of_book_10"]
+    assert rows, "no rows registered for depth_of_book_10"
+    for c in rows:
+        expected_live = c.venue in _DEPTH10_CAPABLE_VENUES
+        assert c.live_capable is expected_live, f"depth_of_book_10/{c.venue} live_capable mismatch"
+        assert c.batch_capable is False, f"depth_of_book_10/{c.venue} — no batch/replay path built yet"
 
 
 def test_source_priority_registered_for_microstructure() -> None:
