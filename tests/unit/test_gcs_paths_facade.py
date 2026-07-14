@@ -58,7 +58,7 @@ def test_tradfi_instruments_returns_none() -> None:
         (AssetGroup.DEFI, f"market-data-tick-defi-{ENV}-{PID}"),
         (AssetGroup.TRADFI, f"market-data-tick-tradfi-{ENV}-{PID}"),
         (AssetGroup.SPORTS, f"market-data-tick-sports-{ENV}-{PID}"),
-        (AssetGroup.PREDICTION, f"market-data-tick-prediction-{ENV}-{PID}"),
+        (AssetGroup.PREDICTION, f"market-data-tick-pred-{ENV}-{PID}"),
     ],
 )
 def test_market_data_bucket_per_asset_group(asset_group: AssetGroup, expected: str) -> None:
