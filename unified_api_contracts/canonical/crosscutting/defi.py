@@ -302,7 +302,7 @@ class DefiPoolIdentity:
 
     @property
     def glued_pair_id(self) -> str:
-        """The human-readable UI pool id — ``UNISWAPV3-ARBITRUM:POOL:AAVE-USDC:100``.
+        """The human-readable UI pool id — ``UNISWAP_V3-ARBITRUM:POOL:AAVE-USDC:100``.
 
         Falls back to the pool address when the pair/fee are unknown
         (``…:POOL:<pool_address>``) so the id is always non-empty + reversible
@@ -319,22 +319,16 @@ class DefiPoolIdentity:
         return f"{prefix}:POOL:{symbol}"
 
 
-def _strip_version_underscore(protocol: str) -> str:
-    """``UNISWAP_V3`` → ``UNISWAPV3`` (the glued-prefix display form).
-
-    Inverse of ``VenueMapping._canonicalise_defi_protocol_spelling`` — removes
-    the underscore before a version token (``_V3`` → ``V3``). Idempotent on a
-    protocol that already lacks the underscore.
-    """
-    return re.sub(r"_V(\d)", r"V\1", protocol)
-
-
 def _insert_version_underscore(protocol: str) -> str:
-    """``UNISWAPV3`` → ``UNISWAP_V3`` (the canonical bare-venue form).
+    """``UNISWAPV3`` → ``UNISWAP_V3`` (the canonical bare-venue AND glued-prefix form).
 
     Mirror of ``VenueMapping._canonicalise_defi_protocol_spelling`` for a
     chain-less protocol token — inserts the underscore before a version token.
-    Idempotent on an already-canonical protocol.
+    Idempotent on an already-canonical protocol. Operator-decided canonical form
+    (``plans/active/issues/instrument_id_format_canonicalization_2026_07_08.md``
+    finding 2): the WITH-underscore spelling is correct everywhere, including the
+    glued venue-chain prefix — this function self-heals any legacy no-underscore
+    ``glued_pair_id`` data read back through ``split_glued_venue_chain``.
     """
     return re.sub(r"([A-Za-z])V(\d)", r"\1_V\2", protocol)
 
@@ -342,16 +336,18 @@ def _insert_version_underscore(protocol: str) -> str:
 def glued_venue_prefix(venue: str, chain: str) -> str:
     """Build the glued venue-chain prefix for the human-readable pool id.
 
-    ``("UNISWAP_V3", "ARBITRUM")`` → ``"UNISWAPV3-ARBITRUM"``. The version
-    underscore is stripped from the protocol (display convention), and the
-    chain is appended uppercase. A ``venue`` already carrying a ``-CHAIN``
-    suffix is split first (defensive — callers should pass the bare venue).
+    ``("UNISWAP_V3", "ARBITRUM")`` → ``"UNISWAP_V3-ARBITRUM"``. The version
+    underscore is PRESERVED in the protocol (operator-decided canonical form,
+    see ``_insert_version_underscore``'s docstring — this also self-heals a
+    protocol token read back without its underscore), and the chain is
+    appended uppercase. A ``venue`` already carrying a ``-CHAIN`` suffix is
+    split first (defensive — callers should pass the bare venue).
     """
     bare = venue
     if "-" in venue and not chain:
         bare, _split_chain = venue.rsplit("-", 1)
         chain = _split_chain
-    return f"{_strip_version_underscore(bare)}-{chain.upper()}"
+    return f"{_insert_version_underscore(bare)}-{chain.upper()}"
 
 
 def split_glued_venue_chain(glued_venue: str) -> tuple[str, str]:
