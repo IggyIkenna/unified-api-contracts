@@ -257,7 +257,15 @@ class VenueMapping:
             # Coinbase Derivatives (perps) — Tardis ``coinbase-international``
             # availableSince 2024-10-31.
             "COINBASE-FUTURES": "2024-10-31",
-            "COINBASE-CDE": "2026-07-10",  # brand-new venue, no historical archive
+            # Measured, not assumed (todo 31a, 2026-07-14): the public
+            # Advanced-Trade ticker endpoint serves REAL backward-paginated
+            # history — earliest observed trade day 2025-12-12 (ADP-20DEC30-CDE;
+            # probed day-by-day back from 2026-07). The prior "2026-07-10 /
+            # no historical archive" floor understated ~7 months of fetchable
+            # trades. The /candles endpoint serves the same depth, but ohlcv
+            # stays UNDECLARED for this venue (bars derive from trades — one
+            # source per cell, same policy as every Tardis venue).
+            "COINBASE-CDE": "2025-12-12",
             "OKX-SPOT": "2020-01-01",
             "OKX-FUTURES": "2020-01-01",
             "OKX-SWAP": "2020-01-01",
