@@ -1623,7 +1623,13 @@ def defi_actual_data_types_not_declared_valid() -> dict[str, frozenset[str]]:
 # venue as "not gated", never as "cannot exist".
 TRADFI_VENUE_INSTRUMENT_TYPES: dict[str, frozenset[str]] = {
     "CME": frozenset({"futures_chain", "options_chain", "combo"}),
-    "ICE": frozenset({"futures_chain", "options_chain", "combo"}),
+    # "index" added 2026-07-14: the Yahoo-sourced DXY index (ICE:INDEX:DXY-USD,
+    # ohlcv_24h) is ICE's only FETCHABLE instrument post-narrowing
+    # (tradfi_ice_ohlcv_1m_no_working_fetch_path_2026_07_13.md) and was missing
+    # from the could-exist axis. The chain types stay: real HISTORICAL captured
+    # rows exist at those grains (finding 1, 2026-07-07) even though their
+    # Databento fetch path is retired.
+    "ICE": frozenset({"index", "futures_chain", "options_chain", "combo"}),
     "NASDAQ": frozenset({"equity", "etf"}),
     "NYSE": frozenset({"equity", "etf"}),
     "CBOE": frozenset({"index", "futures_chain", "options_chain"}),

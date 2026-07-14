@@ -60,6 +60,7 @@ _CONNECTOR_TO_VENUE: Final[dict[str, str]] = {
     "betfair_ws": "betfair",
     "binance_futures_book_ticker_ws": "binance",
     "binance_futures_ws": "binance",
+    "binance_spot_book_ws": "binance",
     "binance_spot_ws": "binance",
     "bitfinex_futures_ws": "bitfinex",
     "bitfinex_spot_ws": "bitfinex",
@@ -99,7 +100,9 @@ _CONNECTOR_TO_VENUE: Final[dict[str, str]] = {
     "lighter_zksync_perp_ws": "lighter",
     "marinade_solana_ws": "marinade",
     "okx_futures_book_ticker_ws": "okx",
+    "okx_futures_ws": "okx",
     "okx_ws": "okx",
+    "okx_spot_book_ws": "okx",
     "okx_spot_ws": "okx",
     "pacifica_solana_perp_ws": "pacifica",
     "polymarket_clob_ws": "polymarket",
@@ -107,6 +110,7 @@ _CONNECTOR_TO_VENUE: Final[dict[str, str]] = {
     "polymarket_trades_ws": "polymarket",
     "spark_ethereum_ws": "spark",
     "tardis_machine_ws": "tardis",
+    "upbit_book_ws": "upbit",
     "upbit_spot_ws": "upbit",
 }
 
