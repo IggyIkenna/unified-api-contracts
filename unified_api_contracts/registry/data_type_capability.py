@@ -301,13 +301,36 @@ DATA_TYPE_CAPABILITY_REGISTRY: Final[tuple[DataTypeCapability, ...]] = (
     ),
     # ``queue_position`` (per-level resting queue) — COMPUTED, not raw-captured
     # (unlike depth_of_book_10 above). `compute_book_microstructure`
-    # (market_tick_data_service/derived/book_microstructure_compute.py) can
-    # derive it from a depth_of_book_10 input, but NO handler dispatches that
-    # function against a live/replay input and writes the result yet (the
-    # pre-retirement handler, book_microstructure_handler.py, was deleted in
-    # a4fb3d13 and has not been rebuilt) — still HONESTLY ABSENT for every
-    # venue, including the 5 with a live depth_of_book_10 feed. Do not flip
-    # until that handler+CLI wiring lands (tracked as a new todo in this plan).
+    # (market_tick_data_service/derived/book_microstructure_compute.py) is now
+    # dispatched by `BookMicrostructureHandler`
+    # (market_tick_data_service/cli/handlers/book_microstructure_handler.py,
+    # `--operation collect-book-microstructure --mode batch`), which reads
+    # already-captured depth_of_book_10 rows and writes queue_position via
+    # record_captured(source="mtds_microstructure") — closing the gap the
+    # deleted pre-retirement handler (a4fb3d13) left open. live_capable=True
+    # (not batch_capable) mirrors depth_of_book_10's own flip: the derivation
+    # is fundamentally bound to the live-only depth_of_book_10 upstream — no
+    # independent historical batch/replay source exists — so history before
+    # each venue's depth_of_book_10 connector went live stays an honest gap.
+    *(
+        DataTypeCapability(
+            asset_group=AssetGroup.CEFI,
+            data_type="queue_position",
+            venue=_venue,
+            instrument_type="",
+            live_capable=True,
+            batch_capable=False,
+            streaming_protocol="ws",
+            sources=("market_tick_data_service/cli/handlers/book_microstructure_handler.py",),
+            notes=(
+                "BookMicrostructureHandler derives this from already-captured "
+                "depth_of_book_10 rows via compute_book_microstructure(); honest "
+                "gap for any day before this venue's depth_of_book_10 connector "
+                "went live (no independent batch/replay source)."
+            ),
+        )
+        for _venue in ("COINBASE-SPOT", "BYBIT", "DERIBIT", "BINANCE-FUTURES", "OKX-SWAP")
+    ),
     *(
         DataTypeCapability(
             asset_group=AssetGroup.CEFI,
@@ -319,20 +342,15 @@ DATA_TYPE_CAPABILITY_REGISTRY: Final[tuple[DataTypeCapability, ...]] = (
             streaming_protocol="ws",
             sources=("market_tick_data_service/derived/book_microstructure_compute.py",),
             notes=(
-                "compute_book_microstructure() can derive this from a depth_of_book_10 "
-                "input, but no handler dispatches it against a live feed yet — honest "
-                "gap until that wiring lands."
+                "No live depth_of_book_10 feed for this venue at all "
+                "(see the depth_of_book_10 honest-gap entry above) — "
+                "nothing for compute_book_microstructure() to derive from."
             ),
         )
         for _venue in (
-            "BINANCE-FUTURES",
             "BINANCE-SPOT",
             "OKX-FUTURES",
             "OKX-SPOT",
-            "OKX-SWAP",
-            "BYBIT",
-            "DERIBIT",
-            "COINBASE-SPOT",
             "UPBIT",
         )
     ),

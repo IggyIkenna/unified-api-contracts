@@ -8,8 +8,10 @@ regardless of source), (c) honest-absence of the deeper-book fields (queue /
 depth-10) that an L5 source cannot fill, and (d) the data_type registrations:
 ``depth_of_book_10`` is a genuine live WS feed for the 5 venues with a deeper
 capture (market-tick-data-service@15f5657b), honest gap elsewhere;
-``queue_position`` is COMPUTED (no handler dispatches
-``compute_book_microstructure`` yet) and stays an honest gap everywhere.
+``queue_position`` is COMPUTED — ``BookMicrostructureHandler`` dispatches
+``compute_book_microstructure`` against already-captured ``depth_of_book_10``
+rows (l2_book_microstructure_capture_2026_07_13 Todo 4) — live_capable for
+the same 5 venues, honest gap elsewhere.
 
 order_flow_imbalance (the third L2-microstructure data_type, formerly
 live-capable from L5 alone) RETIRED 2026-07-08 — zero real consumers, zero
@@ -97,10 +99,12 @@ def test_batch_equals_live_identical_dump() -> None:
 _DEPTH10_CAPABLE_VENUES = frozenset({"COINBASE-SPOT", "BYBIT", "DERIBIT", "BINANCE-FUTURES", "OKX-SWAP"})
 
 
-def test_queue_position_is_honest_gap_everywhere() -> None:
-    """queue_position is COMPUTED (needs a handler dispatching
-    compute_book_microstructure that does not exist yet) -> honest gap on every
-    venue, even the 5 with a live depth_of_book_10 feed."""
+def test_queue_position_live_only_for_capable_venues() -> None:
+    """queue_position is COMPUTED — BookMicrostructureHandler now dispatches
+    compute_book_microstructure against already-captured depth_of_book_10 rows
+    (market-tick-data-service, l2_book_microstructure_capture_2026_07_13 Todo
+    4) -> live_capable=True for the same 5 venues as depth_of_book_10, honest
+    gap for the rest."""
     from unified_api_contracts.registry.data_type_capability import (
         DATA_TYPE_CAPABILITY_REGISTRY,
     )
@@ -108,8 +112,9 @@ def test_queue_position_is_honest_gap_everywhere() -> None:
     rows = [c for c in DATA_TYPE_CAPABILITY_REGISTRY if c.data_type == "queue_position"]
     assert rows, "no rows registered for queue_position"
     for c in rows:
-        assert c.live_capable is False, f"queue_position/{c.venue} must be an honest gap"
-        assert c.batch_capable is False, f"queue_position/{c.venue} must be an honest gap"
+        expected_live = c.venue in _DEPTH10_CAPABLE_VENUES
+        assert c.live_capable is expected_live, f"queue_position/{c.venue} live_capable mismatch"
+        assert c.batch_capable is False, f"queue_position/{c.venue} — no independent batch/replay source"
 
 
 def test_depth_of_book_10_live_only_for_capable_venues() -> None:
