@@ -1,6 +1,6 @@
 """Cross-provider mapping resolver for sports entities.
 
-Reads mapping tables from GCS (instruments-store-sports-{project}/sports_reference/mappings/)
+Reads mapping tables from GCS (instruments-store-sports-prd-{project_id}/sports_reference/mappings/)
 and resolves canonical IDs to provider-specific IDs at runtime.
 
 Usage from services (via facade):
@@ -25,8 +25,11 @@ Caches in memory for the duration of a batch run (cleared between runs).
 from __future__ import annotations
 
 import logging
+import os
 
 import pandas as pd
+
+from .gcs_paths import sports_bucket_name
 
 logger = logging.getLogger(__name__)
 
@@ -37,9 +40,20 @@ _league_mapping_df: pd.DataFrame | None = None
 
 
 def _get_mapping_bucket() -> str:
-    """Resolve the instruments-store-sports bucket name."""
-    project = "test-project"
-    return f"instruments-store-sports-{project}"
+    """Resolve the instruments-store-sports bucket name.
+
+    UAC sits below UTL/UCI in the dependency tier and cannot import
+    ``UnifiedCloudConfig`` (see ``codex/04-architecture/tier-and-import-architecture.md``),
+    so the project id is read directly from ``GCP_PROJECT_ID`` — the same
+    ``# config-bootstrap`` exemption already used by
+    ``canonical/crosscutting/data_locality.py`` in this repo. The bucket-name
+    SHAPE is not re-derived here: it delegates to :func:`sports_bucket_name`,
+    the SSOT template for the SPORTS instruments bucket
+    (``instruments-store-sports-{env}-{project_id}``, env defaults to
+    ``"prd"``) also used by :mod:`gcs_paths`.
+    """
+    project_id = os.environ.get("GCP_PROJECT_ID", "")  # noqa: qg-empty-fallback, qg-os-environ — config-bootstrap: unset locally degrades to a 404 caught by the existing FileNotFoundError/OSError handler in each loader (graceful empty-DataFrame, matching this module's design)
+    return sports_bucket_name(project_id)
 
 
 def _load_team_mapping() -> pd.DataFrame:
