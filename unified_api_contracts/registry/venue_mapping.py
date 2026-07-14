@@ -870,11 +870,11 @@ class VenueMapping:
             # MUST pass canonical_venue="DERIBIT-COMBO" explicitly downstream
             # (never re-derive it from the exchange slug via ``tardis_to_venue``,
             # which is a 1:1 map already claimed by "DERIBIT" — see
-            # ``_resolve_canonical_venue`` in tardis_adapter.py). This dict entry
-            # alone is also not sufficient — the caller must filter to
-            # combo-type symbols only and the instrument catalogue's
-            # venue-tagging for combo instruments needs separate verification
-            # (see cefi_deribit_combo_and_okx_bare_venue_gaps_2026_07_12.md todo 1).
+            # ``_resolve_canonical_venue`` in tardis_adapter.py). The combo-type-only
+            # filter is now applied inside TardisReferenceDataAdapter.get_instruments()
+            # itself, keyed off canonical_venue_override=="DERIBIT-COMBO" (2026-07-14,
+            # cefi_layer1_denominator_gaps_2026_07_03.md) — the venue's catalogue no
+            # longer mixes in bare DERIBIT's option/future/perpetual/spot universe.
             ("DERIBIT-COMBO", "OPTION"): "deribit",
             # Upbit (spot only - Korean exchange for kimchi premium)
             ("UPBIT", "SPOT_PAIR"): "upbit",
