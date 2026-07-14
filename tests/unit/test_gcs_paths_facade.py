@@ -58,6 +58,10 @@ def test_tradfi_instruments_returns_none() -> None:
         (AssetGroup.DEFI, f"market-data-tick-defi-{ENV}-{PID}"),
         (AssetGroup.TRADFI, f"market-data-tick-tradfi-{ENV}-{PID}"),
         (AssetGroup.SPORTS, f"market-data-tick-sports-{ENV}-{PID}"),
+        # Prediction is ABBREVIATED "pred" (flipped 2026-07-14 — the mid-migration guard's
+        # precondition is now met: prediction_manifest_canonicalisation_2026_06_01.md is
+        # archived and the legacy long-form bucket is deleted/404, so pred-prd is the sole
+        # live SSOT). See gcs_paths.py's BUCKET_TEMPLATES_BY_ASSET_GROUP_KIND comment.
         (AssetGroup.PREDICTION, f"market-data-tick-pred-{ENV}-{PID}"),
     ],
 )
