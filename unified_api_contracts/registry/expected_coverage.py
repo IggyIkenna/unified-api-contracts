@@ -284,9 +284,13 @@ _DEFI: dict[str, list[str]] = {
     "FLUID": list(_DEFI_LENDING_PAIRS),
     "KAMINO-SOLANA": list(_DEFI_LENDING_PAIRS),
     # On-chain perps (VENUE-CHAIN format coexists with flat GMX entry above)
-    "GMX-ARBITRUM": ["perp_funding"],
-    "GMX-AVALANCHE": ["perp_funding"],
-    "DRIFT-SOLANA": ["perp_funding", "position_data"],
+    # derivative_ticker added 2026-07-15 (defi_perp_funding_canonicalisation_derivative_ticker_all_perps
+    # issue, operator ruling — highest-resolution raw funding for ALL perps, even without OI at source).
+    # See defi_venue_capabilities.py (DEFI_VENUE_DATA_TYPE_CAPABILITIES) for the matching per-(venue,
+    # data_type) start-date declarations.
+    "GMX-ARBITRUM": ["perp_funding", "derivative_ticker"],
+    "GMX-AVALANCHE": ["perp_funding", "derivative_ticker"],
+    "DRIFT-SOLANA": ["perp_funding", "position_data", "derivative_ticker"],
     # --- LST / yield — lst_rates_handler maps token→protocol then .upper() ---
     # protocol strings: lido, rocketpool, coinbase, ethena, maker, mantle,
     # swell, stader, stakewise, ankr, etherfi, puffer, marinade, jito, sanctum
@@ -330,8 +334,11 @@ _DEFI: dict[str, list[str]] = {
     # actually captured a distinct perp_funding row — market_data_categories.py
     # confirms "No liquidations/perp_funding feed wired for any of the three").
     # GMX still uses the standalone perp_funding data_type — NOT part of this
-    # retirement, left untouched.
-    "GMX": ["perp_funding"],
+    # retirement, left untouched. derivative_ticker added 2026-07-15 (same issue
+    # as the GMX-ARBITRUM/GMX-AVALANCHE entries above — flat "GMX"+chain-dimension
+    # is the format _collect_and_record_gmx actually records under; kept in sync
+    # with the legacy VENUE-CHAIN-embedded entries).
+    "GMX": ["perp_funding", "derivative_ticker"],
     # --- Bridge protocols ---
     # bridge_events_handler _BRIDGE_PROTOCOLS = ["ACROSS", "STARGATE"]
     "ACROSS": ["bridge_events"],
