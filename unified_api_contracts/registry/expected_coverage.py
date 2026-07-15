@@ -159,11 +159,18 @@ _TRADFI: dict[str, list[str]] = {
     # krx_intraday_ohlcv_registry_vs_adapter_mismatch_2026_07_12.md). See
     # tradfi_ice_ohlcv_1m_no_working_fetch_path_2026_07_13.md.
     "ICE": ["ohlcv_24h"],
-    # CBOE: ohlcv_15m = VIX cash INDEX (Barchart/Yahoo). ohlcv_1s + ohlcv_1m =
-    # VX FUTURES via Databento XCBF.PITCH (operator's "CFE" subscription, 2026-06-19;
-    # both L0/free 16y). The denominator must count the futures 1s/1m cells too.
-    # SSOT: codex/02-data/tradfi-databento-sourcing-ssot.md.
-    "CBOE": ["ohlcv_15m", "ohlcv_1s", "ohlcv_1m"],
+    # CBOE: ohlcv_1s + ohlcv_1m = VX FUTURES via Databento XCBF.PITCH (operator's
+    # "CFE" subscription, 2026-06-19; both L0/free 16y). The denominator must
+    # count the futures 1s/1m cells too. SSOT: codex/02-data/tradfi-databento-sourcing-ssot.md.
+    # ohlcv_15m REMOVED 2026-07-15 (same narrowing pattern as the KRX/ICE
+    # precedents): it used to be the VIX cash INDEX via Barchart/Yahoo, but that
+    # fetch path was retired 2026-06-25/26 (operator) — VIX volatility is now
+    # purely the VX futures front contract, aggregated downstream from ohlcv_1s
+    # (no aggregation writer exists yet; see the issue doc). Leaving ohlcv_15m
+    # declared here made every (CBOE, ohlcv_15m) request fall through to the
+    # Databento path (which has no 15m schema) and 100% attempted_fail — see
+    # tradfi_unreachable_databento_data_types_mbp10_ohlcv_coarse_calendar_2026_07_15.md.
+    "CBOE": ["ohlcv_1s", "ohlcv_1m"],
     # NASDAQ + NYSE equity venues added 2026-05-17 per OHLCV-only MVP scope
     # (operator direction 2026-05-15 — see
     # plans/active/tradfi_ohlcv_only_mvp_backfill_2026_05_15.md). Phase 7

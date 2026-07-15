@@ -1147,7 +1147,7 @@ def valid_data_types_for_venue_instrument_type(
 
 # Override entries needed when:
 # - A venue's data type started later than the venue itself (e.g. Deribit options added later)
-# - A venue only supports a subset of its category's data types (e.g. CBOE has ohlcv_15m only)
+# - A venue only supports a subset of its category's data types (e.g. ICE has ohlcv_24h only)
 # - A data type has a different start date per venue (e.g. TradFi venues)
 
 VENUE_DATA_TYPE_CAPABILITIES: dict[str, dict[str, str]] = {
@@ -1442,15 +1442,19 @@ VENUE_DATA_TYPE_CAPABILITIES: dict[str, dict[str, str]] = {
         "ohlcv_24h": "2019-01-02",
     },
     "CBOE": {
-        "ohlcv_15m": "2020-01-07",  # VIX cash INDEX — Barchart/Yahoo (not Databento)
         # VX FUTURES (the VIX futures curve) via Databento XCBF.PITCH (the
         # operator's "CFE" subscription, activated 2026-06-19). Both ohlcv-1s +
         # ohlcv-1m are L0/free 16y; coarser bars aggregate downstream. XCBF.PITCH
-        # coverage starts 2018-11-04. NOTE: these are the FUTURES, distinct from
-        # the ohlcv_15m VIX cash index above. SSOT:
-        # codex/02-data/tradfi-databento-sourcing-ssot.md.
+        # coverage starts 2018-11-04. SSOT: codex/02-data/tradfi-databento-sourcing-ssot.md.
         "ohlcv_1s": "2018-11-04",
         "ohlcv_1m": "2018-11-04",
+        # ohlcv_15m REMOVED 2026-07-15 (was the VIX cash INDEX — Barchart/Yahoo,
+        # "2020-01-07" start; not Databento). That fetch path was retired
+        # 2026-06-25/26 (operator) — no adapter serves (CBOE, ohlcv_15m) anymore,
+        # so declaring the capability made every request fall through to the
+        # Databento path (no 15m schema) and 100% attempted_fail. Matches the
+        # already-shipped KRX/ICE narrowing precedent. See
+        # tradfi_unreachable_databento_data_types_mbp10_ohlcv_coarse_calendar_2026_07_15.md.
     },
     "FX": {
         "ohlcv_24h": "2020-01-01",  # KRW/USD daily via Yahoo Finance
