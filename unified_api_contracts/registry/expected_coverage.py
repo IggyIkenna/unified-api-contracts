@@ -132,8 +132,9 @@ _CEFI: dict[str, list[str]] = {
 
 # ---------------------------------------------------------------------------
 # TradFi — operator-confirmed scope (2026-04-28). CME / ICE futures get
-# trades + ohlcv_1m + tbbo via Databento. CBOE provides VIX 15m. FX +
-# YAHOO_FINANCE for daily rates / VIX rolling.
+# trades + ohlcv_1m + tbbo via Databento. CBOE provides VIX 15m. FX for KRW/USD
+# daily rates. (YAHOO_FINANCE removed 2026-07-15 — source-as-venue modeling error;
+# Yahoo-sourced rows land under real venues (DXY→ICE, KRW/USD→FX) with source=yahoo.)
 #
 # DELIBERATELY OMITTED: NASDAQ, NYSE, BARCHART. They are declared in
 # ``VENUE_DATA_TYPE_CAPABILITIES`` (capable of trades/ohlcv_1m/tbbo) but
@@ -189,7 +190,9 @@ _TRADFI: dict[str, list[str]] = {
     # the prior ohlcv_1m/15m entries were aspirational, never backed by a real fetch
     # path. See krx_intraday_ohlcv_registry_vs_adapter_mismatch_2026_07_12.md.
     "KRX": ["ohlcv_24h"],
-    "YAHOO_FINANCE": ["ohlcv_15m", "ohlcv_24h"],
+    # YAHOO_FINANCE removed 2026-07-15 (source-as-venue modeling error) — Yahoo is a
+    # SOURCE, not a venue; its rows land under real venues (DXY→ICE, KRW/USD→FX) with
+    # source=yahoo. SOURCE modeling kept in data_source_continuity.py / _tradfi.py.
 }
 
 # ---------------------------------------------------------------------------

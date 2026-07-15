@@ -28,8 +28,8 @@ from unified_api_contracts.registry import (
 # artifact, expand-only bare form) — never a shortcut for a missing adapter.
 EXPECTED_SENTINEL_VENUES: frozenset[str] = frozenset(
     {
-        # Legacy source-as-venue artifact (Yahoo data provider).
-        "YAHOO_FINANCE",
+        # (YAHOO_FINANCE removed 2026-07-15 — it was a source-as-venue modeling error,
+        #  no longer enumerated as a venue, so it is no longer a sentinel here.)
         # MTDS-owned market-data venue: execution is FXAdapter (IBKR IDEALPRO), market data
         # is Yahoo Finance via a hardcoded venue_upper == "FX" branch in MTDS's
         # umi_tick_provider.py — bypasses VENUE_TO_ADAPTER_KEY/URDI entirely. No URDI

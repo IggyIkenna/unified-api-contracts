@@ -131,10 +131,10 @@ VENUE_TO_ADAPTER_KEY: dict[str, str] = {
     # genuinely has no URDI adapter, so this is NO_ADAPTER_YET, not a phantom vendor key.
     "FX": NO_ADAPTER_YET,
     "KRX": "databento",
-    # Legacy source-as-venue artifact (rolling VIX 15m / KRW-USD daily via the
-    # Yahoo data provider) — deliberately adapterless; IS excludes it from its
-    # tradfi venue producer via the named _TRADFI_NON_VENUE_KEYS filter.
-    "YAHOO_FINANCE": NO_ADAPTER_YET,
+    # YAHOO_FINANCE removed 2026-07-15 — it was a source-as-venue modeling error, not
+    # a real venue (no adapter, no fetch code stamps venue=YAHOO_FINANCE). Yahoo is a
+    # SOURCE; its rows land under real venues with source=yahoo. IS's
+    # _TRADFI_NON_VENUE_KEYS filter no longer needs to exclude it.
     # Prediction markets
     "POLYMARKET": "polymarket",
     "KALSHI": "kalshi",
