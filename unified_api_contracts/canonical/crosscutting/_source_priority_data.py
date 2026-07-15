@@ -49,6 +49,17 @@ SOURCE_PRIORITY: Final[dict[tuple[str, str], list[str]]] = {
     ("sports", "STANDINGS"): ["api_football"],
     ("sports", "WEATHER"): ["open_meteo"],
     ("sports", "PREDICTIONS"): ["footystats"],
+    # ODDS = footystats PRE-MATCH SNAPSHOT (kickoff-72h, books aggregated) — IS
+    # reference data, NOT raw bookmaker ticks (those are ODDS_SNAPSHOT/ODDS_MOVEMENT/
+    # ARBITRAGE → odds_api/MTDS above; the two legitimately coexist).
+    # Removed 2026-06-25 by 8fb1f54f (#6 "coherent unit"), then decision #6 was REVERSED
+    # by the operator 2026-06-27 — but c75101be restored ONLY SPORTS_DATA_TYPE_TO_SOURCE
+    # (league_data.py), leaving this registry and AVAILABILITY_AT_SEMANTICS unreverted.
+    # That split-brain made has_source_priority("sports","ODDS") False, which silently
+    # DISABLED the UTL write-time mis-stamp guard for the pair and made the IS expected-
+    # universe enumerator fall through to a non-canonical source. Restored 2026-07-15 to
+    # the exact pre-8fb1f54f value. SSOT: codex/02-data/sports-data-types-catalog.md:48-52.
+    ("sports", "ODDS"): ["footystats"],
     ("sports", "ODDS_HORIZON_BUCKET"): ["mdps_odds_horizon_bucket"],
     ("sports", "TRANSFER_RECORDS"): ["transfermarkt"],
     # Sports reference tables.

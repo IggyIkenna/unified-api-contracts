@@ -452,3 +452,129 @@ def test_is_valid_manifest_source_tradfi_unaffected() -> None:
     assert is_valid_manifest_source("tradfi", "trades", "databento") is True
     assert is_valid_manifest_source("tradfi", "trades", "massive") is True
     assert is_valid_manifest_source("tradfi", "trades", "binance") is False
+
+
+# ---------------------------------------------------------------------------
+# Cross-registry drift guard: SPORTS_DATA_TYPE_TO_SOURCE ↔ SOURCE_PRIORITY
+#
+# Regression guard for the 2026-06-25→07-15 ODDS split-brain: decision #6
+# ("odds are MTDS-owned") stripped ("sports","ODDS") from SOURCE_PRIORITY +
+# AVAILABILITY_AT_SEMANTICS + SPORTS_DATA_TYPE_TO_SOURCE as a "coherent unit"
+# (8fb1f54f), the operator REVERSED it 2026-06-27, but the revert (c75101be)
+# only restored SPORTS_DATA_TYPE_TO_SOURCE. The two registries then disagreed
+# for 20 days: league_data said footystats owns ODDS, SOURCE_PRIORITY said the
+# pair did not exist — silently disabling the UTL write-time mis-stamp guard
+# (_writer_ingest.py gates it on has_source_priority) and making the IS
+# expected-universe enumerator fall through to a non-canonical source.
+# This class has recurred (TEAMS/STANDINGS drifted the same way 2026-06-25,
+# ~137k mis-sourced/phantom rows). SSOT: codex/02-data/sports-data-types-catalog.md.
+# ---------------------------------------------------------------------------
+
+
+#: KNOWN split-brain pairs, quarantined so the guard can ship green while the
+#: underlying naming question is ruled on. **This baseline only goes DOWN** — never
+#: add to it to make a new drift pass (same convention as the DTZ/TID251 baselines).
+#:
+#: PLAYER_STATS: instruments-service writes `PLAYER_STATS` (UAC sports gcs_paths
+#: entity `player_stats`, launch date ("api_football","PLAYER_STATS")=2020-06-06,
+#: live gap-fill script instruments-service/scripts/fill_missing_player_stats.py),
+#: but SOURCE_PRIORITY + AVAILABILITY_AT_SEMANTICS register only the *differently
+#: named* FIXTURE_PLAYER_STATS, which is what features-service (FixturePlayerStatsRecord
+#: / fixture_player_stats exports) and the deployment-service sharding doc use.
+#: Same class as the ODDS defect below (has_source_priority is False → the UTL
+#: write-time mis-stamp guard is OFF for every IS PLAYER_STATS row), but the FIX is a
+#: cross-repo NAMING ruling (is FIXTURE_PLAYER_STATS a rename of PLAYER_STATS, or a
+#: distinct per-fixture grain?), not a one-line registry add — registering it blind
+#: would switch the mis-stamp guard ON for the live api_football enrichment fleet.
+#: Tracked: plans/active/issues/
+#: sports_odds_ownership_registry_split_brain_and_bogus_api_football_denominator_2026_07_15.md §A2.
+_KNOWN_SPORTS_REGISTRY_DRIFT: frozenset[str] = frozenset({"PLAYER_STATS"})
+
+
+def test_every_sports_data_type_to_source_key_has_source_priority() -> None:
+    """Every data_type the sports domain map claims a source for must be registered
+    in SOURCE_PRIORITY — otherwise has_source_priority() is False and every gate
+    keyed on it treats the pair as unowned/source-exempt.
+    """
+    from unified_api_contracts import SPORTS_DATA_TYPE_TO_SOURCE
+
+    missing = [
+        dt
+        for dt in SPORTS_DATA_TYPE_TO_SOURCE
+        if ("sports", dt) not in SOURCE_PRIORITY and dt not in _KNOWN_SPORTS_REGISTRY_DRIFT
+    ]
+    assert not missing, (
+        f"{len(missing)} sports data_type(s) in SPORTS_DATA_TYPE_TO_SOURCE have NO "
+        f"SOURCE_PRIORITY entry (registry split-brain): {sorted(missing)}"
+    )
+
+
+def test_known_sports_registry_drift_baseline_only_shrinks() -> None:
+    """The quarantine list must not outlive the defect it documents.
+
+    If a pair in _KNOWN_SPORTS_REGISTRY_DRIFT has been reconciled, delete it from the
+    baseline (that is the only legal edit). This test fails when the baseline is stale,
+    so the allowlist cannot silently become permanent.
+    """
+    from unified_api_contracts import SPORTS_DATA_TYPE_TO_SOURCE
+
+    stale = [
+        dt
+        for dt in _KNOWN_SPORTS_REGISTRY_DRIFT
+        if dt not in SPORTS_DATA_TYPE_TO_SOURCE or ("sports", dt) in SOURCE_PRIORITY
+    ]
+    assert not stale, f"reconciled — remove from _KNOWN_SPORTS_REGISTRY_DRIFT: {sorted(stale)}"
+
+
+def test_sports_registries_agree_on_owning_source() -> None:
+    """The domain map's source must be the SOURCE_PRIORITY primary for the pair.
+
+    A disagreement (not just an absence) is how TEAMS/STANDINGS produced ~137k
+    mis-sourced manifest rows: the writer raised MissingSourceError on the domain
+    map's source because SOURCE_PRIORITY named a different one.
+    """
+    from unified_api_contracts import SPORTS_DATA_TYPE_TO_SOURCE
+
+    disagreements: list[str] = []
+    for dt, domain_source in SPORTS_DATA_TYPE_TO_SOURCE.items():
+        key = ("sports", dt)
+        if key not in SOURCE_PRIORITY:
+            continue  # covered by the split-brain test above
+        priority = SOURCE_PRIORITY[key]
+        if domain_source not in priority:
+            disagreements.append(
+                f"{dt}: SPORTS_DATA_TYPE_TO_SOURCE={domain_source!r} not in SOURCE_PRIORITY={priority!r}"
+            )
+        elif priority[0] != domain_source:
+            disagreements.append(
+                f"{dt}: domain map says {domain_source!r} but SOURCE_PRIORITY primary is {priority[0]!r}"
+            )
+    assert not disagreements, "sports registry drift:\n  " + "\n  ".join(disagreements)
+
+
+def test_sports_odds_is_footystats_owned_in_both_registries() -> None:
+    """Pin the operator's 2026-06-27 ruling (#6 REVERSED) at the registry level.
+
+    footystats' PREDICTIVE pre-match ODDS snapshot = instruments-service reference
+    data. RAW bookmaker tick odds = odds_api/MTDS (ODDS_SNAPSHOT/ODDS_MOVEMENT/
+    ARBITRAGE). They legitimately coexist — do NOT "unify" them.
+    """
+    from unified_api_contracts import SPORTS_DATA_TYPE_TO_SOURCE
+
+    assert has_source_priority("sports", "ODDS") is True
+    assert get_primary_source("sports", "ODDS") == "footystats"
+    assert SPORTS_DATA_TYPE_TO_SOURCE["ODDS"] == "footystats"
+    assert ("sports", "ODDS") in AVAILABILITY_AT_SEMANTICS
+    # The MTDS raw-tick odds types stay odds_api-owned — the coexistence rule.
+    assert get_primary_source("sports", "ODDS_SNAPSHOT") == "odds_api"
+    assert get_primary_source("sports", "ODDS_MOVEMENT") == "odds_api"
+
+
+def test_sports_odds_api_football_is_not_a_valid_odds_source() -> None:
+    """api_football has no odds path in IS (get_odds() is a deprecated stub), so an
+    api_football×ODDS manifest row is impossible by construction. With ODDS
+    registered, the UTL write-time mis-stamp guard rejects it again.
+    SSOT: codex/02-data/sports-data-source-coverage-matrix.md §4.
+    """
+    assert is_valid_manifest_source("sports", "ODDS", "footystats") is True
+    assert is_valid_manifest_source("sports", "ODDS", "api_football") is False
