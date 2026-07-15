@@ -25,6 +25,8 @@ from __future__ import annotations
 
 from enum import StrEnum
 
+from .fixture_lifecycle import FIXTURES_OUTCOMES, FIXTURES_SCHEDULE
+
 # ---------------------------------------------------------------------------
 # data_type → entity folder mapping
 # ---------------------------------------------------------------------------
@@ -35,6 +37,15 @@ from enum import StrEnum
 SPORTS_DATA_TYPE_TO_FOLDER: dict[str, str] = {
     # api-football
     "FIXTURES": "fixtures",
+    # 2026-07-14+: the writer cut FIXTURES over to a two-entity split with NO legacy
+    # dual-write (sports_fixtures_schema_split_completion_2026_06_20.md) — every date
+    # on/after the cutover has ONLY these two entities, zero "fixtures" objects.
+    # Registered here so callers that need the split entities explicitly can use the
+    # SSOT instead of hardcoding the folder name; `candidate_parquet_paths("FIXTURES", ...)`
+    # ALSO auto-appends FIXTURES_SCHEDULE candidates (see below) so existing "FIXTURES"
+    # callers stay correct across the cutover without changing their call sites.
+    FIXTURES_SCHEDULE: "fixtures_schedule",
+    FIXTURES_OUTCOMES: "fixtures_outcomes",
     "FIXTURE_EVENTS": "fixture_events",
     "FIXTURE_LINEUPS": "fixture_lineups",
     "FIXTURE_STATS": "fixture_stats",
@@ -105,6 +116,8 @@ class SportsPathLayout(StrEnum):
 SPORTS_DATA_TYPE_LAYOUT: dict[str, SportsPathLayout] = {
     # Per-league subpartition (modern layout for most entities)
     "FIXTURES": SportsPathLayout.PER_DAY_PER_LEAGUE,
+    FIXTURES_SCHEDULE: SportsPathLayout.PER_DAY_PER_LEAGUE,
+    FIXTURES_OUTCOMES: SportsPathLayout.PER_DAY_PER_LEAGUE,
     "FIXTURE_EVENTS": SportsPathLayout.PER_DAY_PER_LEAGUE,
     "FIXTURE_LINEUPS": SportsPathLayout.PER_DAY_PER_LEAGUE,
     "FIXTURE_STATS": SportsPathLayout.PER_DAY_PER_LEAGUE,
@@ -174,6 +187,12 @@ def candidate_parquet_paths(
     the full list — early-return on ``cands[0]`` only is wrong for layouts
     that emit multiple plausible paths (PER_DAY_PER_SEASON probes 3 seasons).
     Empty list returned for unknown ``data_type``.
+
+    ``data_type="FIXTURES"`` also appends ``FIXTURES_SCHEDULE`` candidates: the
+    2026-07-14+ writer cutover to the fixtures_schedule/fixtures_outcomes entity
+    split shipped with no legacy dual-write, so every date on/after the cutover
+    has zero ``entity=fixtures`` objects. This keeps existing "FIXTURES" callers
+    correct across the cutover without requiring a call-site change.
 
     Args:
         data_type: Canonical SPORTS data_type (e.g. ``"FIXTURES"``).
@@ -300,6 +319,24 @@ def candidate_parquet_paths(
         if layout == SportsPathLayout.PER_DAY_PER_LEAGUE and league_id:
             paths.append(f"{base}/{_fah}/league={league_id}/{folder}.parquet")
         paths.append(f"{base}/{_fah}/{folder}.parquet")
+
+    # 2026-07-14+ writer cutover fallback: FIXTURES has no legacy dual-write, so every
+    # date on/after the cutover has ONLY entity=fixtures_schedule (+ fixtures_outcomes),
+    # zero entity=fixtures objects. Append FIXTURES_SCHEDULE candidates so existing
+    # "FIXTURES" callers (e.g. MTDS fixture_id_resolver.py) keep resolving fixture rows
+    # across the cutover without changing their call sites. FIXTURES_OUTCOMES is
+    # deliberately NOT probed here — it's a subset (completed fixtures only) and would
+    # under-report thin/no-completed-match days as missing when used as a presence marker.
+    if data_type == "FIXTURES":
+        paths.extend(
+            candidate_parquet_paths(
+                FIXTURES_SCHEDULE,
+                day,
+                league_id,
+                include_legacy_archive=include_legacy_archive,
+                pipeline_mode=pipeline_mode,
+            )
+        )
 
     return paths
 

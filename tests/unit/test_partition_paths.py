@@ -240,10 +240,18 @@ def test_dispatcher_routes_sports_to_domain_module() -> None:
         DAY,
         league_id="EPL",
     )
-    # Sports returns ordered candidates: per-league subpartition first, then bare path.
-    assert len(paths) == 2
+    # Sports returns ordered candidates: per-league subpartition first, then bare path,
+    # then (2026-07-14+ writer cutover, no legacy dual-write) the FIXTURES_SCHEDULE
+    # fallback candidates so callers stay correct across the split-entity cutover.
+    assert len(paths) == 4
+    assert "entity=fixtures/" in paths[0]
     assert "league=EPL" in paths[0]
+    assert "entity=fixtures/" in paths[1]
     assert "/league=EPL/" not in paths[1]
+    assert "entity=fixtures_schedule/" in paths[2]
+    assert "league=EPL" in paths[2]
+    assert "entity=fixtures_schedule/" in paths[3]
+    assert "/league=EPL/" not in paths[3]
 
 
 def test_dispatcher_string_asset_group_accepted() -> None:

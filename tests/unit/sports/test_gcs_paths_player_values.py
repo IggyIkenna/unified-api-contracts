@@ -53,9 +53,7 @@ class TestPlayerValuesSSOT:
         # league_id is NOT in the canonical path — league filter happens intra-file.
         assert "league=" not in paths[0]
         # Bare fallback present so historic writes that omitted season still resolve.
-        assert (
-            "sports_reference/by_date/day=2024-08-01/entity=player_values/player_values.parquet" in paths
-        )
+        assert "sports_reference/by_date/day=2024-08-01/entity=player_values/player_values.parquet" in paths
 
     def test_no_season_probes_three_year_window(self) -> None:
         """When the caller doesn't know the season, probe year-1 / year / year+1
@@ -73,9 +71,7 @@ class TestPlayerValuesSSOT:
         seasons = sorted({p.split("season=")[1].split("/")[0] for p in season_paths})
         assert "2023" in seasons and "2024" in seasons and "2025" in seasons
         # Bare path (no season=) present for legacy fallback.
-        assert (
-            "sports_reference/by_date/day=2024-08-01/entity=player_values/player_values.parquet" in paths
-        )
+        assert "sports_reference/by_date/day=2024-08-01/entity=player_values/player_values.parquet" in paths
 
     def test_legacy_per_day_per_league_layout_still_works_for_other_data_types(self) -> None:
         """Sanity: the new PER_DAY_PER_SEASON layout doesn't break the existing
@@ -237,24 +233,24 @@ class TestForwardPhantomPathShapes:
     def test_player_values_transfermarkt_teams_bare_fallback(self) -> None:
         """Bare (no season) transfermarkt_teams.parquet candidate emitted as final fallback."""
         paths = candidate_parquet_paths("PLAYER_VALUES", "2024-08-01")
-        assert any(
-            p.endswith("entity=player_values/transfermarkt_teams.parquet") for p in paths
-        ), "bare transfermarkt_teams.parquet fallback missing"
+        assert any(p.endswith("entity=player_values/transfermarkt_teams.parquet") for p in paths), (
+            "bare transfermarkt_teams.parquet fallback missing"
+        )
 
     # (c) league= without season= — PLAYER_VALUES
     def test_player_values_league_without_season_candidate(self) -> None:
         """league_id provided: entity=player_values/league={L}/player_values.parquet emitted."""
         paths = candidate_parquet_paths("PLAYER_VALUES", "2024-08-01", league_id="BUNDESLIGA")
-        assert any(
-            "league=BUNDESLIGA/player_values.parquet" in p and "season=" not in p for p in paths
-        ), "league-without-season player_values.parquet candidate missing"
+        assert any("league=BUNDESLIGA/player_values.parquet" in p and "season=" not in p for p in paths), (
+            "league-without-season player_values.parquet candidate missing"
+        )
 
     def test_player_values_league_without_season_legacy_name(self) -> None:
         """league_id provided: transfermarkt_teams.parquet also emitted for the per-league legacy shape."""
         paths = candidate_parquet_paths("PLAYER_VALUES", "2024-08-01", league_id="BUNDESLIGA")
-        assert any(
-            "league=BUNDESLIGA/transfermarkt_teams.parquet" in p and "season=" not in p for p in paths
-        ), "league-without-season transfermarkt_teams.parquet candidate missing"
+        assert any("league=BUNDESLIGA/transfermarkt_teams.parquet" in p and "season=" not in p for p in paths), (
+            "league-without-season transfermarkt_teams.parquet candidate missing"
+        )
 
     def test_player_values_no_league_no_league_candidates(self) -> None:
         """Without league_id the per-league-without-season candidates are NOT emitted."""
@@ -262,3 +258,71 @@ class TestForwardPhantomPathShapes:
         assert not any("league=" in p and "season=" not in p for p in paths), (
             "per-league-without-season candidates should only appear when league_id is provided"
         )
+
+
+class TestFixturesScheduleOutcomesSplitRegistration:
+    """FIXTURES_SCHEDULE/FIXTURES_OUTCOMES registration in the GCS-path SSOT.
+
+    The 2026-07-14+ writer cutover (sports_fixtures_schema_split_completion_2026_06_20.md)
+    has NO legacy dual-write — every date on/after the cutover has ONLY
+    entity=fixtures_schedule/entity=fixtures_outcomes, zero entity=fixtures objects.
+    Before this fix, SPORTS_DATA_TYPE_TO_FOLDER had no entry for either split
+    data_type and candidate_parquet_paths("FIXTURES", ...) never probed them, so
+    every caller passing data_type="FIXTURES" silently got an empty/stale candidate
+    list post-cutover (confirmed affecting MTDS fixture_id_resolver.py — see
+    plans/active/issues/features_sports_fixtures_split_reader_gap_2026_07_15.md).
+    """
+
+    def test_fixtures_schedule_registered_in_folder_map(self) -> None:
+        assert SPORTS_DATA_TYPE_TO_FOLDER["FIXTURES_SCHEDULE"] == "fixtures_schedule"
+
+    def test_fixtures_outcomes_registered_in_folder_map(self) -> None:
+        assert SPORTS_DATA_TYPE_TO_FOLDER["FIXTURES_OUTCOMES"] == "fixtures_outcomes"
+
+    def test_fixtures_schedule_and_outcomes_are_per_day_per_league(self) -> None:
+        """Matches the writer's actual per-league split-entity layout."""
+        assert SPORTS_DATA_TYPE_LAYOUT["FIXTURES_SCHEDULE"] == SportsPathLayout.PER_DAY_PER_LEAGUE
+        assert SPORTS_DATA_TYPE_LAYOUT["FIXTURES_OUTCOMES"] == SportsPathLayout.PER_DAY_PER_LEAGUE
+
+    def test_fixtures_schedule_directly_addressable(self) -> None:
+        """Callers can probe FIXTURES_SCHEDULE directly (not only via the FIXTURES fallback)."""
+        paths = candidate_parquet_paths("FIXTURES_SCHEDULE", "2026-07-14", "EPL")
+        assert any(p.endswith("entity=fixtures_schedule/league=EPL/fixtures_schedule.parquet") for p in paths)
+
+    def test_fixtures_outcomes_directly_addressable(self) -> None:
+        paths = candidate_parquet_paths("FIXTURES_OUTCOMES", "2026-07-14", "EPL")
+        assert any(p.endswith("entity=fixtures_outcomes/league=EPL/fixtures_outcomes.parquet") for p in paths)
+
+    def test_fixtures_auto_appends_fixtures_schedule_candidates(self) -> None:
+        """data_type="FIXTURES" transparently probes the split entity too — the
+        cutover-survival fix. Legacy fixtures candidates come first (still correct
+        for pre-cutover dates), fixtures_schedule candidates follow."""
+        paths = candidate_parquet_paths("FIXTURES", "2026-07-14", "EPL")
+        assert any("entity=fixtures/" in p for p in paths)
+        assert any("entity=fixtures_schedule/" in p for p in paths)
+        # legacy fixtures candidates must precede the schedule fallback
+        first_schedule_idx = next(i for i, p in enumerate(paths) if "entity=fixtures_schedule/" in p)
+        first_legacy_idx = next(
+            i for i, p in enumerate(paths) if "entity=fixtures/" in p and "fixtures_schedule" not in p
+        )
+        assert first_legacy_idx < first_schedule_idx
+
+    def test_fixtures_does_not_auto_append_fixtures_outcomes(self) -> None:
+        """FIXTURES_OUTCOMES is a subset (completed fixtures only) — using it as a
+        presence marker would under-report thin/no-completed-match days as missing,
+        so it must NOT be folded into the FIXTURES fallback chain."""
+        paths = candidate_parquet_paths("FIXTURES", "2026-07-14", "EPL")
+        assert not any("entity=fixtures_outcomes/" in p for p in paths)
+
+    def test_fixtures_schedule_probe_does_not_recurse(self) -> None:
+        """Probing FIXTURES_SCHEDULE directly must not re-append itself (no
+        infinite recursion / duplicated candidates)."""
+        paths = candidate_parquet_paths("FIXTURES_SCHEDULE", "2026-07-14", "EPL")
+        assert len(paths) == len(set(paths))
+        assert len(paths) == 2  # per-league + bare, no pipeline_mode
+
+    def test_fixtures_pipeline_mode_schedule_fallback_also_gets_pm_prefix(self) -> None:
+        """pipeline_mode= threads through into the appended fixtures_schedule candidates too."""
+        paths = candidate_parquet_paths("FIXTURES", "2026-07-14", "EPL", pipeline_mode="batch_api_football")
+        schedule_paths = [p for p in paths if "entity=fixtures_schedule/" in p]
+        assert any("pipeline_mode=batch_api_football" in p for p in schedule_paths)
