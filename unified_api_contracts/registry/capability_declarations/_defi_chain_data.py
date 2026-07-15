@@ -559,27 +559,10 @@ SOLANA_DEFI_PROTOCOLS: dict[str, dict[str, str]] = {
         ),
         "data_source": "drift_api",
     },
-    "mango": {
-        "name": "Mango Markets V4",
-        "type": "perps_dex",
-        "program_id": "4MangoMjqJ2firMokCjjGgoK8d4MXcrgL7XJaL3w6fVg",
-        "api_url": "https://api.mngo.cloud/data/v4",
-        "data_source": "mango_api",
-    },
-    "zeta": {
-        "name": "Zeta Markets",
-        "type": "perps_dex",
-        "program_id": "ZETAxsqBRek56DhiGXrn75yj2NHU3aYUnxvHXpkf3aD",
-        "api_url": "https://dex.zeta.markets/api",
-        "data_source": "zeta_api",
-    },
-    "flash_trade": {
-        "name": "Flash Trade",
-        "type": "perps_dex",
-        "program_id": "FLASH6Lo6h3iasJKWDs2F8TkW2UKf3s15C8PMGuVfgBn",
-        "api_url": "https://api.flash.trade/api/v1",
-        "data_source": "flash_api",
-    },
+    # mango / zeta / flash_trade removed 2026-07-15 (operator ruling): all 3 declared API
+    # hosts are dead (api.mngo.cloud/api.flash.trade NXDOMAIN, dex.zeta.markets/api returns
+    # HTML not JSON), ~$0 DeFiLlama TVL, zero MTDS market-data capture ever wired. SSOT:
+    # unified-trading-pm/codex/04-architecture/solana-defi-coverage.md.
     "raydium": {
         "name": "Raydium",
         "type": "dex",

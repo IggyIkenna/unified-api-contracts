@@ -27,16 +27,16 @@ class TestClipDatesToSourceCoverage:
     @pytest.mark.unit
     def test_range_entirely_before_coverage_returns_inverted_bounds(self) -> None:
         """Entire range pre-coverage → inverted bounds signal."""
-        # footystats starts 2019-01-01; window 2010-2018 is entirely pre-coverage
-        start, end = clip_dates_to_source_coverage("footystats", "2010-01-01", "2018-12-31")
+        # footystats starts 2018-01-01; window 2010-2017 is entirely pre-coverage
+        start, end = clip_dates_to_source_coverage("footystats", "2010-01-01", "2017-12-31")
         assert end == "" or start > end
 
     @pytest.mark.unit
     def test_range_straddles_coverage_start_clips_to_coverage(self) -> None:
         """Range that starts before coverage and ends after → clipped to coverage start."""
-        # footystats starts 2019-01-01
-        start, end = clip_dates_to_source_coverage("footystats", "2018-01-01", "2019-06-01")
-        assert start == "2019-01-01"
+        # footystats starts 2018-01-01 (evidence-derived floor, 2026-07-15)
+        start, end = clip_dates_to_source_coverage("footystats", "2017-01-01", "2019-06-01")
+        assert start == "2018-01-01"
         assert end == "2019-06-01"
 
     @pytest.mark.unit
@@ -81,50 +81,49 @@ class TestClipDatesToSourceCoverage:
         assert end == "2019-06-01"
 
     @pytest.mark.unit
-    def test_api_football_fixture_events_override(self) -> None:
-        """api_football FIXTURE_EVENTS override is 2020-06-06 (later than source-wide 2018-01-01)."""
+    @pytest.mark.parametrize(
+        "data_type",
+        ["FIXTURE_EVENTS", "FIXTURE_LINEUPS", "FIXTURE_STATS", "PLAYER_STATS"],
+    )
+    def test_api_football_per_fixture_entities_use_source_wide_floor(self, data_type: str) -> None:
+        """api_football per-fixture entities carry NO override — they use 2018-01-01.
+
+        Regression test for the operator ruling of 2026-07-15 ("amend floors to
+        reality"). These four were pinned at 2020-06-06 on the false premise that
+        "our backfill never captured 2018-2020 dates". An object probe found REAL,
+        historically-coherent data at 2018-01-01 for all four (e.g. fixture_events
+        ENG_CHAMPIONSHIP, 20 rows), so the overrides were deleted. A range opening
+        before the source-wide floor must now clip to 2018-01-01, NOT 2020-06-06.
+        """
         start, end = clip_dates_to_source_coverage(
             "api_football",
-            "2019-01-01",
+            "2016-01-01",
             "2021-01-01",
-            data_type="FIXTURE_EVENTS",
+            data_type=data_type,
         )
-        assert start == "2020-06-06"
+        assert start == "2018-01-01"
         assert end == "2021-01-01"
 
     @pytest.mark.unit
-    def test_api_football_fixture_lineups_override(self) -> None:
-        """api_football FIXTURE_LINEUPS override is 2020-06-06."""
-        start, end = clip_dates_to_source_coverage(
-            "api_football",
-            "2019-01-01",
-            "2021-01-01",
-            data_type="FIXTURE_LINEUPS",
-        )
-        assert start == "2020-06-06"
-        assert end == "2021-01-01"
+    @pytest.mark.parametrize(
+        "data_type",
+        ["FIXTURE_EVENTS", "FIXTURE_LINEUPS", "FIXTURE_STATS", "PLAYER_STATS"],
+    )
+    def test_api_football_per_fixture_2018_dates_are_not_clipped(self, data_type: str) -> None:
+        """2018-01-01 per-fixture data is REAL and must survive the clip.
 
-    @pytest.mark.unit
-    def test_api_football_fixture_stats_override(self) -> None:
-        """api_football FIXTURE_STATS override is 2020-06-06."""
+        The 2,848 legacy-only pre-launch cells were unwritable precisely because
+        these dates were clipped away. Guards against re-pinning the floor above
+        the earliest date we hold real objects for.
+        """
         start, end = clip_dates_to_source_coverage(
             "api_football",
-            "2019-01-01",
-            "2021-01-01",
-            data_type="FIXTURE_STATS",
+            "2018-01-01",
+            "2018-12-31",
+            data_type=data_type,
         )
-        assert start == "2020-06-06"
-
-    @pytest.mark.unit
-    def test_api_football_player_stats_override(self) -> None:
-        """api_football PLAYER_STATS override is 2020-06-06."""
-        start, end = clip_dates_to_source_coverage(
-            "api_football",
-            "2019-01-01",
-            "2021-01-01",
-            data_type="PLAYER_STATS",
-        )
-        assert start == "2020-06-06"
+        assert start == "2018-01-01"
+        assert end == "2018-12-31"
 
     @pytest.mark.unit
     def test_api_football_no_override_uses_source_wide(self) -> None:
@@ -140,9 +139,32 @@ class TestClipDatesToSourceCoverage:
     @pytest.mark.unit
     def test_range_starting_exactly_at_coverage_is_not_clipped(self) -> None:
         """Range starting exactly at coverage start → no clip needed."""
-        start, end = clip_dates_to_source_coverage("footystats", "2019-01-01", "2019-12-31")
-        assert start == "2019-01-01"
+        start, end = clip_dates_to_source_coverage("footystats", "2018-01-01", "2019-12-31")
+        assert start == "2018-01-01"
         assert end == "2019-12-31"
+
+    @pytest.mark.unit
+    @pytest.mark.parametrize(
+        ("source", "expected"),
+        [
+            ("api_football", "2018-01-01"),
+            ("footystats", "2018-01-01"),
+            ("transfermarkt", "2018-01-01"),
+            ("open_meteo", "2018-01-01"),
+            ("understat", "2014-01-01"),
+            ("soccer_football_info", "2019-01-01"),
+        ],
+    )
+    def test_measured_floors_are_pinned(self, source: str, expected: str) -> None:
+        """Pin each sports floor to its evidence-derived value (probe of 2026-07-15).
+
+        Every value here is the earliest date at which a REAL object is held —
+        parquet that parses, has >= 1 row, and is historically coherent with its
+        date partition. Moving any of these requires a fresh object probe, not a
+        policy argument; see SOURCE_COVERAGE_START for the per-source witnesses.
+        """
+        start, _ = clip_dates_to_source_coverage(source, "2010-01-01", "2026-01-01")
+        assert start == expected
 
 
 class TestSourceCoverageStartCompleteness:

@@ -33,7 +33,21 @@ SOURCE_PRIORITY: Final[dict[tuple[str, str], list[str]]] = {
     ("sports", "FIXTURE_LINEUPS"): ["api_football"],
     ("sports", "FIXTURE_EVENTS"): ["api_football"],
     ("sports", "FIXTURE_STATS"): ["api_football"],
-    ("sports", "FIXTURE_PLAYER_STATS"): ["api_football"],
+    # PLAYER_STATS = api_football per-fixture player stats, captured by IS at the
+    # PER_DAY_PER_LEAGUE grain. The canonical data_type name is PLAYER_STATS; the GCS
+    # *entity* folder is `fixture_player_stats` — a deliberate name mismatch documented
+    # in codex/02-data/sports-gcs-path-ssot.md § "non-obvious entity= folder names".
+    # This registry was seeded (106430c9, 2026-05-06) with the ENTITY name
+    # FIXTURE_PLAYER_STATS by analogy with its FIXTURE_* neighbours, while PLAYER_STATS
+    # already existed in SPORTS_DATA_TYPE_TO_SOURCE (league_data.py) and the launch-date
+    # override. Nothing ever wrote FIXTURE_PLAYER_STATS: the live IS sports index holds
+    # 219,508 PLAYER_STATS rows and ZERO FIXTURE_PLAYER_STATS rows (read 2026-07-15).
+    # The phantom name made has_source_priority("sports","PLAYER_STATS") False, which
+    # silently DISABLED the UTL write-time mis-stamp guard for every IS PLAYER_STATS row
+    # (_writer_ingest.py gates it on that call) — same class as the ODDS defect below.
+    # Reconciled 2026-07-15 onto the name reality uses. SSOT:
+    # codex/02-data/sports-gcs-path-ssot.md + codex/02-data/sports-data-types-catalog.md.
+    ("sports", "PLAYER_STATS"): ["api_football"],
     ("sports", "INJURIES"): ["api_football"],
     ("sports", "RESULTS"): ["api_football"],
     ("sports", "UNDERSTAT_XG"): ["understat"],

@@ -63,7 +63,13 @@ AVAILABILITY_AT_SEMANTICS: Final[dict[tuple[str, str], AvailabilitySemantic]] = 
     ("sports", "FIXTURE_EVENTS"): "event_time",
     ("sports", "INJURIES"): "report_time",
     ("sports", "FIXTURE_STATS"): "match_end_time",
-    ("sports", "FIXTURE_PLAYER_STATS"): "match_end_time",
+    # PLAYER_STATS: renamed from the phantom entity-name FIXTURE_PLAYER_STATS 2026-07-15
+    # (nothing ever wrote that name — see _source_priority_data.py for the full
+    # diagnosis). Semantic UNCHANGED: player stats settle with the match, same as
+    # FIXTURE_STATS. Must stay in lockstep with SOURCE_PRIORITY —
+    # test_every_source_priority_pair_has_availability_semantic is a bidirectional
+    # closed-set, so the two registries are added/removed together or the suite fails.
+    ("sports", "PLAYER_STATS"): "match_end_time",
     ("sports", "RESULTS"): "match_end_time",
     ("sports", "UNDERSTAT_XG"): "match_end_time",
     ("sports", "SFI_PROGRESSIVE_STATS"): "match_end_time",

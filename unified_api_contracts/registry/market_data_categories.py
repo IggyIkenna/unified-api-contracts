@@ -1537,9 +1537,12 @@ VENUE_DATA_TYPE_CAPABILITIES: dict[str, dict[str, str]] = {
     "KRX": {
         "ohlcv_24h": "2019-01-02",
     },
-    "BARCHART": {
-        "ohlcv_15m": "2020-01-02",  # VIX 15m historical CSV (discontinued 2025-11-12)
-    },
+    # BARCHART capability block removed 2026-07-15 (wider-sweep audit,
+    # cefi_live_only_data_types_vs_layer1_denominator_contradiction issue P3) —
+    # BARCHART was removed from VENUES_BY_ASSET_GROUP["tradfi"] 2026-06-24 (VIX
+    # 15m now aggregates from VX futures via Databento XCBF.PITCH), making this
+    # entry unreachable dead code (expected-universe producers iterate
+    # VENUES_BY_ASSET_GROUP, never this dict's keys directly).
     # YAHOO_FINANCE caps block removed 2026-07-15 — source-as-venue modeling error
     # (kept the SOURCE modeling in data_source_continuity.py / _tradfi.py capability).
     # ── TradFi reference data venues (canonicalized 2026-05-23) ──

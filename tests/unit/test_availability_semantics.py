@@ -24,7 +24,9 @@ def test_sports_lineups_uses_kickoff_minus_60min() -> None:
 
 def test_sports_post_match_uses_match_end_time() -> None:
     assert get_availability_semantic("sports", "FIXTURE_STATS") == "match_end_time"
-    assert get_availability_semantic("sports", "FIXTURE_PLAYER_STATS") == "match_end_time"
+    # PLAYER_STATS (was the phantom FIXTURE_PLAYER_STATS until 2026-07-15 — the entity
+    # folder name; the canonical data_type is PLAYER_STATS, which is what IS writes).
+    assert get_availability_semantic("sports", "PLAYER_STATS") == "match_end_time"
     assert get_availability_semantic("sports", "RESULTS") == "match_end_time"
     assert get_availability_semantic("sports", "UNDERSTAT_XG") == "match_end_time"
     assert get_availability_semantic("sports", "SFI_PROGRESSIVE_STATS") == "match_end_time"

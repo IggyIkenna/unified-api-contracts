@@ -68,17 +68,60 @@ _API_FOOTBALL_ID_TO_LEAGUE: dict[int, str] = {
 # SSOT for data-status coverage clipping. Update when adding a new provider
 # or when an existing provider extends backfill (e.g. footystats Pro tier
 # unlocks earlier history).
+# EVIDENCE RULE (operator ruling 2026-07-15, "amend floors to reality"): every
+# floor below is the earliest date at which a REAL object is held — parquet that
+# PARSES, carries >= 1 row, and is HISTORICALLY COHERENT with its date partition.
+# Object EXISTENCE is not evidence: the corpus contains a large artifact class of
+# present-day reference data replicated under historical partitions (e.g.
+# `day=2014-01-01/.../entity=standings` carrying `season=2026`, `update=2026-06-12`),
+# which is why each floor cites a probed row count + a coherence witness.
+# Re-probe with the entity/day walk before moving any floor.
 SOURCE_COVERAGE_START: dict[str, date] = {
-    # 2015-01-01 was the nominal api_football archive start, but live probes
-    # confirmed the subscription returns empty for seasons 2015-2017 (35,889
-    # all-empty_confirmed across 76 MVP leagues - subscription floor, not a
-    # backfill bug).  2018-01-01 is the earliest season with real data on our plan.
+    # Measured 2026-07-15 (legacy + prd object probe, all trees, years 2014-2021):
+    # no api_football object of ANY entity exists before 2018-01-01, and the
+    # 2018-01-01 objects are real + coherent (fixtures 64 rows; fixture_events
+    # ENG_CHAMPIONSHIP 20 rows, available_at=2018-01-01T17:00). The 2014/2017
+    # `teams`/`standings` objects in the prd bucket are the artifact class above
+    # (season=2026) and are NOT evidence. Earlier probes had already shown the
+    # subscription returns empty for seasons 2015-2017 (35,889 all-empty_confirmed
+    # across 76 MVP leagues — subscription floor, not a backfill bug). CONFIRMED
+    # CORRECT — unchanged.
     "api_football": date(2018, 1, 1),
-    "footystats": date(2019, 1, 1),
+    # LOWERED 2019-01-01 → 2018-01-01 (2026-07-15). Real+coherent at 2018-01-01:
+    # footystats_matches ENG_LEAGUE_ONE 12 rows (genuine New Year's Day League One
+    # card: AFC Wimbledon v Southend, Bristol Rovers v Portsmouth, …); footystats_odds
+    # + footystats_predictions ENG_LEAGUE_ONE 12 rows each with kickoff_utc=
+    # 2018-01-01T15:00 and available_at=2017-12-29T15:00 — exactly the documented
+    # kickoff-minus-72h pre-match snapshot semantics. No footystats object exists
+    # before 2018-01-01.
+    "footystats": date(2018, 1, 1),
+    # Earliest real understat object is 2014-08-08 (prd, LIGUE_1 understat_xg,
+    # season=2014, Reims v PSG, home_xg=1.36787 — the real 2014/15 Ligue 1 opener),
+    # i.e. the archive starts mid-2014 with the season. This floor already sits
+    # BELOW the earliest real object, so it clips nothing real — left as-is
+    # (no evidence would justify lowering it further).
     "understat": date(2014, 1, 1),
-    "transfermarkt": date(2019, 1, 1),
+    # LOWERED 2019-01-01 → 2018-01-01 (2026-07-15). Real+coherent at 2018-01-01:
+    # entity=player_values/season=2017/player_values.parquet, 456 rows, season=2017
+    # (historically coherent for a 2018-01-01 partition). NOTE: transfermarkt's real
+    # payload is the `season=YYYY`-partitioned shape; the bare `player_values.parquet`
+    # is the artifact class (the 2019-01-01 one carries season=2026), so the floor is
+    # evidenced by the season-partitioned objects only.
+    "transfermarkt": date(2018, 1, 1),
+    # Earliest real SFI object is 2020-01-01 (progressive_stats, 8,125 rows,
+    # available_at spread across 2020-01-01T15:00+ in 30s steps). No SFI object
+    # exists in 2018 or 2019 at all. This source-wide floor already sits BELOW the
+    # earliest real object — left as-is; the operative floor is the
+    # SFI_PROGRESSIVE_STATS override below, which measures EXACTLY correct.
     "soccer_football_info": date(2019, 1, 1),
-    "open_meteo": date(2019, 3, 2),
+    # LOWERED 2019-03-02 → 2018-01-01 (2026-07-15). Real+coherent at 2018-01-01:
+    # entity=weather/weather.parquet, 26 rows, date=2018-01-01, every `actual_*`
+    # observation column populated 26/26 (actual_ko_temp, actual_1h_*, actual_2h_*,
+    # actual_total_precip_mm, …) — matching the 2020-06-06 reference object's 22/22.
+    # The null `forecast_t24h_*` columns are EXPECTED for a historical backfill
+    # (actuals are retrievable; archived forecasts are not) and do not make the
+    # object a placeholder.
+    "open_meteo": date(2018, 1, 1),
     # odds-api raw ticks → MDPS bucketed odds (consumed by FSS odds_features).
     # odds-api itself provides historical from 2020-06; our MTDS+MDPS hooked
     # in at 2020-06-06 per market-data-tick-sports/processed/by_date probe.
@@ -88,28 +131,36 @@ SOURCE_COVERAGE_START: dict[str, date] = {
 
 
 # Per-(source, data_type) override when a specific entity from a source has
-# a later coverage start than the source-wide value. Probed live 2026-04-30:
-# SFI's source-wide coverage is 2019-01-01 (leagues, day-list endpoint), but
-# /matches/view/progressive/ returns empty for every match before 2020-01-01,
-# so SFI_PROGRESSIVE_STATS gets its own later floor here.
+# a LATER coverage start than the source-wide value. An entry equal to (or below)
+# the source-wide value is meaningless — delete it and let the source-wide floor
+# apply. Probed live 2026-04-30: SFI's source-wide coverage is 2019-01-01
+# (leagues, day-list endpoint), but /matches/view/progressive/ returns empty for
+# every match before 2020-01-01, so SFI_PROGRESSIVE_STATS gets its own later floor
+# here. RE-CONFIRMED by object probe 2026-07-15: earliest real progressive_stats
+# object is EXACTLY 2020-01-01 (8,125 rows) — this override measures correct.
 #
-# api_football per-fixture endpoints (events/lineups/statistics/players) all
-# nominally have data going back to 2017-10 per live probes (2026-05-01),
-# but our backfill never captured 2018-2020 dates due to pre-flight skips
-# that mark dates as "done" once any league has a row. Re-fetching is
-# expensive (paid API quota) and operationally we only need data ≥ 2020-06
-# to match the odds_api downstream cutoff — strategies built on these
-# features can't trade on dates without odds anyway. So we declare
-# 2020-06-06 as the effective coverage start (matches odds_api) and stop
-# counting pre-cutoff dates as missing.
+# REMOVED 2026-07-15 (operator ruling "amend floors to reality") — the four
+# api_football per-fixture overrides (FIXTURE_EVENTS / FIXTURE_LINEUPS /
+# FIXTURE_STATS / PLAYER_STATS), each previously pinned at 2020-06-06. Their
+# justification asserted that "our backfill never captured 2018-2020 dates due to
+# pre-flight skips", and then clipped coverage to the odds_api cutoff on that basis.
+# That premise was FALSE: an object probe of the legacy + prd buckets on 2026-07-15
+# found REAL, historically-coherent per-fixture data at 2018-01-01 —
+#   fixture_events   ENG_CHAMPIONSHIP  20 rows (available_at=2018-01-01T17:00)
+#   fixture_lineups  (roll-up)         32 rows
+#   fixture_stats    ENG_CHAMPIONSHIP   4 rows
+#   player_stats     ENG_CHAMPIONSHIP  28 rows
+# ~22.3k such objects exist for 2018-2020. Since the measured earliest real date
+# for all four equals the api_football source-wide floor (2018-01-01), the
+# overrides are redundant AND contradict this dict's own "later than source-wide"
+# contract — so they are deleted rather than restated. Consequence, accepted by the
+# operator: honest-coverage denominators widen and coverage % drops. That is the
+# honest number. (The old floor also conflated "no odds downstream" with "no data
+# upstream" — a downstream trading constraint is not an upstream coverage fact.)
 DATA_TYPE_COVERAGE_START: dict[tuple[str, str], date] = {
     ("soccer_football_info", "SFI_PROGRESSIVE_STATS"): date(2020, 1, 1),
     # SFI_LEAGUES retired 2026-05-05 — was a static provider-catalog mapping,
     # now lives in UAC SOCCER_FOOTBALL_INFO_IDS rather than as captured GCS data.
-    ("api_football", "FIXTURE_EVENTS"): date(2020, 6, 6),
-    ("api_football", "FIXTURE_LINEUPS"): date(2020, 6, 6),
-    ("api_football", "FIXTURE_STATS"): date(2020, 6, 6),
-    ("api_football", "PLAYER_STATS"): date(2020, 6, 6),
 }
 
 
