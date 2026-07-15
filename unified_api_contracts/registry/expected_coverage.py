@@ -171,7 +171,11 @@ _TRADFI: dict[str, list[str]] = {
     # declared here made every (CBOE, ohlcv_15m) request fall through to the
     # Databento path (which has no 15m schema) and 100% attempted_fail — see
     # tradfi_unreachable_databento_data_types_mbp10_ohlcv_coarse_calendar_2026_07_15.md.
-    "CBOE": ["ohlcv_1s", "ohlcv_1m"],
+    # ohlcv_24h added 2026-07-15 (operator decision): CBOE US Treasury-yield tenors
+    # (US3M/US2Y/US5Y/US10Y/US30Y) via Yahoo daily OHLCV — the routing fix
+    # market-tick-data-service@764e7170 sends (CBOE, ohlcv_24h) to Yahoo; this declares the
+    # capability so venue_fetch.py's UAC-intersection no longer filters it out pre-routing.
+    "CBOE": ["ohlcv_1s", "ohlcv_1m", "ohlcv_24h"],
     # NASDAQ + NYSE equity venues added 2026-05-17 per OHLCV-only MVP scope
     # (operator direction 2026-05-15 — see
     # plans/active/tradfi_ohlcv_only_mvp_backfill_2026_05_15.md). Phase 7
