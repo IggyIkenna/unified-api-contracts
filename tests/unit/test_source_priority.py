@@ -475,20 +475,16 @@ def test_is_valid_manifest_source_tradfi_unaffected() -> None:
 #: underlying naming question is ruled on. **This baseline only goes DOWN** — never
 #: add to it to make a new drift pass (same convention as the DTZ/TID251 baselines).
 #:
-#: PLAYER_STATS: instruments-service writes `PLAYER_STATS` (UAC sports gcs_paths
-#: entity `player_stats`, launch date ("api_football","PLAYER_STATS")=2020-06-06,
-#: live gap-fill script instruments-service/scripts/fill_missing_player_stats.py),
-#: but SOURCE_PRIORITY + AVAILABILITY_AT_SEMANTICS register only the *differently
-#: named* FIXTURE_PLAYER_STATS, which is what features-service (FixturePlayerStatsRecord
-#: / fixture_player_stats exports) and the deployment-service sharding doc use.
-#: Same class as the ODDS defect below (has_source_priority is False → the UTL
-#: write-time mis-stamp guard is OFF for every IS PLAYER_STATS row), but the FIX is a
-#: cross-repo NAMING ruling (is FIXTURE_PLAYER_STATS a rename of PLAYER_STATS, or a
-#: distinct per-fixture grain?), not a one-line registry add — registering it blind
-#: would switch the mis-stamp guard ON for the live api_football enrichment fleet.
-#: Tracked: plans/active/issues/
-#: sports_odds_ownership_registry_split_brain_and_bogus_api_football_denominator_2026_07_15.md §A2.
-_KNOWN_SPORTS_REGISTRY_DRIFT: frozenset[str] = frozenset({"PLAYER_STATS"})
+#: EMPTY as of 2026-07-15 — the one entry (PLAYER_STATS) was RECONCILED, not waived.
+#: The naming question it was parked on is answered: PLAYER_STATS is canonical and
+#: FIXTURE_PLAYER_STATS was a phantom (the GCS *entity* folder name, seeded into these
+#: crosscutting registries at 106430c9 by analogy with its FIXTURE_* neighbours while
+#: PLAYER_STATS already existed in SPORTS_DATA_TYPE_TO_SOURCE). Not a distinct grain:
+#: the live IS sports index holds 219,508 PLAYER_STATS rows and ZERO
+#: FIXTURE_PLAYER_STATS rows. The mis-stamp guard is now ON for IS PLAYER_STATS writes
+#: and accepts what the enrichment path actually stamps (api_football). See
+#: _source_priority_data.py ("sports","PLAYER_STATS") for the full diagnosis.
+_KNOWN_SPORTS_REGISTRY_DRIFT: frozenset[str] = frozenset()
 
 
 def test_every_sports_data_type_to_source_key_has_source_priority() -> None:

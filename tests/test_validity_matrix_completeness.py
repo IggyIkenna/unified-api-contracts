@@ -206,7 +206,10 @@ _SOURCE_PRIORITY_EXCLUSION_REASONS: dict[tuple[str, str], str] = {
     #    and weather forecast data — tracked in SOURCE_PRIORITY for
     #    reference-layer provenance but not enumerated at instrument grain.
     ("sports", "ARBITRAGE"): _REFERENCE_NOT_INSTRUMENT_GRAIN,
-    ("sports", "FIXTURE_PLAYER_STATS"): _REFERENCE_NOT_INSTRUMENT_GRAIN,
+    # NOTE: FIXTURE_PLAYER_STATS was excluded here precisely BECAUSE it was not in
+    # SPORTS_DATA_TYPE_TO_SOURCE — the tell that it was a phantom name. Reconciled to
+    # PLAYER_STATS 2026-07-15, which IS in the domain map and therefore reachable at
+    # league grain, so it needs no exclusion.
     ("sports", "LEAGUES"): _REFERENCE_NOT_INSTRUMENT_GRAIN,
     ("sports", "ODDS_MOVEMENT"): _REFERENCE_NOT_INSTRUMENT_GRAIN,
     ("sports", "ODDS_SNAPSHOT"): _REFERENCE_NOT_INSTRUMENT_GRAIN,
