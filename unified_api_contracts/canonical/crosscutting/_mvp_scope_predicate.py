@@ -94,8 +94,54 @@ def _cefi_venue_in_rule(venue: str, rule_venues: frozenset[str]) -> bool:
     return any(rv.split("-", 1)[0] == base for rv in rule_venues)
 
 
+def get_mvp_data_types_for_cefi_venue_itype(venue: str, instrument_type: str) -> frozenset[str]:
+    """Return the MVP data_type set for a CeFi ``(venue, instrument_type)`` cell.
+
+    The instrument_type-AWARE counterpart of
+    :func:`get_mvp_data_types_for_cefi_venue`. It resolves the SAME effective
+    data_type set that :func:`is_mvp` uses for a cefi cell (the two share this
+    one resolver — see :func:`is_mvp`), so a consumer that knows the
+    instrument_type gets the exact per-itype MVP set rather than the venue-wide
+    flat default. This is what the instruments-service expected-universe
+    enumerator uses so that a per-instrument_type override (``PERPETUAL`` →
+    flat + ``liquidations``; ``OPTION`` → ``{options_chain}``) narrows the
+    denominator correctly WITHOUT losing the per-venue ``venue_data_types``
+    override (e.g. ``COINBASE-FUTURES`` → ``{trades}`` still wins for its
+    PERPETUAL cells — no liquidations/book5 over-seed).
+
+    Resolution order (the single SSOT for cefi effective-data_type resolution):
+      1. PER-VENUE override (``venue_data_types``) — highest priority; final for
+         ALL instrument_types at that venue.
+      2. PER-INSTRUMENT_TYPE override (``instrument_type_data_types``) for this
+         ``instrument_type`` — e.g. ``PERPETUAL`` / ``OPTION``.
+      3. Flat ``data_types`` — default when neither override applies.
+
+    Args:
+        venue: Canonical CeFi venue identifier.
+        instrument_type: Canonical instrument_type string (e.g. ``PERPETUAL``);
+            blank / an itype with no override → the flat ``data_types`` set.
+
+    Returns:
+        Frozenset of MVP data_type strings for the cell. Empty frozenset only
+        when the venue is not in the CeFi MVP rule (venue not MVP at all).
+    """
+    rule = MVP_SCOPE.get("cefi")
+    if not isinstance(rule, CeFiMvpRule):
+        return frozenset()
+    # Venue must be in the rule at all.
+    if not _cefi_venue_in_rule(venue, rule.venues):
+        return frozenset()
+    # Per-venue override is the highest-priority gate (final for all itypes).
+    venue_override = _cefi_venue_data_type_set(venue, rule)
+    if venue_override is not None:
+        return venue_override
+    # Per-instrument_type override, else the flat ``data_types`` default.
+    it_norm = (instrument_type or "").strip().upper()
+    return rule.instrument_type_data_types.get(it_norm, rule.data_types)
+
+
 def get_mvp_data_types_for_cefi_venue(venue: str) -> frozenset[str]:
-    """Return the MVP data_type set for a CeFi *venue* (instrument-grain aware).
+    """Return the venue-wide (instrument_type-agnostic) MVP data_type set.
 
     Convenience helper for capture-time enforcement (backfill launchers, the
     MTDS orchestrator, live-VM data_type selection): given a canonical CeFi
@@ -104,17 +150,13 @@ def get_mvp_data_types_for_cefi_venue(venue: str) -> frozenset[str]:
     in the returned set — this is the code-level block so no VM ever spins for
     a non-MVP (venue x data_type) combination.
 
-    Resolution order (mirrors :func:`is_mvp` for cefi):
-      1. Per-venue override (``venue_data_types``) — highest priority.
-      2. The union of all per-instrument_type overrides when ALL instrument_types
-         for this venue have an ``instrument_type_data_types`` entry.  In
-         practice today only OPTION → {options_chain} is declared, so the union
-         for a typical cefi venue includes the flat set + options_chain.
-      3. Flat ``data_types`` — default (trades + book_snapshot_5 + funding).
-
-    For enforcement: if a launcher has ``data_type in {"book_snapshot_5"}`` and
-    ``venue in {"COINBASE-SPOT", "COINBASE-FUTURES"}``, it should skip/reject
-    the shard because ``book_snapshot_5 ∉ get_mvp_data_types_for_cefi_venue(venue)``.
+    This is the instrument_type-AGNOSTIC default: it returns the per-venue
+    override (if any) else the flat ``data_types`` set. It deliberately does NOT
+    reflect the per-instrument_type overrides (``PERPETUAL`` → flat +
+    ``liquidations``; ``OPTION`` → ``{options_chain}``) — a caller that knows
+    the instrument_type MUST use :func:`get_mvp_data_types_for_cefi_venue_itype`
+    (or :func:`is_mvp`) for an exact per-cell gate. Kept for back-compat with
+    the venue-only callers that predate the per-itype axis.
 
     Args:
         venue: Canonical CeFi venue identifier (e.g. ``COINBASE-SPOT``,
@@ -136,21 +178,11 @@ def get_mvp_data_types_for_cefi_venue(venue: str) -> frozenset[str]:
         # Standard venue: trades + book5 + funding
         assert "book_snapshot_5" in get_mvp_data_types_for_cefi_venue("BINANCE-FUTURES")
     """
-    rule = MVP_SCOPE.get("cefi")
-    if not isinstance(rule, CeFiMvpRule):
-        return frozenset()
-    # Venue must be in the rule at all.
-    if not _cefi_venue_in_rule(venue, rule.venues):
-        return frozenset()
-    # Per-venue override is the highest-priority gate.
-    venue_override = _cefi_venue_data_type_set(venue, rule)
-    if venue_override is not None:
-        return venue_override
-    # No per-venue override: return the flat set (the per-instrument_type
-    # overrides are instrument_type-scoped so cannot be collapsed here without
-    # knowing the instrument_type; callers that know the instrument_type should
-    # call ``is_mvp`` directly for an exact gate).
-    return rule.data_types
+    # Delegates to the itype-aware resolver with an UNBOUND instrument_type:
+    # the per-instrument_type override map has no ``""`` key, so this resolves to
+    # the per-venue override (if any) else the flat ``data_types`` set —
+    # byte-identical to the historical venue-wide behaviour.
+    return get_mvp_data_types_for_cefi_venue_itype(venue, "")
 
 
 # ---------------------------------------------------------------------------
@@ -296,12 +328,9 @@ def is_mvp(
         #      {options_chain} only (Deribit BTC/ETH options; this is now
         #      redundant for DERIBIT but kept for any other OPTION rows).
         #   3. FLAT ``data_types`` set — default when no override applies.
-        _venue_dt_set = _cefi_venue_data_type_set(venue, rule)
-        if _venue_dt_set is not None:
-            _dt_set: frozenset[str] = _venue_dt_set
-        else:
-            _it_norm = (instrument_type or "").strip().upper()
-            _dt_set = rule.instrument_type_data_types.get(_it_norm, rule.data_types)
+        # Single SSOT for this resolution (venue is already confirmed in-rule
+        # above, so the helper returns the effective set, never ``frozenset()``).
+        _dt_set = get_mvp_data_types_for_cefi_venue_itype(venue, instrument_type)
         if not _data_type_in_rule(data_type, _dt_set):
             return False
         # Axis 4: base_ccy (optional — if rule has a non-empty set, must match).

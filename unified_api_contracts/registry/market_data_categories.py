@@ -1175,11 +1175,17 @@ VENUE_DATA_TYPE_CAPABILITIES: dict[str, dict[str, str]] = {
         "liquidations": "2019-11-17",
         "futures_chain": "2019-11-17",
     },
+    # ``liquidations`` REMOVED 2026-07-15 (cefi_completion_program workstream E,
+    # operator ruling): only 3 ``captured`` DERIBIT liquidation rows exist in the
+    # live manifest (noise, not a real feed) — DERIBIT is NOT one of the 6
+    # real-feed liquidations venues. With ``liquidations`` now a PERPETUAL-leg
+    # CeFi MVP data_type, a stale gate entry here would seed a phantom liquidations
+    # EXPECTED cell for every DERIBIT perp instrument-day. Gated OUT here; the 6
+    # real-feed venues keep their entries.
     "DERIBIT": {
         "trades": "2019-03-30",
         "book_snapshot_5": "2019-03-30",
         "derivative_ticker": "2019-03-30",
-        "liquidations": "2019-03-30",
         "options_chain": "2019-03-30",
         "futures_chain": "2019-03-30",
     },
@@ -1207,7 +1213,11 @@ VENUE_DATA_TYPE_CAPABILITIES: dict[str, dict[str, str]] = {
         "trades": "2020-01-01",
         "book_snapshot_5": "2020-01-01",
         "derivative_ticker": "2020-01-01",
-        "liquidations": "2020-01-01",
+        # ``liquidations`` REMOVED 2026-07-15 (cefi_completion_program workstream E,
+        # operator ruling): OKX liquidations live on the canonical ``OKX-SWAP``
+        # sub-venue (191,923 captured rows), NOT the bare ``OKX`` token (0 captured
+        # under the bare name; the catalogue enumerates OKX-SPOT/OKX-SWAP/OKX-FUTURES,
+        # never bare OKX). ``OKX-SWAP`` retains its ``liquidations`` entry below.
         # options_chain added 2026-07-12 (cefi_deribit_combo_and_okx_bare_venue_gaps_2026_07_12.md
         # Bug C) — real Tardis okex-options data confirmed live (247,540 option
         # symbols, availableSince verified via api.tardis.dev/v1/exchanges/okex-options
@@ -1278,11 +1288,20 @@ VENUE_DATA_TYPE_CAPABILITIES: dict[str, dict[str, str]] = {
     # IMPORTANT — pre-2024 Aster funding is BINANCE-PROXIED (Astherus pre-rebrand
     # mirrored Binance funding); it is imported, NOT Aster-native — label `source`
     # honestly. SSOT: perp_funding_data_semantics_and_cadence_2026_06_16.md §GAP 2.
+    # ``liquidations`` REMOVED 2026-07-15 (cefi_completion_program workstream E,
+    # operator ruling): ASTER liquidations is a genuine LIVE feed (asterdex WS
+    # !forceOrder@arr) but has ZERO batch capture (0 ``captured`` liquidations
+    # rows in the live manifest — batch REST has no force-order history). Now
+    # that ``liquidations`` is a PERPETUAL-leg CeFi MVP data_type (CeFiMvpRule),
+    # a stale gate entry here would seed ASTER liquidations into the BATCH honest-
+    # coverage denominator; per the ruling "live-only feeds must NOT seed the
+    # batch denominator" (batch-absence is honest, not a gap). ``book_snapshot_5``
+    # (also live-only) is intentionally left untouched here — its live-vs-batch
+    # seeding is tracked separately in workstream I.
     "ASTER": {
         "trades": "2023-07-22",
         "derivative_ticker": "2023-07-22",
         "book_snapshot_5": "2026-06-23",  # live-only via aster_book_liq_ws
-        "liquidations": "2026-06-23",  # live-only via aster_book_liq_ws
     },
     # Tier-3 CeFi (2026-05-01) — spot=trades+book; perp=+ derivative_ticker
     # +liquidations. None carry chain bundles (perps are individual syms).

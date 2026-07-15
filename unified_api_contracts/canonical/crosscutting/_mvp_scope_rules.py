@@ -79,14 +79,23 @@ class CeFiMvpRule:
         instrument_type_data_types: Optional per-instrument_type data_type
             OVERRIDE of the flat ``data_types`` set (operator 2026-06-27,
             decision #2). When an instrument_type key is present, ONLY those
-            data_types are MVP for that instrument_type — the flat ``data_types``
-            set does NOT apply to it. Today the only entry is ``OPTION ->
-            {options_chain}``: a Deribit option's MVP MTDS data_type is the
-            options_chain bundle ONLY (it carries marks + IVs — sufficient);
-            per-strike ``trades`` + ``book_snapshot_5`` are EXCLUDED for options
-            (too heavy / ~12k API calls/day vs 1). An instrument_type ABSENT
-            from this map uses the flat ``data_types`` set unchanged
-            (perps/spot/dated-futures = trades + book_snapshot_5 + funding).
+            data_types are MVP for that instrument_type (a FULL REPLACEMENT) —
+            the flat ``data_types`` set does NOT apply to it. Entries:
+              * ``OPTION -> {options_chain}``: a Deribit option's MVP MTDS
+                data_type is the options_chain bundle ONLY (it carries marks +
+                IVs — sufficient); per-strike ``trades`` + ``book_snapshot_5``
+                are EXCLUDED for options (too heavy / ~12k API calls/day vs 1).
+              * ``PERPETUAL -> {trades, book_snapshot_5, derivative_ticker,
+                funding_rate, liquidations}`` (2026-07-15): the flat tick set
+                PLUS ``liquidations`` — a PERPETUAL-leg CeFi MVP data_type. It is
+                declared on PERPETUAL ONLY (not the flat set, which would
+                over-claim SPOT_PAIR/EQUITY_PERP; not FUTURE, where captured liq
+                is negligible). The venue axis is gated separately by
+                ``VENUE_DATA_TYPE_CAPABILITIES`` to the 6 perp venues that carry
+                a real liquidations feed.
+            An instrument_type ABSENT from this map uses the flat ``data_types``
+            set unchanged (spot/dated-futures = trades + book_snapshot_5 +
+            funding).
         venue_data_types: Optional per-venue data_type OVERRIDE of the flat
             ``data_types`` set (operator 2026-06-28, decision A). When a
             venue key is present, ONLY those data_types are MVP for that venue
@@ -488,15 +497,35 @@ MVP_SCOPE: Final[dict[str, object]] = {
                 "funding_rate",
             }
         ),
-        # OPTION data_type override (operator 2026-06-27 decision #2 — cost cut):
-        # a Deribit OPTION's MVP MTDS data_type is the ``options_chain`` bundle
-        # ONLY (it carries marks + IVs — sufficient for the VOL_* strategy/ML
-        # family). Per-strike ``trades`` + ``book_snapshot_5`` are EXCLUDED for
-        # options (~12k API calls/day per-strike vs 1 bulk chain call/day; full
-        # per-option tick is only needed for execution-quality analysis). This
-        # OVERRIDES the flat ``data_types`` set for OPTION cells.
+        # PER-INSTRUMENT_TYPE data_type overrides (each a FULL REPLACEMENT of the
+        # flat ``data_types`` set for that instrument_type):
+        #   OPTION → {options_chain} (operator 2026-06-27 decision #2 — cost cut):
+        #     a Deribit OPTION's MVP MTDS data_type is the ``options_chain`` bundle
+        #     ONLY (marks + IVs — sufficient for the VOL_* strategy/ML family).
+        #     Per-strike ``trades`` + ``book_snapshot_5`` are EXCLUDED for options
+        #     (~12k API calls/day per-strike vs 1 bulk chain call/day; full
+        #     per-option tick is only needed for execution-quality analysis).
+        #   PERPETUAL → the flat tick set + ``liquidations`` (2026-07-15, workstream
+        #     E of cefi_completion_program_2026_07_15.md): ``liquidations`` is a
+        #     PERPETUAL-leg CeFi MVP data_type — densely captured (732,751 captured
+        #     PERPETUAL manifest rows; 99.95% of all captured cefi liquidations) on
+        #     the perp venues that carry a real liquidations feed. The VENUE axis is
+        #     gated SEPARATELY by ``VENUE_DATA_TYPE_CAPABILITIES`` (market_data_
+        #     categories.py) to exactly the 6 real-feed venues: BINANCE-FUTURES /
+        #     OKX-SWAP / BYBIT / KRAKEN-FUTURES / BITFINEX-FUTURES / BITGET-FUTURES.
+        #     Declared on PERPETUAL ONLY — NOT the flat ``data_types`` set (would
+        #     over-claim SPOT_PAIR/EQUITY_PERP), NOT FUTURE (dated-futures liq is
+        #     negligible — 221 captured FUTURE rows / 0.03%). Reconciles the
+        #     un-superseded ``mvp-universe.yaml`` ("liquidations P1-critical for
+        #     CEFI") vs the prior CeFiMvpRule omission (liquidations pulled
+        #     2026-06-29, never restored). CeFiMvpRule is the live SSOT.
+        #     NOTE: the enumerator applies this per-itype set via the itype-aware
+        #     ``get_mvp_data_types_for_cefi_venue_itype`` helper so the venue
+        #     ``venue_data_types`` overrides (e.g. COINBASE-FUTURES → {trades}) are
+        #     STILL respected for PERPETUAL cells (no over-seed).
         instrument_type_data_types={
             "OPTION": frozenset({"options_chain"}),
+            "PERPETUAL": frozenset({"trades", "book_snapshot_5", "derivative_ticker", "funding_rate", "liquidations"}),
         },
         # PER-VENUE data_type overrides (operator 2026-06-28 decision A):
         #   COINBASE-SPOT/COINBASE-FUTURES → {trades} only. book_snapshot_5 is

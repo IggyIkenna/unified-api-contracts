@@ -60,6 +60,7 @@ from unified_api_contracts.canonical.crosscutting._mvp_scope_mdps import (
 )
 from unified_api_contracts.canonical.crosscutting._mvp_scope_predicate import (
     get_mvp_data_types_for_cefi_venue,
+    get_mvp_data_types_for_cefi_venue_itype,
     is_mvp,
 )
 from unified_api_contracts.canonical.crosscutting._mvp_scope_rules import (
@@ -91,6 +92,7 @@ __all__ = [
     "SportsMvpRule",
     "TradFiMvpRule",
     "get_mvp_data_types_for_cefi_venue",
+    "get_mvp_data_types_for_cefi_venue_itype",
     "is_in_mvp_capture_universe",
     "is_mvp",
     "mdps_mvp_universe",
@@ -113,8 +115,27 @@ _canonical_repr = canonical_config_repr
 # ---------------------------------------------------------------------------
 
 
-MVP_SCOPE_CONFIG_VERSION: Final[int] = 14
+MVP_SCOPE_CONFIG_VERSION: Final[int] = 15
 """Monotonic version of :data:`MVP_SCOPE`. Bump on any content change.
+
+v15 (2026-07-15): ``liquidations`` restored as a PERPETUAL-leg CeFi MVP data_type
+(cefi_completion_program_2026_07_15.md workstream E). New
+``CeFiMvpRule.instrument_type_data_types["PERPETUAL"]`` override = the flat tick
+set + ``liquidations`` (a FULL replacement for PERPETUAL cells; the flat
+``data_types`` set is UNCHANGED, so SPOT_PAIR/EQUITY_PERP/FUTURE do NOT gain
+``liquidations``). liquidations is densely captured (732,751 captured PERPETUAL
+manifest rows, 99.95% of all captured cefi liquidations) but had been excluded
+from CeFiMvpRule since 2026-06-29, contradicting the un-superseded
+``mvp-universe.yaml`` ("liquidations P1-critical for CEFI"); CeFiMvpRule is now
+the live SSOT. The VENUE axis is gated by ``VENUE_DATA_TYPE_CAPABILITIES`` to the
+6 real-feed perp venues (BINANCE-FUTURES/OKX-SWAP/BYBIT/KRAKEN-FUTURES/
+BITFINEX-FUTURES/BITGET-FUTURES); the same pass REMOVED ``liquidations`` from the
+gate for ASTER (live-only, 0 batch captures — live-only must not seed the batch
+denominator), DERIBIT (3 noise rows), and bare OKX (lives on OKX-SWAP). The
+instruments-service expected-universe enumerator consumes the new itype-aware
+``get_mvp_data_types_for_cefi_venue_itype`` helper so the per-instrument_type
+override narrows the denominator WITHOUT bypassing the per-venue
+``venue_data_types`` overrides (COINBASE-FUTURES stays trades-only — no regress).
 
 v14 (2026-07-14): TradFi MVP OPTION underlier narrowing (operator ruling,
 tradfi_eu_not_draining_source_axis_drift_2026_06_24.md, verbatim: "We DO want
