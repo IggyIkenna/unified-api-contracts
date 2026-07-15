@@ -81,7 +81,12 @@ AVAILABILITY_AT_SEMANTICS: Final[dict[tuple[str, str], AvailabilitySemantic]] = 
     ("sports", "STANDINGS"): "fetch_completed_at",  # api_football standings; polled
     ("sports", "WEATHER"): "match_end_time",  # open_meteo reanalysis; post-match
     ("sports", "PREDICTIONS"): "announced_at",  # footystats pre-match predictions
-    # ODDS removed 2026-06-25 (#6 coherent unit) — bookmaker odds are MTDS/odds-api owned.
+    # ODDS removed 2026-06-25 (#6 coherent unit), RESTORED 2026-07-15: decision #6 was
+    # REVERSED by the operator 2026-06-27 (footystats ODDS = pre-match snapshot reference
+    # data owned by IS; raw bookmaker ticks = odds_api/MTDS — they coexist), but the
+    # reversal (c75101be) only restored SPORTS_DATA_TYPE_TO_SOURCE. Exact pre-8fb1f54f
+    # value. SSOT: codex/02-data/sports-data-source-coverage-matrix.md §4.
+    ("sports", "ODDS"): "publication_time",  # footystats raw odds
     ("sports", "ODDS_HORIZON_BUCKET"): "publication_time",  # MDPS bucketed odds
     ("sports", "TRANSFER_RECORDS"): "fetch_completed_at",  # transfermarkt transfers
     # Sports reference tables.
