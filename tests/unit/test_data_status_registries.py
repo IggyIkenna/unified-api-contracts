@@ -114,13 +114,13 @@ class TestExpectedCoverageByAssetGroup:
         # ICE instrument (Yahoo-sourced DXY index) is a daily series.
         assert tradfi["ICE"] == ["ohlcv_24h"]
         # CBOE: VX FUTURES via Databento XCBF.PITCH (CFE dataset, 2026-06-19) —
-        # ohlcv_1s + ohlcv_1m only. ohlcv_15m (formerly the VIX cash INDEX via
-        # Barchart/Yahoo) REMOVED 2026-07-15 — that fetch path was retired
-        # 2026-06-25/26 (operator), so declaring the capability made every
-        # request fall through to Databento (no 15m schema) and 100%
-        # attempted_fail. Same narrowing pattern as the KRX/ICE precedents. See
+        # ohlcv_1s + ohlcv_1m. ohlcv_15m (formerly the VIX cash INDEX via
+        # Barchart/Yahoo) REMOVED 2026-07-15 (retired fetch path). ohlcv_24h ADDED
+        # 2026-07-15 (operator decision): US Treasury-yield tenors via Yahoo daily
+        # OHLCV (routing fix market-tick-data-service@764e7170; ohlcv_24h->Yahoo,
+        # VX-futures ohlcv_1s/1m stay Databento). See
         # tradfi_unreachable_databento_data_types_mbp10_ohlcv_coarse_calendar_2026_07_15.md.
-        assert tradfi["CBOE"] == ["ohlcv_1s", "ohlcv_1m"]
+        assert tradfi["CBOE"] == ["ohlcv_1s", "ohlcv_1m", "ohlcv_24h"]
 
     def test_sports_excludes_arbitrage_opportunity(self) -> None:
         """arbitrage_opportunity is MDPS-derived; no venue emits it."""
@@ -338,6 +338,30 @@ class TestIceExpectedCoverageNarrowedToDailyDxy:
 
     def test_ice_expected_coverage_narrowed(self) -> None:
         assert EXPECTED_COVERAGE_BY_ASSET_GROUP["tradfi"]["ICE"] == ["ohlcv_24h"]
+
+
+class TestCboeTreasuryOhlcv24hEnabled:
+    """Regression: CBOE ohlcv_24h (US Treasury-yield tenors via Yahoo daily OHLCV) was
+    ENABLED 2026-07-15 (operator decision) so the shipped routing fix
+    (market-tick-data-service@764e7170) carries live traffic — venue_fetch.py's
+    UAC-intersection no longer filters (CBOE, ohlcv_24h) out pre-routing. The Yahoo-routed
+    ohlcv_24h must NOT disturb the VX-futures ohlcv_1s/ohlcv_1m Databento legs. See
+    tradfi_unreachable_databento_data_types_mbp10_ohlcv_coarse_calendar_2026_07_15.md."""
+
+    def test_cboe_declares_ohlcv_24h(self) -> None:
+        assert "ohlcv_24h" in VENUE_DATA_TYPE_CAPABILITIES["CBOE"]
+
+    def test_cboe_retains_vx_futures_databento_legs(self) -> None:
+        assert "ohlcv_1s" in VENUE_DATA_TYPE_CAPABILITIES["CBOE"]
+        assert "ohlcv_1m" in VENUE_DATA_TYPE_CAPABILITIES["CBOE"]
+
+    def test_cboe_ohlcv_24h_start_matches_treasury_genesis(self) -> None:
+        # Earliest treasury tenor genesis (^IRX/^FVX/^TNX/^TYX date(2000,1,3)),
+        # matching US_TREASURY_YIELD_DAILY_FIRST_DATE.
+        assert VENUE_DATA_TYPE_CAPABILITIES["CBOE"]["ohlcv_24h"] == "2000-01-03"
+
+    def test_cboe_expected_coverage_includes_ohlcv_24h(self) -> None:
+        assert "ohlcv_24h" in EXPECTED_COVERAGE_BY_ASSET_GROUP["tradfi"]["CBOE"]
 
 
 class TestYahooFinancePhantomVenueRemoved:

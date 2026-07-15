@@ -1500,6 +1500,16 @@ VENUE_DATA_TYPE_CAPABILITIES: dict[str, dict[str, str]] = {
         # coverage starts 2018-11-04. SSOT: codex/02-data/tradfi-databento-sourcing-ssot.md.
         "ohlcv_1s": "2018-11-04",
         "ohlcv_1m": "2018-11-04",
+        # ohlcv_24h: US Treasury-yield tenors (US3M/US2Y/US5Y/US10Y/US30Y) via Yahoo
+        # daily OHLCV — the Yahoo-sourced fixed_income leg, mirroring the ICE:DXY / KRX
+        # Yahoo-daily convention above. Routed by market-tick-data-service@764e7170's
+        # data_type discriminator (ohlcv_24h -> Yahoo; VX-futures ohlcv_1s/1m stay on the
+        # Databento path untouched). Start = US_TREASURY_YIELD_DAILY_FIRST_DATE (earliest
+        # tenor genesis: ^IRX/^FVX/^TNX/^TYX 2000-01-03; US2Y 2018-08-13). ENABLED 2026-07-15
+        # per operator decision (data_pipeline_alerts_batch_remediation_2026_07_15) — treasury
+        # yields are wanted macro reference data, distinct from the mbp_10/CME MVP-scope gate
+        # deliberately left closed (see the tradfi_unreachable_databento_* issue doc).
+        "ohlcv_24h": "2000-01-03",
         # ohlcv_15m REMOVED 2026-07-15 (was the VIX cash INDEX — Barchart/Yahoo,
         # "2020-01-07" start; not Databento). That fetch path was retired
         # 2026-06-25/26 (operator) — no adapter serves (CBOE, ohlcv_15m) anymore,
