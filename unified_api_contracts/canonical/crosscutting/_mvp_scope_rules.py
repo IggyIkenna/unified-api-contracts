@@ -147,7 +147,20 @@ class TradFiMvpRule:
         data_types: Frozenset of data_type strings.
         underliers: Optional frozenset of underlier codes (e.g. ``ES``,
             ``NQ``, ``VX``). When not empty, only cells with one of these
-            underlier codes are MVP.
+            underlier codes are MVP. Applies to non-OPTION instrument_types
+            (FUTURE); OPTION cells use ``option_underliers`` instead when it
+            is declared (mirrors the CeFi ``options_base_ccys`` narrower
+            options carve-out pattern).
+        option_underliers: Optional frozenset of underlier ROOT codes that
+            applies ONLY to ``instrument_type == "OPTION"`` cells (operator
+            2026-07-14 ruling: "tradfi MVP options scope = the S&P 500
+            complex ONLY" — options on non-ES underliers, e.g. GC/CL/NG/NQ,
+            are explicitly OUT of tradfi MVP even though those roots remain
+            MVP for FUTURE/equity-basis cells). When non-empty, an OPTION
+            cell is MVP iff its resolved underlying future ROOT is in this
+            set (``underliers`` is NOT applied to OPTION cells). Empty →
+            fall back to ``underliers`` (pre-2026-07-14 behavior: every
+            underlier root's options were MVP, same as its futures).
         sources: Optional frozenset of source strings.
     """
 
@@ -155,6 +168,7 @@ class TradFiMvpRule:
     instrument_types: frozenset[str]
     data_types: frozenset[str]
     underliers: frozenset[str] = field(default_factory=frozenset)
+    option_underliers: frozenset[str] = field(default_factory=frozenset)
     sources: frozenset[str] = field(default_factory=frozenset)
 
 
@@ -275,6 +289,36 @@ def _mvp_defi_venues() -> frozenset[str]:
 def _mvp_defi_data_types() -> frozenset[str]:
     """Return every DeFi data_type instruments-service/MTDS currently produce."""
     return frozenset(_MDC_DATA_TYPES_BY_ASSET_GROUP["defi"])
+
+
+# ---------------------------------------------------------------------------
+# TradFi MVP OPTION underlying-root narrowing (operator ruling, 2026-07-14,
+# tradfi_eu_not_draining_source_axis_drift_2026_06_24.md).
+# ---------------------------------------------------------------------------
+# Verbatim operator intent: "We DO want tradfi options for S&P 500 — options
+# and futures — but NO other options in tradfi MVP; just the single stocks,
+# ETFs and futures already in MVP." I.e. tradfi MVP OPTION scope narrows to
+# the S&P 500 complex ONLY (options on the ES root, the S&P 500 future that
+# is already MVP) — GC/CL/NG/SI/PL/PA/HG/NQ/VX options are explicitly OUT of
+# MVP even though those roots stay MVP for FUTURE cells (unchanged) and for
+# the equity-basis carve-out (unchanged).
+#
+# Root only, not a Databento sub-code list: ``build_instrument_catalogue.py``
+# ``_tradfi_contract_code_to_root`` already resolves an OPTION row's specific
+# underlying future contract code (e.g. ``ESZ5``) down to its canonical root
+# (``ES``) before calling ``is_mvp`` — so every S&P 500 options sub-series
+# (quarterly ES.OPT, weekly EW/EW1/EW2/EW4.OPT, daily E1A-E5A.OPT, EOM.OPT)
+# resolves to the SAME root "ES" and is covered by this one-element set. No
+# separate "MES" entry is needed today: there is no declared MES.OPT product
+# in ``TRADFI_DATABENTO_INSTRUMENTS`` (micros only exist as FUTURE contracts),
+# so a micro-options root can never actually appear at the catalogue-tagging
+# layer; if a MES options product is added in the future, "MES" would need to
+# be added here explicitly (deliberately not derived/implicit) — MES is not
+# itself a member of ``TradFiMvpRule.underliers`` (only "ES" is), so it would
+# not silently inherit MVP status without an explicit addition. Registry-idiom
+# name mirrors the `MVP_CME_EXCHANGE_CODES` derivation style in
+# `registry/tradfi_instrument_universe.py`.
+TRADFI_MVP_OPTION_UNDERLYING_ROOTS: Final[frozenset[str]] = frozenset({"ES"})
 
 
 # ---------------------------------------------------------------------------
@@ -572,14 +616,28 @@ MVP_SCOPE: Final[dict[str, object]] = {
     #   instrument rows (only futures legs); the actual ingestion of CME option
     #   instrument-definitions into instruments-service is a SEPARATE agent's job.
     #   This rule ensures CME options are correctly MVP-tagged ONCE present.
+    #   UPDATE (operator 2026-07-14, tradfi_eu_not_draining_source_axis_drift_
+    #   2026_06_24.md): once CME OPTION rows actually populated the catalogue
+    #   (739,278 rows, 2026-07-14 regen), the operator narrowed the OPTION
+    #   scope further — see ``option_underliers`` below / ``TRADFI_MVP_OPTION_
+    #   UNDERLYING_ROOTS`` (the S&P 500 / ES complex ONLY, not every underlier
+    #   root that has a future).
     #
     # data_types: ohlcv_1m ONLY (operator 2026-06-27 decision #7 — NO ohlcv_1s,
     #   NO trades/tbbo in tradfi MVP). 1-minute bars are the tradfi MVP grain.
     #
     # underliers: ES (S&P 500 e-mini), NQ (Nasdaq 100 e-mini), VX (VIX futures)
-    #   + the CME commodity roots backing a Binance tradfi-perp. CME OPTIONS on
-    #   these roots are MVP (decision #7: "S&P/ES, and the other CME roots that
-    #   have Binance perps"). These are the exchange_code / underlier values.
+    #   + the CME commodity roots backing a Binance tradfi-perp. Applies to
+    #   FUTURE cells (decision #7: "S&P/ES, and the other CME roots that have
+    #   Binance perps"). These are the exchange_code / underlier values.
+    #
+    # option_underliers: ES ONLY (operator 2026-07-14 ruling — see
+    #   TRADFI_MVP_OPTION_UNDERLYING_ROOTS above). OPTION cells no longer
+    #   inherit the full ``underliers`` set: GC/SI/PL/PA/NG/CL/HG/NQ/VX options
+    #   are explicitly OUT of tradfi MVP even though those roots stay MVP for
+    #   FUTURE cells. The prior (pre-2026-07-14) behavior tagged ALL 739,278
+    #   real CME OPTION catalogue rows mvp=True because every one of those
+    #   roots was already in ``underliers`` with no OPTION-specific narrowing.
     #
     # sources: databento (primary per SOURCE_PRIORITY)
     # ------------------------------------------------------------------
@@ -616,6 +674,9 @@ MVP_SCOPE: Final[dict[str, object]] = {
                 "HG",  # copper (COPPER)
             }
         ),
+        # OPTION-only narrowing (operator 2026-07-14): the S&P 500 / ES complex
+        # ONLY. See TRADFI_MVP_OPTION_UNDERLYING_ROOTS above for full rationale.
+        option_underliers=TRADFI_MVP_OPTION_UNDERLYING_ROOTS,
         # sources: empty → all sources in scope (databento primary + massive secondary)
         # TODO(mvp-scope): narrow to {"databento", "massive"} once live-source tagging confirmed.
         sources=frozenset(),

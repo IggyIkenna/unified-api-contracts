@@ -64,6 +64,7 @@ from unified_api_contracts.canonical.crosscutting._mvp_scope_predicate import (
 )
 from unified_api_contracts.canonical.crosscutting._mvp_scope_rules import (
     MVP_SCOPE,
+    TRADFI_MVP_OPTION_UNDERLYING_ROOTS,
     CeFiMvpRule,
     DeFiMvpRule,
     FeaturesModelsMvpStub,
@@ -81,6 +82,7 @@ __all__ = [
     "MVP_SCOPE",
     "MVP_SCOPE_CONFIG_HASH",
     "MVP_SCOPE_CONFIG_VERSION",
+    "TRADFI_MVP_OPTION_UNDERLYING_ROOTS",
     "CeFiMvpRule",
     "ConfigDescriptor",
     "DeFiMvpRule",
@@ -111,8 +113,23 @@ _canonical_repr = canonical_config_repr
 # ---------------------------------------------------------------------------
 
 
-MVP_SCOPE_CONFIG_VERSION: Final[int] = 13
+MVP_SCOPE_CONFIG_VERSION: Final[int] = 14
 """Monotonic version of :data:`MVP_SCOPE`. Bump on any content change.
+
+v14 (2026-07-14): TradFi MVP OPTION underlier narrowing (operator ruling,
+tradfi_eu_not_draining_source_axis_drift_2026_06_24.md, verbatim: "We DO want
+tradfi options for S&P 500 — options and futures — but NO other options in
+tradfi MVP; just the single stocks, ETFs and futures already in MVP."). New
+``TradFiMvpRule.option_underliers`` field (mirrors the existing CeFi
+``options_base_ccys`` narrower-options-carve-out pattern) narrows OPTION-cell
+MVP membership to ``TRADFI_MVP_OPTION_UNDERLYING_ROOTS = frozenset({"ES"})`` —
+the S&P 500 / ES complex ONLY. Before this change every OPTION cell inherited
+the full ``underliers`` set (ES/NQ/VX/GC/SI/PL/PA/NG/CL/HG) with no
+OPTION-specific narrowing, which is why the 2026-07-14 tradfi catalogue regen
+tagged ALL 739,278 real CME OPTION rows ``mvp=True`` (every one of those
+options resolves to one of those 10 roots). FUTURE cells, the equity-basis
+carve-out, and single stocks/ETFs are UNCHANGED — this narrowing applies to
+``instrument_type == "OPTION"`` only.
 
 v13 (2026-07-09): DeFi MVP framing defined — "everything we capture" (operator
 ruling on ``defi_perp_funding_mvp_scope_contradiction_2026_06_29.md`` §E5).

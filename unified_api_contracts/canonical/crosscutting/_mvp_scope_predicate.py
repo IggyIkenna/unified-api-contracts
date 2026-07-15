@@ -176,6 +176,24 @@ def _data_type_in_rule(data_type: str | None, rule_data_types: frozenset[str]) -
     return data_type in rule_data_types
 
 
+def _tradfi_underlier_gate(instrument_type: str, base_ccy: str | None, rule: TradFiMvpRule) -> bool:
+    """Return True iff the TradFi underlier axis passes for the CME futures complex.
+
+    OPTION cells use the narrower ``option_underliers`` carve-out (operator
+    2026-07-14 ruling: tradfi MVP options = the S&P 500 / ES complex ONLY —
+    see :data:`TradFiMvpRule.option_underliers`) when it is declared; FUTURE
+    (and any other instrument_type) cells use the full ``underliers`` set
+    unchanged. Mirrors the CeFi OPTION -> ``options_base_ccys`` narrowing
+    pattern in :func:`is_mvp`. An empty ``underliers``/``option_underliers``
+    set means "no underlier restriction" (passes unconditionally).
+    """
+    if instrument_type == "OPTION" and rule.option_underliers:
+        return base_ccy in rule.option_underliers
+    if rule.underliers:
+        return base_ccy in rule.underliers
+    return True
+
+
 def is_mvp(
     asset_group: str,
     venue: str,
@@ -341,8 +359,9 @@ def is_mvp(
             return False
         if not _data_type_in_rule(data_type, rule.data_types):
             return False
-        # Axis: underlier — base_ccy carries the underlier code for TradFi
-        if rule.underliers and base_ccy not in rule.underliers:
+        # Axis: underlier — base_ccy carries the underlier code for TradFi.
+        # ``_itype`` was already normalised above (equity-basis check).
+        if not _tradfi_underlier_gate(_itype, base_ccy, rule):
             return False
         return not (rule.sources and source not in rule.sources)
 
