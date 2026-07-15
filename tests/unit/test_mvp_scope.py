@@ -434,11 +434,12 @@ class TestTradFiOptionUnderlierNarrowingV14:
         assert rule.option_underliers == TRADFI_MVP_OPTION_UNDERLYING_ROOTS
         assert frozenset({"ES"}) == TRADFI_MVP_OPTION_UNDERLYING_ROOTS
 
-    def test_config_version_is_v14(self) -> None:
-        """MVP_SCOPE_CONFIG_VERSION == 14 exactly (the v14 OPTION-narrowing pass)."""
+    def test_config_version_is_latest(self) -> None:
+        """MVP_SCOPE_CONFIG_VERSION == 15 exactly (v15 = liquidations PERPETUAL-leg
+        MVP restoration; v14 was the OPTION-underlier narrowing pass)."""
         from unified_api_contracts.canonical.crosscutting.mvp_scope import MVP_SCOPE_CONFIG_VERSION
 
-        assert MVP_SCOPE_CONFIG_VERSION == 14
+        assert MVP_SCOPE_CONFIG_VERSION == 15
 
 
 # ---------------------------------------------------------------------------
@@ -1578,3 +1579,92 @@ class TestMdpsMvpUniverse:
             venue, itype = cell
             assert isinstance(venue, str) and venue == venue.upper().strip()
             assert isinstance(itype, str) and itype == itype.upper().strip()
+
+
+# ---------------------------------------------------------------------------
+# v15 — ``liquidations`` restored as a PERPETUAL-leg CeFi MVP data_type
+# (2026-07-15, cefi_completion_program_2026_07_15.md workstream E). liquidations
+# is captured on exactly 6 perp venues (732,751 captured PERPETUAL manifest rows);
+# it is added to the PERPETUAL instrument_type_data_types override ONLY (NOT the
+# flat set → no SPOT_PAIR/EQUITY_PERP over-claim; NOT FUTURE → dated-futures liq
+# is negligible). The venue axis is gated by ``VENUE_DATA_TYPE_CAPABILITIES``.
+# ---------------------------------------------------------------------------
+class TestLiquidationsPerpetualMvpV15:
+    """v15: ``liquidations`` is a PERPETUAL-leg CeFi MVP data_type."""
+
+    # The 6 venues with a real captured liquidations feed.
+    LIQ_FEED_VENUES = (
+        "BINANCE-FUTURES",
+        "OKX-SWAP",
+        "BYBIT",
+        "KRAKEN-FUTURES",
+        "BITFINEX-FUTURES",
+        "BITGET-FUTURES",
+    )
+
+    def test_perpetual_override_carries_liquidations(self) -> None:
+        """The PERPETUAL override = flat tick set + liquidations (full replacement)."""
+        rule = MVP_SCOPE["cefi"]
+        assert isinstance(rule, CeFiMvpRule)
+        perp = rule.instrument_type_data_types["PERPETUAL"]
+        assert perp == frozenset({"trades", "book_snapshot_5", "derivative_ticker", "funding_rate", "liquidations"})
+
+    def test_liquidations_not_in_flat_data_types(self) -> None:
+        """liquidations is NOT in the flat data_types set (so spot/equity_perp
+        do NOT silently gain it)."""
+        rule = MVP_SCOPE["cefi"]
+        assert isinstance(rule, CeFiMvpRule)
+        assert "liquidations" not in rule.data_types
+
+    def test_liquidations_is_mvp_for_perpetual_on_feed_venues(self) -> None:
+        """is_mvp True for a PERPETUAL liquidations cell on each of the 6 feed venues."""
+        for venue in self.LIQ_FEED_VENUES:
+            assert is_mvp("cefi", venue, "PERPETUAL", "liquidations", base_ccy="BTC"), venue
+
+    def test_liquidations_not_mvp_for_future(self) -> None:
+        """FUTURE cells do NOT carry liquidations (dated-futures liq negligible)."""
+        for venue in ("BINANCE-FUTURES", "BYBIT", "KRAKEN-FUTURES"):
+            assert not is_mvp("cefi", venue, "FUTURE", "liquidations", base_ccy="BTC"), venue
+
+    def test_liquidations_not_mvp_for_spot(self) -> None:
+        """SPOT_PAIR cells do NOT carry liquidations (validity excludes it too)."""
+        for venue in ("BINANCE-SPOT", "COINBASE-SPOT", "UPBIT", "OKX-SPOT"):
+            assert not is_mvp("cefi", venue, "SPOT_PAIR", "liquidations", base_ccy="BTC"), venue
+
+    def test_liquidations_not_mvp_for_equity_perp(self) -> None:
+        """EQUITY_PERP cells do NOT carry liquidations (PERPETUAL-only override)."""
+        assert not is_mvp("cefi", "BINANCE-FUTURES", "EQUITY_PERP", "liquidations", base_ccy="META")
+
+    def test_coinbase_futures_perpetual_stays_trades_only(self) -> None:
+        """COINBASE-FUTURES venue_data_types={trades} override still wins for its
+        PERPETUAL cells (no book5/derivative_ticker/liquidations over-seed)."""
+        assert is_mvp("cefi", "COINBASE-FUTURES", "PERPETUAL", "trades", base_ccy="BTC")
+        for dt in ("book_snapshot_5", "derivative_ticker", "liquidations"):
+            assert not is_mvp("cefi", "COINBASE-FUTURES", "PERPETUAL", dt, base_ccy="BTC"), dt
+
+    def test_itype_aware_helper_resolution(self) -> None:
+        """get_mvp_data_types_for_cefi_venue_itype resolves the exact per-cell set."""
+        from unified_api_contracts import get_mvp_data_types_for_cefi_venue_itype
+
+        # PERPETUAL on a feed venue → includes liquidations.
+        assert "liquidations" in get_mvp_data_types_for_cefi_venue_itype("BINANCE-FUTURES", "PERPETUAL")
+        # FUTURE on the same venue → the flat set, NO liquidations.
+        assert "liquidations" not in get_mvp_data_types_for_cefi_venue_itype("BINANCE-FUTURES", "FUTURE")
+        # Per-venue override wins over the per-itype override for COINBASE-FUTURES.
+        assert get_mvp_data_types_for_cefi_venue_itype("COINBASE-FUTURES", "PERPETUAL") == frozenset({"trades"})
+        # Venue not in the MVP rule → empty frozenset.
+        assert get_mvp_data_types_for_cefi_venue_itype("FAKE_VENUE_XYZ", "PERPETUAL") == frozenset()
+
+    def test_venue_only_helper_unchanged_no_liquidations(self) -> None:
+        """The venue-only (itype-agnostic) helper is byte-identical to pre-v15:
+        it returns the flat set (NO liquidations) for a standard perp venue."""
+        from unified_api_contracts import get_mvp_data_types_for_cefi_venue
+
+        assert "liquidations" not in get_mvp_data_types_for_cefi_venue("BINANCE-FUTURES")
+
+    def test_itype_aware_helper_exported_from_root(self) -> None:
+        """get_mvp_data_types_for_cefi_venue_itype is importable from the package root."""
+        import unified_api_contracts
+
+        assert hasattr(unified_api_contracts, "get_mvp_data_types_for_cefi_venue_itype")
+        assert "get_mvp_data_types_for_cefi_venue_itype" in unified_api_contracts.__all__

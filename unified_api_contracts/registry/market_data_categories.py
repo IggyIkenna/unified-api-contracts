@@ -332,10 +332,13 @@ VENUES_BY_ASSET_GROUP: dict[str, list[str]] = {
         # External data providers
         "FX",  # FX rates (KRW/USD via Yahoo Finance data provider)
         # NOTE: BARCHART removed 2026-06-24 (VIX 15m now aggregates from VX futures
-        # via Databento XCBF.PITCH — Barchart CSV preload retired). YAHOO_FINANCE
-        # below is a legacy source-as-venue artifact (pre-existing; flagged by the
-        # venue/source parity gate — not a real venue, kept to avoid manifest churn).
-        "YAHOO_FINANCE",  # legacy source-as-venue (rolling VIX 15m / KRW-USD daily)
+        # via Databento XCBF.PITCH — Barchart CSV preload retired).
+        # YAHOO_FINANCE removed 2026-07-15: legacy source-as-venue artifact, NOT a real
+        # venue — real Yahoo-sourced rows land under REAL venues (DXY→ICE, KRW/USD→FX,
+        # treasuries→CBOE) with source=yahoo (see data_source_continuity.py). No fetch
+        # code ever stamps venue=YAHOO_FINANCE. Do NOT re-add it here: enumerating a
+        # source-as-venue with no caps re-arms the get_expected_data_types_for_venue
+        # empty-caps→all-asset-group-types fallback (documented on that function).
     ],
     # Honest-coverage denominator: only IS-producible venues (phase=="live").
     # _ALL_DEFI_VENUES is the full registry (unchanged); _DEFI_VENUE_PHASE gates
@@ -1175,11 +1178,17 @@ VENUE_DATA_TYPE_CAPABILITIES: dict[str, dict[str, str]] = {
         "liquidations": "2019-11-17",
         "futures_chain": "2019-11-17",
     },
+    # ``liquidations`` REMOVED 2026-07-15 (cefi_completion_program workstream E,
+    # operator ruling): only 3 ``captured`` DERIBIT liquidation rows exist in the
+    # live manifest (noise, not a real feed) — DERIBIT is NOT one of the 6
+    # real-feed liquidations venues. With ``liquidations`` now a PERPETUAL-leg
+    # CeFi MVP data_type, a stale gate entry here would seed a phantom liquidations
+    # EXPECTED cell for every DERIBIT perp instrument-day. Gated OUT here; the 6
+    # real-feed venues keep their entries.
     "DERIBIT": {
         "trades": "2019-03-30",
         "book_snapshot_5": "2019-03-30",
         "derivative_ticker": "2019-03-30",
-        "liquidations": "2019-03-30",
         "options_chain": "2019-03-30",
         "futures_chain": "2019-03-30",
     },
@@ -1208,6 +1217,21 @@ VENUE_DATA_TYPE_CAPABILITIES: dict[str, dict[str, str]] = {
         "book_snapshot_5": "2020-01-01",
         "derivative_ticker": "2020-01-01",
         "liquidations": "2020-01-01",
+        # ``liquidations`` KEPT on bare OKX (2026-07-15, cefi_completion_program
+        # workstream E — CORRECTION to the initial removal): bare ``OKX`` is the
+        # canonical Layer-1 EXPECTED token for the OKX perp. The Layer-1
+        # completeness checker FOLDS the writer's Tardis-grain ``OKX-SWAP`` /
+        # ``OKX-FUTURES`` / ``OKEX-SWAP`` rows UP to bare ``OKX``
+        # (check_enumeration_completeness.py ``_CEFI_VENUE_FOLD``), so OKX-SWAP's
+        # 191,923 captured liquidations rows compare against the bare-``OKX``
+        # EXPECTED tuple. ``build_expected`` (expected_universe.py) iterates
+        # ``VENUES_BY_ASSET_GROUP["cefi"]`` which carries bare ``OKX`` (NOT
+        # OKX-SWAP) — dropping liquidations here would silently zero OKX out of
+        # the honest-coverage BATCH denominator even though it is one of the 6
+        # real-feed liquidations venues. (The catalogue-driven enumerator
+        # ``enumerate_expected_universe.py`` uses the OKX-SWAP sub-venue directly,
+        # which retains its own ``liquidations`` entry below — so BOTH producers
+        # now agree that OKX perp liquidations IS expected.)
         # options_chain added 2026-07-12 (cefi_deribit_combo_and_okx_bare_venue_gaps_2026_07_12.md
         # Bug C) — real Tardis okex-options data confirmed live (247,540 option
         # symbols, availableSince verified via api.tardis.dev/v1/exchanges/okex-options
@@ -1278,11 +1302,20 @@ VENUE_DATA_TYPE_CAPABILITIES: dict[str, dict[str, str]] = {
     # IMPORTANT — pre-2024 Aster funding is BINANCE-PROXIED (Astherus pre-rebrand
     # mirrored Binance funding); it is imported, NOT Aster-native — label `source`
     # honestly. SSOT: perp_funding_data_semantics_and_cadence_2026_06_16.md §GAP 2.
+    # ``liquidations`` REMOVED 2026-07-15 (cefi_completion_program workstream E,
+    # operator ruling): ASTER liquidations is a genuine LIVE feed (asterdex WS
+    # !forceOrder@arr) but has ZERO batch capture (0 ``captured`` liquidations
+    # rows in the live manifest — batch REST has no force-order history). Now
+    # that ``liquidations`` is a PERPETUAL-leg CeFi MVP data_type (CeFiMvpRule),
+    # a stale gate entry here would seed ASTER liquidations into the BATCH honest-
+    # coverage denominator; per the ruling "live-only feeds must NOT seed the
+    # batch denominator" (batch-absence is honest, not a gap). ``book_snapshot_5``
+    # (also live-only) is intentionally left untouched here — its live-vs-batch
+    # seeding is tracked separately in workstream I.
     "ASTER": {
         "trades": "2023-07-22",
         "derivative_ticker": "2023-07-22",
         "book_snapshot_5": "2026-06-23",  # live-only via aster_book_liq_ws
-        "liquidations": "2026-06-23",  # live-only via aster_book_liq_ws
     },
     # Tier-3 CeFi (2026-05-01) — spot=trades+book; perp=+ derivative_ticker
     # +liquidations. None carry chain bundles (perps are individual syms).
@@ -1497,10 +1530,8 @@ VENUE_DATA_TYPE_CAPABILITIES: dict[str, dict[str, str]] = {
     "BARCHART": {
         "ohlcv_15m": "2020-01-02",  # VIX 15m historical CSV (discontinued 2025-11-12)
     },
-    "YAHOO_FINANCE": {
-        "ohlcv_15m": "2021-04-22",  # VIX 15m rolling 60-day window
-        "ohlcv_24h": "2020-01-01",  # KRW/USD daily rates
-    },
+    # YAHOO_FINANCE caps block removed 2026-07-15 — source-as-venue modeling error
+    # (kept the SOURCE modeling in data_source_continuity.py / _tradfi.py capability).
     # ── TradFi reference data venues (canonicalized 2026-05-23) ──
     "POLYGON": {
         "corporate_action_confirmed": "2020-01-01",
@@ -1893,6 +1924,24 @@ def get_expected_data_types_for_venue(
 
     Market shards (BTC, ETH, SPX for prediction) are emergent from the index
     and not declared in either registry — they appear automatically.
+
+    FOOTGUN / by-design fallback (read before adding a "venue"): when a venue has
+    NO ``VENUE_DATA_TYPE_CAPABILITIES`` entry we deliberately fall through to
+    ``get_valid_data_types_for_venue`` — the FULL asset-group cross-product (all
+    ~10 tradfi / cefi / etc. data_types). This is the INTENDED default for a
+    legit venue whose caps are simply not narrowed (e.g. the 5 sports odds venues
+    BETFAIR_*/DRAFTKINGS/FANDUEL genuinely rely on it — MTDS produces their data).
+    The safety this rests on: ``get_valid_data_types_for_venue`` is empty for a
+    venue that is NOT enumerated in ``VENUES_BY_ASSET_GROUP`` (no asset_group → []).
+    So a *source-as-venue artifact* (a data SOURCE like Yahoo Finance that has no
+    real adapter and no fetch code stamping ``venue=<it>``) must NEVER be listed in
+    ``VENUES_BY_ASSET_GROUP`` — if it were, this fallback would silently inflate it
+    to all ~10 types and seed phantom EXPECTED cells across the honest-coverage
+    denominator. Model such artifacts as a SOURCE only (data_source_continuity.py /
+    capability_declarations), never as a venue. There is deliberately NO code guard
+    here (it would break the legit empty-caps venues above) — the invariant is
+    enforced by simply not enumerating non-venues. (YAHOO_FINANCE was removed as a
+    venue on 2026-07-15 for exactly this reason.)
     """
     if service == "instruments-service":
         ref_caps = VENUE_REFERENCE_DATA_CAPABILITIES.get(venue, {})

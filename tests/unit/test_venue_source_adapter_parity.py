@@ -118,9 +118,12 @@ _KNOWN_SOURCE_WITHOUT_CAPABILITY: frozenset[str] = frozenset(
 )
 
 # "Venues" that are actually source-as-venue legacy artifacts (a data SOURCE listed
-# in VENUES_BY_ASSET_GROUP). PRE-EXISTING — kept to avoid manifest churn; flagged.
+# in VENUES_BY_ASSET_GROUP). Defensive filter for _tradfi_market_data_venues().
+# YAHOO_FINANCE (the sole prior artifact) was removed as a venue 2026-07-15 (it is a
+# SOURCE, not a venue), so this is now empty — kept as the mechanism for any future
+# artifact that must be tolerated before it can be properly de-enumerated.
 _KNOWN_SOURCE_AS_VENUE: dict[str, frozenset[str]] = {
-    "tradfi": frozenset({"YAHOO_FINANCE"}),  # a source, not a venue (legacy denom artifact)
+    "tradfi": frozenset(),
 }
 
 

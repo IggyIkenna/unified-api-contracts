@@ -286,7 +286,7 @@ class TestKrxVenueDataTypeCapabilitiesRegistryGap:
     """Regression for a real registry-gap bug (2026-07-13 pipeline_e2e_check
     TRADFI diagnostic pass): KRX had NO entry at all in
     ``VENUE_DATA_TYPE_CAPABILITIES``, even though every OTHER TradFi venue
-    (NASDAQ/NYSE/CME/ICE/CBOE/FX/YAHOO_FINANCE) has one. ``get_expected_data_
+    (NASDAQ/NYSE/CME/ICE/CBOE/FX) has one. ``get_expected_data_
     types_for_venue`` falls through to ``get_valid_data_types_for_venue`` (a
     blanket cross-product of ALL 10 TradFi data_types) whenever a venue is
     absent here — directly contradicting the SAME-day narrowed
@@ -338,3 +338,65 @@ class TestIceExpectedCoverageNarrowedToDailyDxy:
 
     def test_ice_expected_coverage_narrowed(self) -> None:
         assert EXPECTED_COVERAGE_BY_ASSET_GROUP["tradfi"]["ICE"] == ["ohlcv_24h"]
+
+
+class TestYahooFinancePhantomVenueRemoved:
+    """Regression for the YAHOO_FINANCE source-as-venue MODELING ERROR
+    (tradfi_unreachable_databento_data_types...2026_07_15.md +
+    data_pipeline_alerts_batch_remediation_2026_07_15.md). Yahoo Finance is a data
+    SOURCE, NOT a venue — real Yahoo-sourced rows land under REAL venues (DXY→ICE,
+    KRW/USD→FX, treasuries→CBOE) with source=yahoo, and no fetch code ever stamps
+    venue=YAHOO_FINANCE. It was removed 2026-07-15 from every venue-shaped registry
+    (VENUES_BY_ASSET_GROUP/VENUE_TO_ASSET_GROUP, VENUE_DATA_TYPE_CAPABILITIES,
+    expected_coverage, venue_adapter_keys, data_availability); the SOURCE modeling is
+    KEPT (data_source_continuity.py / capability_declarations/_tradfi.py).
+
+    These tests also lock in the get_expected_data_types_for_venue footgun fix: an
+    un-narrowed (empty-caps) venue deliberately falls through to the FULL asset-group
+    data_type cross-product. That is CORRECT for legit venues (the sports odds
+    NO_ADAPTER_YET venues rely on it — MTDS produces their data). De-enumerating a
+    source-as-venue is what makes that fallback return [] for it, so the phantom is
+    neutralized WITHOUT a blanket guard that would break the legit venues.
+    """
+
+    def test_yahoo_finance_is_not_an_enumerated_venue(self) -> None:
+        from unified_api_contracts.registry.market_data_categories import (
+            VENUE_TO_ASSET_GROUP,
+        )
+
+        assert "YAHOO_FINANCE" not in VENUE_TO_ASSET_GROUP
+        assert "YAHOO_FINANCE" not in VENUE_DATA_TYPE_CAPABILITIES
+
+    def test_get_expected_data_types_for_yahoo_finance_is_empty(self) -> None:
+        """The footgun is neutralized: empty caps + not-a-venue → []."""
+        from unified_api_contracts.registry.market_data_categories import (
+            get_expected_data_types_for_venue,
+        )
+
+        assert get_expected_data_types_for_venue("YAHOO_FINANCE") == []
+
+    def test_legit_sports_no_adapter_venue_keeps_fallback_types(self) -> None:
+        """A real NO_ADAPTER_YET venue with no caps MUST still fan out to its full
+        asset-group data_types (MTDS produces its data) — proves the empty-caps
+        fallback is intact and we did NOT over-correct with a blanket guard."""
+        from unified_api_contracts.registry.market_data_categories import (
+            get_expected_data_types_for_venue,
+            get_valid_data_types_for_venue,
+        )
+
+        for venue in ("BETFAIR_EX_EU", "DRAFTKINGS", "FANDUEL"):
+            expected = get_expected_data_types_for_venue(venue)
+            assert expected, f"{venue} lost its empty-caps fallback types"
+            assert expected == get_valid_data_types_for_venue(venue)
+
+    def test_yahoo_finance_source_modeling_is_kept(self) -> None:
+        """The SOURCE modeling is intentionally preserved: Yahoo-sourced tradfi rows
+        still resolve to source='YAHOO_FINANCE' (they land under REAL venues with
+        source=yahoo)."""
+        from datetime import date
+
+        from unified_api_contracts.registry.data_source_continuity import (
+            get_us_treasury_yield_daily_source,
+        )
+
+        assert get_us_treasury_yield_daily_source(date(2024, 6, 1)) == "YAHOO_FINANCE"

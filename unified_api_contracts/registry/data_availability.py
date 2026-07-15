@@ -86,14 +86,10 @@ VENUE_DATA_AVAILABILITY: dict[str, ProviderDataAvailability] = {
     ),
     # "BARCHART" provider RETIRED 2026-06-24 — Barchart removed (VIX 15m now
     # aggregates from VX futures via Databento XCBF.PITCH). No shim.
-    "YAHOO_FINANCE": ProviderDataAvailability(
-        venue_name="YAHOO_FINANCE",
-        asset_group="tradfi",
-        availability_lag_hours=0.0,
-        available_after_utc_hour=None,
-        is_t_plus_one=False,
-        notes="Rolling 60-day window for VIX 15m; real-time for FX rates",
-    ),
+    # "YAHOO_FINANCE" provider entry removed 2026-07-15 — source-as-venue modeling
+    # error (Yahoo is a SOURCE, not a venue). Availability of Yahoo-sourced data is
+    # modeled under the real venues its rows land on (ICE/FX/CBOE); the SOURCE itself
+    # is declared in capability_declarations/_tradfi.py.
     # ── Sports reference data ────────────────────────────────────────
     "API_FOOTBALL": ProviderDataAvailability(
         venue_name="API_FOOTBALL",
