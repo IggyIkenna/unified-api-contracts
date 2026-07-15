@@ -360,6 +360,88 @@ class TestTradFiMvp:
 
 
 # ---------------------------------------------------------------------------
+# v14 — TradFi MVP OPTION underlier narrowing (2026-07-14, operator ruling on
+# tradfi_eu_not_draining_source_axis_drift_2026_06_24.md, verbatim: "We DO
+# want tradfi options for S&P 500 — options and futures — but NO other
+# options in tradfi MVP; just the single stocks, ETFs and futures already in
+# MVP."). Before this change every OPTION cell inherited the full
+# ``TradFiMvpRule.underliers`` set (ES/NQ/VX/GC/SI/PL/PA/NG/CL/HG) with no
+# OPTION-specific narrowing — this class pins the new
+# ``option_underliers`` = ``TRADFI_MVP_OPTION_UNDERLYING_ROOTS`` = {"ES"} gate.
+# ---------------------------------------------------------------------------
+
+
+class TestTradFiOptionUnderlierNarrowingV14:
+    """v14: tradfi MVP OPTION scope narrows to the S&P 500 / ES complex ONLY."""
+
+    def test_es_option_is_mvp(self) -> None:
+        """CME OPTION on the ES root → MVP (the S&P 500 complex stays in scope)."""
+        assert is_mvp("tradfi", "CME", "OPTION", "ohlcv_1m", base_ccy="ES")
+
+    def test_gc_gold_option_not_mvp(self) -> None:
+        """CME OPTION on GC (gold) → NOT MVP (narrowed out, even though the GC
+        FUTURE itself stays MVP — see test_gc_future_still_mvp below)."""
+        assert not is_mvp("tradfi", "CME", "OPTION", "ohlcv_1m", base_ccy="GC")
+
+    def test_cl_crude_option_not_mvp(self) -> None:
+        """CME OPTION on CL (crude) → NOT MVP (narrowed out)."""
+        assert not is_mvp("tradfi", "CME", "OPTION", "ohlcv_1m", base_ccy="CL")
+
+    def test_ng_natgas_option_not_mvp(self) -> None:
+        """CME OPTION on NG (natgas) → NOT MVP (narrowed out)."""
+        assert not is_mvp("tradfi", "CME", "OPTION", "ohlcv_1m", base_ccy="NG")
+
+    def test_nq_option_not_mvp(self) -> None:
+        """CME OPTION on NQ (Nasdaq 100) → NOT MVP — narrowed out even though NQ
+        is itself an MVP underlier for FUTURE cells (the S&P 500 complex is the
+        ONLY MVP options underlier per the 2026-07-14 ruling)."""
+        assert not is_mvp("tradfi", "CME", "OPTION", "ohlcv_1m", base_ccy="NQ")
+
+    def test_vx_option_not_mvp(self) -> None:
+        """CME OPTION on VX (VIX futures) → NOT MVP (narrowed out)."""
+        assert not is_mvp("tradfi", "CME", "OPTION", "ohlcv_1m", base_ccy="VX")
+
+    def test_si_pl_pa_hg_options_not_mvp(self) -> None:
+        """The remaining commodity-option underliers (SI/PL/PA/HG) → NOT MVP."""
+        for root in ("SI", "PL", "PA", "HG"):
+            assert not is_mvp("tradfi", "CME", "OPTION", "ohlcv_1m", base_ccy=root)
+
+    def test_gc_future_still_mvp(self) -> None:
+        """Regression: GC FUTURE (not OPTION) is UNCHANGED — still MVP.
+
+        ``option_underliers`` gates OPTION cells only; the flat ``underliers``
+        set still governs FUTURE cells exactly as before this change.
+        """
+        assert is_mvp("tradfi", "CME", "FUTURE", "ohlcv_1m", base_ccy="GC")
+
+    def test_nq_future_still_mvp(self) -> None:
+        """Regression: NQ FUTURE is UNCHANGED — still MVP."""
+        assert is_mvp("tradfi", "CME", "FUTURE", "ohlcv_1m", base_ccy="NQ")
+
+    def test_equity_basis_carve_out_still_mvp(self) -> None:
+        """Regression: the cash equity/ETF basis carve-out is UNCHANGED — still
+        MVP (single stocks/ETFs are untouched by the OPTION-only narrowing)."""
+        assert is_mvp("tradfi", "NASDAQ", "EQUITY", "ohlcv_1m", base_ccy="NVDA")
+
+    def test_option_underliers_field_exact_value(self) -> None:
+        """``TradFiMvpRule.option_underliers`` == ``TRADFI_MVP_OPTION_UNDERLYING_ROOTS`` == {"ES"}."""
+        from unified_api_contracts.canonical.crosscutting.mvp_scope import (
+            TRADFI_MVP_OPTION_UNDERLYING_ROOTS,
+        )
+
+        rule = MVP_SCOPE["tradfi"]
+        assert isinstance(rule, TradFiMvpRule)
+        assert rule.option_underliers == TRADFI_MVP_OPTION_UNDERLYING_ROOTS
+        assert frozenset({"ES"}) == TRADFI_MVP_OPTION_UNDERLYING_ROOTS
+
+    def test_config_version_is_v14(self) -> None:
+        """MVP_SCOPE_CONFIG_VERSION == 14 exactly (the v14 OPTION-narrowing pass)."""
+        from unified_api_contracts.canonical.crosscutting.mvp_scope import MVP_SCOPE_CONFIG_VERSION
+
+        assert MVP_SCOPE_CONFIG_VERSION == 14
+
+
+# ---------------------------------------------------------------------------
 # Grain test: ALL expiries of an MVP (venue, instrument_type) are in-scope
 # ---------------------------------------------------------------------------
 
@@ -1189,11 +1271,14 @@ class TestCoinbaseVenueOverrideV11Continued:
 
         assert get_mvp_data_types_for_cefi_venue("FAKE_VENUE_XYZ") == frozenset()
 
-    def test_config_version_is_v13(self) -> None:
-        """MVP_SCOPE_CONFIG_VERSION == 13 after the DeFi MVP "everything we capture" broadening."""
+    def test_config_version_is_at_least_v13(self) -> None:
+        """MVP_SCOPE_CONFIG_VERSION >= 13 (the DeFi MVP "everything we capture" broadening this
+        class exercises is still live; v14's exact pin lives in
+        ``TestTradFiOptionUnderlierNarrowingV14``).
+        """
         from unified_api_contracts.canonical.crosscutting.mvp_scope import MVP_SCOPE_CONFIG_VERSION
 
-        assert MVP_SCOPE_CONFIG_VERSION == 13
+        assert MVP_SCOPE_CONFIG_VERSION >= 13
 
     def test_get_mvp_data_types_public_import_surface(self) -> None:
         """get_mvp_data_types_for_cefi_venue is importable from the package root."""
@@ -1268,11 +1353,12 @@ class TestDeFiMvpV13Broadening:
     (MarginFi, Solend) into instruments-service and flipped their
     ``DEFI_VENUE_PHASE`` from "pipeline" to "live"."""
 
-    def test_config_version_is_v13(self) -> None:
-        """MVP_SCOPE_CONFIG_VERSION == 13 exactly (the v13 broadening pass)."""
+    def test_config_version_is_at_least_v13(self) -> None:
+        """MVP_SCOPE_CONFIG_VERSION >= 13 (the v13 broadening pass is still live;
+        v14's exact pin lives in ``TestTradFiOptionUnderlierNarrowingV14``)."""
         from unified_api_contracts.canonical.crosscutting.mvp_scope import MVP_SCOPE_CONFIG_VERSION
 
-        assert MVP_SCOPE_CONFIG_VERSION == 13
+        assert MVP_SCOPE_CONFIG_VERSION >= 13
 
     def test_defi_venues_equal_is_producible_set(self) -> None:
         """DeFiMvpRule.venues == VENUES_BY_ASSET_GROUP["defi"] exactly (== P)."""
