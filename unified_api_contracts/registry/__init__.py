@@ -249,6 +249,7 @@ from .market_data_categories import (
     VALID_DATA_TYPES_BY_AG_AND_INSTRUMENT_TYPE,
     VENUE_DATA_TYPE_CAPABILITIES,
     VENUE_DATA_TYPE_COVERAGE_WINDOWS,
+    VENUE_DATA_TYPE_NO_BATCH_SOURCE,
     VENUE_TO_ASSET_GROUP,
     VENUES_BY_ASSET_GROUP,
     bundle_instrument_type_for_leaf,
@@ -268,6 +269,7 @@ from .market_data_categories import (
     valid_data_types_for_instrument_type,
     valid_data_types_for_venue_instrument_type,
     validate_data_type_for_venue,
+    venue_data_type_has_batch_source,
 )
 from .max_underlying_moves import (
     MAX_UNDERLYING_MOVES,
@@ -929,6 +931,7 @@ __all__ = [
     "VENUE_DATA_AVAILABILITY",
     "VENUE_DATA_TYPE_CAPABILITIES",
     "VENUE_DATA_TYPE_COVERAGE_WINDOWS",
+    "VENUE_DATA_TYPE_NO_BATCH_SOURCE",
     "VENUE_FEE_MODEL_MAP",
     "VENUE_ORDER_CAPABILITIES",
     "VENUE_PREFIX_TO_PROTOCOL",
@@ -1156,5 +1159,6 @@ __all__ = [
     "validate_mode_env_auth",
     "validate_operation",
     "venue_accepts_collateral",
+    "venue_data_type_has_batch_source",
     "venue_has_no_expected_defi_coverage",
 ]

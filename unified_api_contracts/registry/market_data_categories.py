@@ -1895,6 +1895,77 @@ def is_in_coverage_window(venue: str, data_type: str, date_str: str) -> bool:
     return any(start <= date_str <= end for start, end in windows)
 
 
+# Batch/historical-source capability — a DIFFERENT axis from
+# VENUE_DATA_TYPE_CAPABILITIES (which declares the data_type exists for the
+# venue AT ALL, live-or-batch, with a start_date). Some (venue, data_type)
+# pairs are declared capabilities (they DO exist, captured by a live
+# WebSocket connector going forward) but have ZERO viable batch/historical
+# source — no vendor archive (Tardis etc.), no venue REST history endpoint,
+# nothing. "Short of magic" that historical data cannot be retrieved
+# (operator ruling 2026-07-15,
+# unified-trading-pm/plans/active/issues/
+# cefi_live_only_data_types_vs_layer1_denominator_contradiction_2026_07_12.md):
+# such cells must NOT be seeded into the BATCH expected/reachable universe at
+# all (no expected_unattempted, no empty_confirmed) — they simply are not a
+# batch-mode concern, tracked (if at all) by the live pipeline's own
+# event-log/heartbeat accounting, never by this manifest-eu machinery.
+#
+# This is DELIBERATELY a separate registry from VENUE_DATA_TYPE_CAPABILITIES
+# so the live-mode capability declaration is UNTOUCHED (removing these entries
+# from VENUE_DATA_TYPE_CAPABILITIES outright would silently tell every live
+# consumer the data_type doesn't exist at all — breaking the live pipeline,
+# per the operator's 2026-07-15 explicit "NOT deleting the tuple from UAC
+# wholesale" instruction).
+#
+# Moved here from market-tick-data-service's
+# `_onchain_perp_batch_live_only.py::LIVE_ONLY_DATA_TYPES` (2026-07-13) per
+# the SSOT rule "venue lists + capability declarations are UAC data" — MTDS
+# now imports this registry rather than declaring its own copy.
+#
+# NOT included: COINBASE-CDE/trades — it WAS live-only-no-batch-source when
+# the original issue doc was filed (2026-07-12), but market-tick-data-service
+# shipped a genuine native-REST batch adapter
+# (`adapters/coinbase_cde_batch.py`, mtds@28ad6b38, 2026-07-13) that backfills
+# real historical trades — probed live back to 2025-12-12
+# (`venue_mapping.py::venue_start_dates["COINBASE-CDE"]`, 2026-07-14). This
+# tuple has a real batch source now; it is NOT a "short of magic" case.
+#
+# Consulted by instruments-service's `expected_universe.py` (Layer-1/Layer-2
+# EXPECTED-matrix producer) and `enumerate_expected_universe.py` (the
+# per-instrument-day writer that materialises expected_unattempted rows) —
+# both make the batch expected-universe seeding BATCH-source-aware.
+VENUE_DATA_TYPE_NO_BATCH_SOURCE: dict[str, frozenset[str]] = {
+    # ASTER: book endpoint is current-snapshot-only (no historical range
+    # param); liquidations feed has no batch OR live source via this venue's
+    # adapters (kept here too — harmless superset, matches the proven MTDS
+    # dict exactly so nothing is missed in the UAC move).
+    "ASTER": frozenset({"book_snapshot_5", "liquidations"}),
+    # PACIFICA-SOLANA / EXTENDED-STARKNET: same current-snapshot-only book
+    # endpoint limitation as ASTER.
+    "PACIFICA-SOLANA": frozenset({"book_snapshot_5"}),
+    "EXTENDED-STARKNET": frozenset({"book_snapshot_5"}),
+    # LIGHTER-ZKSYNC: own REST (/recentTrades, /orderBookOrders) is
+    # snapshot-only for BOTH trades and book — no historical range param on
+    # either. derivative_ticker (funding) is NOT listed — it has a real batch
+    # source via Tardis (see market-tick-data-service's
+    # _onchain_perp_batch_lighter.py).
+    "LIGHTER-ZKSYNC": frozenset({"trades", "book_snapshot_5"}),
+}
+
+
+def venue_data_type_has_batch_source(venue: str, data_type: str) -> bool:
+    """True unless (venue, data_type) is a declared no-batch-source cell.
+
+    A declared capability (``VENUE_DATA_TYPE_CAPABILITIES``) can still lack a
+    batch/historical source — this is the batch-vs-live distinction consumers
+    building the BATCH expected/reachable universe must apply. Unknown venues
+    default to True (no carve-out information == assume batch-capable; the
+    existing ``VENUE_DATA_TYPE_CAPABILITIES`` carve-out already excludes
+    genuinely undeclared capabilities upstream of this check).
+    """
+    return data_type not in VENUE_DATA_TYPE_NO_BATCH_SOURCE.get(venue, frozenset())
+
+
 def get_venue_data_type_start_date(venue: str, data_type: str) -> str | None:
     """Return the start date for a specific (venue, data_type) pair.
 

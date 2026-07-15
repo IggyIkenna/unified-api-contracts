@@ -1376,6 +1376,7 @@ from .registry import (
     valid_data_types_for_instrument_type,
     valid_data_types_for_venue_instrument_type,
     validate_data_type_for_venue,
+    venue_data_type_has_batch_source,
     venue_has_no_expected_defi_coverage,
 )
 from .registry import (
@@ -2371,6 +2372,7 @@ __all__ = [
     "to_canonical_chain_wire",
     "validate_row_df",
     "venue_has_no_expected_defi_coverage",
+    "venue_data_type_has_batch_source",
     "TARDIS_FREE_ROLLING_WINDOW_DAYS",
     "free_dates_in_range",
     "is_tardis_free_date",
