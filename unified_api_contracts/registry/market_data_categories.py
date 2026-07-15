@@ -159,6 +159,15 @@ DATA_TYPES_BY_ASSET_GROUP: dict[str, list[str]] = {
         # LIGHTER-ZKSYNC perp_funding RETIRED 2026-07-08 — funding now reads via
         # derivative_ticker's embedded funding_rate field for those 4 venues.
         "perp_funding",
+        # derivative_ticker (2026-07-15, defi_perp_funding_canonicalisation_derivative_
+        # ticker_all_perps issue, operator ruling): the canonical RAW-funding home for
+        # ALL perp venues, defi-asset-group ones included (GMX, DRIFT-SOLANA) —
+        # captured at the highest resolution each source offers, even when the source
+        # has no OI. Was previously declared only under "cefi" (where HYPERLIQUID/
+        # ASTER/PACIFICA-SOLANA/EXTENDED-STARKNET/LIGHTER-ZKSYNC already emit it,
+        # despite their DeFi on-chain settlement — those 5 stay cefi-asset-group per
+        # VENUES_BY_ASSET_GROUP's "on-chain CLOBs reclassified from DEFI" note above).
+        "derivative_ticker",
         "lst_rates",  # Liquid staking token exchange rates
         "oracle_prices",  # Chainlink oracle price snapshots
         "gas_fees",  # EVM gas fee history
@@ -1373,7 +1382,17 @@ VENUE_DATA_TYPE_CAPABILITIES: dict[str, dict[str, str]] = {
     "LIGHTER-ZKSYNC": {
         "trades": "2024-08-01",
         "book_snapshot_5": "2024-08-01",
-        "derivative_ticker": "2024-08-01",
+        # derivative_ticker start CORRECTED 2026-07-15 (defi_perp_funding_canonicalisation_
+        # derivative_ticker_all_perps issue, todo 2) from a copy-pasted 2024-08-01 (matching
+        # trades/book_snapshot_5's venue-genesis floor) to 2026-04-17 — the real coverage-start
+        # of the ONLY source that actually serves LIGHTER-ZKSYNC derivative_ticker.
+        # adapters/umi_tick_provider.py's _route_lighter (:356-405) gates Tardis routing on
+        # `date >= "2026-04-17"`; before that date it falls to the native REST adapter
+        # (adapters/_umi_lighter.py), which has ZERO funding/derivative_ticker code (only
+        # trades/book_snapshot_5/candles — confirmed via full-file grep). The prior
+        # 2024-08-01 declaration would have the enumerator schedule ~20 months of dates
+        # against a source with nothing to return.
+        "derivative_ticker": "2026-04-17",
     },
     # Coinbase Derivatives (perps) — D2b, 2026-07-06. COINBASE-FUTURES passed
     # the itype-gate even pre-D2a (it already had a tardis routing entry) but

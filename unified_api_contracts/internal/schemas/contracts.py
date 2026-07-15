@@ -741,6 +741,30 @@ DEFI_PERPETUAL_PERP_FUNDING = SchemaContract(
     required_row_count_min=1,
 )
 
+# derivative_ticker (2026-07-15, defi_perp_funding_canonicalisation_derivative_ticker_all_perps
+# issue, operator ruling): the canonical RAW-funding home for ALL DeFi perp venues, captured
+# at the highest resolution each source offers — even where the source genuinely has no OI
+# (GMX's native fundingRateChangedEvents query has no OI field; Drift/Aster/Pacifica/Extended
+# similarly omit it at settlement grain). Mirrors CEFI_PERPETUAL_DERIVATIVE_TICKER's shape —
+# funding_rate mandatory, open_interest/mark_price/index_price nullable (never fabricated).
+DEFI_PERPETUAL_DERIVATIVE_TICKER = SchemaContract(
+    asset_group="defi",
+    instrument_type="perpetual",
+    data_type="derivative_ticker",
+    columns=[
+        _INSTRUMENT_ID,
+        _VENUE,
+        _CHAIN,
+        _TS_EVENT,
+        ColumnSpec(name="funding_rate", dtype="float64", nullable=True),
+        ColumnSpec(name="open_interest", dtype="float64", nullable=True),
+        ColumnSpec(name="mark_price", dtype="float64", nullable=True),
+        ColumnSpec(name="index_price", dtype="float64", nullable=True),
+    ],
+    symbol_column="symbol",
+    required_row_count_min=1,
+)
+
 # Solana basis-trading MVP (plans/active/solana_basis_trading_mvp_2026_06_01.md
 # Phase 1). Drift V2 per-fill ground truth via the Velocity Data API endpoint
 # ``data.api.drift.trade/market/{market}/trades/{Y}/{M}/{D}?format=csv``.
@@ -994,6 +1018,7 @@ CONTRACT_REGISTRY: dict[tuple[str, str, str], SchemaContract] = {
     ("defi", "spot_asset", "gas_fees"): DEFI_SPOT_ASSET_GAS_FEES,
     ("defi", "spot_asset", "oracle_prices"): DEFI_SPOT_ASSET_ORACLE_PRICES,
     ("defi", "perpetual", "perp_funding"): DEFI_PERPETUAL_PERP_FUNDING,
+    ("defi", "perpetual", "derivative_ticker"): DEFI_PERPETUAL_DERIVATIVE_TICKER,
     # Solana basis MVP (plans/active/solana_basis_trading_mvp_2026_06_01.md)
     ("defi", "perpetual", "perp_trades"): DEFI_PERPETUAL_PERP_TRADES,
     ("defi", "perpetual", "perp_mark_oracle"): DEFI_PERPETUAL_PERP_MARK_ORACLE,
@@ -1318,6 +1343,7 @@ __all__ = [
     "DEFI_LENDING_POSITION_DATA",
     "DEFI_LENDING_POSITION_LENDING_INDICES",
     "DEFI_LST_LST_RATES",
+    "DEFI_PERPETUAL_DERIVATIVE_TICKER",
     "DEFI_PERPETUAL_PERP_FUNDING",
     "DEFI_POOL_DEX_POOLS",
     "DEFI_POOL_DEX_POOL_SWAPS",
