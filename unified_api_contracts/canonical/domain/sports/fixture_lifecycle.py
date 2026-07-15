@@ -3,10 +3,17 @@
 ADDITIVE foundation for the fixture-schedule-split (operator decision
 "code-now, walk-after"). These types live ALONGSIDE the legacy
 ``CanonicalFixture`` (in this package's ``__init__``) — they do NOT replace it.
-The writer cutover, the GCS entity-folder split, the one-shot manifest
-migration, and the ``available_at`` strict-mode flip are GATED until after the
-sports canonicalisation migration ships (single-walk discipline). Nothing here
-changes any writer or path today.
+
+**The writer cutover has SHIPPED (2026-07-14+, no legacy dual-write)** —
+``instruments-service``'s FIXTURES writer now writes ONLY
+``entity=fixtures_schedule``/``entity=fixtures_outcomes`` for every date on/after
+the cutover; ``entity=fixtures`` no longer receives new data
+(``sports_fixtures_schema_split_completion_2026_06_20.md``,
+``plans/active/issues/features_sports_fixtures_split_reader_gap_2026_07_15.md``).
+``gcs_paths.SPORTS_DATA_TYPE_TO_FOLDER`` now registers both split entity-type
+strings AND ``candidate_parquet_paths("FIXTURES", ...)`` auto-appends
+``FIXTURES_SCHEDULE`` candidates so existing "FIXTURES" callers keep resolving
+rows across the cutover.
 
 Split rationale (lookahead-bias avoidance — Q1/Q3 of the source issue):
 ``CanonicalFixtureSchedule`` carries pre-match / in-play timing that is known
@@ -18,10 +25,10 @@ existed.
 All timestamps are tz-aware UTC (``AwareDatetime``). ET/PEN timestamps are
 nullable — regular matches never reach extra time or penalties.
 
-New entity-type constants ``FIXTURES_SCHEDULE`` + ``FIXTURES_OUTCOMES`` sit
-alongside the live ``FIXTURES`` data_type (which is NOT removed — it remains the
-emitted entity until the gated split). See ``gcs_paths.SPORTS_DATA_TYPE_TO_FOLDER``
-for the legacy ``FIXTURES`` → ``fixtures`` folder mapping.
+The legacy ``FIXTURES`` data_type is NOT removed (no historical dual-write ever
+existed, so pre-cutover dates still only have ``entity=fixtures``) — see
+``gcs_paths.SPORTS_DATA_TYPE_TO_FOLDER`` for the legacy ``FIXTURES`` →
+``fixtures`` folder mapping alongside the two split entities.
 
 SSOT: ``plans/epics/sports_master.md`` § "Match HT/ET/PEN timestamps +
 score-distinction columns" (Q5 + Q6 + Q7) +
