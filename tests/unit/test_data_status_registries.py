@@ -113,9 +113,14 @@ class TestExpectedCoverageByAssetGroup:
         # Databento datasets are out of the 3-dataset subscription; the only real
         # ICE instrument (Yahoo-sourced DXY index) is a daily series.
         assert tradfi["ICE"] == ["ohlcv_24h"]
-        # CBOE: VX index cash = ohlcv_15m; CBOE Futures Exchange (XCBF.PITCH / Databento
-        # CFE dataset 2026-06-19) adds ohlcv_1s + ohlcv_1m for VX futures.
-        assert tradfi["CBOE"] == ["ohlcv_15m", "ohlcv_1s", "ohlcv_1m"]
+        # CBOE: VX FUTURES via Databento XCBF.PITCH (CFE dataset, 2026-06-19) —
+        # ohlcv_1s + ohlcv_1m only. ohlcv_15m (formerly the VIX cash INDEX via
+        # Barchart/Yahoo) REMOVED 2026-07-15 — that fetch path was retired
+        # 2026-06-25/26 (operator), so declaring the capability made every
+        # request fall through to Databento (no 15m schema) and 100%
+        # attempted_fail. Same narrowing pattern as the KRX/ICE precedents. See
+        # tradfi_unreachable_databento_data_types_mbp10_ohlcv_coarse_calendar_2026_07_15.md.
+        assert tradfi["CBOE"] == ["ohlcv_1s", "ohlcv_1m"]
 
     def test_sports_excludes_arbitrage_opportunity(self) -> None:
         """arbitrage_opportunity is MDPS-derived; no venue emits it."""
@@ -223,9 +228,9 @@ class TestRegistryConsistencyWithCapabilities:
 
         Distinguishes ``arbitrage_opportunity`` (computed by MDPS across
         bookmakers — no venue-native source) from ohlcv_* timeframes
-        that ARE venue-native somewhere (CBOE emits ``ohlcv_15m`` for
-        VIX; Databento emits ``ohlcv_1m`` natively). The latter
-        legitimately appear in expected coverage for the venue that
+        that ARE venue-native somewhere (ICE emits ``ohlcv_24h`` for the
+        Yahoo-sourced DXY index; Databento emits ``ohlcv_1m`` natively). The
+        latter legitimately appear in expected coverage for the venue that
         emits them as raw, even though they're MDPS-derived for other
         venues. The deployment-api resolver picks raw-vs-processed at
         the (venue, data_type) join, not at the data_type level.
