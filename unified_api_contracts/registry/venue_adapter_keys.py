@@ -220,10 +220,9 @@ VENUE_TO_ADAPTER_KEY: dict[str, str] = {
     "LIGHTER-ZKSYNC": "lighter",
     "EXTENDED-STARKNET": "extended",
     "PACIFICA-SOLANA": "pacifica",
-    # Solana perp DEX venues (Plan B 2026-05-13)
-    "MANGO-SOLANA": "mango",
-    "ZETA-SOLANA": "zeta",
-    "FLASH-SOLANA": "flash_trade",
+    # MANGO-SOLANA/ZETA-SOLANA/FLASH-SOLANA removed 2026-07-15 (operator ruling —
+    # dead API endpoints, ~$0 TVL, zero MTDS capture ever wired; adapter classes
+    # deleted at instruments-service@9f7ffb27).
     # SOLAYER/PICASSO/CAMBRIAN-SOLANA removed 2026-06-02 (operator decision; no
     # usable/decodable DeFi data source).
 }
