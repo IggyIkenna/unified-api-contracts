@@ -220,10 +220,11 @@ VENUE_TO_ADAPTER_KEY: dict[str, str] = {
     "LIGHTER-ZKSYNC": "lighter",
     "EXTENDED-STARKNET": "extended",
     "PACIFICA-SOLANA": "pacifica",
-    # Solana perp DEX venues (Plan B 2026-05-13)
-    "MANGO-SOLANA": "mango",
-    "ZETA-SOLANA": "zeta",
-    "FLASH-SOLANA": "flash_trade",
+    # MANGO-SOLANA/ZETA-SOLANA/FLASH-SOLANA (Plan B 2026-05-13) removed 2026-07-15
+    # (operator ruling): all 3 declared API hosts are dead (api.mngo.cloud/
+    # api.flash.trade NXDOMAIN, dex.zeta.markets/api returns HTML not JSON), ~$0
+    # DeFiLlama TVL, zero MTDS market-data capture ever wired. SSOT:
+    # unified-trading-pm/codex/04-architecture/solana-defi-coverage.md.
     # SOLAYER/PICASSO/CAMBRIAN-SOLANA removed 2026-06-02 (operator decision; no
     # usable/decodable DeFi data source).
 }
