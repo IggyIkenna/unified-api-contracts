@@ -716,10 +716,15 @@ def test_prediction_groups_have_per_market_min_rows() -> None:
 
 
 def test_other_bucket_member_added_logged_on_unknown_polymarket(caplog: pytest.LogCaptureFixture) -> None:
-    """Unmatched Polymarket market emits OTHER_BUCKET_MEMBER_ADDED at INFO."""
+    """Unmatched Polymarket market emits OTHER_BUCKET_MEMBER_ADDED at DEBUG.
+
+    Downgraded from INFO (2026-07-16): this classifier runs per-row over the full
+    prediction catalogue on every cache-miss sweep (hundreds of thousands of calls) —
+    INFO-level logging here was pure log-volume/latency noise, not a useful signal.
+    """
     import logging
 
-    with caplog.at_level(logging.INFO, logger="unified_api_contracts.canonical.domain.predictions.classifiers"):
+    with caplog.at_level(logging.DEBUG, logger="unified_api_contracts.canonical.domain.predictions.classifiers"):
         group = classify_polymarket_to_canonical_group(
             title="Will Mars be colonised by 2030?",
             slug="mars-colonised-by-2030",
@@ -734,10 +739,13 @@ def test_other_bucket_member_added_logged_on_unknown_polymarket(caplog: pytest.L
 
 
 def test_other_bucket_member_added_logged_on_unknown_kalshi(caplog: pytest.LogCaptureFixture) -> None:
-    """Unmatched Kalshi ticker emits OTHER_BUCKET_MEMBER_ADDED at INFO."""
+    """Unmatched Kalshi ticker emits OTHER_BUCKET_MEMBER_ADDED at DEBUG.
+
+    Downgraded from INFO 2026-07-16 — see the Polymarket test above for why.
+    """
     import logging
 
-    with caplog.at_level(logging.INFO, logger="unified_api_contracts.canonical.domain.predictions.classifiers"):
+    with caplog.at_level(logging.DEBUG, logger="unified_api_contracts.canonical.domain.predictions.classifiers"):
         group = classify_kalshi_to_canonical_group(ticker="UNKNOWN-TICKER-001")
     assert group == CanonicalQuestionGroup.OTHER
     assert any("OTHER_BUCKET_MEMBER_ADDED" in r.message for r in caplog.records)

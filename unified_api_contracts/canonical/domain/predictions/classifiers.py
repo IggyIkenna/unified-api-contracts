@@ -536,8 +536,10 @@ def classify_polymarket_to_canonical_group(
     :data:`_CATEGORY_UNDERLYING_TO_EVENT_GROUP` (event markets).
 
     Returns :attr:`~CanonicalQuestionGroup.OTHER` for unmatched combinations
-    and emits ``OTHER_BUCKET_MEMBER_ADDED`` at INFO level so operators can
-    audit the catch-all bucket and promote recurring patterns to first-class
+    and emits ``OTHER_BUCKET_MEMBER_ADDED`` at DEBUG level (this classifier
+    runs per-row over the full catalogue on every cache-miss sweep — hundreds
+    of thousands of calls, so INFO-level here is log-volume/latency noise, not
+    a useful signal) so operators can opt in via DEBUG to audit the catch-all
     groups. Previously returned ``None`` (caller routed to
     ``attempted_failed[reason=ClassifierConfidenceLow]``) — changed to
     ``OTHER`` so honest-absence capture replaces silent failure.
@@ -585,14 +587,14 @@ def classify_polymarket_to_canonical_group(
             result = _CATEGORY_UNDERLYING_PERIOD_TO_GROUP.get(daily_key)
             if result is not None:
                 return result
-        _log.info("OTHER_BUCKET_MEMBER_ADDED condition_id=%s slug=%s", condition_id, slug)
+        _log.debug("OTHER_BUCKET_MEMBER_ADDED condition_id=%s slug=%s", condition_id, slug)
         return residual
 
     event_key = (category, underlying.upper())
     result = _CATEGORY_UNDERLYING_TO_EVENT_GROUP.get(event_key)
     if result is not None:
         return result
-    _log.info("OTHER_BUCKET_MEMBER_ADDED condition_id=%s slug=%s", condition_id, slug)
+    _log.debug("OTHER_BUCKET_MEMBER_ADDED condition_id=%s slug=%s", condition_id, slug)
     return residual
 
 
@@ -696,8 +698,10 @@ def classify_kalshi_to_canonical_group(
        candidate prefixes from *longest to shortest* so a more-specific
        series (e.g. ``KXBTCD`` — daily directional) always beats the generic
        family prefix (``KXBTC`` — plain range).
-    3. **OTHER catch-all** — emits ``OTHER_BUCKET_MEMBER_ADDED`` at INFO so
-       operators can audit the residual bucket and promote recurring patterns
+    3. **OTHER catch-all** — emits ``OTHER_BUCKET_MEMBER_ADDED`` at DEBUG (a
+       per-row hot-path call over the full catalogue; INFO here was
+       log-volume/latency noise, not a useful signal) so operators can opt in
+       via DEBUG to audit the residual bucket and promote recurring patterns
        to first-class groups.
 
     Where a Kalshi series represents the **same real-world question** as a
@@ -725,7 +729,7 @@ def classify_kalshi_to_canonical_group(
             return KALSHI_TICKER_PREFIX_TO_GROUP[prefix]
 
     # 3 — fallback
-    _log.info("OTHER_BUCKET_MEMBER_ADDED ticker=%s", ticker)
+    _log.debug("OTHER_BUCKET_MEMBER_ADDED ticker=%s", ticker)
     return CanonicalQuestionGroup.OTHER
 
 
