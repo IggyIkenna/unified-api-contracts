@@ -517,9 +517,23 @@ class SFMatchProgressiveStatsRaw(BaseModel):
 
 
 class SFMatchProgressiveOddsRaw(BaseModel):
-    """Raw progressive odds at 30-second intervals.
+    """Raw progressive odds at 30-second intervals, as dumped by the LEGACY BULK EXPORT.
 
     All odds stored as Decimal for precision (no floating-point drift).
+
+    .. warning::
+       **This model mirrors the legacy ``sf_match_progressive_odds`` bulk-dump
+       table, NOT the shape of the live SFI RapidAPI response.** The live
+       ``GET /matches/view/progressive/`` endpoint returns a NESTED ``odds``
+       object keyed ``1X2`` / ``asian_handicap`` / ``over_under`` /
+       ``asian_corner`` plus the first-half markets ``1h_result`` /
+       ``1h_asian_handicap`` / ``1h_goalline`` / ``1h_asian_corner`` — it does
+       NOT return the flat ``h1_home_win`` spelling below (verified against the
+       live API 2026-07-16). Reading these field names as evidence of the API
+       contract has caused at least one incorrect audit conclusion; the adapter
+       that talks to the live API is
+       ``instruments_service.reference_data.adapters.sports.adapters.soccerfootball_info``
+       and its ``_extract_odds`` is the authority on the real payload shape.
     """
 
     model_config = ConfigDict(frozen=True)
