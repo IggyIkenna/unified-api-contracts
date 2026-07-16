@@ -408,6 +408,12 @@ NEEDS_CANDLE_PROCESSING: dict[str, bool] = {
     # DeFi — candle-sampled types need processing; pass-through types do not
     "dex_pool_state": False,
     "dex_pool_swaps": True,
+    # Per-trade prints for on-chain perp venues (Drift V2 historical ingester) — same
+    # class as "trades" / "dex_pool_swaps": raw per-trade ticks that need candle
+    # sampling into OHLCV. Added alongside DATA_TYPES_BY_ASSET_GROUP registration
+    # (drift_helius_path_obsolete_2026_07_15 P1.2, commit 5fd781c7) — that commit
+    # missed this entry, breaking MDPS's TestDefiDataTypeCoverage completeness gate.
+    "perp_trades": True,
     # Bypass — periodic supply/borrow-index snapshot read raw by features-onchain
     # (aave_lending_rates / aave_utilization); no lending_ohlcv consumer exists.
     # Same class as oracle_prices / lst_rates. Do NOT re-enable without a real
