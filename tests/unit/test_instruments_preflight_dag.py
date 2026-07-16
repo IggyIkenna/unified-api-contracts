@@ -167,10 +167,10 @@ def test_tradfi_ohlcv_15m_requires_instrument_catalog_24h() -> None:
 
 
 def test_defi_collect_daily_requires_instrument_catalog_24h() -> None:
-    """DeFi daily collect requires the DeFi instrument-catalog fresh within 24h (A12a)."""
+    """DeFi daily collect requires the DeFi instrument catalog fresh within 24h (A12a)."""
     reqs = get_preflight_requirements(MarketAssetGroup.DEFI, "defi_market_data")
     assert len(reqs) == 1
-    assert reqs[0].upstream_entity_type == "instrument-catalog"
+    assert reqs[0].upstream_entity_type == "instruments"
     assert reqs[0].max_staleness_seconds == 24 * 3600
 
 
@@ -185,12 +185,12 @@ def test_validate_defi_collect_daily_failed_when_catalog_missing() -> None:
     """DeFi collect preflight FAILS loudly when the DeFi catalog is absent (A12a).
 
     Mirrors the CeFi/TradFi catalog-missing path: missing upstream => PreflightFailed
-    with the instrument-catalog dependency listed, so MTDS DeFi handlers route the
+    with the instruments dependency listed, so MTDS DeFi handlers route the
     shard honestly (record_failed / record_empty) rather than silently fetching
     against a stale/absent catalog.
     """
     reader = _FakeManifestReader()
-    reader.set(MarketAssetGroup.DEFI, "instrument-catalog", _FIXTURE_DAY, None)
+    reader.set(MarketAssetGroup.DEFI, "instruments", _FIXTURE_DAY, None)
     result = validate_preflight_for_trigger(
         trigger_name="defi_collect_daily",
         asset_group=MarketAssetGroup.DEFI,
@@ -200,7 +200,7 @@ def test_validate_defi_collect_daily_failed_when_catalog_missing() -> None:
     )
     assert isinstance(result, PreflightFailed)
     assert len(result.missing) == 1
-    assert result.missing[0].entity_type == "instrument-catalog"
+    assert result.missing[0].entity_type == "instruments"
     assert result.missing[0].actual_age_seconds is None
 
 
@@ -209,7 +209,7 @@ def test_validate_defi_collect_daily_ok_when_catalog_fresh() -> None:
     reader = _FakeManifestReader()
     reader.set(
         MarketAssetGroup.DEFI,
-        "instrument-catalog",
+        "instruments",
         _FIXTURE_DAY,
         _NOW - timedelta(hours=1),
     )
