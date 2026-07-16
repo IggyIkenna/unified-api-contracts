@@ -6,6 +6,7 @@ import pytest
 
 from unified_api_contracts.registry.market_data_categories import (
     DATA_TYPES_BY_ASSET_GROUP,
+    NEEDS_CANDLE_PROCESSING,
     TIMEFRAMES,
     VENUES_BY_ASSET_GROUP,
     get_valid_timeframes_for_data_type,
@@ -98,3 +99,30 @@ def test_venues_are_strings() -> None:
     for ag, venues in VENUES_BY_ASSET_GROUP.items():
         for v in venues:
             assert isinstance(v, str), f"Non-string venue in {ag}: {v!r}"
+
+
+# ---------------------------------------------------------------------------
+# NEEDS_CANDLE_PROCESSING completeness (registry-drift guard)
+# ---------------------------------------------------------------------------
+# market-data-processing-service enforces this same invariant over the "defi"
+# group (tests/unit/test_defi_bypass_routing.py). Enforcing it ONLY downstream
+# means UAC can land an unclassified data_type green and red MDPS's LDR on the
+# next dep resolve — which is exactly what "perp_trades" did on 2026-07-16.
+# This is the same assertion, run in UAC's own gate, at the source of the drift.
+#
+# Scoped to "defi" deliberately: needs_candle_processing() defaults unknown
+# types to True, which is the CORRECT answer for every cefi/tradfi type but the
+# WRONG one for most defi types (the group is a pass-through/candle mix), so an
+# omission is only silently harmful here. sports/prediction/tradfi carry
+# pre-existing unclassified types (ODDS, MARKET_LIFECYCLE, mbp_10, …) that
+# default-True benignly; classifying them is a separate call, not a drift guard.
+
+
+@pytest.mark.parametrize("data_type", DATA_TYPES_BY_ASSET_GROUP["defi"])
+def test_defi_data_type_has_explicit_candle_classification(data_type: str) -> None:
+    """Every defi data_type needs an explicit entry — the True default is unsafe here."""
+    assert data_type in NEEDS_CANDLE_PROCESSING, (
+        f"DeFi data type '{data_type}' is in DATA_TYPES_BY_ASSET_GROUP but missing from "
+        f"NEEDS_CANDLE_PROCESSING. It will default to True and route to an MDPS candle "
+        f"adapter that may not exist. Add an explicit True/False entry."
+    )
