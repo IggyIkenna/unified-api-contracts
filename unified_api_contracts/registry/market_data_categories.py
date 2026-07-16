@@ -415,6 +415,10 @@ NEEDS_CANDLE_PROCESSING: dict[str, bool] = {
     # DeFi — candle-sampled types need processing; pass-through types do not
     "dex_pool_state": False,
     "dex_pool_swaps": True,
+    # Per-fill ground truth for on-chain perp CLOB / hybrid-AMM venues — same
+    # class as "trades" / "dex_pool_swaps" (raw event stream, requires candle
+    # sampling into OHLCV). See DataType.PERP_TRADES docstring.
+    "perp_trades": True,
     # Bypass — periodic supply/borrow-index snapshot read raw by features-onchain
     # (aave_lending_rates / aave_utilization); no lending_ohlcv consumer exists.
     # Same class as oracle_prices / lst_rates. Do NOT re-enable without a real
