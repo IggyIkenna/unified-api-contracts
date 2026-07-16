@@ -161,9 +161,16 @@ def test_us_persons_get_fewer_venues_than_home_entity() -> None:
 
 
 def test_retail_restricted_blocks_derivative_venues() -> None:
-    """A retail-restricted entity sees no leveraged-derivative venues."""
+    """A retail-restricted entity sees no leveraged-derivative venues.
+
+    "drift" (Solana perp DEX) removed from this set 2026-07-16 (operator ruling: all Solana
+    perp DEXes dropped except Jupiter, not integrated) — it is no longer a KNOWN_VENUE_ID at
+    all, so asserting it "not in allowed" would pass vacuously off the absence-default rather
+    than exercising a real RETAIL_RESTRICTED _block row. The remaining venues below each carry
+    an explicit _block(..., Jurisdiction.RETAIL_RESTRICTED, ...) row, so coverage stays real.
+    """
     allowed = allowed_venues_for_jurisdiction(Jurisdiction.RETAIL_RESTRICTED)
-    for venue in ("binance", "bybit", "okx", "deribit", "hyperliquid", "gmx_v2", "drift"):
+    for venue in ("binance", "bybit", "okx", "deribit", "hyperliquid", "gmx_v2"):
         assert venue not in allowed, f"{venue} must be blocked for RETAIL_RESTRICTED"
 
 

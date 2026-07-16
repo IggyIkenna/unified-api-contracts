@@ -147,12 +147,9 @@ _DEFI_PERP_TOKENS: frozenset[str] = frozenset(
         # hedge-leg ``eligible_venue_id`` (folds to ``gmxv2``); the parser needs
         # the exact folded token to build a slot routing a perp leg there.
         "gmxv2",
-        # Added 2026-04-19 after operator approval (Phase 7 NEEDS_REVIEW resolution).
-        # Drift is Solana-native perps — required for SOL basis + staked-basis
-        # strategies that hedge native SOL exposure on the same chain. Forcing
-        # the hedge to an EVM perp venue (Hyperliquid) was economically worse
-        # than the native path on every per-hedge cross-chain transfer.
-        "drift",
+        # "drift" (Solana-native perps) removed 2026-07-16 (operator ruling: all Solana perp DEXes
+        # dropped except Jupiter, not integrated).
+        # SSOT: unified-trading-pm/codex/04-architecture/solana-defi-coverage.md.
         # dYdX is a Cosmos-native perpetuals DEX (dYdX Chain L1). Required for
         # ML_DIRECTIONAL_CONTINUOUS DeFi perp slots in target_universe catalog.
         "dydx",

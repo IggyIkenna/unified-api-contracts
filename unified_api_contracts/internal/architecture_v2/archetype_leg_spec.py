@@ -246,7 +246,7 @@ class ArchetypeLegSpec(BaseModel):
     eligible_venue_ids: tuple[str, ...] = Field(
         description=(
             "Lowercase venue ids eligible for THIS leg (e.g. the hedge leg's "
-            "``('hyperliquid', 'gmx_v2', 'drift', 'binance', 'bybit', 'deribit', "
+            "``('hyperliquid', 'gmx_v2', 'binance', 'bybit', 'deribit', "
             "'okx')``). Sourced per leg from the engine catalog / manifest cell "
             "``venue_ids`` / slot labels — NOT the archetype's flat mixed list."
         )

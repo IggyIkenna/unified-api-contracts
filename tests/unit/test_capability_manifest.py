@@ -302,7 +302,9 @@ def test_collateral_registry_is_backfilled() -> None:
     backfill assertions (per-venue counts, source_of_truth non-empty, missing
     venues) live in ``test_collateral_registry_backfill.py``.
     """
-    assert len(COLLATERAL_REGISTRY) >= 9  # 7 perp + 2 lending MVP venues
+    # 6 perp + 2 lending MVP venues (was 7 perp until "drift" (Solana perp DEX) removed 2026-07-16,
+    # operator ruling: all Solana perp DEXes dropped except Jupiter, not integrated).
+    assert len(COLLATERAL_REGISTRY) >= 8
     assert all(p.source_of_truth for p in COLLATERAL_REGISTRY)
 
 
@@ -438,8 +440,11 @@ def test_fund_structures_module_share_class_is_same_as_enums_share_class() -> No
 
 def test_venue_order_semantics_backfilled() -> None:
     """Backfilled 2026-06-13 from the execution-service venue-adapter scan;
-    see test_order_semantics_sim_backfill.py for full coverage assertions."""
-    assert len(VENUE_ORDER_SEMANTICS) >= 9
+    see test_order_semantics_sim_backfill.py for full coverage assertions.
+
+    Count was >= 9 until "drift" (Solana perp DEX) removed 2026-07-16 (operator ruling: all
+    Solana perp DEXes dropped except Jupiter, not integrated)."""
+    assert len(VENUE_ORDER_SEMANTICS) >= 8
 
 
 def test_time_in_force_values() -> None:

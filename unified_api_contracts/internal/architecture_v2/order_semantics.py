@@ -253,20 +253,9 @@ VENUE_ORDER_SEMANTICS: Final[list[VenueOrderSemantics]] = [
             "httpx). Option instrument classification + integer-contract amount conversion wired."
         ),
     ),
-    VenueOrderSemantics(
-        venue_id="drift",
-        honored_tif=[TimeInForce.GTC, TimeInForce.IOC],
-        post_only=False,
-        make_take_modes=["make", "take"],
-        ref_pricing_modes=[RefPricingMode.FIXED],
-        multi_leg_delta_owner=None,
-        atomic_execution_modes=[],
-        auth_wired=CapabilityEdgeStatus.AVAILABLE,
-        notes=(
-            "FULLY WIRED Solana CLOB via driftpy (defi_execution/protocols/drift.py:317,346 — "
-            "place_order end-to-end). Perp venue."
-        ),
-    ),
+    # "drift" (Solana perp DEX) VenueOrderSemantics entry removed 2026-07-16 (operator ruling: all
+    # Solana perp DEXes dropped except Jupiter, not integrated).
+    # SSOT: unified-trading-pm/codex/04-architecture/solana-defi-coverage.md.
     VenueOrderSemantics(
         venue_id="binance",
         honored_tif=[],

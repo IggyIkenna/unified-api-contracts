@@ -249,10 +249,11 @@ def _unknown(venue: str, jur: Jurisdiction, reason: str, src: str) -> Jurisdicti
 
 #: The MVP venue universe (from archetype_leg_spec_seeds.py eligible venues +
 #: lending/staking venues). Used by the filter as the candidate universe.
+#: "drift" (Solana perp DEX) removed 2026-07-16 (operator ruling: all Solana perp DEXes dropped
+#: except Jupiter, not integrated). SSOT: unified-trading-pm/codex/04-architecture/solana-defi-coverage.md.
 KNOWN_VENUE_IDS: Final[tuple[str, ...]] = (
     "hyperliquid",
     "gmx_v2",
-    "drift",
     "binance",
     "bybit",
     "deribit",
@@ -280,12 +281,6 @@ JURISDICTION_VENUE_POLICIES: Final[tuple[JurisdictionVenuePolicy, ...]] = (
         _SRC_GMX_PERMISSIONLESS,
     ),
     _unknown(
-        "drift",
-        Jurisdiction.US_CFTC,
-        "Drift permissionless Solana perp DEX; US-person front-end access uncertain — needs legal review.",
-        _SRC_DEX_PERMISSIONLESS,
-    ),
-    _unknown(
         "aave_v3",
         Jurisdiction.US_CFTC,
         "Aave permissionless lending protocol; US-person access (yield/securities framing) uncertain.",
@@ -304,7 +299,6 @@ JURISDICTION_VENUE_POLICIES: Final[tuple[JurisdictionVenuePolicy, ...]] = (
     _allow("deribit", Jurisdiction.UK_FCA, "Institutional/professional-client access.", _SRC_UK_HOME),
     _allow("hyperliquid", Jurisdiction.UK_FCA, "Self-custody on-chain perp access.", _SRC_UK_HOME),
     _allow("gmx_v2", Jurisdiction.UK_FCA, "Permissionless on-chain perp DEX.", _SRC_DEX_PERMISSIONLESS),
-    _allow("drift", Jurisdiction.UK_FCA, "Permissionless Solana perp DEX.", _SRC_DEX_PERMISSIONLESS),
     _allow("aave_v3", Jurisdiction.UK_FCA, "Permissionless lending protocol.", _SRC_DEX_PERMISSIONLESS),
     _allow("kamino", Jurisdiction.UK_FCA, "Permissionless Solana lending protocol.", _SRC_DEX_PERMISSIONLESS),
     # ===================== CAYMAN home entity — documented ALLOWS ===========
@@ -314,7 +308,6 @@ JURISDICTION_VENUE_POLICIES: Final[tuple[JurisdictionVenuePolicy, ...]] = (
     _allow("deribit", Jurisdiction.CAYMAN, "Offshore-domicile institutional access.", _SRC_CAYMAN_HOME),
     _allow("hyperliquid", Jurisdiction.CAYMAN, "Self-custody on-chain perp access.", _SRC_CAYMAN_HOME),
     _allow("gmx_v2", Jurisdiction.CAYMAN, "Permissionless on-chain perp DEX.", _SRC_DEX_PERMISSIONLESS),
-    _allow("drift", Jurisdiction.CAYMAN, "Permissionless Solana perp DEX.", _SRC_DEX_PERMISSIONLESS),
     _allow("aave_v3", Jurisdiction.CAYMAN, "Permissionless lending protocol.", _SRC_DEX_PERMISSIONLESS),
     _allow("kamino", Jurisdiction.CAYMAN, "Permissionless Solana lending protocol.", _SRC_DEX_PERMISSIONLESS),
     # ===================== EU_MiCA — derivative-venue access UNKNOWN ========
@@ -356,7 +349,6 @@ JURISDICTION_VENUE_POLICIES: Final[tuple[JurisdictionVenuePolicy, ...]] = (
     _block("deribit", Jurisdiction.RETAIL_RESTRICTED, "Retail crypto-derivatives restricted.", _SRC_RETAIL_DERIV),
     _block("hyperliquid", Jurisdiction.RETAIL_RESTRICTED, "Retail crypto-derivatives restricted.", _SRC_RETAIL_DERIV),
     _block("gmx_v2", Jurisdiction.RETAIL_RESTRICTED, "Retail crypto-derivatives restricted.", _SRC_RETAIL_DERIV),
-    _block("drift", Jurisdiction.RETAIL_RESTRICTED, "Retail crypto-derivatives restricted.", _SRC_RETAIL_DERIV),
     _unknown(
         "aave_v3",
         Jurisdiction.RETAIL_RESTRICTED,
