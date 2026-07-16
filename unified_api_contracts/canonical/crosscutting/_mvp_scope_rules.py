@@ -89,7 +89,7 @@ class CeFiMvpRule:
                 funding_rate, liquidations}`` (2026-07-15): the flat tick set
                 PLUS ``liquidations`` — a PERPETUAL-leg CeFi MVP data_type. It is
                 declared on PERPETUAL ONLY (not the flat set, which would
-                over-claim SPOT_PAIR/EQUITY_PERP; not FUTURE, where captured liq
+                over-claim SPOT_PAIR; not FUTURE, where captured liq
                 is negligible). The venue axis is gated separately by
                 ``VENUE_DATA_TYPE_CAPABILITIES`` to the 6 perp venues that carry
                 a real liquidations feed.
@@ -477,13 +477,18 @@ MVP_SCOPE: Final[dict[str, object]] = {
                 # perp-gate; a bare is_mvp("FUTURE") with no perp-sibling is
                 # still excluded by the capture predicate.
                 "FUTURE",  # InstrumentType.FUTURE
-                # Crypto-venue equity instruments (2026-06-20):
-                "EQUITY_PERP",  # InstrumentType.EQUITY_PERP — single-stock perps (Binance/OKX/Bybit)
-                "TOKENIZED_EQUITY",  # InstrumentType.TOKENIZED_EQUITY — tokenized stocks (e.g. Bybit AAPLX)
+                # Crypto-venue equity instruments (operator 2026-07-16): NO longer a
+                # distinct EQUITY_PERP/TOKENIZED_EQUITY type — instrument_type is the
+                # BROAD mechanics type only. A single-stock perp gates here as
+                # ``PERPETUAL`` and a tokenized stock as ``SPOT_PAIR``; their equity
+                # bases (META/NVDA/AAPL/…) ride ``CEFI_EQUITY_PERP_BASE_UNIVERSE``,
+                # already unioned into ``base_ccys`` below, so they stay MVP. The
+                # equity identity is carried by the catalogue ``is_equity_perp`` /
+                # ``tracks_equity`` tags (IS rollup), NOT by a scoped instrument_type.
             }
         ),
-        # FLAT data_types — apply to SPOT_PAIR / PERPETUAL / FUTURE / EQUITY_PERP
-        # / TOKENIZED_EQUITY (everything EXCEPT the OPTION override below):
+        # FLAT data_types — apply to SPOT_PAIR / PERPETUAL / FUTURE (everything
+        # EXCEPT the OPTION override below):
         #   trades + book_snapshot_5 (the spot/perp microstructure pair) +
         #   derivative_ticker / funding_rate (the perp funding axis).
         data_types=frozenset(
@@ -514,7 +519,7 @@ MVP_SCOPE: Final[dict[str, object]] = {
         #     categories.py) to exactly the 6 real-feed venues: BINANCE-FUTURES /
         #     OKX-SWAP / BYBIT / KRAKEN-FUTURES / BITFINEX-FUTURES / BITGET-FUTURES.
         #     Declared on PERPETUAL ONLY — NOT the flat ``data_types`` set (would
-        #     over-claim SPOT_PAIR/EQUITY_PERP), NOT FUTURE (dated-futures liq is
+        #     over-claim SPOT_PAIR), NOT FUTURE (dated-futures liq is
         #     negligible — 221 captured FUTURE rows / 0.03%). Reconciles the
         #     un-superseded ``mvp-universe.yaml`` ("liquidations P1-critical for
         #     CEFI") vs the prior CeFiMvpRule omission (liquidations pulled
@@ -573,9 +578,12 @@ MVP_SCOPE: Final[dict[str, object]] = {
         },
         # Curated CeFi capture universe (operator-confirmed SSOT, ~490 base assets,
         # survivorship-bias-free). Spot + perp legs.
-        # EQUITY_PERP/TOKENIZED_EQUITY cells use CEFI_EQUITY_PERP_BASE_UNIVERSE as
-        # their base_ccys (equity tickers like META, NVDA, AAPL — not crypto coins).
-        # The combined union covers both crypto-perp and equity-perp families.
+        # Crypto-venue equity instruments (operator 2026-07-16): typed PERPETUAL
+        # (single-stock perp) / SPOT_PAIR (tokenized stock), NOT a distinct type.
+        # Their equity bases (META, NVDA, AAPL — not crypto coins) ride
+        # CEFI_EQUITY_PERP_BASE_UNIVERSE, unioned in below so those PERPETUAL /
+        # SPOT_PAIR cells stay MVP; the equity identity is carried by the catalogue
+        # is_equity_perp / tracks_equity tags, not by the instrument_type.
         base_ccys=CEFI_BASE_ASSET_UNIVERSE | CEFI_EQUITY_PERP_BASE_UNIVERSE,
         # Deribit-options carve-out: BTC + ETH only (the OPTION expected universe).
         options_base_ccys=CEFI_OPTIONS_UNDERLYINGS,

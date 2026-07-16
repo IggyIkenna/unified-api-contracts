@@ -21,8 +21,12 @@ Rule (per (venue, base, instrument_type), keyed on a per-(venue,base,day)
 ``has_perp_for_base`` flag the caller computes from the full catalogue):
   - base ∈ the CeFi capture universe (``is_mvp`` base-membership). NECESSARY
     but NOT sufficient.
-  - PERPETUAL / EQUITY_PERP  ⇒ MVP on base-membership (the perp IS the gate;
-    a TradFi-linked equity perp rides ``CEFI_EQUITY_PERP_BASE_UNIVERSE``).
+  - PERPETUAL  ⇒ MVP on base-membership (the perp IS the gate). A crypto-venue
+    single-stock equity perp is typed PERPETUAL too (operator 2026-07-16 —
+    no distinct EQUITY_PERP type) and rides ``CEFI_EQUITY_PERP_BASE_UNIVERSE``,
+    which is unioned into the cefi ``base_ccys`` so it self-qualifies. (The
+    legacy EQUITY_PERP type is DEPRECATED-but-parseable; ``_CEFI_PERP_TYPES``
+    below still lists it defensively for any residual pre-2026-07-16 row.)
   - SPOT_PAIR / SPOT_ASSET   ⇒ MVP ONLY IF ``has_perp_for_base`` (the venue
     also lists a perp for that base). spot-and-no-perp ⇒ DROP (even top-100).
   - FUTURE (dated/quarterly, shares a universe base) ⇒ MVP on base-membership
@@ -73,10 +77,14 @@ _CEFI_DATED_FUTURE_TYPES: Final[frozenset[str]] = frozenset(
 )
 
 #: CeFi instrument types that ARE perps (self-qualify the perp-gate on base-membership).
+#: A crypto-venue single-stock equity perp is now typed PERPETUAL (operator
+#: 2026-07-16 — no distinct EQUITY_PERP type). EQUITY_PERP is retained here only
+#: DEFENSIVELY so any residual pre-2026-07-16 catalogue row typed EQUITY_PERP still
+#: classifies as a perp; nothing mints it anymore.
 _CEFI_PERP_TYPES: Final[frozenset[str]] = frozenset(
     {
-        "PERPETUAL",  # InstrumentType.PERPETUAL
-        "EQUITY_PERP",  # InstrumentType.EQUITY_PERP — TradFi-linked single-stock perps
+        "PERPETUAL",  # InstrumentType.PERPETUAL (incl. crypto-venue equity perps)
+        "EQUITY_PERP",  # DEPRECATED — retained defensively (no longer minted)
     }
 )
 

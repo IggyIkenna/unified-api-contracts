@@ -120,9 +120,25 @@ def test_cefi_equity_perp_base_universe_contains_linked_bases() -> None:
     )
 
 
-def test_instrument_types_exist() -> None:
-    """EQUITY_PERP and TOKENIZED_EQUITY must be valid InstrumentType members."""
+def test_instrument_types_exist_deprecated() -> None:
+    """EQUITY_PERP / TOKENIZED_EQUITY remain DEFINED InstrumentType members but are
+    DEPRECATED (operator 2026-07-16): the catalogue no longer mints them — a
+    single-stock perp is typed PERPETUAL, a tokenized stock SPOT_PAIR, and the
+    equity identity rides the tracks_equity / is_equity_perp catalogue tags. The
+    members stay defined so pre-2026-07-16 persisted rows / external string
+    consumers remain parseable, so this still holds."""
     from unified_api_contracts import InstrumentType
 
     assert InstrumentType.EQUITY_PERP == "EQUITY_PERP"
     assert InstrumentType.TOKENIZED_EQUITY == "TOKENIZED_EQUITY"
+
+
+def test_equity_perp_bases_are_in_universe() -> None:
+    """The is_equity_perp / tracks_equity tags gate on membership in
+    CEFI_EQUITY_PERP_BASE_UNIVERSE — the equity bases the IS rollup flags as
+    equity instruments. NVDA/META/AAPL (the operator's cited examples) resolve
+    to a real-equity ticker via tracks_equity AND are in the universe (so an
+    IS PERPETUAL on those bases gets is_equity_perp=True + tracks_equity set)."""
+    for base in ("NVDA", "META", "AAPL", "TSLA"):
+        assert base in CEFI_EQUITY_PERP_BASE_UNIVERSE
+        assert tracks_equity(base) == base
