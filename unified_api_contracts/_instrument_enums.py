@@ -32,12 +32,17 @@ class InstrumentType(StrEnum):
     PERPETUAL = "PERPETUAL"
     FUTURE = "FUTURE"
     OPTION = "OPTION"
-    # Crypto-venue equity instruments — perpetual contracts or tokenized shares
-    # that track a real underlying equity (e.g. Binance METAUSDT, OKX AAPL-USDT-SWAP,
-    # Bybit AAPLX). The cross-venue canonical link (tracks_equity) maps each symbol
-    # to its Databento DBEQ.BASIC real-equity ticker, enabling basis/dispersion arb.
-    # Pre-IPO symbols (e.g. SPCXUSDT — SpaceX) have no real-equity twin and are
-    # standalone (dispersion-only across crypto venues).
+    # DEPRECATED — collapsed to PERPETUAL/SPOT_PAIR + the tracks_equity /
+    # is_equity_perp catalogue tags (operator 2026-07-16). instrument_type is now
+    # the BROAD contract-mechanics type ONLY: a crypto-venue single-stock perp is
+    # ``PERPETUAL`` and a tokenized stock is ``SPOT_PAIR`` — the equity identity +
+    # real-equity linkage ride the ``is_equity_perp`` (bool) + ``tracks_equity``
+    # (real-equity ticker) catalogue tags built at roll-up from
+    # ``crypto_equity_link.tracks_equity`` + ``CEFI_EQUITY_PERP_BASE_UNIVERSE``.
+    # These two members are NO LONGER MINTED (the IS catalogue rollup no longer
+    # re-types to them) but are KEPT DEFINED so pre-2026-07-16 persisted catalogue
+    # rows + external string consumers (MTDS/deployment-api/UI snapshot) stay
+    # parseable, and so every enum member keeps a valid ledger-asset class.
     # See: unified_api_contracts.canonical.crosscutting.crypto_equity_link
     EQUITY_PERP = "EQUITY_PERP"
     TOKENIZED_EQUITY = "TOKENIZED_EQUITY"

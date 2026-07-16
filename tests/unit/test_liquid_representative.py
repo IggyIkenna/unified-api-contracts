@@ -90,9 +90,7 @@ class TestFiltering:
         even if it has the highest volume (perps usually dominate perps-vs-spot
         but execution wants the spot leg)."""
         observations = [
-            _obs(
-                "BINANCE-FUTURES", "BTCUSDT", "PERPETUAL", "BTC", 50_000_000_000.0
-            ),
+            _obs("BINANCE-FUTURES", "BTCUSDT", "PERPETUAL", "BTC", 50_000_000_000.0),
             _obs("COINBASE-SPOT", "BTC-USD", "SPOT_PAIR", "BTC", 800_000_000.0),
         ]
         assert execution_spot_representative("BTC", "cefi", observations) == (
@@ -174,9 +172,7 @@ class TestTradFi:
             _obs("NASDAQ", "AAPL", "EQUITY", "AAPL", 1_000_000.0),
             _obs("ARCA", "SPY", "ETF", "AAPL", 500_000.0),
         ]
-        assert execution_spot_representative(
-            "AAPL", "tradfi", observations
-        ) == ("NASDAQ", "AAPL")
+        assert execution_spot_representative("AAPL", "tradfi", observations) == ("NASDAQ", "AAPL")
 
     def test_cme_future_not_selected_as_spot_for_tradfi(self) -> None:
         """CME FUTURE must not be selected as a SPOT representative — for
@@ -243,8 +239,9 @@ class TestPurity:
 # ---------------------------------------------------------------------------
 # feature_perp_representative — item 002. Same shared VenueVolumeObservation
 # basis + deterministic (venue ASC, instrument ASC) tie-break as the spot
-# selector; per-AG filter switches to PERP-class instrument_types (PERPETUAL /
-# EQUITY_PERP for cefi, FUTURE for tradfi-no-perp).
+# selector; per-AG filter switches to PERP-class instrument_types (PERPETUAL for
+# cefi — incl. crypto-venue equity perps, operator 2026-07-16; FUTURE for
+# tradfi-no-perp).
 # ---------------------------------------------------------------------------
 
 
@@ -281,10 +278,13 @@ class TestPerpSelectionCefi:
         )
 
     def test_equity_perp_also_eligible(self) -> None:
-        """EQUITY_PERP (tokenized-stock perps) is also a delta-one feature instrument."""
+        """A crypto-venue single-stock equity perp is a delta-one feature instrument.
+        It is typed PERPETUAL (operator 2026-07-16 — no distinct EQUITY_PERP type);
+        its equity base (AAPL) is in CEFI_EQUITY_PERP_BASE_UNIVERSE so its
+        (venue, PERPETUAL) cell is MVP-scoped."""
         observations = [
-            _obs("BYBIT", "AAPLPERP", "EQUITY_PERP", "AAPL", 5_000_000.0),
-            _obs("OKX-SWAP", "AAPL-PERP", "EQUITY_PERP", "AAPL", 3_000_000.0),
+            _obs("BYBIT", "AAPLPERP", "PERPETUAL", "AAPL", 5_000_000.0),
+            _obs("OKX-SWAP", "AAPL-PERP", "PERPETUAL", "AAPL", 3_000_000.0),
         ]
         assert feature_perp_representative("AAPL", "cefi", observations) == (
             "BYBIT",
@@ -361,9 +361,7 @@ class TestPerpDeterministicTieBreak:
     def test_selection_is_stable_across_input_order(self) -> None:
         a = _obs("BINANCE-FUTURES", "BTC-USDT", "PERPETUAL", "BTC", 100.0)
         b = _obs("BYBIT", "BTC-USDT", "PERPETUAL", "BTC", 100.0)
-        assert feature_perp_representative("BTC", "cefi", [a, b]) == feature_perp_representative(
-            "BTC", "cefi", [b, a]
-        )
+        assert feature_perp_representative("BTC", "cefi", [a, b]) == feature_perp_representative("BTC", "cefi", [b, a])
 
 
 class TestPerpTradFi:
@@ -478,8 +476,8 @@ class TestFiveAssetGroupDeltaOneMatrix:
 
     def test_cefi_excludes_option_even_with_dominant_volume(self) -> None:
         """cefi: ``(DERIBIT, OPTION)`` is in MVP_SCOPE, but the perp filter
-        only admits ``PERPETUAL`` / ``EQUITY_PERP`` — so a DERIBIT OPTION row
-        with overwhelming volume is dropped and the PERPETUAL leg wins.
+        only admits ``PERPETUAL`` (incl. crypto-venue equity perps) — so a DERIBIT
+        OPTION row with overwhelming volume is dropped and the PERPETUAL leg wins.
         Delta-one features do not run on options."""
         observations = [
             _obs("DERIBIT", "BTC-27JUN26-50000-C", "OPTION", "BTC", 9_999_999_999.0),
@@ -581,9 +579,7 @@ class TestFiveAssetGroupDeltaOneMatrix:
             ("tradfi", "FUTURE", "ES"),
         ],
     )
-    def test_deterministic_tie_break_is_ag_uniform(
-        self, asset_group: str, instrument_type: str, base: str
-    ) -> None:
+    def test_deterministic_tie_break_is_ag_uniform(self, asset_group: str, instrument_type: str, base: str) -> None:
         """Same shape of deterministic tie-break (``venue ASC, instrument
         ASC``) for both AGs that support delta-one. Equal volume on the same
         venue collapses to the lexicographically smaller instrument — the

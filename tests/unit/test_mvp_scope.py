@@ -861,10 +861,12 @@ def test_capture_universe_options_deribit_btc_eth_only() -> None:
 
 
 def test_capture_universe_tradfi_equity_perp() -> None:
-    """TradFi-linked EQUITY_PERP on Binance is in-universe (it IS a perp)."""
+    """A crypto-venue single-stock equity perp is typed PERPETUAL (operator
+    2026-07-16, no distinct EQUITY_PERP type) and its equity base rides
+    CEFI_EQUITY_PERP_BASE_UNIVERSE → in-universe (it IS a perp)."""
     from unified_api_contracts import is_in_mvp_capture_universe
 
-    assert is_in_mvp_capture_universe("BINANCE-FUTURES", "AAPL", "EQUITY_PERP", has_perp_for_base=True)
+    assert is_in_mvp_capture_universe("BINANCE-FUTURES", "AAPL", "PERPETUAL", has_perp_for_base=True)
 
 
 def test_capture_universe_base_not_in_universe_excluded() -> None:
@@ -1586,7 +1588,7 @@ class TestMdpsMvpUniverse:
 # (2026-07-15, cefi_completion_program_2026_07_15.md workstream E). liquidations
 # is captured on exactly 6 perp venues (732,751 captured PERPETUAL manifest rows);
 # it is added to the PERPETUAL instrument_type_data_types override ONLY (NOT the
-# flat set → no SPOT_PAIR/EQUITY_PERP over-claim; NOT FUTURE → dated-futures liq
+# flat set → no SPOT_PAIR over-claim; NOT FUTURE → dated-futures liq
 # is negligible). The venue axis is gated by ``VENUE_DATA_TYPE_CAPABILITIES``.
 # ---------------------------------------------------------------------------
 class TestLiquidationsPerpetualMvpV15:
@@ -1610,8 +1612,8 @@ class TestLiquidationsPerpetualMvpV15:
         assert perp == frozenset({"trades", "book_snapshot_5", "derivative_ticker", "funding_rate", "liquidations"})
 
     def test_liquidations_not_in_flat_data_types(self) -> None:
-        """liquidations is NOT in the flat data_types set (so spot/equity_perp
-        do NOT silently gain it)."""
+        """liquidations is NOT in the flat data_types set (so SPOT_PAIR does
+        NOT silently gain it)."""
         rule = MVP_SCOPE["cefi"]
         assert isinstance(rule, CeFiMvpRule)
         assert "liquidations" not in rule.data_types
@@ -1631,9 +1633,12 @@ class TestLiquidationsPerpetualMvpV15:
         for venue in ("BINANCE-SPOT", "COINBASE-SPOT", "UPBIT", "OKX-SPOT"):
             assert not is_mvp("cefi", venue, "SPOT_PAIR", "liquidations", base_ccy="BTC"), venue
 
-    def test_liquidations_not_mvp_for_equity_perp(self) -> None:
-        """EQUITY_PERP cells do NOT carry liquidations (PERPETUAL-only override)."""
-        assert not is_mvp("cefi", "BINANCE-FUTURES", "EQUITY_PERP", "liquidations", base_ccy="META")
+    def test_liquidations_mvp_for_equity_perp_as_perpetual(self) -> None:
+        """A crypto-venue single-stock equity perp is typed PERPETUAL (operator
+        2026-07-16, no distinct EQUITY_PERP type) so it rides the PERPETUAL
+        liquidations override on a feed venue — its equity base (META) is in
+        CEFI_EQUITY_PERP_BASE_UNIVERSE ⊂ base_ccys."""
+        assert is_mvp("cefi", "BINANCE-FUTURES", "PERPETUAL", "liquidations", base_ccy="META")
 
     def test_coinbase_futures_perpetual_stays_trades_only(self) -> None:
         """COINBASE-FUTURES venue_data_types={trades} override still wins for its

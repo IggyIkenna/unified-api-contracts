@@ -164,9 +164,7 @@ def execution_spot_representative(
     eligible = [
         obs
         for obs in venue_volumes
-        if obs.base == base
-        and obs.instrument_type in spot_types
-        and (obs.venue, obs.instrument_type) in mvp_cells
+        if obs.base == base and obs.instrument_type in spot_types and (obs.venue, obs.instrument_type) in mvp_cells
     ]
     if not eligible:
         return None
@@ -181,8 +179,11 @@ def execution_spot_representative(
 # Delta-one features are computed on the **most-liquid PERP per base**
 # (plan: every MVP base has a perp via the perp-gate rule, and perps usually
 # carry more open interest / volume than the matching spot leg). Per-AG:
-#   - cefi: PERPETUAL is the crypto-base case; EQUITY_PERP is the TradFi-linked
-#     single-stock perp (Bybit / OKX / Binance for tokenized stocks).
+#   - cefi: PERPETUAL covers BOTH the crypto-base perp AND the crypto-venue
+#     single-stock equity perp (operator 2026-07-16 — equity perps are typed
+#     PERPETUAL, no distinct EQUITY_PERP type; the equity identity rides the
+#     catalogue is_equity_perp / tracks_equity tags). EQUITY_PERP is retained in
+#     the set below only DEFENSIVELY (deprecated; no obs carries it anymore).
 #   - tradfi: NO perpetual exists — the plan substitutes the most-liquid 1m
 #     FUTURE source (CME front-month). OPTION is excluded (delta-one features
 #     do not run on options).
@@ -193,6 +194,9 @@ def execution_spot_representative(
 #     ``sports`` / ``prediction``.
 
 _PERP_INSTRUMENT_TYPES_BY_ASSET_GROUP: Final[dict[str, frozenset[str]]] = {
+    # PERPETUAL covers crypto-venue equity perps too (operator 2026-07-16 — no
+    # distinct EQUITY_PERP type). EQUITY_PERP kept defensively (deprecated; no obs
+    # carries it, and the (venue, EQUITY_PERP) MVP cell no longer exists either).
     "cefi": frozenset({"PERPETUAL", "EQUITY_PERP"}),
     "tradfi": frozenset({"FUTURE"}),
 }
@@ -235,8 +239,8 @@ def feature_perp_representative(
 
     Per-asset-group dispatch:
 
-    * **cefi** — filter to ``PERPETUAL`` or ``EQUITY_PERP``; the perp leg of a
-      crypto base or the TradFi-linked single-stock perp.
+    * **cefi** — filter to ``PERPETUAL``; the perp leg of a crypto base OR a
+      crypto-venue single-stock equity perp (typed PERPETUAL, operator 2026-07-16).
     * **tradfi** — no perpetual exists; collapse to the most-liquid 1m
       ``FUTURE`` source instead (CME front-month is the typical winner; the
       tradfi MVP rule has CME as the only venue today).
@@ -293,9 +297,7 @@ def feature_perp_representative(
     eligible = [
         obs
         for obs in venue_volumes
-        if obs.base == base
-        and obs.instrument_type in perp_types
-        and (obs.venue, obs.instrument_type) in mvp_cells
+        if obs.base == base and obs.instrument_type in perp_types and (obs.venue, obs.instrument_type) in mvp_cells
     ]
     if not eligible:
         return None

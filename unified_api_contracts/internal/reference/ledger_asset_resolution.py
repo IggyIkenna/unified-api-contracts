@@ -55,9 +55,13 @@ _INSTRUMENT_TYPE_TO_LEDGER_ASSET_CLASS: dict[InstrumentType, LedgerAssetClass] =
     InstrumentType.OPTION: LedgerAssetClass.OPTION,
     InstrumentType.ETF: LedgerAssetClass.ETF,
     InstrumentType.EQUITY: LedgerAssetClass.SPOT_TOKEN,
-    # Crypto-venue equity instruments: equity perps resolve as PERP (they carry
-    # funding rates like any perpetual); tokenized stocks resolve as SPOT_TOKEN
-    # (they track share price without a funding mechanism).
+    # Crypto-venue equity instruments — DEPRECATED types (operator 2026-07-16:
+    # collapsed to PERPETUAL/SPOT_PAIR + the tracks_equity/is_equity_perp catalogue
+    # tags; no longer minted). RETAINED here because the enum members remain defined
+    # for parseability, and this map must stay complete over every InstrumentType
+    # (test_every_instrument_type_resolves). The resolution is identical to what
+    # PERPETUAL→PERP / SPOT_PAIR→SPOT_TOKEN now give, since InstrumentKeys always
+    # carried the broad type (only the catalogue instrument_type column was refined).
     InstrumentType.EQUITY_PERP: LedgerAssetClass.PERP,
     InstrumentType.TOKENIZED_EQUITY: LedgerAssetClass.SPOT_TOKEN,
     InstrumentType.COMMODITY: LedgerAssetClass.FUTURE,
