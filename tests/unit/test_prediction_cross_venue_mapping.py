@@ -392,3 +392,31 @@ def test_match_key_is_order_independent_for_crypto() -> None:
     p = match_key(venue="POLYMARKET", instrument_key="0xBTC", raw_symbol="bitcoin-above-95000", symbol="y", **common)
     assert k == p
     assert k is not None
+
+
+# ---------------------------------------------------------------------------
+# category_for_group — public facade composition of underlying_for_group +
+# the internal underlying→category classifier, one representative cqg per
+# PredictionMarketCategory bucket (P3 data-status prediction catalogue browser).
+# ---------------------------------------------------------------------------
+
+
+def test_category_for_group_composes_across_all_categories() -> None:
+    """One representative cqg per category resolves to the expected coarse bucket."""
+    from unified_api_contracts.predictions import (
+        CanonicalQuestionGroup,
+        PredictionMarketCategory,
+        category_for_group,
+    )
+
+    cases = {
+        CanonicalQuestionGroup.BTC_UP_DOWN_DAILY: PredictionMarketCategory.CRYPTO,
+        CanonicalQuestionGroup.SPX_UP_DOWN_DAILY: PredictionMarketCategory.FINANCIAL,
+        CanonicalQuestionGroup.SPORTS_MLB_MATCH: PredictionMarketCategory.SPORTS,
+        CanonicalQuestionGroup.WEATHER_TEMP_DAILY: PredictionMarketCategory.WEATHER,
+        CanonicalQuestionGroup.OSCARS_BEST_PICTURE: PredictionMarketCategory.ENTERTAINMENT,
+        CanonicalQuestionGroup.ELECTION_PRESIDENT_2028: PredictionMarketCategory.POLITICS,
+        CanonicalQuestionGroup.OTHER: PredictionMarketCategory.OTHER,
+    }
+    for cqg, expected in cases.items():
+        assert category_for_group(cqg) is expected, f"{cqg} expected {expected}, got {category_for_group(cqg)}"

@@ -80,6 +80,9 @@ from unified_api_contracts.canonical.domain.prediction.prediction_mapping import
     PredictionMarketCategory,
     PredictionMarketCrossVenueMapping,
 )
+from unified_api_contracts.canonical.domain.predictions.canonical_groups import (
+    CanonicalQuestionGroup,
+)
 from unified_api_contracts.canonical.domain.predictions.classifiers import (
     classify_kalshi_to_canonical_group,
     classify_polymarket_to_canonical_group,
@@ -100,6 +103,7 @@ if TYPE_CHECKING:
 
 __all__ = [
     "build_cross_venue_mapping",
+    "category_for_group",
     "match_key",
 ]
 
@@ -326,6 +330,21 @@ def _category_for_underlying(underlying: PredictionUnderlying) -> PredictionMark
     if name in {"ELECTION", "TRUMP", "ELON"} or name.startswith("GEO_"):
         return PredictionMarketCategory.POLITICS
     return PredictionMarketCategory.OTHER
+
+
+def category_for_group(cqg: CanonicalQuestionGroup) -> PredictionMarketCategory:
+    """Coarse :class:`PredictionMarketCategory` for a canonical question group.
+
+    Public composition of the Axis-1 :func:`underlying_for_group` decomposition
+    with the underlying→category classifier already used internally by
+    :func:`_build_mapping` (:func:`_category_for_underlying`) — reused here, not
+    duplicated. Lives in this module (rather than ``two_axis.py`` next to
+    :func:`underlying_for_group`) to avoid a circular import: this module
+    already imports from ``two_axis`` and from the ``prediction_mapping``
+    module that defines :class:`PredictionMarketCategory`, so composing here
+    needs no new dependency edge.
+    """
+    return _category_for_underlying(underlying_for_group(cqg))
 
 
 def _price_or_macro_key(
