@@ -82,6 +82,14 @@ class TestGetDataTypesForProtocol:
         data_types = get_data_types_for_protocol("uniswap_v3")
         assert len(data_types) > 0
 
+    def test_drift_has_perp_trades(self) -> None:
+        """Regression guard: perp_trades was missing here (drift_helius_path_obsolete_2026_07_15),
+        silently blocking expected_unattempted catalog seeding despite the MTDS
+        Velocity ingester and UAC schema both already supporting the data_type."""
+        data_types = get_data_types_for_protocol("drift")
+        assert "perp_trades" in data_types
+        assert "perp_funding" in data_types
+
 
 class TestGetMtdsOperationsForProtocol:
     def test_aave_v3_has_operations(self) -> None:
