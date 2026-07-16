@@ -6,6 +6,7 @@ CanonicalPlayer, CanonicalFeatureRecord using normalize_utils._helpers.
 
 from __future__ import annotations
 
+import re
 from datetime import UTC, datetime
 from typing import cast
 
@@ -260,19 +261,32 @@ def normalize_soccer_football_info_progressive_stats(
     )
 
 
-def _parse_timer_to_seconds(timer: str) -> int:
-    """Parse SFI timer string "MM:SS" to total seconds.
+_TIMER_RE = re.compile(r"^\s*(\d+):([0-5]\d)(?:\+(\d+):([0-5]\d))?\s*$")
 
-    Examples: "00:30" -> 30, "45:00" -> 2700, "90:00" -> 5400.
-    Falls back to 0 on parse errors.
+
+def _parse_timer_to_seconds(timer: str) -> int:
+    """Parse an SFI timer string to total seconds elapsed from kickoff.
+
+    Handles both provider formats:
+
+    * ``"MM:SS"`` — regular play. ``"00:30"`` -> 30, ``"45:00"`` -> 2700.
+    * ``"MM:SS+MM:SS"`` — stoppage time, period end plus time played beyond it.
+      ``"45:00+02:30"`` -> 2850.
+
+    The stoppage form is ~15% of a real fixture's snapshots and previously fell
+    through to ``0``, collapsing those rows onto the pre-kickoff snapshot.
+
+    Raises:
+        ValueError: on an unparseable timer — better than a silent ``0`` that
+            reads as a genuine pre-kickoff row.
     """
-    parts = timer.split(":")
-    if len(parts) == 2:
-        try:
-            return int(parts[0]) * 60 + int(parts[1])
-        except (ValueError, TypeError):
-            return 0
-    return 0
+    match = _TIMER_RE.match(timer)
+    if match is None:
+        raise ValueError(f"unparseable SFI timer: {timer!r}")
+    seconds = int(match.group(1)) * 60 + int(match.group(2))
+    if match.group(3) is not None:
+        seconds += int(match.group(3)) * 60 + int(match.group(4))
+    return seconds
 
 
 __all__ = [

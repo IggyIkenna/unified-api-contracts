@@ -91,6 +91,47 @@ class CanonicalProgressiveStats(BaseModel):
     odds_asian_corner_under: float | None = None
     odds_asian_corner_line: float | None = None
 
+    # --- FIRST-HALF (HT) markets — SFI ``1h_*`` odds objects ---
+    #
+    # These are the FIRST-HALF markets ("who wins the first half"), a distinct
+    # market family from the full-time ``odds_1x2_*`` / ``odds_ah_*`` /
+    # ``odds_ou_*`` / ``odds_asian_corner_*`` fields above. Provider keys are
+    # ``1h_result`` / ``1h_asian_handicap`` / ``1h_goalline`` / ``1h_asian_corner``
+    # on the ``odds`` object of ``GET /matches/view/progressive/`` (verified
+    # against the live API 2026-07-16 — NOT the ``h1_*`` spelling of the legacy
+    # bulk-dump table mirrored by ``SFMatchProgressiveOddsRaw``).
+    #
+    # POINT-IN-TIME WARNING (measured 2026-07-16 on 8 fixtures, 2022→2026, 4
+    # leagues): these prices are a live forecast ONLY while the first half is
+    # in progress (11-26 distinct home prices per fixture pre-HT). Once the
+    # first half ends they FREEZE at a settled, degenerate quote that encodes
+    # the actual HT scoreline (1-2 distinct values across the whole 2nd half;
+    # e.g. a 1-1 first half pins draw at 1.055). A ``1h_*`` quote taken at or
+    # after the halftime break is therefore LOOKAHEAD — consumers MUST select
+    # the last snapshot strictly before halftime starts. See
+    # ``features_service.sports.calculators.sfi_progressive_calculator``.
+
+    # First-half 1X2 ("1h_result")
+    odds_h1_result_home: float | None = None
+    odds_h1_result_draw: float | None = None
+    odds_h1_result_away: float | None = None
+
+    # First-half Asian Handicap ("1h_asian_handicap")
+    odds_h1_ah_home: float | None = None
+    odds_h1_ah_away: float | None = None
+    odds_h1_ah_line: float | None = None
+
+    # First-half goal line ("1h_goalline" — provider's own market name; this is
+    # the first-half total-goals line, the H1 analogue of over_under)
+    odds_h1_goalline_over: float | None = None
+    odds_h1_goalline_under: float | None = None
+    odds_h1_goalline_line: float | None = None
+
+    # First-half Asian Corner ("1h_asian_corner")
+    odds_h1_ac_over: float | None = None
+    odds_h1_ac_under: float | None = None
+    odds_h1_ac_line: float | None = None
+
     # Halftime detection (seconds — derived from stats freeze detection)
     ht_start_timer: int | None = None
     ht_end_timer: int | None = None

@@ -665,6 +665,87 @@ SPORTS_SFI_PROGRESSIVE_STATS = SchemaContract(
         ColumnSpec(
             name="odds_asian_corner_line", dtype="float64", nullable=True, description="Asian corners line threshold."
         ),
+        # --- FIRST-HALF (HT) markets — SFI ``1h_*`` odds objects ---
+        # Distinct market family from the full-time columns above. PIT WARNING:
+        # only a quote taken strictly BEFORE halftime starts is a forecast; from
+        # the HT break onward these freeze at a settled price encoding the actual
+        # HT scoreline (measured 2026-07-16), so a break/2nd-half quote is
+        # lookahead. Consumers gate on ht_start (see sfi_progressive_calculator).
+        ColumnSpec(
+            name="odds_h1_result_home",
+            dtype="float64",
+            nullable=True,
+            description=(
+                "First-half 1X2 ('1h_result') — home side. The HT-RESULT market: who leads at halftime. "
+                "Forecast only while the first half is live; settles/freezes once the half ends."
+            ),
+        ),
+        ColumnSpec(
+            name="odds_h1_result_draw",
+            dtype="float64",
+            nullable=True,
+            description="First-half 1X2 ('1h_result') — draw side. See odds_h1_result_home for PIT semantics.",
+        ),
+        ColumnSpec(
+            name="odds_h1_result_away",
+            dtype="float64",
+            nullable=True,
+            description="First-half 1X2 ('1h_result') — away side. See odds_h1_result_home for PIT semantics.",
+        ),
+        ColumnSpec(
+            name="odds_h1_ah_home",
+            dtype="float64",
+            nullable=True,
+            description="First-half Asian handicap ('1h_asian_handicap') — home side.",
+        ),
+        ColumnSpec(
+            name="odds_h1_ah_away",
+            dtype="float64",
+            nullable=True,
+            description="First-half Asian handicap ('1h_asian_handicap') — away side.",
+        ),
+        ColumnSpec(
+            name="odds_h1_ah_line",
+            dtype="float64",
+            nullable=True,
+            description="First-half Asian handicap line threshold.",
+        ),
+        ColumnSpec(
+            name="odds_h1_goalline_over",
+            dtype="float64",
+            nullable=True,
+            description="First-half goal line ('1h_goalline') — over side. H1 analogue of the full-time over_under.",
+        ),
+        ColumnSpec(
+            name="odds_h1_goalline_under",
+            dtype="float64",
+            nullable=True,
+            description="First-half goal line ('1h_goalline') — under side.",
+        ),
+        ColumnSpec(
+            name="odds_h1_goalline_line",
+            dtype="float64",
+            nullable=True,
+            description="First-half goal line threshold.",
+        ),
+        ColumnSpec(
+            name="odds_h1_ac_over",
+            dtype="float64",
+            nullable=True,
+            description="First-half Asian corners ('1h_asian_corner') — over side.",
+        ),
+        ColumnSpec(
+            name="odds_h1_ac_under",
+            dtype="float64",
+            nullable=True,
+            description="First-half Asian corners ('1h_asian_corner') — under side.",
+        ),
+        ColumnSpec(
+            name="odds_h1_ac_line",
+            dtype="float64",
+            nullable=True,
+            description="First-half Asian corners line threshold.",
+        ),
         ColumnSpec(
             name="ht_start_timer",
             dtype="int64",
