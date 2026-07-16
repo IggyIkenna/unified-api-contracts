@@ -326,11 +326,12 @@ INSTRUMENTS_PREFLIGHT_REQUIREMENTS: Final[Mapping[tuple[MarketAssetGroup, str], 
     # freshly-listed ones (silent gap that downstream features-onchain drops).
     # The DeFi catalog is written by instruments-service to the
     # ``instruments-store-defi-{pid}`` availability index under
-    # ``data_type='instrument-catalog'`` — the same upstream_entity_type the
-    # CeFi/TradFi entries probe. A12a (DeFi upstream-preflight wiring).
+    # ``data_type='instruments'`` (operator decision 2026-07-16, P9 Q2 — was
+    # ``'instrument-catalog'``, now migrated; matches the live batched-writer
+    # path). A12a (DeFi upstream-preflight wiring).
     (MarketAssetGroup.DEFI, "defi_market_data"): (
         PreflightRequirement(
-            upstream_entity_type="instrument-catalog",
+            upstream_entity_type="instruments",
             max_staleness_seconds=_24H_SECONDS,
             rationale=(
                 "DeFi daily collect (dex_pools / lst_rates / lending_indices / "
