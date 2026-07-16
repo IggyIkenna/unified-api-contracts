@@ -193,8 +193,13 @@ VENUE_TO_ADAPTER_KEY: dict[str, str] = {
     "BETFAIR_EX_EU": NO_ADAPTER_YET,
     "DRAFTKINGS": NO_ADAPTER_YET,
     "FANDUEL": NO_ADAPTER_YET,
+    # DRIFT (Solana) removed 2026-07-16 (operator ruling): Drift was hacked for
+    # ~$280M on 2026-04-01 (Lazarus-attributed), offline 3 months, then
+    # rebranded to "Velocity DEX" 2026-07-01 — a ~2-week-old private beta with
+    # ~$0 listed TVL. Operator dropped ALL Solana perp DEXes; Jupiter ($716M
+    # leader) is the only one kept conceptually but is NOT integrated here.
+    # SSOT: unified-trading-pm/codex/04-architecture/solana-defi-coverage.md.
     # Solana DeFi (REST API, no subgraph)
-    "DRIFT-SOLANA": "drift",
     "KAMINO-SOLANA": "kamino",
     "RAYDIUM-SOLANA": "raydium",
     "ORCA-SOLANA": "orca",
@@ -219,7 +224,8 @@ VENUE_TO_ADAPTER_KEY: dict[str, str] = {
     # DEX perp venues (L2 + StarkNet + Solana clone)
     "LIGHTER-ZKSYNC": "lighter",
     "EXTENDED-STARKNET": "extended",
-    "PACIFICA-SOLANA": "pacifica",
+    # PACIFICA (Solana) removed 2026-07-16 (operator ruling, same as DRIFT
+    # (Solana) above): all Solana perp DEXes dropped except Jupiter (not integrated).
     # MANGO-SOLANA/ZETA-SOLANA/FLASH-SOLANA (Plan B 2026-05-13) removed 2026-07-15
     # (operator ruling): all 3 declared API hosts are dead (api.mngo.cloud/
     # api.flash.trade NXDOMAIN, dex.zeta.markets/api returns HTML not JSON), ~$0

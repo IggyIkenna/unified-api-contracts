@@ -191,7 +191,7 @@
       "signing_surface": "CLOUD_KMS_ENCRYPTED",
       "kms_key_uri": "projects/central-element-323112/locations/asia-northeast1/keyRings/wallets-prod/cryptoKeys/trading-defi-master-v1",
       "private_key_secret_ref": "apd-sol-hot-raydium-v1-wrapped",
-      "allowed_protocols": ["RAYDIUM", "ORCA", "JUPITER", "DRIFT"],
+      "allowed_protocols": ["RAYDIUM", "ORCA", "JUPITER"],
       "spending_caps": {
         "per_tx_usd": "25000",
         "per_hour_usd": "150000",

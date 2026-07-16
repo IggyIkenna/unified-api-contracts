@@ -33,7 +33,8 @@ _DEFI_VENUE_PREFIXES = frozenset(
         "LIDO",
         "ETHERFI",
         "ETHENA",
-        "DRIFT",
+        # "DRIFT" removed 2026-07-16 (operator ruling: all Solana perp DEXes
+        # dropped except Jupiter, not integrated).
         "KAMINO",
         "RAYDIUM",
         "ORCA",
@@ -97,12 +98,16 @@ _ALL_KNOWN_VENUES: frozenset[str] = _TRADFI_VENUES | _CEFI_VENUES | _SPORTS_VENU
 _EVM_CHAINS = frozenset(chain for chain, chain_id in MAINNET_CHAIN_IDS.items() if chain_id != 0)
 
 # Solana DeFi protocol prefixes — raw_symbol is base58 address
-_SOLANA_DEFI_PREFIXES = frozenset({"DRIFT", "KAMINO", "RAYDIUM", "ORCA", "MARINADE", "JITO"})
+# ("DRIFT" removed 2026-07-16 — operator ruling: all Solana perp DEXes
+# dropped except Jupiter, not integrated.)
+_SOLANA_DEFI_PREFIXES = frozenset({"KAMINO", "RAYDIUM", "ORCA", "MARINADE", "JITO"})
 
 # DeFi protocols where raw_symbol is NOT a standard address:
-# - DRIFT: uses market symbols ("BTC-PERP", "SOL")
 # - COMPOUND_V3: uses market names ("USDC", "ETH") or numeric IDs
-_DEFI_NON_ADDRESS_RAW_SYMBOL = frozenset({"DRIFT", "COMPOUND_V3"})
+# (DRIFT used market symbols like "BTC-PERP"/"SOL" here until removed
+# 2026-07-16 — operator ruling: all Solana perp DEXes dropped except
+# Jupiter, not integrated.)
+_DEFI_NON_ADDRESS_RAW_SYMBOL = frozenset({"COMPOUND_V3"})
 
 # EVM hex address: 0x followed by exactly 40 hex digits
 _EVM_ADDRESS_RE = re.compile(r"^0x[0-9a-fA-F]{40}$")

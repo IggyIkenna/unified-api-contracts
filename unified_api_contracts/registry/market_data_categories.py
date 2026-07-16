@@ -123,13 +123,14 @@ DATA_TYPES_BY_ASSET_GROUP: dict[str, list[str]] = {
         "liquidations",
         "options_chain",  # Deribit options - LOCF sampled to candles
         "futures_chain",  # Deribit/CME futures - LOCF sampled to candles
-        # 2026-05-07: ohlcv_1m for DEX venues (Lighter /candles + Pacifica /kline).
-        # Lighter zkSync per-trade /recentTrades is hard-capped at last ~100 trades
-        # with no cursor, so /candles OHLCV bars are the only historical-capable
-        # path; same shape applies to Pacifica /kline. Tardis CeFi venues do not
-        # expose OHLCV bars — their adapters return empty for ohlcv_1m, which the
-        # manifest records as empty_confirmed (honest absence per workspace
-        # "honest absence vs fake placeholders" rule).
+        # 2026-05-07: ohlcv_1m for DEX venues (Lighter /candles). Lighter zkSync
+        # per-trade /recentTrades is hard-capped at last ~100 trades with no
+        # cursor, so /candles OHLCV bars are the only historical-capable path.
+        # (Pacifica /kline was the same shape — Pacifica removed 2026-07-16,
+        # operator ruling.) Tardis CeFi venues do not expose OHLCV bars —
+        # their adapters return empty for ohlcv_1m, which the manifest
+        # records as empty_confirmed (honest absence per workspace "honest
+        # absence vs fake placeholders" rule).
         "ohlcv_1m",
         # 2026-06-21: periodic funding settlements for CFTC-regulated crypto perp venues.
         # kalshi_perp (launched 2026-05-29) + polymarket_perp (launched 2026-04-21) expose
@@ -155,24 +156,29 @@ DATA_TYPES_BY_ASSET_GROUP: dict[str, list[str]] = {
         "dex_pool_swaps",  # DEX swap events (requires candle sampling)
         "lending_indices",  # Lending rate indices (supply/borrow APY, utilization)
         "liquidations",  # DeFi liquidation events
-        # Perpetual funding rates (GMX, Drift). HYPERLIQUID/ASTER/PACIFICA-SOLANA/
-        # LIGHTER-ZKSYNC perp_funding RETIRED 2026-07-08 — funding now reads via
-        # derivative_ticker's embedded funding_rate field for those 4 venues.
+        # Perpetual funding rates (GMX). HYPERLIQUID/ASTER/LIGHTER-ZKSYNC
+        # perp_funding RETIRED 2026-07-08 — funding now reads via
+        # derivative_ticker's embedded funding_rate field for those venues.
+        # (DRIFT/PACIFICA (Solana) were among the venues this note originally
+        # covered; both removed entirely 2026-07-16 — operator ruling: all
+        # Solana perp DEXes dropped except Jupiter, not integrated.)
         "perp_funding",
         # derivative_ticker (2026-07-15, defi_perp_funding_canonicalisation_derivative_
         # ticker_all_perps issue, operator ruling): the canonical RAW-funding home for
-        # ALL perp venues, defi-asset-group ones included (GMX, DRIFT-SOLANA) —
-        # captured at the highest resolution each source offers, even when the source
-        # has no OI. Was previously declared only under "cefi" (where HYPERLIQUID/
-        # ASTER/PACIFICA-SOLANA/EXTENDED-STARKNET/LIGHTER-ZKSYNC already emit it,
-        # despite their DeFi on-chain settlement — those 5 stay cefi-asset-group per
+        # ALL perp venues, defi-asset-group ones included (GMX) — captured at the
+        # highest resolution each source offers, even when the source has no OI. Was
+        # previously declared only under "cefi" (where HYPERLIQUID/ASTER/
+        # EXTENDED-STARKNET/LIGHTER-ZKSYNC already emit it, despite their DeFi
+        # on-chain settlement — those stay cefi-asset-group per
         # VENUES_BY_ASSET_GROUP's "on-chain CLOBs reclassified from DEFI" note above).
         "derivative_ticker",
-        # Per-trade prints for on-chain perp venues (Drift V2 historical ingester,
-        # drift_helius_path_obsolete_2026_07_15). Schema existed (DataType.PERP_TRADES,
-        # DEFI_PERPETUAL_PERP_TRADES contract) and the MTDS writer already handles it;
-        # this enumeration entry was the missing piece blocking expected_unattempted
-        # catalog seeding for the data_type.
+        # Per-trade prints for on-chain perp venues. Schema existed
+        # (DataType.PERP_TRADES, DEFI_PERPETUAL_PERP_TRADES contract) and the
+        # MTDS writer already handles it; this enumeration entry was the
+        # missing piece blocking expected_unattempted catalog seeding for the
+        # data_type. (The Drift V2 historical ingester that originally
+        # motivated this entry was removed 2026-07-16 along with the rest of
+        # the Drift venue — operator ruling.)
         "perp_trades",
         "lst_rates",  # Liquid staking token exchange rates
         "oracle_prices",  # Chainlink oracle price snapshots
@@ -305,8 +311,9 @@ VENUES_BY_ASSET_GROUP: dict[str, list[str]] = {
         # On-chain CLOBs (reclassified from DEFI - CLOB-style data like CeFi)
         "HYPERLIQUID",
         "ASTER",
-        # 2026-05-01 DEX perp expansion (cefi_venue_universe_expansion plan)
-        "PACIFICA-SOLANA",
+        # PACIFICA (Solana) removed 2026-07-16 (operator ruling: all Solana perp
+        # DEXes dropped except Jupiter, not integrated). SSOT: unified-
+        # trading-pm/codex/04-architecture/solana-defi-coverage.md.
         "EXTENDED-STARKNET",
         "LIGHTER-ZKSYNC",
         # 2026-06-20 prediction-platform perp CLOBs — CFTC-regulated crypto perps
@@ -816,15 +823,11 @@ VALID_DATA_TYPES_BY_AG_AND_INSTRUMENT_TYPE: dict[tuple[str, str], frozenset[str]
 VALID_DATA_TYPES_VENUE_EXCLUSIONS: dict[tuple[str, str, str], frozenset[str]] = {
     ("tradfi", "ICE", "futures_chain"): frozenset({"ohlcv_1s"}),
     ("tradfi", "ICE", "combo"): frozenset({"ohlcv_1s"}),
-    # DRIFT's capability declaration (_defi.py) bundles PERPETUAL + SPOT_PAIR
-    # under one _ProtocolCapability entry (instrument_types has no per-type
-    # data_types split), so perp_funding leaks onto every DRIFT-SOLANA SPOT
-    # market — SPOT instruments structurally cannot have a funding rate.
-    # Found investigating mvp_backfill_defi_onchain_v10-010 (2026-07-11):
-    # 51,301 expected_unattempted perp_funding cells across 41 instrument_ids,
-    # most of them DRIFT SPOT markets. oracle_prices legitimately still
-    # applies to SPOT (price feed), so only perp_funding is excluded here.
-    ("defi", "DRIFT", "spot_pair"): frozenset({"perp_funding"}),
+    # The former DRIFT spot_pair/perp_funding exclusion (DRIFT's capability
+    # declaration bundled PERPETUAL + SPOT_PAIR under one entry, leaking
+    # perp_funding onto SPOT markets) was removed 2026-07-16 along with the
+    # rest of the DRIFT venue — operator ruling: all Solana perp DEXes
+    # dropped except Jupiter, not integrated.
 }
 
 
@@ -1394,9 +1397,9 @@ VENUE_DATA_TYPE_CAPABILITIES: dict[str, dict[str, str]] = {
         "options_chain": "2022-08-23",
     },
     # ── DEX-perp on-chain CLOBs (D2b, honest_coverage cefi gate-authority fix,
-    # 2026-07-06) — PACIFICA-SOLANA / EXTENDED-STARKNET / LIGHTER-ZKSYNC are
-    # declared cefi venues (VENUES_BY_ASSET_GROUP["cefi"]) whose itype-gate the
-    # D2a fix now admits (INSTRUMENT_TYPES_BY_VENUE, venue_constants.py), but
+    # 2026-07-06) — EXTENDED-STARKNET / LIGHTER-ZKSYNC are declared cefi
+    # venues (VENUES_BY_ASSET_GROUP["cefi"]) whose itype-gate the D2a fix now
+    # admits (INSTRUMENT_TYPES_BY_VENUE, venue_constants.py), but
     # they had NO entry here — absent from this dict means Carve-out 1 (this
     # is a cefi/tradfi skip-filter; see check_enumeration_completeness.py
     # VENUE_CAPABILITY_AGS) zeroes EVERY data_type, independent of the itype
@@ -1406,13 +1409,10 @@ VENUE_DATA_TYPE_CAPABILITIES: dict[str, dict[str, str]] = {
     # Tardis routed pre-2026-04-17). Start dates = VenueMapping.
     # venue_start_dates (venue_mapping.py — documented "single source of
     # truth"/"earliest manifest data, NOT exchange founding dates"). No
-    # liquidations/perp_funding feed wired for any of the three (same
-    # minimum-perp-surface note as data_type_capability.py).
-    "PACIFICA-SOLANA": {
-        "trades": "2025-06-01",
-        "book_snapshot_5": "2025-06-01",
-        "derivative_ticker": "2025-06-01",
-    },
+    # liquidations/perp_funding feed wired for either (same minimum-perp-
+    # surface note as data_type_capability.py). (PACIFICA (Solana) was a third
+    # venue here until removed 2026-07-16 — operator ruling: all Solana perp
+    # DEXes dropped except Jupiter, not integrated.)
     "EXTENDED-STARKNET": {
         "trades": "2024-10-01",
         "book_snapshot_5": "2024-10-01",
@@ -1949,9 +1949,10 @@ VENUE_DATA_TYPE_NO_BATCH_SOURCE: dict[str, frozenset[str]] = {
     # adapters (kept here too — harmless superset, matches the proven MTDS
     # dict exactly so nothing is missed in the UAC move).
     "ASTER": frozenset({"book_snapshot_5", "liquidations"}),
-    # PACIFICA-SOLANA / EXTENDED-STARKNET: same current-snapshot-only book
-    # endpoint limitation as ASTER.
-    "PACIFICA-SOLANA": frozenset({"book_snapshot_5"}),
+    # EXTENDED-STARKNET: same current-snapshot-only book endpoint limitation
+    # as ASTER. (PACIFICA (Solana) had the same entry until removed 2026-07-16
+    # — operator ruling: all Solana perp DEXes dropped except Jupiter, not
+    # integrated.)
     "EXTENDED-STARKNET": frozenset({"book_snapshot_5"}),
     # LIGHTER-ZKSYNC: own REST (/recentTrades, /orderBookOrders) is
     # snapshot-only for BOTH trades and book — no historical range param on
@@ -2068,7 +2069,7 @@ _PER_INSTRUMENT_SHARD_DATA_TYPES: frozenset[str] = frozenset(
         "futures_chain",
         # TradFi + CeFi DEX OHLCV (Phase 3.D.5 v2 enumerator — per-equity-ticker
         # and per-pool denominator; TradFi catalog reader provides equity tickers,
-        # CeFi catalog reader provides DEX pool instrument IDs for LIGHTER/PACIFICA).
+        # CeFi catalog reader provides DEX pool instrument IDs for LIGHTER).
         # ohlcv_1s shares the SAME per-instrument shard grain as ohlcv_1m (TradFi
         # Databento 1s fetch) — same shard-key, denominator and Tier-3 fan-out.
         "ohlcv_1s",
@@ -2227,7 +2228,7 @@ def _default_seed_instruments_for(venue: str, data_type: str) -> tuple[str, ...]
     """
     # ohlcv_1m is per-instrument (Phase 3.D.5 v2). Per-instrument universe is
     # always provided by a catalog reader (TradFiCatalogReader for equity
-    # tickers; CeFiCatalogReader for DEX pools on LIGHTER/PACIFICA). When no
+    # tickers; CeFiCatalogReader for DEX pools on LIGHTER). When no
     # catalog reader is registered for a venue, return () so Tier-3 degrades
     # to Tier-2 — same as today's behaviour (no regression on first-boot or
     # test environments where the catalog is absent).

@@ -35,8 +35,11 @@ BREAKERS: Final[tuple[BreakerConfig, ...]] = (
     # 4 new breakers for ARBITRAGE_PRICE_DISPERSION: oracle staleness, per-chain
     # RPC outage (Ethereum + Solana), and lending pool unavailability.
     # The arbitrage_price_dispersion archetype uses both ETH and SOL chain RPCs
-    # (hedge legs on Hyperliquid/DRIFT both require chain connectivity) and
-    # interacts with lending pools for margin/collateral.
+    # (hedge legs on Hyperliquid + Solana DeFi protocols both require chain
+    # connectivity) and interacts with lending pools for margin/collateral.
+    # (Drift was a Solana hedge-leg example here until removed 2026-07-16 —
+    # operator ruling: all Solana perp DEXes dropped except Jupiter, not
+    # integrated.)
     BreakerConfig(
         breaker_id=CircuitBreakerId.ORACLE_STALENESS_SECONDS,
         scope=BreakerScope.PER_ARCHETYPE,
@@ -85,7 +88,7 @@ BREAKERS: Final[tuple[BreakerConfig, ...]] = (
         cooldown_seconds=120,
         alerting_severity=AlertSeverity.HIGH,
         description=(
-            "Solana RPC unreachable >= 30s — block new SOL on-chain ops (DRIFT/JitoSOL);"
+            "Solana RPC unreachable >= 30s — block new SOL on-chain ops (JitoSOL/Kamino/etc);"
             " other chain legs unaffected. AUTO_COOLDOWN on reconnect."
         ),
     ),

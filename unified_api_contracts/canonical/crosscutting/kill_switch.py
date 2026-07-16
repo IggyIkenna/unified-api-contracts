@@ -114,8 +114,10 @@ class KillSwitchId(StrEnum):
     KILL_PER_TREASURY_SUB_ACCOUNT_HYPERLIQUID = "KILL_PER_TREASURY_SUB_ACCOUNT_HYPERLIQUID"
     """Halt Hyperliquid sub-account withdrawals."""
 
-    KILL_PER_TREASURY_SUB_ACCOUNT_DRIFT = "KILL_PER_TREASURY_SUB_ACCOUNT_DRIFT"
-    """Halt DRIFT sub-account withdrawals."""
+    # KILL_PER_TREASURY_SUB_ACCOUNT_DRIFT removed 2026-07-16 (operator ruling:
+    # all Solana perp DEXes dropped except Jupiter, not integrated — the
+    # DRIFT treasury sub-account no longer exists). SSOT: unified-trading-pm/
+    # codex/04-architecture/solana-defi-coverage.md.
 
     KILL_PER_TREASURY_SUB_ACCOUNT_DYDX = "KILL_PER_TREASURY_SUB_ACCOUNT_DYDX"
     """Halt dYdX sub-account withdrawals."""

@@ -297,7 +297,9 @@ _DEFI: dict[str, list[str]] = {
     # data_type) start-date declarations.
     "GMX-ARBITRUM": ["perp_funding", "derivative_ticker"],
     "GMX-AVALANCHE": ["perp_funding", "derivative_ticker"],
-    "DRIFT-SOLANA": ["perp_funding", "position_data", "derivative_ticker"],
+    # DRIFT (Solana) expected-coverage entry removed 2026-07-16 (operator
+    # ruling: all Solana perp DEXes dropped except Jupiter, not integrated).
+    # SSOT: unified-trading-pm/codex/04-architecture/solana-defi-coverage.md.
     # --- LST / yield — lst_rates_handler maps token→protocol then .upper() ---
     # protocol strings: lido, rocketpool, coinbase, ethena, maker, mantle,
     # swell, stader, stakewise, ankr, etherfi, puffer, marinade, jito, sanctum
@@ -334,12 +336,15 @@ _DEFI: dict[str, list[str]] = {
     "PYTH": ["oracle_prices"],
     # --- Perp funding (DeFi perpetual protocols) ---
     # perp_funding_handler DEFAULT_PROTOCOLS; venue is protocol-only (chain in shard dim).
-    # HYPERLIQUID / ASTER / PACIFICA-SOLANA / LIGHTER-ZKSYNC perp_funding RETIRED
+    # HYPERLIQUID / ASTER / LIGHTER-ZKSYNC perp_funding RETIRED
     # 2026-07-08 (operator-approved) — funding now reads via each venue's
     # derivative_ticker embedded funding_rate field (see the _CEFI dict above for
-    # HYPERLIQUID/ASTER's real coverage row; PACIFICA-SOLANA/LIGHTER-ZKSYNC never
+    # HYPERLIQUID/ASTER's real coverage row; LIGHTER-ZKSYNC never
     # actually captured a distinct perp_funding row — market_data_categories.py
     # confirms "No liquidations/perp_funding feed wired for any of the three").
+    # (PACIFICA (Solana) was a fourth venue covered by this note until removed
+    # entirely 2026-07-16 — operator ruling: all Solana perp DEXes dropped
+    # except Jupiter, not integrated.)
     # GMX still uses the standalone perp_funding data_type — NOT part of this
     # retirement, left untouched. derivative_ticker added 2026-07-15 (same issue
     # as the GMX-ARBITRUM/GMX-AVALANCHE entries above — flat "GMX"+chain-dimension

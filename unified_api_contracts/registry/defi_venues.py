@@ -197,7 +197,9 @@ ALL_DEFI_VENUES: list[str] = [
     "JITO-SOLANA",
     "MARGINFI-SOLANA",
     "SOLEND-SOLANA",
-    "DRIFT-SOLANA",
+    # DRIFT (Solana) removed 2026-07-16 (operator ruling): all Solana perp DEXes
+    # dropped except Jupiter (not integrated). SSOT: unified-trading-pm/codex/
+    # 04-architecture/solana-defi-coverage.md.
     # ── Catalogue Phase 1A new Solana entries (slot 5 2026-05-11). JUPITER
     #    aggregator is read-only (route registry, no MTDS tick stream);
     #    SOLBLAZE = bSOL liquid-staking; JITORESTAKING = distinct from
@@ -307,7 +309,8 @@ LEGACY_DEFI_VENUE_ALIASES: dict[str, str] = {
     "JITO": "JITO-SOLANA",
     "MARGINFI": "MARGINFI-SOLANA",
     "SOLEND": "SOLEND-SOLANA",
-    "DRIFT": "DRIFT-SOLANA",
+    # DRIFT alias removed 2026-07-16 (operator ruling, all Solana perp DEXes
+    # dropped except Jupiter, not integrated).
     # LST / staking-yield protocols on Ethereum (added 2026-05-07 — DEFI
     # panel audit). Bare-name aliases needed because the manifest carries
     # them as ``venue=ANKR chain=ETHEREUM`` etc.; the
@@ -547,7 +550,8 @@ DEFI_VENUE_PHASE: dict[str, str] = {
     "ORCA-SOLANA": "live",
     "RAYDIUM-SOLANA": "live",
     "JITO-SOLANA": "live",
-    "DRIFT-SOLANA": "live",
+    # DRIFT (Solana) removed 2026-07-16 (operator ruling: all Solana perp DEXes
+    # dropped except Jupiter, not integrated).
     # MarginFi + Solend Solana lending adapters (2026-07-09) — real,
     # IS-producible per _build_defi_venues() (marginfi.py / solend.py now
     # wired into instruments-service's factory + the Solana venue list).
@@ -573,8 +577,9 @@ DEFI_PERP_VENUES: list[str] = [
     # GMX perpetual DEX — Arbitrum + Avalanche (on-chain, wallet-signed settlement)
     "GMX-ARBITRUM",
     "GMX-AVALANCHE",
-    # DRIFT perpetual DEX — Solana CLOB (on-chain settlement, not off-chain like CeFi)
-    "DRIFT-SOLANA",
+    # DRIFT (Solana) removed 2026-07-16 (operator ruling): all Solana perp DEXes
+    # dropped except Jupiter (not integrated). SSOT: unified-trading-pm/codex/
+    # 04-architecture/solana-defi-coverage.md.
 ]
 
 # Formerly routed GMX/DRIFT to the cefi axis (CLOB-style data shape reasoning).
@@ -643,9 +648,9 @@ MTDS_DEFI_VENUES: list[str] = [
     # GMX: operator revised 2026-05-13 — DeFi-only (not CeFi axis).
     "GMX-ARBITRUM",
     "GMX-AVALANCHE",
-    # Drift V1 S3 archive data starts 2022-01-01; Data API (2025-present).
-    # Operator revised 2026-05-13: DeFi-only (not CeFi axis).
-    "DRIFT-SOLANA",
+    # DRIFT (Solana) removed 2026-07-16 (operator ruling): all Solana perp DEXes
+    # dropped except Jupiter (not integrated). SSOT: unified-trading-pm/codex/
+    # 04-architecture/solana-defi-coverage.md.
 ]
 
 

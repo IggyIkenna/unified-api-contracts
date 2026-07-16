@@ -105,22 +105,10 @@ _DEFAULT_RULES: dict[TreasurySource, list[WithdrawalApprovalRule]] = {
             approver_pool=_CUTOVER_APPROVER_POOL,
         ),
     ],
-    TreasurySource.SUB_ACCOUNT_DRIFT: [
-        WithdrawalApprovalRule(
-            treasury_source=TreasurySource.SUB_ACCOUNT_DRIFT,
-            amount_bucket="MEDIUM",
-            threshold_amount_usd=Decimal("10000"),
-            required_approvers=2,
-            approver_pool=_CUTOVER_APPROVER_POOL,
-        ),
-        WithdrawalApprovalRule(
-            treasury_source=TreasurySource.SUB_ACCOUNT_DRIFT,
-            amount_bucket="LARGE",
-            threshold_amount_usd=Decimal("100000"),
-            required_approvers=3,
-            approver_pool=_CUTOVER_APPROVER_POOL,
-        ),
-    ],
+    # TreasurySource.SUB_ACCOUNT_DRIFT approval rules removed 2026-07-16
+    # (operator ruling: all Solana perp DEXes dropped except Jupiter, not
+    # integrated — the enum member itself was removed from treasury.py in
+    # the same landing).
     TreasurySource.SUB_ACCOUNT_DYDX: [
         WithdrawalApprovalRule(
             treasury_source=TreasurySource.SUB_ACCOUNT_DYDX,

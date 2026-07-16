@@ -20,12 +20,13 @@ class TestTreasurySource:
 
     def test_all_sources_defined(self) -> None:
         """Verify all required treasury sources are defined."""
+        # SUB_ACCOUNT_DRIFT removed 2026-07-16 (operator ruling: all Solana
+        # perp DEXes dropped except Jupiter, not integrated).
         expected = {
             "COPPER",
             "CEFFU",
             "DEFI_HOT_WALLET",
             "SUB_ACCOUNT_HYPERLIQUID",
-            "SUB_ACCOUNT_DRIFT",
             "SUB_ACCOUNT_DYDX",
         }
         actual = {source.value for source in TreasurySource}
@@ -37,7 +38,6 @@ class TestTreasurySource:
         assert TreasurySource.CEFFU.value == "CEFFU"
         assert TreasurySource.DEFI_HOT_WALLET.value == "DEFI_HOT_WALLET"
         assert TreasurySource.SUB_ACCOUNT_HYPERLIQUID.value == "SUB_ACCOUNT_HYPERLIQUID"
-        assert TreasurySource.SUB_ACCOUNT_DRIFT.value == "SUB_ACCOUNT_DRIFT"
         assert TreasurySource.SUB_ACCOUNT_DYDX.value == "SUB_ACCOUNT_DYDX"
 
     def test_source_is_strenum(self) -> None:
@@ -57,8 +57,8 @@ class TestSubAccountId:
 
     def test_subaccount_int_id(self) -> None:
         """Create sub-account with integer id."""
-        sub = SubAccountId(venue="DRIFT", subaccount_id=42)
-        assert sub.venue == "DRIFT"
+        sub = SubAccountId(venue="DYDX", subaccount_id=42)
+        assert sub.venue == "DYDX"
         assert sub.subaccount_id == 42
 
     def test_subaccount_string_representation(self) -> None:
@@ -70,7 +70,7 @@ class TestSubAccountId:
         """Verify SubAccountId is frozen."""
         sub = SubAccountId(venue="HYPERLIQUID", subaccount_id=1)
         with pytest.raises(AttributeError):
-            sub.venue = "DRIFT"
+            sub.venue = "DYDX"
 
 
 class TestCopperEndpoint:

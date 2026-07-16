@@ -40,8 +40,9 @@ class TreasurySource(StrEnum):
     SUB_ACCOUNT_HYPERLIQUID = "SUB_ACCOUNT_HYPERLIQUID"
     """Hyperliquid sub-account. Routed through Hyperliquid REST API."""
 
-    SUB_ACCOUNT_DRIFT = "SUB_ACCOUNT_DRIFT"
-    """DRIFT Protocol sub-account. Routed through DRIFT on-chain contract."""
+    # SUB_ACCOUNT_DRIFT removed 2026-07-16 (operator ruling: all Solana perp
+    # DEXes dropped except Jupiter, not integrated). SSOT: unified-trading-
+    # pm/codex/04-architecture/solana-defi-coverage.md.
 
     SUB_ACCOUNT_DYDX = "SUB_ACCOUNT_DYDX"
     """dYdX v4 sub-account. Routed through dYdX v4 API."""
@@ -56,7 +57,7 @@ class SubAccountId:
     """
 
     venue: str
-    """Venue name (e.g., 'HYPERLIQUID', 'DRIFT', 'DYDX')."""
+    """Venue name (e.g., 'HYPERLIQUID', 'DYDX')."""
 
     subaccount_id: str | int
     """Venue-specific sub-account identifier (string for some venues, int for others)."""

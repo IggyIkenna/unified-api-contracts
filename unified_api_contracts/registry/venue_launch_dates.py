@@ -13,7 +13,7 @@ Used by:
   ``(asset_group, venue, data_type, day)`` tuple where ``day < launch_date``.
 - ``deployment-api`` data-status panel: clip pre-venue-launch dates from the expected
   denominator so the panel doesn't render thousands of "missing" days for venues that
-  only existed for the last few months (Hyperliquid, Aster, Lighter, Pacifica, Extended).
+  only existed for the last few months (Hyperliquid, Aster, Lighter, Extended).
 
 **Conservative principle**: when uncertain, prefer the LATER (more recent) date. A
 later date means fewer ``EXPECTED_PRE_VENUE_LAUNCH`` rows are emitted; if our value is
@@ -79,11 +79,12 @@ CEFI_VENUE_LAUNCH_DATES: dict[str, str] = {
     # Astherus pre-rebrand genesis (operator-confirmed 2026-06-17);
     # pre-2024 funding is Binance-proxied (imported, not Aster-native).
     "ASTER": "2023-07-22",
-    "PACIFICA-SOLANA": "2024-04-01",  # Pacifica perp DEX on Solana
+    # DRIFT / PACIFICA (Solana) removed 2026-07-16 (operator ruling: all Solana
+    # perp DEXes dropped except Jupiter, not integrated). SSOT: unified-
+    # trading-pm/codex/04-architecture/solana-defi-coverage.md.
     "EXTENDED-STARKNET": "2024-09-01",  # Extended on Starknet
     "LIGHTER-ZKSYNC": "2024-09-01",  # Lighter on zkSync Era
     "GMX": "2021-09-01",  # GMX V1 on Arbitrum (V2 launched 2023-08)
-    "DRIFT": "2021-11-08",  # Drift V1 mainnet on Solana
     # Prediction-platform PERPETUAL FUTURES — crypto perps with funding. NOT
     # the same as KALSHI/POLYMARKET prediction YES/NO markets (those are in
     # PREDICTION_VENUE_LAUNCH_DATES). These are CFTC-regulated crypto perps in
@@ -190,7 +191,8 @@ DEFI_VENUE_LAUNCH_DATES: dict[str, str] = {
     "KAMINO-SOLANA": "2022-08-24",  # Kamino Aug 2022
     "JITO-SOLANA": "2022-08-16",  # Jito MEV+staking Aug 2022
     "MARINADE-SOLANA": "2021-08-02",  # Marinade mSOL launch
-    "DRIFT-SOLANA": "2021-11-08",  # Drift V1 mainnet
+    # DRIFT (Solana) removed 2026-07-16 (operator ruling: all Solana perp DEXes
+    # dropped except Jupiter, not integrated).
     "RAYDIUM-SOLANA": "2021-02-21",  # Raydium AMM launch
     "ORCA-SOLANA": "2021-02-09",  # Orca AMM launch
     # GMX — Sept 2021 Arbitrum, Jan 2022 Avalanche.
@@ -212,7 +214,9 @@ DEFI_VENUE_LAUNCH_DATES: dict[str, str] = {
     # pre-2024 funding is Binance-proxied (imported, not Aster-native).
     "ASTER": "2023-07-22",
     "LIGHTER-ZKSYNC": "2024-09-01",  # Lighter perp DEX on zkSync Era
-    "PACIFICA-SOLANA": "2024-04-01",  # Pacifica perp DEX on Solana
+    # PACIFICA (Solana) removed 2026-07-16 (operator ruling: all Solana perp
+    # DEXes dropped except Jupiter, not integrated). SSOT: unified-trading-pm/
+    # codex/04-architecture/solana-defi-coverage.md.
     # Pre-2018 venues kept for completeness (no EXPECTED_PRE_VENUE_LAUNCH rows
     # within the default [2018-01-01, today] window):
     "MAKER": "2017-12-19",  # MakerDAO single-collateral DAI launch

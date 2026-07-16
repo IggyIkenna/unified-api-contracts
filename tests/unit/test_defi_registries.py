@@ -347,18 +347,12 @@ class TestVenueCollateral:
                 f"row {entry.venue}/{entry.token} has invalid venue_kind={entry.venue_kind!r}"
             )
 
-    def test_drift_accepts_jitosol_with_probed_haircut(self) -> None:
-        """LST_AS_MARGIN structure (CARRY_STAKED_BASIS) — only DRIFT/JitoSOL +
-        DRIFT/mSOL are accepted today. The haircut value is the SSOT input
-        for the per-archetype ranker's effective-notional sizing. Probed 2026-06-17
-        from Drift on-chain initialAssetWeight=0.80 (conservative initial weight)."""
-        assert venue_accepts_collateral("DRIFT", "JitoSOL") is True
-        assert get_collateral_haircut("DRIFT", "JitoSOL") == Decimal("0.20")
-
-    def test_drift_accepts_msol_with_probed_haircut(self) -> None:
-        # Probed 2026-06-17: Drift on-chain initialAssetWeight=0.80 -> haircut 0.20.
-        assert venue_accepts_collateral("DRIFT", "mSOL") is True
-        assert get_collateral_haircut("DRIFT", "mSOL") == Decimal("0.20")
+    # test_drift_accepts_jitosol_with_probed_haircut / test_drift_accepts_msol_
+    # with_probed_haircut removed 2026-07-16 (operator ruling: all Solana perp
+    # DEXes dropped except Jupiter, not integrated). They tested the DRIFT
+    # JitoSOL/mSOL collateral rows, which were removed from venue_collateral.py
+    # in the same landing. SSOT: unified-trading-pm/codex/04-architecture/
+    # solana-defi-coverage.md.
 
     def test_no_eth_perp_venue_accepts_eth_lst_today(self) -> None:
         """As of 2026-05-08 the production ETH-perp venues that accept an
@@ -405,8 +399,10 @@ class TestVenueCollateral:
                     f"on CARRY_STAKED_BASIS catalog and the matrix audit"
                 )
 
-    def test_no_non_drift_venue_accepts_solana_lst(self) -> None:
-        """SOL LSTs (JitoSOL, mSOL) are only accepted at DRIFT today."""
+    def test_no_venue_accepts_solana_lst(self) -> None:
+        """SOL LSTs (JitoSOL, mSOL) are accepted at no venue today. (DRIFT was
+        the sole acceptor until removed 2026-07-16 — operator ruling: all
+        Solana perp DEXes dropped except Jupiter, not integrated.)"""
         for venue in ("HYPERLIQUID", "BINANCE", "BYBIT", "OKX", "ASTER"):
             for lst in ("JitoSOL", "mSOL"):
                 accepted = venue_accepts_collateral(venue, lst)

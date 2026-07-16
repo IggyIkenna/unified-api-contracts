@@ -560,37 +560,22 @@ class TestValidDataTypesVenueAxisExclusions:
         assert no_venue == valid_data_types_for_instrument_type("tradfi", "futures_chain")
         assert "ohlcv_1s" in no_venue
 
-    def test_drift_spot_pair_excludes_perp_funding(self) -> None:
-        # DRIFT's capability declaration bundles PERPETUAL + SPOT_PAIR under
-        # one _ProtocolCapability entry with no per-instrument_type data_types
-        # split, so perp_funding leaked onto every DRIFT-SOLANA SPOT market —
-        # SPOT instruments structurally cannot have a funding rate. Found
-        # investigating mvp_backfill_defi_onchain_v10-010 (2026-07-11):
-        # 51,301 expected_unattempted perp_funding cells, mostly DRIFT SPOT.
-        valid = valid_data_types_for_venue_instrument_type("defi", "DRIFT-SOLANA", "spot_pair")
-        assert valid is not None
-        assert "perp_funding" not in valid
+    # test_drift_spot_pair_excludes_perp_funding / test_drift_spot_pair_retains_
+    # oracle_prices / test_drift_perpetual_still_includes_perp_funding removed
+    # 2026-07-16 (operator ruling: all Solana perp DEXes dropped except
+    # Jupiter, not integrated). They tested the DRIFT spot_pair/perp_funding
+    # exclusion row in VALID_DATA_TYPES_VENUE_EXCLUSIONS, which was removed
+    # from market_data_categories.py in the same landing. SSOT: unified-
+    # trading-pm/codex/04-architecture/solana-defi-coverage.md.
 
-    def test_drift_spot_pair_retains_oracle_prices(self) -> None:
-        # oracle_prices legitimately still applies to SPOT (price feed) — the
-        # fix subtracts only the proven-wrong perp_funding cell.
-        valid = valid_data_types_for_venue_instrument_type("defi", "DRIFT-SOLANA", "spot_pair")
-        assert valid is not None
-        assert "oracle_prices" in valid
-
-    def test_drift_perpetual_still_includes_perp_funding(self) -> None:
-        # Non-regression: DRIFT's genuine PERP markets are untouched by the
-        # SPOT_PAIR-only exclusion.
-        valid = valid_data_types_for_venue_instrument_type("defi", "DRIFT-SOLANA", "perpetual")
-        assert valid is not None
-        assert "perp_funding" in valid
-
-    def test_exclusion_table_is_ice_and_drift_only_today(self) -> None:
+    def test_exclusion_table_is_ice_only_today(self) -> None:
         # Documents the current, intentionally-narrow scope: every exclusion
-        # key names ICE or DRIFT — no other venue's theoretical set is
-        # touched by this mechanism yet (a future venue-specific bug would
-        # add its own row, not widen this table's meaning).
-        assert {venue for (_, venue, _) in VALID_DATA_TYPES_VENUE_EXCLUSIONS} == {"ICE", "DRIFT"}
+        # key names ICE — no other venue's theoretical set is touched by this
+        # mechanism yet (a future venue-specific bug would add its own row,
+        # not widen this table's meaning). (The DRIFT row was removed
+        # 2026-07-16 — operator ruling: all Solana perp DEXes dropped except
+        # Jupiter, not integrated.)
+        assert {venue for (_, venue, _) in VALID_DATA_TYPES_VENUE_EXCLUSIONS} == {"ICE"}
 
 
 class TestDefiActualNotDeclaredValidJoin:

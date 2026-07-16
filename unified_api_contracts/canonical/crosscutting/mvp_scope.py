@@ -201,9 +201,11 @@ the prior audit's drifts):
      Perps/spot/dated-futures unchanged (trades + book_snapshot_5 + funding).
   3. DROP ``BINANCE-DELIVERY`` from the cefi MVP venues (COIN-M delivery not
      MVP). Other venues' dated/quarterly futures STAY MVP (FUTURE type).
-  4. LIGHTER-ZKSYNC / EXTENDED-STARKNET / PACIFICA-SOLANA added to the cefi MVP
-     venues (CLOB perp DEXs, classified cefi everywhere — reconciled vs the
-     instruments-side which already had them cefi).
+  4. LIGHTER-ZKSYNC / EXTENDED-STARKNET / PACIFICA (Solana) added to the cefi
+     MVP venues (CLOB perp DEXs, classified cefi everywhere — reconciled vs
+     the instruments-side which already had them cefi). PACIFICA (Solana)
+     removed entirely 2026-07-16 — operator ruling: all Solana perp DEXes
+     dropped except Jupiter, not integrated.
   5. PREDICTION KALSHI flipped in-MVP — prediction MVP = the Kalshi↔Polymarket
      arb-overlap (needs BOTH venues). TODO resolved.
   7. TRADFI data_types narrowed to ``ohlcv_1m`` ONLY (no ohlcv_1s/trades); CME

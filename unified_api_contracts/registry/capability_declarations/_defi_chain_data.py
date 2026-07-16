@@ -537,28 +537,12 @@ SOLANA_MINT_TO_SYMBOL["So11111111111111111111111111111111111111112"] = "SOL"
 # Solana DeFi protocol metadata — SSOT for all API endpoints.
 # Services import these URLs; never hardcode them.
 SOLANA_DEFI_PROTOCOLS: dict[str, dict[str, str]] = {
-    "drift": {
-        "name": "Drift Protocol",
-        "type": "perps_dex",
-        "program_id": "dRiftyHA39MWEi3m9aunc5MzRF1JYuBsbn6VPcn33UH",
-        # api_url (https://data.api.drift.trade) is dead (404/403 CloudFront
-        # as of 2026-06-19). Use sdk_perp_markets_url / sdk_spot_markets_url
-        # to discover the market universe from the public GitHub SDK constants.
-        "api_url": "https://data.api.drift.trade",
-        "sdk_perp_markets_url": (
-            "https://raw.githubusercontent.com/drift-labs/protocol-v2/master/sdk/src/constants/perpMarkets.ts"
-        ),
-        "sdk_spot_markets_url": (
-            "https://raw.githubusercontent.com/drift-labs/protocol-v2/master/sdk/src/constants/spotMarkets.ts"
-        ),
-        "dlob_url": "https://dlob.drift.trade",
-        "ws_url": "wss://dlob.drift.trade/ws",
-        "s3_historical_url": (
-            "https://drift-historical-data-v2.s3.eu-west-1.amazonaws.com"
-            "/program/dRiftyHA39MWEi3m9aunc5MzRF1JYuBsbn6VPcn33UH"
-        ),
-        "data_source": "drift_api",
-    },
+    # "drift" protocol entry removed 2026-07-16 (operator ruling): Drift was
+    # hacked for ~$280M on 2026-04-01 (Lazarus-attributed), offline 3 months,
+    # then rebranded + relaunched as "Velocity DEX" 2026-07-01 under an
+    # entirely new program deployment -- now a ~2-week-old private beta with
+    # ~$0 listed TVL. Operator dropped ALL Solana perp DEXes; Jupiter ($716M
+    # leader) is the only one kept conceptually but is NOT integrated here.
     # mango / zeta / flash_trade removed 2026-07-15 (operator ruling): all 3 declared API
     # hosts are dead (api.mngo.cloud/api.flash.trade NXDOMAIN, dex.zeta.markets/api returns
     # HTML not JSON), ~$0 DeFiLlama TVL, zero MTDS market-data capture ever wired. SSOT:
@@ -658,7 +642,7 @@ def get_solana_protocol_url(protocol: str, url_type: str = "api_url") -> str | N
     """Get a Solana DeFi protocol URL by protocol name and URL type.
 
     Args:
-        protocol: Protocol key (drift, raydium, orca, kamino, marinade, jupiter).
+        protocol: Protocol key (raydium, orca, kamino, marinade, jupiter).
         url_type: URL type key (api_url, dlob_url, ws_url, s3_historical_url).
     """
     proto = SOLANA_DEFI_PROTOCOLS.get(protocol)

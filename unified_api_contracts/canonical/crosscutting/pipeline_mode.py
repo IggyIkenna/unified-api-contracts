@@ -109,20 +109,17 @@ class PipelineMode(StrEnum):
     # like ASTER/HYPERLIQUID → batch_extended via UTL ``_VENUE_OVERRIDES["EXTENDED-STARKNET"]``.
     # SSOT: data_completion_to_100_all_ag_2026_06_21.md task-085.
     BATCH_EXTENDED = "batch_extended"
-    # PACIFICA-SOLANA (Solana on-chain CeFi perp CLOB, Hyperliquid clone) uses its own
-    # public REST API (api.pacifica.fi/api/v1 — no Tardis archive). Self-archiving
-    # venue like ASTER/HYPERLIQUID/EXTENDED-STARKNET → batch_pacifica via UTL/handler
-    # venue overrides. Registered BATCH-only for now (no LIVE_/REPLAY_ member) —
-    # `collect-onchain-perp-batch` (OnchainPerpBatchHandler) is the sole batch
-    # consumer; live-mode capture is a separate WS connector not yet pipeline_mode-
-    # registered. SSOT: cefi_onchain_perp_batch_venue_allowlist_gap_2026_07_12.md.
-    BATCH_PACIFICA = "batch_pacifica"
+    # BATCH_PACIFICA removed 2026-07-16 (operator ruling: all Solana perp
+    # DEXes dropped except Jupiter, not integrated — the "pacifica" source was
+    # removed from SOURCE_PRIORITY in the same landing to preserve the
+    # PipelineMode<->SOURCE_PRIORITY closed-set round-trip invariant). SSOT:
+    # unified-trading-pm/codex/04-architecture/solana-defi-coverage.md.
     # deribit already carries LIVE_DERIBIT / REPLAY_DERIBIT (the per-venue
     # live/replay override for OTHER CeFi data_types, tardis is those data_types'
     # batch archive). It ALSO self-archives (cefi, volatility_index) — Deribit's
     # public REST DVOL-history endpoint, no creds, back to 2021-03-24 — so it is
     # a BATCH_CAPABLE_CEFI_VENUES exception for that one data_type, same pattern
-    # as BATCH_ASTER/BATCH_EXTENDED/BATCH_PACIFICA above. SSOT:
+    # as BATCH_ASTER/BATCH_EXTENDED above. SSOT:
     # vol_dvol_backtestable_engines_2026_07_13.md.
     BATCH_DERIBIT = "batch_deribit"
     BATCH_MASSIVE = "batch_massive"

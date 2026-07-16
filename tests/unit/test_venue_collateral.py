@@ -152,17 +152,15 @@ def test_f28_consolidation_canonical_clear_cut_values() -> None:
 
 
 def test_f28_haircuts_live_probed_2026_06_17() -> None:
-    """F28 former-placeholder rows are now LIVE-PROBED (operator-authorised 2026-06-17).
+    """F28 former-placeholder row is now LIVE-PROBED (operator-authorised 2026-06-17).
 
-    Bybit stETH = 0.10 (Bybit UTA ``collateralRatio`` 0.9 via ``/v5/spot-margin-trade/data``);
-    Drift mSOL = 0.20 (Drift on-chain ``initialAssetWeight`` 0.80 — the conservative initial weight;
-    the prior 0.10 placeholder was the maintenance value). ``PLACEHOLDER_HAIRCUTS_PENDING_GO_LIVE``
-    is now empty.
+    Bybit stETH = 0.10 (Bybit UTA ``collateralRatio`` 0.9 via ``/v5/spot-margin-trade/data``).
+    ``PLACEHOLDER_HAIRCUTS_PENDING_GO_LIVE`` is now empty. (The former Drift mSOL = 0.20 row was
+    removed 2026-07-16 along with the rest of the DRIFT venue — operator ruling: all Solana perp
+    DEXes dropped except Jupiter, not integrated.)
     """
     assert venue_accepts_collateral("BYBIT", "stETH")
     assert get_collateral_haircut("BYBIT", "stETH") == Decimal("0.10")
-    assert venue_accepts_collateral("DRIFT", "mSOL")
-    assert get_collateral_haircut("DRIFT", "mSOL") == Decimal("0.20")
     assert not PLACEHOLDER_HAIRCUTS_PENDING_GO_LIVE  # empty: no haircut remains a placeholder
 
 

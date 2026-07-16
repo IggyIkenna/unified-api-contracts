@@ -26,11 +26,14 @@ from unified_api_contracts.internal.reference.instrument import InstrumentRecord
 _DUMMY_ADDR = "0xBcca60bB61934080951369a648Fb03DF4F96263C"
 
 
-def _drift_defi_record(**overrides: object) -> InstrumentRecord:
-    """Minimal DeFi STAKING record representing a Drift market."""
+def _solana_staking_defi_record(**overrides: object) -> InstrumentRecord:
+    """Minimal DeFi STAKING record representing a Solana staking market.
+    (Previously named _drift_defi_record / keyed to DRIFT — renamed
+    2026-07-16, operator ruling: all Solana perp DEXes dropped except
+    Jupiter, not integrated; JITO is a still-live Solana staking venue.)"""
     kwargs: dict[str, object] = {
-        "instrument_key": "DRIFT:STAKING:SOL-PERP",
-        "venue": "DRIFT",
+        "instrument_key": "JITO:STAKING:SOL-PERP",
+        "venue": "JITO",
         "instrument_type": InstrumentType.STAKING,
         "pool_address": _DUMMY_ADDR,
         "base_asset_decimals": 9,
@@ -58,7 +61,7 @@ def test_expected_past_source_coverage_end_in_closed_set() -> None:
 
 
 def test_archive_fields_default_none() -> None:
-    rec = _drift_defi_record()
+    rec = _solana_staking_defi_record()
     assert rec.source_archive_url_template is None
     assert rec.source_record_types is None
     assert rec.source_coverage_start is None
@@ -83,7 +86,7 @@ def test_archive_metadata_roundtrip() -> None:
     listed = date(2020, 9, 14)
     delisted = date(2025, 1, 8)
 
-    rec = _drift_defi_record(
+    rec = _solana_staking_defi_record(
         source_archive_url_template=url_template,
         source_record_types=record_types,
         source_coverage_start=coverage_start,
@@ -102,7 +105,7 @@ def test_archive_metadata_roundtrip() -> None:
 
 def test_archive_metadata_pydantic_serialise_deserialise() -> None:
     """model_dump + model_validate roundtrip preserves all archive-metadata fields."""
-    rec = _drift_defi_record(
+    rec = _solana_staking_defi_record(
         source_archive_url_template="https://example.com/{market}/{year}/{day}",
         source_record_types={"trades": "tradeRecords"},
         source_coverage_start={"trades": date(2020, 9, 14)},
@@ -137,7 +140,7 @@ def test_archive_metadata_pydantic_serialise_deserialise() -> None:
 )
 def test_coverage_end_logic(query_date: date, coverage_end: date, expected_past_end: bool) -> None:
     """Callers should emit EXPECTED_PAST_SOURCE_COVERAGE_END when query_date > coverage_end."""
-    rec = _drift_defi_record(
+    rec = _solana_staking_defi_record(
         source_coverage_end={"trades": coverage_end},
     )
     assert rec.source_coverage_end is not None

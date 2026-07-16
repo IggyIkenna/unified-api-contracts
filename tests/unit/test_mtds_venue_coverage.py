@@ -35,8 +35,11 @@ class TestAllCefiVenuesDeduplicated:
         # Tier-1/2 Tardis (BINANCE-SPOT/FUTURES, DERIBIT, BYBIT, OKX-SPOT/FUTURES/SWAP,
         # COINBASE-SPOT, UPBIT) + Tier-3 (2026-05-01: BITFINEX-SPOT/FUTURES, BITGET-SPOT,
         # BITGET-FUTURES, KRAKEN-SPOT, KRAKEN-FUTURES) + on-chain CLOBs (HYPERLIQUID,
-        # ASTER, PACIFICA-SOLANA, EXTENDED-STARKNET, LIGHTER-ZKSYNC). HYPERLIQUID is in
-        # both Tardis-backed and CLOB sets so dedupes once.
+        # ASTER, EXTENDED-STARKNET, LIGHTER-ZKSYNC). HYPERLIQUID is in
+        # both Tardis-backed and CLOB sets so dedupes once. (PACIFICA (Solana) was
+        # a fifth CLOB venue here until removed 2026-07-16 — operator ruling: all
+        # Solana perp DEXes dropped except Jupiter, not integrated — dropping the
+        # total below from 24 to 23.)
         # 2026-06-23 (cefi_universe_capture_rule): + BYBIT-SPOT (Tardis bybit-spot,
         # split from BYBIT) + COINBASE-FUTURES (Tardis coinbase-international). Total = 22.
         # 2026-06-24 (cefi_universe_capture_rule): + BINANCE-DELIVERY (COIN-M inverse).
@@ -44,8 +47,8 @@ class TestAllCefiVenuesDeduplicated:
         # 2026-07-10 (COINBASE-FUTURES/#3-vs-#8 resolution): + COINBASE-CDE (Coinbase
         # Derivatives Exchange dated futures, native Advanced Trade REST, zero Tardis
         # coverage — see unified-api-contracts@1cafb3c5). Total = 24.
-        assert len(vm.all_cefi_venues) == 24, (
-            f"expected 24 unique CEFI venues, got {len(vm.all_cefi_venues)}: {sorted(vm.all_cefi_venues)}"
+        assert len(vm.all_cefi_venues) == 23, (
+            f"expected 23 unique CEFI venues, got {len(vm.all_cefi_venues)}: {sorted(vm.all_cefi_venues)}"
         )
 
     def test_includes_all_suffixed_variants(self) -> None:
@@ -353,7 +356,9 @@ class TestIsPerInstrumentShardDataType:
     def test_ohlcv_1m_is_per_instrument(self) -> None:
         # Phase 3.D.5 v2: ohlcv_1m promoted to per-instrument shard.
         # TradFiCatalogReader provides equity tickers; CeFiCatalogReader
-        # provides DEX pool IDs for LIGHTER/PACIFICA.
+        # provides DEX pool IDs for LIGHTER. (PACIFICA removed 2026-07-16 —
+        # operator ruling: all Solana perp DEXes dropped except Jupiter, not
+        # integrated.)
         assert is_per_instrument_shard_data_type("ohlcv_1m")
 
     def test_venue_level_dts(self) -> None:

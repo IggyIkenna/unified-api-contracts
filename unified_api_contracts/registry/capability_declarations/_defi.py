@@ -654,18 +654,11 @@ PROTOCOL_CAPABILITIES: dict[str, _ProtocolCapability] = {
         mtds_operations=["collect-perp-funding"],
     ),
     # ── Solana DeFi ─────────────────────────────────────────────
-    "drift": _ProtocolCapability(
-        venue_prefix="DRIFT",
-        protocol_class=ProtocolClass.PERPS,
-        instrument_types=_PERPS,
-        # perp_trades added 2026-07-16 (drift_helius_path_obsolete_2026_07_15): the
-        # Velocity historical ingester writes it, but this list never registered it,
-        # so no expected_unattempted catalog row was ever seeded for it — only
-        # ad-hoc manually-reconciled rows existed.
-        data_types=["perp_funding", "oracle_prices", "perp_trades"],
-        mtds_operations=["collect-perp-funding"],
-        required_tokens=frozenset({"DRIFT"}),
-    ),
+    # "drift" capability declaration removed 2026-07-16 (operator ruling: all
+    # Solana perp DEXes dropped except Jupiter, not integrated — Drift was
+    # hacked 2026-04-01, rebranded, and is now a ~2-week-old private beta with
+    # ~$0 listed TVL). SSOT: unified-trading-pm/codex/04-architecture/
+    # solana-defi-coverage.md.
     "kamino": _ProtocolCapability(
         venue_prefix="KAMINO",
         protocol_class=ProtocolClass.DEX,
@@ -1026,7 +1019,7 @@ def get_required_tokens_for_venue(venue: str) -> frozenset[str]:
     """Get all required tokens for a venue (protocol + chain tokens).
 
     Args:
-        venue: Canonical venue name (e.g. "AAVE_V3-ETHEREUM", "DRIFT-SOLANA").
+        venue: Canonical venue name (e.g. "AAVE_V3-ETHEREUM", "KAMINO-SOLANA").
 
     Returns:
         Union of protocol-required tokens + chain-native tokens.
@@ -1134,7 +1127,8 @@ _STATIC_VENUE_CHAINS: dict[str, list[str]] = {
     "eigenlayer": ["ETHEREUM"],
     "hyperliquid": ["HYPERLIQUID"],
     "aster": ["ASTER"],
-    "drift": ["SOLANA"],
+    # "drift" entry removed 2026-07-16 (operator ruling: all Solana perp
+    # DEXes dropped except Jupiter, not integrated).
     "kamino": ["SOLANA"],
     "raydium": ["SOLANA"],
     "orca": ["SOLANA"],
