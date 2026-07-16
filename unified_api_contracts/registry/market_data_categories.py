@@ -422,6 +422,15 @@ NEEDS_CANDLE_PROCESSING: dict[str, bool] = {
     "lending_indices": False,
     # Note: "liquidations" already declared in CeFi section above (True — same for DeFi)
     "perp_funding": False,
+    # Per-fill prints; SEMANTICALLY the same class as "trades"/"dex_pool_swaps" (True).
+    # Pass-through ONLY because no defi/perp_trades candle adapter exists in MDPS and no
+    # defi-asset-group venue currently emits it — the Drift V2 ingester that motivated the
+    # DATA_TYPES_BY_ASSET_GROUP entry was removed 2026-07-16 with the Drift venue (operator
+    # ruling); the on-chain CLOBs that do emit per-fill prints are cefi-asset-group and use
+    # "trades". Omitting the key is NOT equivalent: needs_candle_processing() defaults
+    # unknown types to True, which routes perp_trades to a non-existent adapter. Flip to
+    # True ONLY together with a real defi/perp_trades adapter (cf. "lending_indices" below).
+    "perp_trades": False,
     "lst_rates": False,
     "oracle_prices": False,
     "gas_fees": False,
