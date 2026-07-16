@@ -69,7 +69,7 @@ def test_scaffold_venues_are_not_registered() -> None:
 
 def test_wired_clob_venues_honor_tif() -> None:
     """The CLOB perp/options venues that are wired send at least GTC + IOC."""
-    for vid in ("hyperliquid", "deribit", "drift"):
+    for vid in ("hyperliquid", "deribit"):  # drift removed 2026-07-16 (Solana perp DEX cull)
         tif = set(_os(vid).honored_tif)
         assert {TimeInForce.GTC, TimeInForce.IOC} <= tif
 
