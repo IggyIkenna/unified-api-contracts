@@ -233,8 +233,6 @@ archetypes:
           ceiling_usd: "250000"
           spender_contract: "jupiter_v6_aggregator"
           purpose: "Jupiter aggregator routes"
-      DRIFT:
-        - asset: USDC
-          ceiling_usd: "150000"
-          spender_contract: "drift_v2_program"
-          purpose: "Drift perp leg margin"
+      # DRIFT approval entry removed 2026-07-16 (operator ruling: all Solana
+      # perp DEXes dropped except Jupiter, not integrated). SSOT:
+      # unified-trading-pm/codex/04-architecture/solana-defi-coverage.md.

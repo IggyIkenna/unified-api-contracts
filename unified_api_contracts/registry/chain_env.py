@@ -281,7 +281,8 @@ PROTOCOL_LAUNCH_DATES: dict[tuple[str, str], str] = {
     ("SOLANA", "RAYDIUM"): "2021-02-21",
     ("SOLANA", "ORCA"): "2021-02-09",
     ("SOLANA", "KAMINO"): "2022-08-23",
-    ("SOLANA", "DRIFT"): "2021-11-18",
+    # ("SOLANA", "DRIFT") removed 2026-07-16 (operator ruling: all Solana
+    # perp DEXes dropped except Jupiter, not integrated).
     # ── Perp DEXes / aggregators ──
     ("ARBITRUM", "GMX"): "2021-09-01",
     ("AVALANCHE", "GMX"): "2022-01-05",

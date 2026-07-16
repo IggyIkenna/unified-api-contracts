@@ -6,7 +6,6 @@ funding rates from, replacing per-file hardcoded string literals.
 Provenance: URLs verified from public venue API documentation (2026-05-22).
   - Hyperliquid: https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api
   - Aster: https://docs.asterdex.com
-  - Pacifica: https://docs.pacifica.fi
   - Kalshi-perp: https://docs.kalshi.com/margin (perps_openapi.yaml), re-verified
     2026-07-14 with a live GET against external-api.kalshi.com/trade-api/v2/margin/markets.
 
@@ -24,7 +23,9 @@ from typing import Final
 CEFI_PERP_VENUE_API_ENDPOINTS: Final[dict[str, str]] = {
     "HYPERLIQUID": "https://api.hyperliquid.xyz/info",
     "ASTER": "https://fapi.asterdex.com",
-    "PACIFICA": "https://api.pacifica.fi/api/v1",
+    # PACIFICA endpoint removed 2026-07-16 (operator ruling: all Solana perp
+    # DEXes dropped except Jupiter, not integrated). SSOT: unified-trading-
+    # pm/codex/04-architecture/solana-defi-coverage.md.
     # Kalshi-perp: CFTC-regulated crypto perpetuals (launched 2026-05-29).
     # Public-read REST (no auth for market data). History from 2026-05-29.
     # CONFIRMED 2026-07-14 (mtds_perp_funding_backfill_hang_2026_07_14.md

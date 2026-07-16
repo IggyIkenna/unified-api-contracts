@@ -644,12 +644,15 @@ DATA_TYPE_CAPABILITY_REGISTRY: Final[tuple[DataTypeCapability, ...]] = (
     # derivative_ticker (perp funding). Minimum perp surface so the data_type
     # axis is non-empty (operator 2026-06-23: all venues incl small DEX-perps
     # are in scope). DERIBIT-COMBO rides Deribit's multi-leg combo feed.
-    # PACIFICA-SOLANA + LIGHTER-ZKSYNC (like HYPERLIQUID + ASTER above): the
-    # standalone ``perp_funding`` data_type was RETIRED for these 2 venues
+    # EXTENDED-STARKNET + LIGHTER-ZKSYNC (like HYPERLIQUID + ASTER above): the
+    # standalone ``perp_funding`` data_type was RETIRED for these venues
     # (2026-07-08, operator-approved) in favor of this derivative_ticker row's
     # embedded funding_rate field — a live-fetch probe confirmed byte-identical/
     # same-source funding data for both. derivative_ticker IS the funding source
     # here; no separate perp_funding capability declaration exists or is needed.
+    # (PACIFICA (Solana) was a third venue in this loop until removed entirely
+    # 2026-07-16 — operator ruling: all Solana perp DEXes dropped except
+    # Jupiter, not integrated.)
     *(
         DataTypeCapability(
             asset_group=AssetGroup.CEFI,
@@ -660,7 +663,7 @@ DATA_TYPE_CAPABILITY_REGISTRY: Final[tuple[DataTypeCapability, ...]] = (
             batch_capable=True,
             streaming_protocol="ws",
         )
-        for _venue in ("PACIFICA-SOLANA", "EXTENDED-STARKNET", "LIGHTER-ZKSYNC")
+        for _venue in ("EXTENDED-STARKNET", "LIGHTER-ZKSYNC")
         for _dt, _itype in (
             ("trades", ""),
             ("book_snapshot_5", ""),

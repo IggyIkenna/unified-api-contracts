@@ -111,10 +111,8 @@ EXPECTED_SOURCE_MODE_CAPABILITY: dict[str, frozenset[Mode]] = {
     # Extended (EXTENDED-STARKNET CeFi on-chain perp CLOB, api.starknet.extended.exchange):
     # self-archiving native REST → {BATCH, LIVE, REPLAY}. BATCH_CAPABLE_CEFI_VENUES exception.
     "extended": _BLR,
-    # Pacifica (PACIFICA-SOLANA CeFi on-chain perp CLOB, api.pacifica.fi): self-archiving
-    # native REST → BATCH-only for now (no LIVE_/REPLAY_ member registered yet — see
-    # cefi_onchain_perp_batch_venue_allowlist_gap_2026_07_12.md).
-    "pacifica": _B,
+    # "pacifica" source removed 2026-07-16 (operator ruling: all Solana perp
+    # DEXes dropped except Jupiter, not integrated).
 }
 
 

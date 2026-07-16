@@ -160,10 +160,12 @@ class TestCeFiMvp:
         assert not is_mvp("cefi", "DERIBIT", "OPTION", "options_chain", base_ccy="SOL")
 
     def test_dex_clob_perp_venues_are_cefi_mvp(self) -> None:
-        """LIGHTER / EXTENDED / PACIFICA perps are cefi MVP (decision #4)."""
+        """LIGHTER / EXTENDED perps are cefi MVP (decision #4). (PACIFICA
+        (Solana) was a third venue here until removed 2026-07-16 — operator
+        ruling: all Solana perp DEXes dropped except Jupiter, not
+        integrated.)"""
         assert is_mvp("cefi", "LIGHTER-ZKSYNC", "PERPETUAL", "trades", base_ccy="BTC")
         assert is_mvp("cefi", "EXTENDED-STARKNET", "PERPETUAL", "trades", base_ccy="ETH")
-        assert is_mvp("cefi", "PACIFICA-SOLANA", "PERPETUAL", "trades", base_ccy="SOL")
 
     def test_binance_delivery_dropped_from_mvp(self) -> None:
         """BINANCE-DELIVERY (COIN-M) dropped from cefi MVP (decision #3)."""
@@ -929,12 +931,14 @@ def test_capture_universe_binance_delivery_dropped() -> None:
 
 
 def test_capture_universe_dex_clob_perps_in_universe() -> None:
-    """LIGHTER / EXTENDED / PACIFICA perps are in the cefi capture universe (decision #4)."""
+    """LIGHTER / EXTENDED perps are in the cefi capture universe (decision #4).
+    (PACIFICA (Solana) was a third venue here until removed 2026-07-16 —
+    operator ruling: all Solana perp DEXes dropped except Jupiter, not
+    integrated.)"""
     from unified_api_contracts import is_in_mvp_capture_universe
 
     assert is_in_mvp_capture_universe("LIGHTER-ZKSYNC", "BTC", "PERPETUAL", has_perp_for_base=False)
     assert is_in_mvp_capture_universe("EXTENDED-STARKNET", "ETH", "PERPETUAL", has_perp_for_base=False)
-    assert is_in_mvp_capture_universe("PACIFICA-SOLANA", "SOL", "PERPETUAL", has_perp_for_base=False)
 
 
 def test_capture_universe_deribit_option_in_universe() -> None:
@@ -1409,11 +1413,11 @@ class TestDeFiMvpV13Broadening:
         """AAVE_V3-ARBITRUM was outside the pre-v13 curated (ETHEREUM-only) subset — now MVP."""
         assert is_mvp("defi", "AAVE_V3-ARBITRUM", "LENDING", "lending_indices")
 
-    def test_drift_perpetual_perp_funding_now_mvp(self) -> None:
-        """DRIFT-SOLANA PERPETUAL perp_funding → MVP (resolves the linked
-        defi_perp_funding_mvp_scope_contradiction_2026_06_29.md contradiction
-        as Option 2 — PERPETUAL is now a real DeFi MVP instrument_type)."""
-        assert is_mvp("defi", "DRIFT-SOLANA", "PERPETUAL", "perp_funding")
+    # test_drift_perpetual_perp_funding_now_mvp removed 2026-07-16 (operator
+    # ruling: all Solana perp DEXes dropped except Jupiter, not integrated —
+    # "no instruments no mvp nothing"). DRIFT (Solana)'s MVP_SCOPE entry no
+    # longer exists; the venue itself is gone from the system. SSOT:
+    # unified-trading-pm/codex/04-architecture/solana-defi-coverage.md.
 
     def test_rocketpool_ethereum_still_excluded_post_v13(self) -> None:
         """ROCKETPOOL-ETHEREUM stays excluded post-v13 — MVP venues are still ⊆ P."""

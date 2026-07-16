@@ -410,19 +410,19 @@ MVP_SCOPE: Final[dict[str, object]] = {
                 # perp-gate exception (see is_in_mvp_capture_universe): its SPOT
                 # is mvp=true despite no perp on the venue.
                 "UPBIT",
-                # On-chain CLOB perp venues (LIGHTER / EXTENDED / PACIFICA) —
-                # classified as CEFI everywhere (venue_mapping
-                # all_cefi_onchain_clob_venues + VENUES_BY_ASSET_GROUP["cefi"] +
-                # is_cefi_venue), but previously ABSENT from this MVP rule so their
-                # PERPETUAL cells tagged mvp=0 (instruments-vs-MTDS drift). Added
-                # cefi here for BOTH instruments + MTDS (operator 2026-06-27
-                # decision #4). All three are CLOB-based perp DEXs (confirmed: same
-                # CLOB capture surface as HL/ASTER — trades + book_snapshot_5 +
-                # derivative_ticker). PACIFICA is forward-poll-only for tick (no
-                # historical book/trades backfill — see DataTypeCapability notes).
+                # On-chain CLOB perp venues (LIGHTER / EXTENDED) — classified as
+                # CEFI everywhere (venue_mapping all_cefi_onchain_clob_venues +
+                # VENUES_BY_ASSET_GROUP["cefi"] + is_cefi_venue), but previously
+                # ABSENT from this MVP rule so their PERPETUAL cells tagged mvp=0
+                # (instruments-vs-MTDS drift). Added cefi here for BOTH
+                # instruments + MTDS (operator 2026-06-27 decision #4). Both are
+                # CLOB-based perp DEXs (confirmed: same CLOB capture surface as
+                # HL/ASTER — trades + book_snapshot_5 + derivative_ticker).
+                # (PACIFICA (Solana) was a third venue here, forward-poll-only
+                # for tick, until removed entirely 2026-07-16 — operator ruling:
+                # all Solana perp DEXes dropped except Jupiter, not integrated.)
                 "LIGHTER-ZKSYNC",
                 "EXTENDED-STARKNET",
-                "PACIFICA-SOLANA",
                 # NOTE (operator 2026-06-27 decision #3): BINANCE-DELIVERY (Binance
                 # COIN-M inverse/delivery futures) was REMOVED from the cefi MVP
                 # set — the operator accepts COIN-M delivery is NOT MVP. Other
@@ -610,8 +610,9 @@ MVP_SCOPE: Final[dict[str, object]] = {
     #   DEBT_TOKEN  — borrow-side lending leg (Morpho, Fluid, MarginFi, Solend)
     #   LST         — liquid staking tokens (Lido, EtherFi)
     #   YIELD_BEARING — yield-bearing wrapped assets (Ethena sUSDe, EtherFi)
-    #   PERPETUAL   — on-chain perp markets (Drift)
-    #   SPOT_PAIR   — on-chain spot markets (Drift, EigenLayer governance token)
+    #   PERPETUAL   — on-chain perp markets (Drift adapter removed 2026-07-16,
+    #                 operator ruling — no current IS-adapter example)
+    #   SPOT_PAIR   — on-chain spot markets (EigenLayer governance token)
     #   STAKING     — native/protocol staking (Jito, Marinade)
     #
     # data_types: the full DATA_TYPES_BY_ASSET_GROUP["defi"] list (dex pool

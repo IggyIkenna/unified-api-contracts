@@ -113,7 +113,8 @@ _CATALOGUE_VENUE_TO_PARQUET: dict[str, list[str]] = {
     "sushiswap": ["SUSHISWAP"],
     "maverick": ["MAVERICK"],
     "gmx": ["GMX"],
-    "drift": ["DRIFT"],
+    # "drift": ["DRIFT"] removed 2026-07-16 (operator ruling: all Solana perp
+    # DEXes dropped except Jupiter, not integrated).
     "kamino": ["KAMINO"],
     "raydium": ["RAYDIUM"],
     "orca": ["ORCA"],

@@ -193,15 +193,9 @@ DEFI_VENUE_DATA_TYPE_CAPABILITIES: dict[str, dict[str, str]] = {
         "derivative_ticker": "2021-12-31",
     },
     # ── DeFi — Solana ──
-    # Drift perpetual CLOB: V1 S3 archive 2022-01-01; LST margin (JitoSOL/mSOL accepted).
-    # derivative_ticker (2026-07-15, same issue as above): drift_adapter.py's fetch_drift_data already produces
-    # real derivative_ticker rows (funding_rate/mark_price via the Drift Data API /fundingRates endpoint,
-    # adapters/drift_adapter.py:141-167) but ONLY for date >= 2025-01-01 (_DRIFT_API_START gate at
-    # adapters/drift_adapter.py:315-341) — there is no S3-archive funding fetch in this adapter for the
-    # 2022-01-01..2024-12-31 window (that window's funding is captured under a DIFFERENT data_type,
-    # perp_funding, via a separate S3-CSV backfill path in solana_defi_drift.py). Declaring 2022-01-01 here would
-    # be dishonest (nothing serves derivative_ticker before 2025-01-01) — floor matches the adapter's real gate.
-    "DRIFT-SOLANA": {"perp_funding": "2022-01-01", "dex_pool_swaps": "2022-01-01", "derivative_ticker": "2025-01-01"},
+    # DRIFT (Solana) capability entry removed 2026-07-16 (operator ruling: all
+    # Solana perp DEXes dropped except Jupiter, not integrated). SSOT:
+    # unified-trading-pm/codex/04-architecture/solana-defi-coverage.md.
     "KAMINO-SOLANA": {"lending_indices": "2023-06-01", "oracle_prices": "2023-06-01"},
     "MARINADE-SOLANA": {"lst_rates": "2021-08-01", "oracle_prices": "2021-08-01"},
     "ORCA-SOLANA": {"dex_pool_swaps": "2021-03-01", "dex_pool_state": "2021-03-01"},

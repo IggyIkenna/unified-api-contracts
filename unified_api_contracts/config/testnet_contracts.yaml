@@ -158,9 +158,8 @@
     sol_stake_pool: "Jito4APyf642JPZPx3hGc6WWJ8zPKtRbRs4P815Awbb"
     # jitoSOL mint on devnet — operator confirms; placeholder pattern
     jitosol_mint: "DEVNET_JITOSOL_MINT_TBD"
-  # Drift V2 devnet program IDs
-  drift_v2:
-    program_id: "dRiftyHA39MWEi3m9aunc5MzRF1JYuBsbn6VPcn33UH"
+  # drift_v2 devnet program-id entry removed 2026-07-16 (operator ruling: all
+  # Solana perp DEXes dropped except Jupiter, not integrated).
   # Marinade devnet (small differences from mainnet)
   marinade:
     state: "MarBmsSgKXdrN1egZf5sqe1TMThczhgQyz44GFiAYbu"

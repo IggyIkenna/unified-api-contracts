@@ -97,11 +97,14 @@ class VenueMapping:
         default_factory=lambda: [
             "HYPERLIQUID",
             "ASTER",
-            "PACIFICA-SOLANA",
             "EXTENDED-STARKNET",
             "LIGHTER-ZKSYNC",
             # DRIFT removed 2026-05-14: operator revised 2026-05-13 — GMX/DRIFT are
-            # DeFi-only (on-chain settlement). DRIFT-SOLANA lives in MTDS_DEFI_VENUES.
+            # DeFi-only (on-chain settlement). DRIFT (Solana) lived in MTDS_DEFI_VENUES
+            # until removed entirely 2026-07-16 (operator ruling: all Solana perp
+            # DEXes dropped except Jupiter, not integrated).
+            # PACIFICA (Solana) removed 2026-07-16 (same ruling). SSOT: unified-trading-
+            # pm/codex/04-architecture/solana-defi-coverage.md.
             "COINBASE-CDE",  # 2026-07-10, zero Tardis coverage, native REST source
         ]
     )
@@ -217,10 +220,12 @@ class VenueMapping:
             # DeFi venues with direct API integration
             "HYPERLIQUID": "hyperliquid_api",
             "ASTER": "aster_api",
-            "PACIFICA-SOLANA": "pacifica_api",
+            # DRIFT / PACIFICA (Solana) data-source entries removed 2026-07-16
+            # (operator ruling: all Solana perp DEXes dropped except Jupiter,
+            # not integrated). SSOT: unified-trading-pm/codex/04-architecture/
+            # solana-defi-coverage.md.
             "EXTENDED-STARKNET": "extended_api",
             "LIGHTER-ZKSYNC": "lighter_api",  # pre-2026-04-17; post routes to Tardis
-            "DRIFT": "drift_api",  # S3 archive (2022-2025) + Data API (2025-present)
             "COINBASE-CDE": "coinbase_advanced_trade_api",
             # DeFi venues — canonical PROTOCOL-CHAIN format
             "UNISWAP_V2-ETHEREUM": "the_graph",
@@ -292,7 +297,8 @@ class VenueMapping:
             # Astherus pre-rebrand genesis (operator-confirmed 2026-06-17);
             # pre-2024 funding is Binance-proxied (imported, not Aster-native).
             "ASTER": "2023-07-22",
-            "PACIFICA-SOLANA": "2025-06-01",
+            # PACIFICA (Solana) removed 2026-07-16 (operator ruling: all Solana
+            # perp DEXes dropped except Jupiter, not integrated).
             "EXTENDED-STARKNET": "2024-10-01",
             "LIGHTER-ZKSYNC": "2024-08-01",
             # Prediction-platform PERPETUAL FUTURES — crypto perps treated as cefi.
@@ -364,10 +370,10 @@ class VenueMapping:
             "EIGENLAYER-ETHEREUM": "2024-09-17",  # EIGEN token listing date (earliest instrument)
             "SUSHISWAP-ARBITRUM": "2023-03-30",  # Earliest pool createdAtTimestamp from subgraph
             # DeFi - Solana protocols
-            # DRIFT canonical venue string (market_data_categories.py uses "DRIFT" not "DRIFT-SOLANA").
-            # S3 archive data: 2022-01-01. DRIFT-SOLANA kept as an alias start date.
-            "DRIFT": "2022-01-01",
-            "DRIFT-SOLANA": "2022-11-04",
+            # DRIFT / DRIFT (Solana) launch-date entries removed 2026-07-16
+            # (operator ruling: all Solana perp DEXes dropped except Jupiter,
+            # not integrated). SSOT: unified-trading-pm/codex/04-architecture/
+            # solana-defi-coverage.md.
             "ORCA-SOLANA": "2023-12-29",
             "RAYDIUM-SOLANA": "2021-02-21",  # Raydium AMM V4 mainnet launch
             "KAMINO-SOLANA": "2023-01-21",
@@ -1022,11 +1028,12 @@ class DataTypeConfig:
 # LST margin collateral — venues that accept liquid staking tokens as margin
 # 2026-05-12 (dex_perp_and_venue_data_expansion plan, Phase 1)
 # ---------------------------------------------------------------------------
-# Confirmed: Bybit UTA (stETH), Deribit (stETH, 7.5% haircut), Drift (JitoSOL + mSOL).
+# Confirmed: Bybit UTA (stETH), Deribit (stETH, 7.5% haircut).
 # OKX, Binance: pending live API verification (stETH status unconfirmed).
+# DRIFT (JitoSOL + mSOL) removed 2026-07-16 (operator ruling: all Solana perp
+# DEXes dropped except Jupiter, not integrated).
 # Reference: codex/09-strategy/architecture-v2/archetypes/carry-staked-basis.md
 LST_MARGIN_VENUES: dict[str, list[str]] = {
     "BYBIT": ["stETH"],
     "DERIBIT": ["stETH"],
-    "DRIFT": ["JitoSOL", "mSOL"],
 }

@@ -140,10 +140,6 @@ allowed:
     reason: recording-template
     detail: "Raydium REST API (api-v3.raydium.io/pools/info/list). IS adapter instruments_service/reference_data/adapters/defi/raydium.py calls this URL. UAC external/raydium schemas not yet imported by IS adapter. Phase 2 QG task. Cassette covers the api-v3.raydium.io host."
     acked_by: slot-2 2026-05-21
-  - path: drift/mocks/markets.yaml
-    reason: recording-template
-    detail: "Drift Protocol REST API (data.api.drift.trade/stats/markets). IS adapter instruments_service/reference_data/adapters/defi/drift.py calls this URL. UAC external/drift schemas not yet imported by IS adapter. Phase 2 QG task. Cassette covers the data.api.drift.trade host."
-    acked_by: slot-2 2026-05-21
   - path: lifinity/mocks/pools.yaml
     reason: recording-template
     detail: "Lifinity REST API (api.lifinity.io/pools). IS adapter instruments_service/reference_data/adapters/defi/lifinity.py calls this URL. UAC external/lifinity schemas not yet imported by IS adapter. Phase 2 QG task. Cassette covers the api.lifinity.io host."
@@ -173,10 +169,6 @@ allowed:
   - path: kraken_futures/mocks/trade_ws.yaml
     reason: recording-template
     detail: "Kraken Futures WS trade frames (wss://futures.kraken.com/ws/v1). MTDS live connector kraken_futures_ws.py streams this channel. UAC external/kraken_futures schemas not yet imported by the WS connector. Phase 4 WS cassette; venue hit wired post-Phase-2 QG."
-    acked_by: slot-2 2026-05-21
-  - path: pacifica/mocks/funding_rate_history.yaml
-    reason: recording-template
-    detail: "Pacifica perp funding rate history (api.pacifica.fi/api/v1/funding_rate/history). MTDS perp_funding_handler.py calls _PACIFICA_API_URL. UAC external/pacifica schemas not yet imported by MTDS. Phase 2 QG task. Cassette covers the api.pacifica.fi host."
     acked_by: slot-2 2026-05-21
   - path: extended/mocks/markets.yaml
     reason: recording-template
@@ -366,10 +358,6 @@ allowed:
   - path: deribit/mocks/trade_ws.yaml
     reason: recording-template
     detail: "Deribit WS trade frames (wss://www.deribit.com/ws/api/v2). MTDS deribit_ws.py connector. UAC external/deribit schemas not yet imported by WS connector. Phase 4 WS cassette."
-    acked_by: slot-1 2026-05-26
-  - path: drift/mocks/trade_ws.yaml
-    reason: recording-template
-    detail: "Drift Protocol WS trade frames (dlob.drift.trade/ws). MTDS live connector drift_ws.py streams this channel. UAC external/drift WS schemas not yet imported by WS connector. Phase 4 WS cassette."
     acked_by: slot-1 2026-05-26
   - path: ecb/mocks/ticker.yaml
     reason: recording-template
@@ -620,10 +608,6 @@ allowed:
   - path: marinade/mocks/marinade_solana_ws.yaml
     reason: stub-placeholder
     detail: "Marinade Solana account/log-subscription stub — BLOCKED-CREDENTIALS (RPC-provider key + filter needed). Coexistence-only stub; real frames captured post-credentials."
-    acked_by: slot-8 2026-07-07
-  - path: pacifica/mocks/pacifica_solana_perp_ws.yaml
-    reason: stub-placeholder
-    detail: "Pacifica Solana-perp live-WS stub (wss://ws.pacifica.fi/v1). Coexistence-only stub; real frames post live-mode smoke."
     acked_by: slot-8 2026-07-07
   - path: spark/mocks/spark_ethereum_ws.yaml
     reason: stub-placeholder

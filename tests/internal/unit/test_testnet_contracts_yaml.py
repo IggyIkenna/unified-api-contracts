@@ -93,8 +93,9 @@ def test_solana_devnet_present() -> None:
     data = _load()
     assert 103 in data
     # Solana uses program IDs not EVM addresses
+    # drift_v2 removed 2026-07-16 (operator ruling: all Solana perp DEXes
+    # dropped except Jupiter, not integrated).
     assert "jito" in data[103]
-    assert "drift_v2" in data[103]
     assert "pyth_hermes" in data[103]
     # Hermes devnet base_url is HTTPS not on-chain
     assert data[103]["pyth_hermes"]["base_url"].startswith("https://")

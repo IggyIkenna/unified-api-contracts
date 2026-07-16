@@ -39,7 +39,8 @@ class ExchangeInstrumentConfig:
             # CeFi - On-chain CLOBs
             "HYPERLIQUID": ["PERPETUAL"],
             "ASTER": ["PERPETUAL"],
-            "PACIFICA-SOLANA": ["PERPETUAL"],
+            # PACIFICA (Solana) removed 2026-07-16 (operator ruling: all Solana
+            # perp DEXes dropped except Jupiter, not integrated).
             "EXTENDED-STARKNET": ["PERPETUAL"],
             "LIGHTER-ZKSYNC": ["PERPETUAL"],
             # DeFi - DEX protocols (canonical PROTOCOL-CHAIN format)

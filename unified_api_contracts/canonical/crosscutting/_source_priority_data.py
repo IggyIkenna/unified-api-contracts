@@ -98,11 +98,10 @@ SOURCE_PRIORITY: Final[dict[tuple[str, str], list[str]]] = {
     # source on batch rows (like aster/hyperliquid — native REST, not Tardis).
     # polymarket_perp is BLOCKED-UPSTREAM-OUTAGE (DNS NXDOMAIN 2026-06-21); scaffold
     # registered for when the endpoint recovers. SSOT: prediction-perps-sourcing.md.
-    # pacifica: PACIFICA-SOLANA (Solana on-chain CeFi perp CLOB, Hyperliquid clone)
-    # self-archives trades + funding over its own public REST (api.pacifica.fi) —
-    # same self-archiving-venue pattern as aster/extended (2-source registration
-    # closes the closed-set round-trip for batch_pacifica + lets the handler stamp
-    # per-venue source). SSOT: cefi_onchain_perp_batch_venue_allowlist_gap_2026_07_12.md.
+    # "pacifica" source (PACIFICA (Solana) on-chain CeFi perp CLOB) removed
+    # 2026-07-16 (operator ruling: all Solana perp DEXes dropped except
+    # Jupiter, not integrated). SSOT: unified-trading-pm/codex/04-architecture/
+    # solana-defi-coverage.md.
     ("cefi", "trades"): [
         "tardis",
         "aster",
@@ -110,7 +109,6 @@ SOURCE_PRIORITY: Final[dict[tuple[str, str], list[str]]] = {
         "kalshi_perp",
         "polymarket_perp",
         "extended",
-        "pacifica",
     ],
     ("cefi", "ohlcv_1m"): ["tardis", "aster", "hyperliquid", "extended"],
     # ("cefi", "ohlcv_15m") RETIRED 2026-06-09 (operator-directed): cefi has no
@@ -128,7 +126,7 @@ SOURCE_PRIORITY: Final[dict[tuple[str, str], list[str]]] = {
     # (uac@3652f99f "ASTER book_snapshot_5 + liquidations live-wire capability";
     # HYPERLIQUID book_snapshot_5 S3-archived since 2023-04-15) — removing them
     # would reopen bug#8 (MissingSourceError) for real live traffic.
-    ("cefi", "book_snapshot"): ["tardis", "aster", "hyperliquid", "extended", "pacifica"],
+    ("cefi", "book_snapshot"): ["tardis", "aster", "hyperliquid", "extended"],
     ("cefi", "liquidations"): ["tardis", "aster", "extended"],  # hyperliquid removed 2026-07-13 (no real feed)
     # derivative_ticker (perp mark/index/OI/funding). tardis is the multi-venue T+1
     # archive BATCH primary for every Tardis-covered CeFi perp venue (binance/okx/
@@ -143,7 +141,7 @@ SOURCE_PRIORITY: Final[dict[tuple[str, str], list[str]]] = {
     # venue-override Aster shard). source_required becomes True, but every
     # derivative_ticker writer already passes an explicit source. SSOT:
     # ``perp_funding_data_semantics_and_cadence_2026_06_16.md`` §genesis.
-    ("cefi", "derivative_ticker"): ["tardis", "aster", "hyperliquid", "extended", "pacifica"],
+    ("cefi", "derivative_ticker"): ["tardis", "aster", "hyperliquid", "extended"],
     # ERA-B (operator 2026-06-07): options_chain / futures_chain are
     # INSTRUMENT_TYPES (per-underlying chain bundles), captured as data_type=trades
     # — so the Era-B writer resolves source via ``(cefi, "trades")`` above (same
@@ -170,7 +168,7 @@ SOURCE_PRIORITY: Final[dict[tuple[str, str], list[str]]] = {
     # deribit is only the LIVE/REPLAY per-venue override and tardis is the batch
     # archive. deribit is therefore a BATCH_CAPABLE_CEFI_VENUES exception for
     # THIS data_type only (same "self-archiving vendor" pattern as
-    # aster/extended/pacifica). SSOT: vol_dvol_backtestable_engines_2026_07_13.md.
+    # aster/extended). SSOT: vol_dvol_backtestable_engines_2026_07_13.md.
     ("cefi", "volatility_index"): ["deribit"],
     # perp_funding (periodic funding settlements) for the new CFTC-regulated crypto
     # perp venues. kalshi_perp + polymarket_perp each expose a dedicated
@@ -537,7 +535,7 @@ SOURCE_MODE_CAPABILITY: Final[dict[str, frozenset[Mode]]] = {
     # public REST DVOL-history endpoint, no creds, back to 2021-03-24. For
     # every OTHER CeFi data_type deribit still serves only live/replay (tardis
     # is those data_types' batch archive) — the extra Mode.BATCH here is a
-    # per-source coarse capability (mirrors the aster/extended/pacifica unified
+    # per-source coarse capability (mirrors the aster/extended unified
     # -vendor exceptions), refined per-data_type by ``modes_for()`` at the call
     # site. SSOT: vol_dvol_backtestable_engines_2026_07_13.md.
     "deribit": frozenset({Mode.BATCH, Mode.LIVE, Mode.REPLAY}),
@@ -556,16 +554,10 @@ SOURCE_MODE_CAPABILITY: Final[dict[str, frozenset[Mode]]] = {
     # funding tape → batch + replay capable. WS live stream = LIVE capable. Same pattern
     # as aster. SSOT: data_completion_to_100_all_ag_2026_06_21.md task-085.
     "extended": frozenset({Mode.BATCH, Mode.LIVE, Mode.REPLAY}),
-    # Pacifica (PACIFICA-SOLANA on-chain CeFi perp CLOB, Hyperliquid clone on Solana,
-    # mainnet 2025-06) uses its own public REST API (api.pacifica.fi) — NOT
-    # Tardis-archived. Self-archives trades + funding history → BATCH capable via
-    # ``collect-onchain-perp-batch``. Registered BATCH-only for now (no LIVE_/
-    # REPLAY_ member yet) — a live WS connector exists
-    # (``live/connectors/pacifica_solana_perp_ws.py``) but is not yet wired to a
-    # source-aware pipeline_mode; add {Mode.LIVE, Mode.REPLAY} + the matching
-    # PipelineMode members when that lands. SSOT: cefi_onchain_perp_batch_venue_
-    # allowlist_gap_2026_07_12.md.
-    "pacifica": frozenset({Mode.BATCH}),
+    # "pacifica" source (PACIFICA (Solana) on-chain CeFi perp CLOB) removed
+    # 2026-07-16 (operator ruling: all Solana perp DEXes dropped except
+    # Jupiter, not integrated). SSOT: unified-trading-pm/codex/04-architecture/
+    # solana-defi-coverage.md.
     # Kalshi-perp (CFTC crypto perps, launched 2026-05-29): public-read REST
     # (GET /markets/{ticker}/trades + /funding_rates, cursor-paginated).
     # Self-archives its own trade + funding tape → batch + replay capable.
@@ -672,7 +664,8 @@ EMISSION_LATENCY_MS_BY_SOURCE: Final[dict[str, int]] = {
     "hyperliquid": 1_000,  # 1s: HL REST API polling cadence (source=hyperliquid, transport=rest)
     "aster": 1_000,  # 1s: Aster native REST polling cadence (source=aster, transport=rest)
     "extended": 1_000,  # 1s: EXTENDED-STARKNET native REST polling cadence (source=extended, transport=rest)
-    "pacifica": 1_000,  # 1s: PACIFICA-SOLANA native REST polling cadence (source=pacifica, transport=rest)
+    # "pacifica" latency entry removed 2026-07-16 (operator ruling: all Solana
+    # perp DEXes dropped except Jupiter, not integrated).
     # DVOL history endpoint serves hourly/daily OHLC resolutions (no sub-minute
     # tick stream) — conservative hourly cadence, same class as the other
     # periodic-series REST sources below (footystats/mdps_odds_horizon_bucket).

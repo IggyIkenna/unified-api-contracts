@@ -63,7 +63,8 @@ declare -A CONNECTOR_VENUE=(
     ["coinbase_spot_ws"]="coinbase"
     ["databento_tradfi_ws"]="databento"
     ["deribit_ws"]="deribit"
-    ["drift_solana_ws"]="drift"
+    # ["drift_solana_ws"]="drift" removed 2026-07-16 (operator ruling: all
+    # Solana perp DEXes dropped except Jupiter, not integrated).
     ["hyperliquid_ws"]="hyperliquid"
     ["hyperliquid_l2book_ws"]="hyperliquid"
     ["hyperliquid_ticker_ws"]="hyperliquid"

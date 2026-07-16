@@ -442,7 +442,9 @@ INSTRUMENT_TYPES_BY_VENUE: dict[str, set[str]] = {
     "BITGET-FUTURES": {"PERPETUAL", "FUTURE"},
     "BITFINEX-SPOT": {"SPOT_PAIR"},
     "BITGET-SPOT": {"SPOT_PAIR"},
-    "PACIFICA-SOLANA": {"PERPETUAL"},  # Solana perp DEX — native pacifica_api, not Tardis
+    # PACIFICA (Solana) removed 2026-07-16 (operator ruling: all Solana perp DEXes
+    # dropped except Jupiter, not integrated). SSOT: unified-trading-pm/codex/
+    # 04-architecture/solana-defi-coverage.md.
     "EXTENDED-STARKNET": {"PERPETUAL"},  # Starknet perp DEX — native extended_api, not Tardis
     "LIGHTER-ZKSYNC": {"PERPETUAL"},  # zkSync perp DEX — Tardis post-2026-04-17, native lighter_api before
     # DERIBIT-COMBO: multi-leg combo/spread instruments from Deribit's

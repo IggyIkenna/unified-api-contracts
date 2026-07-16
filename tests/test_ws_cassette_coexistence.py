@@ -78,7 +78,9 @@ _CONNECTOR_TO_VENUE: Final[dict[str, str]] = {
     "deribit_book_ticker_ws": "deribit",
     "deribit_ws": "deribit",
     "dex_swap_scaffold_ws": "dex_swap_scaffold",
-    "drift_solana_ws": "drift",
+    # "drift_solana_ws": "drift" removed 2026-07-16 (operator ruling: all
+    # Solana perp DEXes dropped except Jupiter, not integrated — MTDS
+    # connector + UAC external/drift/ mocks both deleted in the same pass).
     "eigenlayer_ethereum_ws": "eigenlayer",
     "ethena_ethereum_ws": "ethena",
     "etherfi_ethereum_ws": "etherfi",
@@ -104,7 +106,10 @@ _CONNECTOR_TO_VENUE: Final[dict[str, str]] = {
     "okx_ws": "okx",
     "okx_spot_book_ws": "okx",
     "okx_spot_ws": "okx",
-    "pacifica_solana_perp_ws": "pacifica",
+    # "pacifica_solana_perp_ws": "pacifica" removed 2026-07-16 (operator
+    # ruling: all Solana perp DEXes dropped except Jupiter, not integrated —
+    # MTDS connector + UAC external/pacifica/ mocks both deleted in the same
+    # pass).
     "polymarket_clob_ws": "polymarket",
     "polymarket_perp_ws": "polymarket",
     "polymarket_trades_ws": "polymarket",
