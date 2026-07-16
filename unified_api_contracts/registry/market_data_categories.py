@@ -168,6 +168,12 @@ DATA_TYPES_BY_ASSET_GROUP: dict[str, list[str]] = {
         # despite their DeFi on-chain settlement — those 5 stay cefi-asset-group per
         # VENUES_BY_ASSET_GROUP's "on-chain CLOBs reclassified from DEFI" note above).
         "derivative_ticker",
+        # Per-trade prints for on-chain perp venues (Drift V2 historical ingester,
+        # drift_helius_path_obsolete_2026_07_15). Schema existed (DataType.PERP_TRADES,
+        # DEFI_PERPETUAL_PERP_TRADES contract) and the MTDS writer already handles it;
+        # this enumeration entry was the missing piece blocking expected_unattempted
+        # catalog seeding for the data_type.
+        "perp_trades",
         "lst_rates",  # Liquid staking token exchange rates
         "oracle_prices",  # Chainlink oracle price snapshots
         "gas_fees",  # EVM gas fee history

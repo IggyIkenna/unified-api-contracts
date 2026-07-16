@@ -658,7 +658,11 @@ PROTOCOL_CAPABILITIES: dict[str, _ProtocolCapability] = {
         venue_prefix="DRIFT",
         protocol_class=ProtocolClass.PERPS,
         instrument_types=_PERPS,
-        data_types=["perp_funding", "oracle_prices"],
+        # perp_trades added 2026-07-16 (drift_helius_path_obsolete_2026_07_15): the
+        # Velocity historical ingester writes it, but this list never registered it,
+        # so no expected_unattempted catalog row was ever seeded for it — only
+        # ad-hoc manually-reconciled rows existed.
+        data_types=["perp_funding", "oracle_prices", "perp_trades"],
         mtds_operations=["collect-perp-funding"],
         required_tokens=frozenset({"DRIFT"}),
     ),
