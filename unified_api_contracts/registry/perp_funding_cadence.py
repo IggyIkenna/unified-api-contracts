@@ -8,8 +8,7 @@ funding interval:
 
 * 8h period (3 figures/day): Binance, Bybit, OKX, Aster (perp-CCXT), Bitget, Bitfinex
 * 4h period (6 figures/day): Kraken Pro derivatives
-* 1h period (24 figures/day): Hyperliquid, GMX, Pacifica, Lighter
-* 5min period (288 figures/day): Drift (Solana)
+* 1h period (24 figures/day): Hyperliquid, GMX, Lighter
 
 **Deribit is the one figure-vs-charge exception (codified 2026-06-17).** Deribit
 *charges* funding hourly, but the canonical ``derivative_ticker.funding_rate`` we
@@ -73,10 +72,9 @@ FUNDING_CADENCE_SECONDS: Final[dict[str, int]] = {
     # DeFi — 1h figure (24/day)
     "hyperliquid": 1 * 3600,
     "gmx": 1 * 3600,
-    "pacifica": 1 * 3600,
     "lighter": 1 * 3600,
-    # DeFi — sub-hourly (Drift settles every block; we approximate at 5min)
-    "drift": 5 * 60,
+    # DRIFT / PACIFICA (Solana) removed 2026-07-16 (operator ruling: all Solana perp
+    # DEXes dropped except Jupiter, which is a swap aggregator not a perp DEX).
 }
 
 SECONDS_PER_YEAR: Final[int] = 365 * 24 * 3600
@@ -115,8 +113,8 @@ def fundings_per_year(venue: str) -> Decimal:
     have validated venue against ``is_supported_venue`` already.
     """
     cadence = FUNDING_CADENCE_SECONDS[_canonical_venue(venue)]
-    # Decimal arithmetic to avoid float drift on the high cadences (Drift =
-    # 105120 fundings/year would float-round otherwise).
+    # Decimal arithmetic to avoid float drift on the high cadences (a 5min
+    # cadence = 105120 fundings/year would float-round otherwise).
     return Decimal(SECONDS_PER_YEAR) / Decimal(cadence)
 
 

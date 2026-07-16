@@ -412,12 +412,6 @@ from unified_api_contracts.internal.domain.defi import (
     CurveWithdrawParams,
     DecisionOutcome,
     DexPoolDayRecord,
-    DriftMarketInfo,
-    DriftMarketType,
-    DriftOrderParams,
-    DriftOrderResult,
-    DriftOrderSide,
-    DriftPosition,
     Erc20TransferFromCalldata,
     EtherFiStakeResponse,
     EtherFiUnstakeResponse,
@@ -547,7 +541,6 @@ from unified_api_contracts.internal.domain.defi.rate_model import (
     RateImpactResult,
 )
 from unified_api_contracts.internal.domain.defi.solana import (
-    DriftOrderType,
     SolanaChainId,
 )
 from unified_api_contracts.internal.domain.defi.transfers import (
@@ -1785,12 +1778,6 @@ __all__ = [
     "DexPoolDayRecord",
     "DividendRecord",
     "DividendType",
-    "DriftMarketInfo",
-    "DriftMarketType",
-    "DriftOrderParams",
-    "DriftOrderResult",
-    "DriftOrderSide",
-    "DriftPosition",
     "DurationBucket",
     "DustConversionResult",
     "DustRouterResult",
@@ -2434,7 +2421,6 @@ __all__ = [
     "DocumentMetadata",
     "DocumentStatus",
     "DriftDimension",
-    "DriftOrderType",
     "DriftSeverity",
     "EconomicResultItem",
     "EthBalanceImpact",

@@ -56,10 +56,6 @@ class TestFundingsPerYear:
         # 4h cadence -> 6/day x 365 = 2190/year
         assert fundings_per_year("kraken") == Decimal("2190")
 
-    def test_drift_five_minute(self) -> None:
-        # 5min cadence -> 12/hour x 24 x 365 = 105120/year
-        assert fundings_per_year("drift") == Decimal("105120")
-
     def test_aster_eight_hour(self) -> None:
         # Aster funds every 8h (fundingTime spacing = 28 800 s, verified 2026-06-16),
         # like Binance — NOT 1h. Regression guard vs the deleted UTL FUNDING_PERIODS_PER_DAY
