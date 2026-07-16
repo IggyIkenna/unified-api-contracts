@@ -1,7 +1,12 @@
 """Solana DeFi protocol SDK types.
 
-Types for Drift (perps/spot), Kamino (lending), Raydium (DEX), Jupiter (aggregator).
+Types for Kamino (lending), Raydium (DEX), Jupiter (aggregator).
 These mirror the response shapes from the respective Python SDKs and REST APIs.
+
+Drift Protocol types (DriftMarketInfo/DriftMarketType/DriftOrderParams/DriftOrderResult/
+DriftOrderSide/DriftOrderType/DriftPosition) were removed 2026-07-16 (operator ruling:
+all Solana perp DEXes dropped except Jupiter, which is a swap aggregator not a perp DEX).
+Their only consumer, execution-service's ``drift.py`` connector, was deleted the same day.
 """
 
 from __future__ import annotations
@@ -19,86 +24,6 @@ class SolanaChainId(StrEnum):
     MAINNET = "mainnet-beta"
     DEVNET = "devnet"
     TESTNET = "testnet"
-
-
-# ---------------------------------------------------------------------------
-# Drift Protocol types (driftpy SDK)
-# ---------------------------------------------------------------------------
-
-
-class DriftMarketType(StrEnum):
-    """Drift market types."""
-
-    PERP = "perp"
-    SPOT = "spot"
-
-
-class DriftOrderType(StrEnum):
-    """Drift order types."""
-
-    MARKET = "market"
-    LIMIT = "limit"
-    TRIGGER_MARKET = "trigger_market"
-    TRIGGER_LIMIT = "trigger_limit"
-
-
-class DriftOrderSide(StrEnum):
-    """Drift order side."""
-
-    LONG = "long"
-    SHORT = "short"
-
-
-class DriftMarketInfo(BaseModel):
-    """Drift perp or spot market metadata."""
-
-    market_index: int
-    market_type: DriftMarketType
-    symbol: str
-    base_asset: str
-    quote_asset: str
-    oracle_price_usd: Decimal
-    total_deposits: Decimal | None = None
-    total_borrows: Decimal | None = None
-    open_interest: Decimal | None = None
-    funding_rate_1h: Decimal | None = None
-    is_active: bool = True
-
-
-class DriftOrderParams(BaseModel):
-    """Parameters for placing a Drift order."""
-
-    market_index: int
-    market_type: DriftMarketType
-    order_type: DriftOrderType
-    side: DriftOrderSide
-    base_amount: Decimal
-    price: Decimal | None = None  # None for market orders
-    reduce_only: bool = False
-
-
-class DriftPosition(BaseModel):
-    """Drift position snapshot."""
-
-    market_index: int
-    market_type: DriftMarketType
-    base_amount: Decimal
-    quote_amount: Decimal
-    entry_price: Decimal
-    unrealized_pnl: Decimal
-    oracle_price: Decimal
-
-
-class DriftOrderResult(BaseModel):
-    """Result of a Drift order execution."""
-
-    tx_signature: str
-    market_index: int
-    side: DriftOrderSide
-    base_filled: Decimal
-    quote_filled: Decimal
-    fee: Decimal
-    timestamp: datetime
 
 
 # ---------------------------------------------------------------------------
