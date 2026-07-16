@@ -184,10 +184,11 @@ class TestCeFiMvp:
         """An instrument_type not in the CeFi MVP set → False.
 
         (FUTURE is now an MVP cefi instrument_type — dated futures are in scope per
-        cefi_universe_capture_rule_2026_06_23 — so this asserts COMBO, which is NOT
-        in the rule.)
+        cefi_universe_capture_rule_2026_06_23 — and COMBO joined too, v16, for
+        DERIBIT-COMBO — so this asserts POOL, a DeFi-only instrument_type that is
+        NOT in the CeFi rule.)
         """
-        assert not is_mvp("cefi", "BINANCE-FUTURES", "COMBO", "trades", base_ccy="BTC")
+        assert not is_mvp("cefi", "BINANCE-FUTURES", "POOL", "trades", base_ccy="BTC")
 
     def test_dated_future_is_mvp_instrument_type(self) -> None:
         """FUTURE IS an MVP cefi instrument_type (dated/quarterly futures, 2026-06-23)."""
@@ -437,11 +438,12 @@ class TestTradFiOptionUnderlierNarrowingV14:
         assert frozenset({"ES"}) == TRADFI_MVP_OPTION_UNDERLYING_ROOTS
 
     def test_config_version_is_latest(self) -> None:
-        """MVP_SCOPE_CONFIG_VERSION == 15 exactly (v15 = liquidations PERPETUAL-leg
-        MVP restoration; v14 was the OPTION-underlier narrowing pass)."""
+        """MVP_SCOPE_CONFIG_VERSION == 16 exactly (v16 = COMBO instrument_type
+        addition for DERIBIT-COMBO; v15 was the liquidations PERPETUAL-leg MVP
+        restoration)."""
         from unified_api_contracts.canonical.crosscutting.mvp_scope import MVP_SCOPE_CONFIG_VERSION
 
-        assert MVP_SCOPE_CONFIG_VERSION == 15
+        assert MVP_SCOPE_CONFIG_VERSION == 16
 
 
 # ---------------------------------------------------------------------------
@@ -1267,6 +1269,60 @@ class TestDeribitComboMvpScopeV12:
         DERIBIT-COMBO override (the two venues are distinct dict keys)."""
         assert is_mvp("cefi", "DERIBIT", "OPTION", "options_chain", base_ccy="BTC")
         assert not is_mvp("cefi", "DERIBIT", "OPTION", "trades", base_ccy="BTC")
+
+
+# ---------------------------------------------------------------------------
+# v16 — "COMBO" added to CeFiMvpRule.instrument_types (operator decision on
+# cefi_deribit_combo_and_okx_bare_venue_gaps_2026_07_12.md's
+# BLOCKED-OPERATOR-DECISION item, option (a), 2026-07-16). The
+# instruments-service catalogue tags DERIBIT-COMBO rows with instrument_type
+# "COMBO" (distinct from "OPTION" — see _instrument_enums.py), so before this
+# fix is_mvp() unconditionally returned False for every DERIBIT-COMBO
+# catalogue row regardless of the venue already being MVP-declared (v12
+# above).
+# ---------------------------------------------------------------------------
+
+
+class TestDeribitComboInstrumentTypeV16:
+    """v16: "COMBO" instrument_type joins CeFiMvpRule.instrument_types."""
+
+    def test_deribit_combo_combo_trades_is_mvp(self) -> None:
+        """DERIBIT-COMBO COMBO trades -> MVP (the real catalogue-row itype)."""
+        assert is_mvp("cefi", "DERIBIT-COMBO", "COMBO", "trades", base_ccy="BTC")
+
+    def test_deribit_combo_combo_book_snapshot_5_is_mvp(self) -> None:
+        """DERIBIT-COMBO COMBO book_snapshot_5 -> MVP (the real catalogue-row itype)."""
+        assert is_mvp("cefi", "DERIBIT-COMBO", "COMBO", "book_snapshot_5", base_ccy="BTC")
+
+    def test_deribit_combo_combo_eth_is_mvp(self) -> None:
+        """DERIBIT-COMBO COMBO trades -> MVP for ETH too (not BTC-only)."""
+        assert is_mvp("cefi", "DERIBIT-COMBO", "COMBO", "trades", base_ccy="ETH")
+
+    def test_deribit_combo_combo_does_not_inherit_options_chain(self) -> None:
+        """DERIBIT-COMBO COMBO options_chain -> NOT MVP.
+
+        The venue_data_types override ({trades, book_snapshot_5}) is final for
+        ALL instrument_types at DERIBIT-COMBO (per-instrument_type overrides
+        never apply when a venue override is set) — so COMBO does not inherit
+        any options_chain minting either, same guarantee v12 established for
+        the OPTION itype.
+        """
+        assert not is_mvp("cefi", "DERIBIT-COMBO", "COMBO", "options_chain", base_ccy="BTC")
+
+    def test_combo_instrument_type_scoped_to_deribit_combo_venue(self) -> None:
+        """A COMBO itype on a venue that isn't in the CeFi MVP rule -> NOT MVP.
+
+        "COMBO" only broadens the instrument_type axis; venue membership is a
+        separate, still-enforced axis (axis 1 of is_mvp), so this does not
+        open MVP scope for arbitrary venues.
+        """
+        assert not is_mvp("cefi", "FAKE_VENUE_XYZ", "COMBO", "trades", base_ccy="BTC")
+
+    def test_config_version_is_at_least_v16(self) -> None:
+        """MVP_SCOPE_CONFIG_VERSION >= 16 (the COMBO instrument_type addition)."""
+        from unified_api_contracts.canonical.crosscutting.mvp_scope import MVP_SCOPE_CONFIG_VERSION
+
+        assert MVP_SCOPE_CONFIG_VERSION >= 16
 
 
 class TestCoinbaseVenueOverrideV11Continued:

@@ -485,6 +485,27 @@ MVP_SCOPE: Final[dict[str, object]] = {
                 # already unioned into ``base_ccys`` below, so they stay MVP. The
                 # equity identity is carried by the catalogue ``is_equity_perp`` /
                 # ``tracks_equity`` tags (IS rollup), NOT by a scoped instrument_type.
+                # InstrumentType.COMBO — Deribit multi-leg combo/spread instruments
+                # (operator decision, cefi_deribit_combo_and_okx_bare_venue_gaps_
+                # 2026_07_12.md, 2026-07-16): the instruments-service catalogue tags
+                # DERIBIT-COMBO rows with instrument_type "COMBO" (a distinct
+                # InstrumentType from "OPTION" — see _instrument_enums.py), so
+                # without this entry is_mvp() unconditionally returned False for
+                # every one of the 68,847 now-fully-backfilled DERIBIT-COMBO
+                # catalogue rows regardless of base_ccy/available_from — the exact
+                # "entire venue silently excluded from the denominator" dishonesty
+                # class honest-coverage v2 exists to kill (same precedent as the
+                # DERIBIT-COMBO venues-set addition above, operator decision #6,
+                # 2026-07-10). The DERIBIT-COMBO ``venue_data_types`` override below
+                # already scopes its effective data_type set to {trades,
+                # book_snapshot_5} (NOT options_chain) independent of
+                # instrument_type, so adding "COMBO" here does not risk minting a
+                # phantom options_chain cell. "COMBO" is ALSO used by TradFi
+                # Databento spread/bag instruments (external/databento/
+                # databento_classifier.py) — but those route through the SEPARATE
+                # ``TradFiMvpRule`` instance, so this CeFi-scoped addition cannot
+                # leak into TradFi's MVP predicate.
+                "COMBO",  # InstrumentType.COMBO (Deribit multi-leg combo/spread)
             }
         ),
         # FLAT data_types — apply to SPOT_PAIR / PERPETUAL / FUTURE (everything

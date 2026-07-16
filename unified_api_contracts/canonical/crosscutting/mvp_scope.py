@@ -115,8 +115,23 @@ _canonical_repr = canonical_config_repr
 # ---------------------------------------------------------------------------
 
 
-MVP_SCOPE_CONFIG_VERSION: Final[int] = 15
+MVP_SCOPE_CONFIG_VERSION: Final[int] = 16
 """Monotonic version of :data:`MVP_SCOPE`. Bump on any content change.
+
+v16 (2026-07-16): ``COMBO`` added to ``CeFiMvpRule.instrument_types`` (operator
+decision on cefi_deribit_combo_and_okx_bare_venue_gaps_2026_07_12.md's
+BLOCKED-OPERATOR-DECISION item, option (a)). The instruments-service catalogue
+tags DERIBIT-COMBO rows with instrument_type ``"COMBO"`` (distinct from
+``"OPTION"``), so ``is_mvp()`` unconditionally returned ``False`` for every
+DERIBIT-COMBO catalogue row (68,847 rows, fully backfilled 2026-07-14) despite
+DERIBIT-COMBO already being a declared MVP venue with its own
+``venue_data_types`` override (``{trades, book_snapshot_5}``, operator decision
+#6, 2026-07-10) — the venue-level work was silently inert without this
+instrument_type entry. No other axis changes: the existing DERIBIT-COMBO
+``venue_data_types`` override still wins over any per-instrument_type default
+(so no phantom ``options_chain`` cell is minted), and "COMBO" only appears on
+CeFi's DERIBIT-COMBO venue (TradFi's Databento spread/bag "COMBO" rows route
+through the separate ``TradFiMvpRule`` instance, unaffected).
 
 v15 (2026-07-15): ``liquidations`` restored as a PERPETUAL-leg CeFi MVP data_type
 (cefi_completion_program_2026_07_15.md workstream E). New
