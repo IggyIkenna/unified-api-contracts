@@ -166,9 +166,11 @@ def test_carry_staked_basis_has_cefi_hedge_slot_labels() -> None:
     """CARRY_STAKED_BASIS has representative slot labels for CeFi-perp hedge legs.
 
     The strategy is 3-leg atomic (stake + lending + perp). The DeFi-perp
-    variants (hyperliquid / gmx_v2 / drift) are present from the original
-    manifest seed; this test asserts the CeFi-perp hedge variants
-    (binance / bybit / okx / deribit) added 2026-05-08 are also present.
+    variants (hyperliquid / gmx_v2) are present from the original manifest
+    seed (the Solana-native "drift" variant was removed 2026-07-16, operator
+    ruling: all Solana perp DEXes dropped except Jupiter, not integrated);
+    this test asserts the CeFi-perp hedge variants (binance / bybit / okx /
+    deribit) added 2026-05-08 are also present.
     """
     capability = capability_for(StrategyArchetype.CARRY_STAKED_BASIS)
     assert capability is not None

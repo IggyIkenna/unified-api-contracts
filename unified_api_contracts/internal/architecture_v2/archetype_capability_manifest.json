@@ -109,8 +109,7 @@
           "status": "SUPPORTED",
           "venue_ids": [
             "hyperliquid",
-            "gmx_v2",
-            "drift"
+            "gmx_v2"
           ],
           "signal_variants": [
             "price"
@@ -364,7 +363,6 @@
           "status": "PARTIAL",
           "venue_ids": [
             "gmx_v2",
-            "drift",
             "hyperliquid"
           ],
           "signal_variants": [
@@ -637,7 +635,6 @@
             "uniswap_v3",
             "hyperliquid",
             "gmx_v2",
-            "drift",
             "lido"
           ],
           "signal_variants": [
@@ -672,7 +669,6 @@
             "kamino",
             "hyperliquid",
             "gmx_v2",
-            "drift",
             "binance",
             "bybit",
             "deribit",
@@ -687,14 +683,13 @@
           "block_list_refs": [],
           "representative_slot_labels": [
             "CARRY_STAKED_BASIS@lido-aave-hyperliquid-eth-prod",
-            "CARRY_STAKED_BASIS@jito-kamino-drift-sol-usdc-prod",
             "CARRY_STAKED_BASIS@lido-aave-binance-eth-usdt-prod",
             "CARRY_STAKED_BASIS@lido-aave-bybit-eth-usdt-prod",
             "CARRY_STAKED_BASIS@lido-aave-deribit-eth-usdt-prod",
             "CARRY_STAKED_BASIS@lido-aave-okx-eth-usdt-prod",
             "CARRY_STAKED_BASIS@jito-kamino-bybit-sol-usdt-prod"
           ],
-          "notes": "3-leg ATOMIC (stake + lending + perp). Ethereum (Lido/RocketPool + Aave + HL/GMX) and Solana (Jito/Marinade + Kamino + Drift). CeFi-perp hedge legs (Binance/Bybit/Deribit/OKX) added 2026-05-08 for May-23 cutover (master_to_live_defi_2026_05_23 \u00a71 \u2014 6-venue hedge universe). Aster pending venue onboarding \u2014 track in defi_master."
+          "notes": "3-leg ATOMIC (stake + lending + perp). Ethereum (Lido/RocketPool + Aave + HL/GMX) and Solana (Jito/Marinade + Kamino + CeFi-perp hedge \u2014 native Solana perp DEX hedge leg (Drift) removed 2026-07-16, operator ruling: all Solana perp DEXes dropped except Jupiter, not integrated). CeFi-perp hedge legs (Binance/Bybit/Deribit/OKX) added 2026-05-08 for May-23 cutover (master_to_live_defi_2026_05_23 \u00a71 \u2014 6-venue hedge universe). Aster pending venue onboarding \u2014 track in defi_master."
         },
         {
           "asset_group": "CEFI",
@@ -914,8 +909,7 @@
           "status": "SUPPORTED",
           "venue_ids": [
             "hyperliquid",
-            "gmx_v2",
-            "drift"
+            "gmx_v2"
           ],
           "signal_variants": [
             "price",
@@ -1716,8 +1710,7 @@
           "status": "PARTIAL",
           "venue_ids": [
             "hyperliquid",
-            "gmx_v2",
-            "drift"
+            "gmx_v2"
           ],
           "signal_variants": [
             "zscore_reversion"
@@ -1830,8 +1823,7 @@
           "status": "PARTIAL",
           "venue_ids": [
             "hyperliquid",
-            "gmx_v2",
-            "drift"
+            "gmx_v2"
           ],
           "signal_variants": [
             "momentum_ranking"

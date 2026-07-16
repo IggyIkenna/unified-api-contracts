@@ -38,7 +38,9 @@ def _os(venue_id: str):
 
 
 def test_order_semantics_is_backfilled_not_empty() -> None:
-    assert len(VENUE_ORDER_SEMANTICS) >= 9
+    # Count was >= 9 until "drift" (Solana perp DEX) removed 2026-07-16 (operator ruling: all
+    # Solana perp DEXes dropped except Jupiter, not integrated).
+    assert len(VENUE_ORDER_SEMANTICS) >= 8
 
 
 def test_order_semantics_covers_mvp_venue_universe() -> None:

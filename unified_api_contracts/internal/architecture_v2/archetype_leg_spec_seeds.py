@@ -69,16 +69,19 @@ _ENGINE_STAKED = (
 _CELL_STAKED = (
     "manifest cell CARRY_STAKED_BASIS (DEFI, staking) notes '3-leg ATOMIC "
     "(stake + lending + perp)' + slot labels lido-aave-hyperliquid / "
-    "jito-kamino-drift / lido-aave-{binance,bybit,deribit,okx}"
+    "jito-kamino-bybit / lido-aave-{binance,bybit,deribit,okx}"
 )
 _DOC_STAKED = (
     "codex/09-strategy/architecture-v2/archetypes/carry-staked-basis.md § 'Token / position flow — LST_AS_MARGIN'"
 )
 
+#: "drift" (Solana perp DEX) removed 2026-07-16 (operator ruling: all Solana perp DEXes dropped
+#: except Jupiter, not integrated). Solana-side hedge now runs via the CeFi perp venues below
+#: (see jito-kamino-bybit-sol-usdt-prod slot label). SSOT:
+#: unified-trading-pm/codex/04-architecture/solana-defi-coverage.md.
 _STAKED_HEDGE_VENUES: Final[tuple[str, ...]] = (
     "hyperliquid",
     "gmx_v2",
-    "drift",
     "binance",
     "bybit",
     "deribit",
@@ -225,7 +228,7 @@ def _staked_basis_structure(
                 constraints=(),
                 source_of_truth=(
                     f"{_CELL_STAKED} (lend@aave/kamino encoded in slot labels "
-                    "lido-AAVE-hyperliquid / jito-KAMINO-drift)"
+                    "lido-AAVE-hyperliquid / jito-KAMINO-bybit)"
                 ),
             ),
             ArchetypeLegSpec(
@@ -294,7 +297,6 @@ def _basis_perp_structure(archetype: StrategyArchetype, *, inverse: bool, notes:
                     "bitget",  # F39: bitget_native.py:125 (BITGET-FUTURES adapter — perp leg)
                     "bybit",
                     "deribit",
-                    "drift",
                     "gmx_v2",
                     "hyperliquid",
                     "kraken",  # F39: kraken_rest_adapter.py:159 (KRAKEN-FUTURES adapter — perp leg)
@@ -572,7 +574,6 @@ def _price_dispersion_structure() -> ArchetypeLegStructure:
         "coinbase",  # F39: coinbase_ccxt.py:32 (COINBASE-SPOT adapter)
         "curve",
         "deribit",
-        "drift",
         "gmx_v2",
         "hyperliquid",
         "kraken",  # F39: kraken_rest_adapter.py:159 (KRAKEN-FUTURES/SPOT adapter)
@@ -990,7 +991,7 @@ def _stat_arb_cross_sectional_structure() -> ArchetypeLegStructure:
     # ibkr-sp500-sector-rotation / ibkr-russell2000-mr — S&P 500 + Russell 2000 baskets span
     # both exchanges; equities are spot-only so the combined SPOT+PERP `instr` above doesn't
     # misclaim a PERP capability for either exchange.
-    venues = ("binance", "hyperliquid", "bybit", "gmx_v2", "drift", "ibkr", "nasdaq", "nyse")
+    venues = ("binance", "hyperliquid", "bybit", "gmx_v2", "ibkr", "nasdaq", "nyse")
     return ArchetypeLegStructure(
         archetype_id=StrategyArchetype.STAT_ARB_CROSS_SECTIONAL,
         legs=(
@@ -1207,7 +1208,7 @@ def _directional_seeds() -> tuple[ArchetypeLegStructure, ...]:
     # Shared by 3 archetypes below (ML/RULES_DIRECTIONAL_CONTINUOUS + TSMOM_BTC_CTA) — do NOT
     # add fx/nasdaq/nyse here, TSMOM_BTC_CTA's own codex doc states "BTC-only CeFi archetype by
     # design", so a TradFi-equity/FX addition to this shared tuple would leak into it.
-    continuous_venues = ("binance", "okx", "bybit", "hyperliquid", "gmx_v2", "drift", "ibkr", "cme")
+    continuous_venues = ("binance", "okx", "bybit", "hyperliquid", "gmx_v2", "ibkr", "cme")
     # ML/RULES_DIRECTIONAL_CONTINUOUS-only extension: codex ml-directional-continuous.md /
     # rules-directional-continuous.md example instances ibkr-spy-1m-usd-prod (NYSE),
     # ibkr-aapl-daily-usd-prod / ibkr-qqq-15m-breakout (NASDAQ), ibkr-eurusd-fx-15m-usd-prod /

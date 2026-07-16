@@ -22,7 +22,9 @@ from unified_api_contracts.internal.architecture_v2.collateral_registry import (
 )
 
 # MVP venue universe from archetype_leg_spec.py eligible venues.
-_PERP_VENUES = {"hyperliquid", "gmx_v2", "drift", "binance", "bybit", "deribit", "okx"}
+# "drift" (Solana perp DEX) removed 2026-07-16 (operator ruling: all Solana perp DEXes dropped
+# except Jupiter, not integrated). SSOT: unified-trading-pm/codex/04-architecture/solana-defi-coverage.md.
+_PERP_VENUES = {"hyperliquid", "gmx_v2", "binance", "bybit", "deribit", "okx"}
 _LENDING_VENUES = {"aave_v3", "kamino"}
 _STAKING_VENUES = {"lido", "rocketpool", "jito", "marinade"}
 
@@ -134,12 +136,14 @@ def test_deribit_steth_haircut_7_5() -> None:
     assert steth.haircut_pct == Decimal("7.5")
 
 
-def test_drift_accepts_solana_lsts() -> None:
-    drift = _by_id("drift")
-    accepted = set(drift.accepted_assets())
-    assert {"mSOL", "JitoSOL"} <= accepted
-    msol = next(ah for ah in drift.accepted_collateral if ah.asset == "mSOL")
-    assert msol.haircut_pct == Decimal("20")  # probed 2026-06-17: Drift initialAssetWeight 0.80
+# test_drift_accepts_solana_lsts removed 2026-07-16 (operator ruling: all Solana perp DEXes
+# dropped except Jupiter, not integrated — Drift's CollateralPolicy no longer exists). The
+# scenario it covered ("a PERP venue accepts Solana LSTs as cross-margin") is genuinely
+# unreachable now: Drift was the only perp venue that ever accepted mSOL/JitoSOL. The
+# Solana-LST-accepted-with-a-sourced-haircut coverage is NOT lost — Kamino (LENDING) is the
+# surviving Solana LST acceptor and is already asserted by
+# test_kamino_partial_ltv_none_but_haircut_sourced below (mSOL @15%, source_note sourced).
+# SSOT: unified-trading-pm/codex/04-architecture/solana-defi-coverage.md.
 
 
 def test_aave_per_asset_ltv() -> None:
