@@ -11,6 +11,9 @@ Re-exports:
   (cadenced range-bracket + event markets).
 * :class:`CanonicalGroupMetadata` + :data:`CANONICAL_GROUP_METADATA` —
   per-group cadence / expected counts / settlement_lag.
+* :class:`PredictionMarketCategory` + :func:`category_for_group` — the coarse
+  category (crypto/financial/sports/weather/entertainment/politics/other) for
+  a canonical group, composed from :func:`underlying_for_group`.
 * :func:`classify_polymarket_to_canonical_group` /
   :func:`classify_kalshi_to_canonical_group` — raw market metadata →
   canonical group. Unmatched markets route to :attr:`CanonicalQuestionGroup.OTHER`
@@ -34,6 +37,9 @@ Reference plan:
 
 from __future__ import annotations
 
+from unified_api_contracts.canonical.domain.prediction.prediction_mapping import (
+    PredictionMarketCategory,
+)
 from unified_api_contracts.canonical.domain.predictions.canonical_groups import (
     CANONICAL_GROUP_METADATA,
     CanonicalGroupMetadata,
@@ -50,6 +56,7 @@ from unified_api_contracts.canonical.domain.predictions.classifiers import (
 )
 from unified_api_contracts.canonical.domain.predictions.cross_venue_mapping import (
     build_cross_venue_mapping,
+    category_for_group,
     match_key,
 )
 from unified_api_contracts.canonical.domain.predictions.fixture_parsing import (
@@ -98,10 +105,12 @@ __all__ = [
     "CanonicalQuestionGroup",
     "MarketLifecycle",
     "PredictionBetType",
+    "PredictionMarketCategory",
     "PredictionUnderlying",
     "SportsFixtureKey",
     "bet_type_for_group",
     "build_cross_venue_mapping",
+    "category_for_group",
     "classify_kalshi_to_canonical_group",
     "classify_polymarket_to_canonical_group",
     "cross_venue_underlying_overlap",
