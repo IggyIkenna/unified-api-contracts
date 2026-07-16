@@ -415,6 +415,13 @@ NEEDS_CANDLE_PROCESSING: dict[str, bool] = {
     "lending_indices": False,
     # Note: "liquidations" already declared in CeFi section above (True — same for DeFi)
     "perp_funding": False,
+    # Per-fill ground truth for CLOB / hybrid-AMM perp venues (Drift V2) — same
+    # shape as CeFi "trades" / DeFi "dex_pool_swaps" (raw fills that must be
+    # downsampled into OHLCV candles), not a pre-aggregated snapshot. Added
+    # 2026-07-16 alongside the DATA_TYPES_BY_ASSET_GROUP / PROTOCOL_CAPABILITIES
+    # registration (unified-api-contracts@5fd781c7) — that fix covered universe
+    # enumeration but missed this classification table.
+    "perp_trades": True,
     "lst_rates": False,
     "oracle_prices": False,
     "gas_fees": False,

@@ -6,6 +6,7 @@ import pytest
 
 from unified_api_contracts.registry.market_data_categories import (
     DATA_TYPES_BY_ASSET_GROUP,
+    NEEDS_CANDLE_PROCESSING,
     TIMEFRAMES,
     VENUES_BY_ASSET_GROUP,
     get_valid_timeframes_for_data_type,
@@ -64,6 +65,24 @@ def test_needs_candle_processing_for_ohlcv() -> None:
 def test_needs_candle_processing_unknown_data_type() -> None:
     result = needs_candle_processing("unknown_data_type")
     assert isinstance(result, bool)
+
+
+def test_needs_candle_processing_for_perp_trades() -> None:
+    """perp_trades is per-fill ground truth (Drift V2) — same shape as CeFi
+    "trades" / DeFi "dex_pool_swaps", needs OHLCV downsampling."""
+    assert needs_candle_processing("perp_trades") is True
+
+
+@pytest.mark.parametrize("data_type", DATA_TYPES_BY_ASSET_GROUP["defi"])
+def test_every_defi_data_type_has_needs_candle_processing_entry(data_type: str) -> None:
+    """Every DeFi data type registered for universe enumeration must also be
+    explicitly classified in NEEDS_CANDLE_PROCESSING — a data type present in
+    one registry but missing from the other is a drift bug (e.g. perp_trades
+    was registered for enumeration in unified-api-contracts@5fd781c7 but this
+    classification table was missed)."""
+    assert data_type in NEEDS_CANDLE_PROCESSING, (
+        f"DeFi data type '{data_type}' missing from NEEDS_CANDLE_PROCESSING"
+    )
 
 
 # ---------------------------------------------------------------------------
