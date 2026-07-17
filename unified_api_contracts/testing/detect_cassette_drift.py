@@ -69,6 +69,81 @@ def _cassette_name_hint(path: Path) -> str:
     return path.stem.lower().replace("-", "_")
 
 
+def _cassette_venue_module(path: Path) -> str | None:
+    """Return the UAC module prefix owning this cassette, e.g.
+    ``unified_api_contracts.external.bitget`` for ``external/bitget/mocks/ticker.yaml``.
+
+    A cassette records what a VENUE returned, so the only models that can legitimately
+    describe it are that venue's own RAW response models. Returns None when the path is not
+    under ``external/<venue>/`` (then we refuse to guess — see _select_model).
+    """
+    parts = path.parts
+    try:
+        i = len(parts) - 1 - parts[::-1].index("external")
+    except ValueError:
+        return None
+    if i + 1 >= len(parts):
+        return None
+    return f"{_uac_pkg.__name__}.external.{parts[i + 1]}"
+
+
+def _select_model(cassette_path: Path, model_registry: dict[str, type]) -> type | None:
+    """Pick the model to validate a cassette against — VENUE-SCOPED, or None.
+
+    WHY THIS IS SCOPED (2026-07-17). The previous selector substring-matched the bare filename
+    stem against a registry of EVERY BaseModel in UAC (~2172 of them), in BOTH directions, first
+    dict hit wins:
+
+        for key, cls in model_registry.items():
+            if key in hint or hint in key:   # "ticker" in "canonicalticker" -> match!
+                model = cls; break
+
+    That is a category error: a cassette holds the RAW venue envelope, while ``Canonical*`` models
+    describe the NORMALIZED shape an adapter EMITS after transforming it. They can never validate,
+    so the nightly reported drift forever. Measured on 2026-07-17: 28 "drifted" of 179 — 28/28
+    FALSE POSITIVES. 13 were canonical-vs-raw (``CanonicalTicker`` x8 for bitget/bybit/coingecko/
+    deribit/ecb/kraken/okx/upbit, ``CanonicalMarketStateEvent`` x4, ``CanonicalOrderBook`` x1);
+    10 were cross-venue collisions the stem match invented — alchemy's
+    ``aave_get_user_account_data.yaml`` matched nautilus ``Account`` on the substring "account",
+    hyperliquid ``*order*`` matched nautilus ``Order``, defillama ``yields`` matched
+    ``YahooFinanceYieldSnapshot``, copper ``wallet_balances`` matched risk ``Balance``,
+    hyperliquid ``meta`` matched ``FeatureMetadata``.
+
+    Scoping to the cassette's OWN ``external/<venue>`` package fixes both classes at once and — the
+    reason we scope rather than tighten the string match — PRESERVES the genuine matches, which all
+    rely on the ``hint in key`` direction within their own venue:
+    ``circle_cctp/attestation.yaml`` -> ``CircleCctpAttestation``, ``coinbase/products.yaml`` ->
+    ``CoinbaseProductsResponse``, ``kraken_futures/tickers.yaml`` -> ``KrakenFuturesTickersResponse``
+    (raw-vs-raw, all passing). A venue with no raw schema of its own (bitget has only
+    ``normalize.py``) now correctly matches NOTHING and is SKIPPED.
+
+    SKIP, NEVER GUESS: an unmatched cassette is reported as unvalidated, not as drift. Guessing is
+    what produced 4 months of noise.
+    """
+    venue_mod = _cassette_venue_module(cassette_path)
+    if venue_mod is None:
+        return None
+    hint = _cassette_name_hint(cassette_path)
+    candidates: list[tuple[str, type]] = []
+    for key, cls in model_registry.items():
+        # Only this venue's OWN models are candidates.
+        mod = getattr(cls, "__module__", "")
+        if mod != venue_mod and not mod.startswith(venue_mod + "."):
+            continue
+        if key in hint or hint in key:
+            candidates.append((key, cls))
+    if not candidates:
+        return None
+    # MOST-SPECIFIC wins, not first-dict-hit. A cassette records the FULL response, so when a venue
+    # models both the envelope and the inner object the envelope is the right node — and its name is
+    # the longer one. Measured: kraken ships BOTH KrakenTickerData (inner, schemas.py:8) and
+    # KrakenTickerResponse (envelope, schemas.py:22); hint "ticker" substring-matches both, and the
+    # old first-hit-wins took whichever dict order surfaced first — picking the inner model made
+    # kraken/mocks/ticker.yaml report drift forever against a cassette that is perfectly correct.
+    candidates.sort(key=lambda kc: len(kc[0]), reverse=True)
+    return candidates[0][1]
+
+
 # ---------------------------------------------------------------------------
 # Drift detection logic
 # ---------------------------------------------------------------------------
@@ -91,12 +166,7 @@ def _validate_cassette(
     if not interactions:
         return []
 
-    hint = _cassette_name_hint(cassette_path)
-    model: type | None = None
-    for key, cls in model_registry.items():
-        if key in hint or hint in key:
-            model = cls
-            break
+    model: type | None = _select_model(cassette_path, model_registry)
 
     errors: list[str] = []
     for idx, interaction in enumerate(interactions):
@@ -130,7 +200,13 @@ def _validate_cassette(
             except ValidationError as exc:
                 errors.append(f"{cassette_path.name}[interaction={idx}]: {type(exc).__name__}: {exc}")
         else:
-            if isinstance(response_body, str):
+            # An EMPTY body is not malformed JSON — it is a body that was never JSON. These are
+            # BINARY endpoints whose payload the recorder did not persist (the cassette carries
+            # `string: ""`): databento's DBN timeseries and tardis' `datasets_csv_download`
+            # (.csv.gz). `json.loads("")` raises, so all 3 were reported every night as
+            # "may indicate API format change" against endpoints that never returned JSON at all.
+            # Nothing about them can drift in a way this detector can see, so skip them.
+            if isinstance(response_body, str) and response_body.strip():
                 try:
                     json.loads(response_body)
                 except ValueError:
