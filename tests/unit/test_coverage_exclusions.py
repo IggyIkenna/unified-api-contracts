@@ -472,22 +472,3 @@ def test_falsifier_flags_overlapping_declarations() -> None:
 
 def test_falsifier_is_quiet_on_a_clean_declaration() -> None:
     assert _structural_findings([_valid(verified_at=_TODAY)]) == []
-
-
-# ---------------------------------------------------------------------------
-# The unevidenced ancestor stays disarmed
-# ---------------------------------------------------------------------------
-
-
-def test_sports_known_coverage_gaps_stays_frozen_empty() -> None:
-    """The legacy sports gap registry accepts bare (start, end) tuples with no evidence and
-    no falsifier — the loaded gun this whole exercise exists to unload.
-
-    It is frozen empty: bounded ranges go in the evidenced COVERAGE_EXCLUSIONS SSOT, whose
-    cross-asset oracle gate already covers sports. If this fails, someone declared a sports
-    range on nothing but their say-so — move it to the evidenced registry (with evidence) or
-    delete it.
-    """
-    from unified_api_contracts.canonical.domain.sports.league_data import KNOWN_COVERAGE_GAPS
-
-    assert KNOWN_COVERAGE_GAPS == {}

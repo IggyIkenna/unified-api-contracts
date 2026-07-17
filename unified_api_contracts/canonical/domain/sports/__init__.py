@@ -79,7 +79,6 @@ from .injury import classify_absence as classify_absence
 from .league_classification_data import DEFAULT_CLASSIFICATION_REGISTRY as DEFAULT_CLASSIFICATION_REGISTRY
 from .league_classification_data import LEAGUE_CLASSIFICATION_DATA as LEAGUE_CLASSIFICATION_DATA
 from .league_data import DATA_TYPE_COVERAGE_START as DATA_TYPE_COVERAGE_START
-from .league_data import KNOWN_COVERAGE_GAPS as KNOWN_COVERAGE_GAPS
 from .league_data import LEAGUE_EXPECTED_TEAM_COUNTS as LEAGUE_EXPECTED_TEAM_COUNTS
 from .league_data import LEAGUE_REGISTRY as LEAGUE_REGISTRY
 from .league_data import SOURCE_COVERAGE_START as SOURCE_COVERAGE_START
@@ -90,7 +89,6 @@ from .league_data import clip_dates_to_source_coverage as clip_dates_to_source_c
 from .league_data import get_all_prediction_league_ids as get_all_prediction_league_ids
 from .league_data import get_expected_leagues_for_source as get_expected_leagues_for_source
 from .league_data import get_expected_team_count_for_league as get_expected_team_count_for_league
-from .league_data import get_known_coverage_gaps as get_known_coverage_gaps
 from .league_data import get_league as get_league
 from .league_data import get_league_by_api_football_id as get_league_by_api_football_id
 from .league_data import get_league_fixture_calendar as get_league_fixture_calendar
@@ -100,7 +98,6 @@ from .league_data import get_leagues_for_sport as get_leagues_for_sport
 from .league_data import get_prediction_leagues as get_prediction_leagues
 from .league_data import get_source_coverage_start as get_source_coverage_start
 from .league_data import get_source_for_data_type as get_source_for_data_type
-from .league_data import is_in_known_gap as is_in_known_gap
 from .league_data import is_pre_launch_date as is_pre_launch_date
 from .league_data import is_sports_structural_gap as is_sports_structural_gap
 from .league_registry import COUNTRY_MAP as COUNTRY_MAP

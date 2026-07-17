@@ -147,16 +147,6 @@ class TestProtocolPauseWindows:
             del protocol_pause_windows.PROTOCOL_PAUSE_WINDOWS[key]
 
 
-class TestSportsKnownGap:
-    """2026-05-20 round 2 — sports.league_data.is_in_known_gap integration."""
-
-    def test_non_gap_date_falls_through(self) -> None:
-        # PINNACLE is not in any KNOWN_COVERAGE_GAPS today; cell should fall through.
-        result = expected_coverage("sports", "PINNACLE", "odds_snapshot", date(2024, 6, 15))
-        # Either SHOULD_HAVE_DATA or another non-known-gap state — must NOT be EXPECTED_KNOWN_SOURCE_GAP.
-        assert result.reason != "EXPECTED_KNOWN_SOURCE_GAP"
-
-
 class TestDefiFlatProtocolLaunchFallback:
     """2026-06-22 — flat-venue manifest rows (UNISWAP_V4, CURVE, AERODROME_V3 …)
     must resolve a launch date from the PROTOCOL-CHAIN keys in

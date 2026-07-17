@@ -2,9 +2,8 @@
 
 Mirrors the sports-source-coverage pattern in
 ``unified_api_contracts.canonical.domain.sports.league_data`` (where
-``clip_dates_to_source_coverage`` / ``is_in_known_gap`` are SSOT-level
-helpers consumed by both the orchestrator pre-flight skip and the
-data-status denominator).
+``clip_dates_to_source_coverage`` is an SSOT-level helper consumed by both
+the orchestrator pre-flight skip and the data-status denominator).
 
 For TradFi the equivalent registry of "we know this isn't a real
 trading day" is the :data:`US_MARKET_HOLIDAYS` frozenset below plus
