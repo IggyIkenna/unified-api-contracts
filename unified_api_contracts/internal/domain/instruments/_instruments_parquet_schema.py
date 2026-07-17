@@ -197,6 +197,17 @@ INSTRUMENTS_PARQUET_SCHEMA: list[dict[str, str | bool]] = [
         "description": "Human-canonical product root from the exchange-code registry (e.g. ES → SP500).",
     },
     {
+        # A4 (data_status_page_ux_and_canonicalisation_2026_07_16): human-readable
+        # market question/title. Aligned 1:1 with InstrumentRecord.question. Prediction
+        # adapters populate it (Polymarket question / Kalshi title — yes_sub_title);
+        # None/blank for every other instrument. Additive + nullable (non-breaking).
+        "name": "question",
+        "type": "string",
+        "required": False,
+        "nullable": True,
+        "description": "Human-readable market question/title (prediction markets). None if adapter resolves none.",
+    },
+    {
         "name": "min_size",
         "type": "string",
         "required": False,

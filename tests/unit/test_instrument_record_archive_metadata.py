@@ -146,3 +146,41 @@ def test_coverage_end_logic(query_date: date, coverage_end: date, expected_past_
     assert rec.source_coverage_end is not None
     is_past = query_date > rec.source_coverage_end["trades"]
     assert is_past == expected_past_end
+
+
+class TestQuestionField:
+    """A4 (data_status_page_ux_and_canonicalisation_2026_07_16): additive human-title
+    field for prediction markets. The prediction adapters already resolve a
+    question/title at parse time but had no field to persist it (pydantic's default
+    extra='ignore' silently dropped it), which is why the catalogue label fell back
+    to the raw slug."""
+
+    def test_question_defaults_to_none(self) -> None:
+        r = InstrumentRecord(
+            instrument_key="BINANCE-SPOT:SPOT_PAIR:BTC-USDT",
+            venue="BINANCE-SPOT",
+            instrument_type=InstrumentType.SPOT_PAIR,
+            base_asset="BTC",
+            quote_asset="USDT",
+        )
+        assert r.question is None
+
+    def test_question_persists_when_provided(self) -> None:
+        r = InstrumentRecord(
+            instrument_key="POLYMARKET:PREDICTION_MARKET:cond-1",
+            venue="POLYMARKET",
+            instrument_type=InstrumentType.PREDICTION_MARKET,
+            question="Will BTC close above $100k on 2026-06-24?",
+        )
+        assert r.question == "Will BTC close above $100k on 2026-06-24?"
+
+    def test_question_is_in_the_parquet_schema_aligned(self) -> None:
+        from unified_api_contracts.internal.domain.instruments._instruments_parquet_schema import (
+            INSTRUMENTS_PARQUET_SCHEMA,
+        )
+
+        entry = next((c for c in INSTRUMENTS_PARQUET_SCHEMA if c["name"] == "question"), None)
+        assert entry is not None, "question must be in INSTRUMENTS_PARQUET_SCHEMA (model↔schema 1:1)"
+        assert entry["type"] == "string"
+        assert entry["nullable"] is True
+        assert entry["required"] is False
