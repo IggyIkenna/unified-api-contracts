@@ -253,10 +253,9 @@ def test_expected_known_source_gap_value_present() -> None:
     """Added 2026-05-11 (operator-approved per wave3x_track_d_findings_2026_05_11.md § TL;DR 2).
 
     Reference uses: VIX 15m mid-history gap (currently written as NaN-OHLC placeholder, see
-    ``plans/active/issues/wave3x_track_d_findings_2026_05_11.md`` P0-2) + sports
-    ``KNOWN_COVERAGE_GAPS`` ranges. Distinct from ``EXPECTED_PRE_SOURCE_COVERAGE_START`` /
-    ``EXPECTED_INSTRUMENT_NOT_LISTED`` — those are pre-launch absence; this is mid-history
-    accepted gap.
+    ``plans/active/issues/wave3x_track_d_findings_2026_05_11.md`` P0-2). Distinct from
+    ``EXPECTED_PRE_SOURCE_COVERAGE_START`` / ``EXPECTED_INSTRUMENT_NOT_LISTED`` — those are
+    pre-launch absence; this is mid-history accepted gap.
     """
 
     assert EmptyConfirmedReason.EXPECTED_KNOWN_SOURCE_GAP.value == "EXPECTED_KNOWN_SOURCE_GAP"
@@ -528,6 +527,4 @@ def test_expected_bookmaker_market_sets_tier_2_domestic_is_subset_of_tier_1() ->
     """Tier-2 domestic bookmaker set must be a subset of tier-1 domestic."""
     tier1_bks = set(EXPECTED_BOOKMAKER_MARKET_SETS["tier_1_domestic"])
     tier2_bks = set(EXPECTED_BOOKMAKER_MARKET_SETS["tier_2_domestic"])
-    assert tier2_bks <= tier1_bks, (
-        f"tier_2_domestic bookmakers {tier2_bks - tier1_bks} not in tier_1_domestic"
-    )
+    assert tier2_bks <= tier1_bks, f"tier_2_domestic bookmakers {tier2_bks - tier1_bks} not in tier_1_domestic"

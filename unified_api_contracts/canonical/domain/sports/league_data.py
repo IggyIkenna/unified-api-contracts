@@ -164,47 +164,28 @@ DATA_TYPE_COVERAGE_START: dict[tuple[str, str], date] = {
 }
 
 
-# Date-range gaps that we KNOW are missing and should NOT count as "missing"
-# in the data-status denominator. Format: list of (start, end) inclusive
-# `YYYY-MM-DD` tuples per (source, data_type).
-#
-# Add to this registry as we discover gaps live (e.g. provider outages,
-# leagues paused). Sparse-but-not-empty windows (like SFI_PROGRESSIVE_STATS
-# 2020-2021, where some matches return data and most don't) are NOT a good
-# fit — those still count as expected, just under-captured.
-#
 # Design decision — sports off-seasons (D2 Phase 2, Decision 1, 2026-05-21):
 # Per-league off-season windows are handled SEPARATELY by
 # ``get_league_fixture_calendar()`` + ``SEASON_BY_COUNTRY`` (fixture-calendar
-# level), NOT via KNOWN_COVERAGE_GAPS. The oracle ``expected_coverage()`` in
-# ``registry/expected_coverage.py`` does not include a per-league off-season
-# gate because the oracle signature is per-(asset_group, source, data_type)
-# without a league_id axis. Per-league oracle integration is Decision 3
-# (deferred — requires IS instrument-catalogue access).
+# level). The oracle ``expected_coverage()`` in ``registry/expected_coverage.py``
+# does not include a per-league off-season gate because the oracle signature is
+# per-(asset_group, source, data_type) without a league_id axis. Per-league
+# oracle integration is Decision 3 (deferred — requires IS instrument-catalogue
+# access).
 #
-# This dict is ONLY for SOURCE-LEVEL gaps: complete provider outages or
-# protocol-level blackout periods where the source produced NO data at all
-# for a date range.
-#
-# ***FROZEN EMPTY 2026-07-17 — DO NOT ADD ENTRIES HERE.***
-# This registry is the unevidenced ancestor of the bounded out-of-bounds construct: it
-# accepts a bare (start, end) tuple with NO reason, NO evidence, NO verified_at/by, and
-# nothing that could ever prove an entry wrong. That is exactly how SOURCE_COVERAGE_START
-# stayed wrong for months (UAC@c280e1ff) — floors declared 2018-2020 uncapturable while we
-# held ~22,327 real objects for those dates. An entry typed in here would drop days out of
-# the sports denominator on nothing but a reviewer's say-so.
-#
-# Declare bounded uncapturable ranges in the evidence-gated, falsifiable SSOT instead:
+# Bounded, SOURCE-LEVEL gaps (complete provider outages or protocol-level
+# blackout periods where the source produced NO data at all for a date range)
+# are declared in the evidence-gated, falsifiable SSOT instead:
 #   ``unified_api_contracts.canonical.coverage_exclusions.COVERAGE_EXCLUSIONS``
 # — mandatory typed reason + machine-checkable evidence + re-runnable probe + verified_at/by
 # (enforced at construction), cross-asset, and continuously falsified by
 # ``scripts/check_coverage_exclusions.py``. The oracle gate for it is cross-asset and fires
-# BEFORE this one, so sports is already covered by the evidenced path.
+# for sports too, so there is no source-level-gap registry at this layer.
 #
-# ``test_sports_known_coverage_gaps_stays_frozen_empty`` enforces this. The accessors below
-# are retained only because MTDS' sports manifest-rebuild classifiers still import them;
-# migrating those callsites and deleting this registry outright is a filed follow-up.
-KNOWN_COVERAGE_GAPS: dict[tuple[str, str], list[tuple[str, str]]] = {}
+# The unevidenced ``KNOWN_COVERAGE_GAPS`` dict + its ``get_known_coverage_gaps`` /
+# ``is_in_known_gap`` accessors were DELETED 2026-07-17 (frozen empty since 2026-07-17,
+# deleted once MTDS' sports manifest-rebuild classifiers were migrated off them) — see
+# ``codex/02-data/honest-coverage-model.md`` § Bounded coverage exclusions.
 
 
 # Sports manifest data_type → source-key mapping (SSOT).
@@ -277,9 +258,9 @@ def get_source_for_data_type(data_type: str) -> str | None:
 # Structural (league x source) honest-absence gaps (operator 2026-06-27 #6)
 # ---------------------------------------------------------------------------
 # Some (league x source) combinations are STRUCTURALLY UNAVAILABLE — the source
-# simply does not carry that league, at ANY date. These are distinct from
-# ``SOURCE_COVERAGE_START`` (a date floor) and ``KNOWN_COVERAGE_GAPS`` (a date
-# window): a structural gap is "the source NEVER has this league". Encoding it
+# simply does not carry that league, at ANY date. This is distinct from
+# ``SOURCE_COVERAGE_START`` (a date floor): a structural gap is "the source
+# NEVER has this league". Encoding it
 # means:
 #   1. the honest-coverage SSOT treats the (league x source) cell as
 #      EXPECTED-ABSENT (it is NOT counted as missing in any denominator), and
@@ -381,25 +362,6 @@ def get_source_coverage_start(
         if override is not None:
             return override
     return SOURCE_COVERAGE_START.get(source_key)
-
-
-def get_known_coverage_gaps(
-    source_key: str,
-    data_type: str,
-) -> list[tuple[str, str]]:
-    """Return list of (start, end) ISO-date gap windows that should be
-    excluded from the expected denominator for this (source, data_type)."""
-    return KNOWN_COVERAGE_GAPS.get((source_key, data_type), [])
-
-
-def is_in_known_gap(
-    source_key: str,
-    data_type: str,
-    iso_date: str,
-) -> bool:
-    """True if the given ``YYYY-MM-DD`` date falls inside a registered
-    known-gap window for this (source, data_type)."""
-    return any(start <= iso_date <= end for start, end in KNOWN_COVERAGE_GAPS.get((source_key, data_type), []))
 
 
 def clip_dates_to_source_coverage(
@@ -714,7 +676,6 @@ def sports_leagues_config_descriptor() -> ConfigDescriptor:
 __all__ = [
     "DATA_TYPE_COVERAGE_START",
     "FEATURES_LEAGUES",
-    "KNOWN_COVERAGE_GAPS",
     "LEAGUE_EXPECTED_TEAM_COUNTS",
     "LEAGUE_REGISTRY",
     "NON_FOOTBALL_LEAGUES",
@@ -729,7 +690,6 @@ __all__ = [
     "get_all_prediction_league_ids",
     "get_expected_leagues_for_source",
     "get_expected_team_count_for_league",
-    "get_known_coverage_gaps",
     "get_league",
     "get_league_by_api_football_id",
     "get_league_fixture_calendar",
@@ -739,7 +699,6 @@ __all__ = [
     "get_live_stats_api_football_ids",
     "get_prediction_leagues",
     "get_source_coverage_start",
-    "is_in_known_gap",
     "is_sports_structural_gap",
     "sports_leagues_config_descriptor",
 ]

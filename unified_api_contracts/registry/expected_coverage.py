@@ -676,21 +676,6 @@ def _is_defi_not_yet_collected(data_source: str) -> bool:
     return data_source in DEFI_INSTRUMENTS_NOT_YET_COLLECTED
 
 
-def _is_sports_in_known_source_gap(data_source: str, data_type: str, target_date: _date) -> bool:
-    """True if (source, data_type, date) is inside a registered sports
-    known-gap window.
-
-    SSOT: ``unified_api_contracts.canonical.domain.sports.is_in_known_gap``
-    which reads ``KNOWN_COVERAGE_GAPS[(source, data_type)]``. Sister to the
-    pre-source-coverage-start gate but operates on per-source-published gaps
-    (e.g. API-Football historical-stats outage windows) rather than the source
-    archive's start date.
-    """
-    from unified_api_contracts.canonical.domain.sports import is_in_known_gap
-
-    return is_in_known_gap(data_source, data_type, target_date.isoformat())
-
-
 def _is_us_trading_day(target_date: _date) -> tuple[bool, str | None]:
     """Return (is_trading_day, reason_if_not).
 
@@ -827,10 +812,13 @@ def expected_coverage(
       scope here. Pair this oracle with IS at the call site (R9 in mega-audit
       delegation SSOT).
     * Sports league off-season (per-league fixture calendar) requires league_id
-      axis on the oracle signature; current gate only covers source-level
-      known-gap windows via `is_in_known_gap`. Per-league off-season check
-      lives in `unified_api_contracts.canonical.domain.sports.get_league_fixture_calendar`
-      and should be called by callers that know the league_id.
+      axis on the oracle signature — not yet wired into this cross-asset oracle.
+      Per-league off-season check lives in
+      `unified_api_contracts.canonical.domain.sports.get_league_fixture_calendar`
+      and should be called by callers that know the league_id. The prior
+      source-level known-gap gate (`is_in_known_gap`) was deleted 2026-07-17 —
+      the evidenced cross-asset `COVERAGE_EXCLUSIONS` gate above already covers
+      sports.
     * DeFi protocol pause windows (time-windowed, e.g. Aave V2 deprecation)
       not yet encoded. Venue-level deprecation IS handled via
       `EMPTY_OR_DEPRECATED_DEFI_VENUES` (gate added 2026-05-20 round 2).
@@ -918,19 +906,6 @@ def expected_coverage(
             # Carry the provenance into the diagnostic: an out-of-model cell must always be
             # explainable + auditable at the point of use, never an unattributed hole.
             diagnostic=_exclusion.describe(),
-        )
-
-    # Sports source-level known gaps (added 2026-05-20 round 2 — operator Q1 fix).
-    # Composes with sports.league_data.is_in_known_gap which reads the canonical
-    # KNOWN_COVERAGE_GAPS registry per (source, data_type).
-    if ag == "sports" and _is_sports_in_known_source_gap(data_source, data_type, target_date):
-        return ExpectedCoverageResult(
-            state=ExpectedState.EXPECTED_EMPTY,
-            reason="EXPECTED_KNOWN_SOURCE_GAP",
-            diagnostic=(
-                f"sports source {data_source} data_type {data_type} in known-gap window "
-                f"covering {target_date.isoformat()} (see sports.league_data.KNOWN_COVERAGE_GAPS)"
-            ),
         )
 
     # Phase 4 helper: per-data_type source coverage start.

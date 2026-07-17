@@ -253,9 +253,10 @@ class EmptyConfirmedReason(StrEnum):
     * **VIX 15m gap** (``2025-11-13`` to ``today - 60d``) - the rolling Yahoo Finance window cannot reach back
       to those dates and the Barchart historical preload stopped at ``2025-11-12``. Per CLAUDE.md
       "VIX 15m source layering" rule the gap is honest absence (denominator clip), not a coverage hole.
-    * **Sports ``KNOWN_COVERAGE_GAPS``** — per UAC ``unified_api_contracts.sports.KNOWN_COVERAGE_GAPS``
-      ranges where a sports source had a documented multi-day outage / paused windows that don't fit
-      the league-paused / pre-source-launch categories.
+    * Sports source-level outages that don't fit the league-paused / pre-source-launch categories are now
+      declared in the evidence-gated ``unified_api_contracts.canonical.coverage_exclusions.COVERAGE_EXCLUSIONS``
+      SSOT instead (the unevidenced sports ``KNOWN_COVERAGE_GAPS`` registry was deleted 2026-07-17); that path
+      reports ``EXPECTED_UPSTREAM_OUT_OF_BOUNDS``, not this reason.
 
     Plan: ``manifest_schema_final_gate_2026_05_09.md`` Phase 1 — operator-approved 2026-05-11 in the
     ``plans/active/issues/wave3x_track_d_findings_2026_05_11.md`` § TL;DR point 2 routing decision."""

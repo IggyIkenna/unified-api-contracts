@@ -31,7 +31,6 @@ from datetime import datetime
 
 from .league_data import (
     clip_dates_to_source_coverage,
-    is_in_known_gap,
     is_pre_launch_date,
 )
 from .provider_league_ids import get_entity_league_coverage
@@ -255,18 +254,16 @@ def in_coverage(
 
     Composes existing UAC coverage helpers:
       1. ``is_pre_launch_date(data_type, iso_date)`` — date floor check
-      2. ``is_in_known_gap(source, data_type, iso_date)`` — provider-outage
-         windows
-      3. ``get_entity_league_coverage(data_type)`` — league filter
+      2. ``get_entity_league_coverage(data_type)`` — league filter
 
     Returns True if the combination is **in coverage** — i.e. we expect
     upstream to have data, so a missing manifest row is a real gap. Returns
     False if the combination is **out of coverage** — upstream legitimately
     doesn't serve this combo, so NaN-by-design is the right outcome.
 
-    The ``source`` arg is currently used only for known-gap lookup;
-    data_type → source mapping is via ``SPORTS_DATA_TYPE_TO_SOURCE``. The
-    arg is kept explicit on the signature so callers can pass it directly
+    The ``source`` arg is currently used only for the ``"derived"`` sentinel
+    check above; data_type → source mapping is via ``SPORTS_DATA_TYPE_TO_SOURCE``.
+    The arg is kept explicit on the signature so callers can pass it directly
     when they already know the source (avoids round-tripping through the
     dict).
 
@@ -296,12 +293,7 @@ def in_coverage(
     if data_type and is_pre_launch_date(data_type, iso_date):
         return False
 
-    # 2. Known gap window: provider outage / paused league for this
-    #    (source, data_type) over a documented date range.
-    if is_in_known_gap(source, data_type, iso_date):
-        return False
-
-    # 3. League coverage: this entity may only serve certain leagues
+    # 2. League coverage: this entity may only serve certain leagues
     #    (e.g. understat = 6 European leagues). league_id="" disables
     #    the check (used when the calculator doesn't shard by league).
     if league_id and data_type:

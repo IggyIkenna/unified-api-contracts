@@ -1012,9 +1012,6 @@ from .canonical.domain.sports.league_data import (
     get_league_fixture_calendar as get_league_fixture_calendar,
 )
 from .canonical.domain.sports.league_data import (
-    is_in_known_gap as is_in_known_gap,
-)
-from .canonical.domain.sports.league_data import (
     sports_leagues_config_descriptor as sports_leagues_config_descriptor,
 )
 from .canonical.domain.sports.league_registry import (
@@ -2463,7 +2460,6 @@ __all__ = [
     "get_league",
     "get_league_by_api_football_id",
     "get_league_fixture_calendar",
-    "is_in_known_gap",
     "SessionWindow",
     "SignoffVerdict",
     "SlippageBudgetTrigger",
