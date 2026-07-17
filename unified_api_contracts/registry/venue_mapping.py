@@ -23,6 +23,29 @@ from unified_api_contracts.registry.venue_trading_calendar import (
 )
 
 
+def _build_source_data_start_dates() -> dict[str, str]:
+    """Build ``source_data_start_dates`` — DERIVING the sports keys from the sports SSOT.
+
+    ``odds_api`` is the single source that both this venue registry (the MTDS fetch
+    pre-skip) and ``SOURCE_COVERAGE_START`` (the coverage oracle / IS fetch guards /
+    ManifestWriter write-guard) describe. It is read from the sports SSOT rather than
+    restated so the two surfaces cannot drift apart — see the field comment on
+    :attr:`VenueMapping.source_data_start_dates`.
+
+    Imported lazily-at-module-scope is unnecessary: ``league_data`` imports nothing from
+    ``registry`` (probed both import orders 2026-07-17), so this is cycle-free.
+    """
+    from unified_api_contracts.canonical.domain.sports.league_data import (
+        SOURCE_COVERAGE_START,
+    )
+
+    return {
+        # Sports — the odds-api vendor floor (API 401s for dates before it).
+        # DERIVED from the sports SSOT; do not hand-type a date here.
+        "ODDS_API": SOURCE_COVERAGE_START["odds_api"].isoformat(),
+    }
+
+
 @dataclass
 class VenueMapping:
     """CANONICAL venue to exchange API mappings (centralized business logic)"""
@@ -405,13 +428,25 @@ class VenueMapping:
     # Source/provider data start dates (distinct from venue launch dates)
     # These are data aggregators or providers, not trading venues.
     # The date is the earliest date with actual data available from the source.
-    source_data_start_dates: dict[str, str] = field(
-        default_factory=lambda: {
-            # Sports — Odds API historical data starts 2020-06-06
-            # API returns 401 Unauthorized for dates before this
-            "ODDS_API": "2020-06-06",
-        }
-    )
+    #
+    # DERIVED, never hand-typed (2026-07-17). ``ODDS_API`` here and ``odds_api`` in
+    # ``canonical.domain.sports.league_data.SOURCE_COVERAGE_START`` are the SAME FACT
+    # (the odds-api vendor floor: the API 401s below it and our MTDS+MDPS capture
+    # starts there) reached by two DIFFERENT surfaces:
+    #   * this dict gates FETCHING — MTDS' ``is_venue_available`` pre-skip
+    #     (engine/orchestrator ``_build_active_venues_for_date``) strips ODDS_API
+    #     below this date, so a stale value here silently no-ops a backfill;
+    #   * ``SOURCE_COVERAGE_START`` gates the coverage ORACLE, the IS fetch guards,
+    #     the enumerator denominator and the ManifestWriter ``is_pre_launch_date``
+    #     write-guard.
+    # Typed independently they can DRIFT — lower the sports SSOT on new evidence and
+    # the fetch pre-skip would keep refusing the very dates the oracle now expects.
+    # That is exactly the failure class UAC@c280e1ff exposed (floors declared
+    # uncapturable while ~22,327 real objects existed), so this side DERIVES from the
+    # sports SSOT instead of restating it. Falsifier:
+    # ``tests/test_sports_source_coverage_propagation.py::TestOddsApiFloorDerivesFromSportsSsot``.
+    # Non-sports entries would be typed here directly — only the overlapping key derives.
+    source_data_start_dates: dict[str, str] = field(default_factory=_build_source_data_start_dates)
 
     # MVP token list for DeFi pool discovery (configurable)
     defi_mvp_base_currencies: list[str] = field(

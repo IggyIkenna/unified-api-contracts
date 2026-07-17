@@ -19,6 +19,7 @@ from unified_api_contracts.canonical.domain.sports.league_data import (
     clip_dates_to_source_coverage,
     get_source_coverage_start,
 )
+from unified_api_contracts.registry.venue_mapping import VenueMapping
 
 
 class TestClipDatesToSourceCoverage:
@@ -234,3 +235,46 @@ class TestSourceCoverageStartCompleteness:
         """get_source_coverage_start returns None for unknown sources."""
         result = get_source_coverage_start("nonexistent_source")
         assert result is None
+
+
+class TestOddsApiFloorDerivesFromSportsSsot:
+    """The MTDS fetch pre-skip floor must DERIVE from the sports coverage SSOT.
+
+    ``venue_mapping.source_data_start_dates['ODDS_API']`` and
+    ``SOURCE_COVERAGE_START['odds_api']`` are the SAME FACT (the odds-api vendor
+    floor) consumed by two different surfaces — the MTDS ``is_venue_available``
+    FETCH pre-skip vs the coverage oracle / IS fetch guards / ManifestWriter
+    ``is_pre_launch_date`` WRITE guard.
+
+    Typed independently they drift, and the drift is SILENT in the dangerous
+    direction: lower the sports SSOT on new evidence and a hand-typed fetch floor
+    would keep pre-skipping the very dates the oracle now expects, so the backfill
+    no-ops while coverage reports the days as missing. That is the failure class
+    UAC@c280e1ff exposed for the OTHER sports sources (floors asserted 2018-2020
+    uncapturable while ~22,327 real objects were held for those dates).
+    """
+
+    @pytest.mark.unit
+    def test_fetch_preskip_floor_equals_sports_ssot(self) -> None:
+        """Today's values agree — the two surfaces name one floor."""
+        venue_mapping = VenueMapping()
+        assert venue_mapping.get_venue_start_date("ODDS_API") == SOURCE_COVERAGE_START["odds_api"].isoformat()
+
+    @pytest.mark.unit
+    def test_amending_the_sports_ssot_moves_the_fetch_preskip(
+        self,
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        """The falsifier: amend the SSOT → the FETCH gate must follow, unedited.
+
+        A snapshot assertion would pass against two hand-typed constants that merely
+        happen to match. This fails unless the fetch floor genuinely derives: it
+        amends only the sports SSOT and requires the MTDS pre-skip to open up.
+        """
+        monkeypatch.setitem(SOURCE_COVERAGE_START, "odds_api", date(2018, 1, 1))
+
+        venue_mapping = VenueMapping()
+
+        assert venue_mapping.get_venue_start_date("ODDS_API") == "2018-01-01"
+        # The pre-skip (MTDS _build_active_venues_for_date) must now admit the date.
+        assert venue_mapping.is_venue_available_on_date("ODDS_API", "2018-06-15") is True
