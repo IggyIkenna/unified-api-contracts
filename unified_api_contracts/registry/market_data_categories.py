@@ -221,6 +221,27 @@ DATA_TYPES_BY_ASSET_GROUP: dict[str, list[str]] = {
         "settlements",  # Settlement records (payout confirmation)
         # ── Bet/trade events (PINNACLE, BETFAIR_SB_UK/EX_UK/EX_EU, DRAFTKINGS, FANDUEL) ──
         "trades",  # Matched bets / trade-level acceptance events (aligned with CeFi/prediction)
+        # 2026-07-17 (operator ruling OR-5b(c), sports legacy-bucket cutover): POST-KICKOFF
+        # ("in-play") bookmaker quotes recovered from the legacy MDT bucket, kept as a
+        # population DISTINCT from pre-match ``trades`` so the observations survive the
+        # legacy-bucket delete without contaminating the pre-match T-0 horizon path.
+        # Discriminator at write time: ``bm_minutes_to_kickoff < 0``.
+        #
+        # Three deliberate NON-registrations keep this inert for the LIVE sports fleet —
+        # do NOT "complete" them without re-measuring, they are the safety design:
+        #   1. NOT in ``SPORTS_DATA_TYPE_TO_SOURCE`` — that (not this dict) is the axis the
+        #      v2 expected-universe enumerator iterates for sports
+        #      (``instruments-service/scripts/enumerate_expected_universe.py::_sports_data_types``).
+        #      Adding it there would mint ``expected_unattempted`` rows across every sports
+        #      instrument x date — the flood this exclusion exists to prevent.
+        #   2. NO ``AVAILABILITY_AT_SEMANTICS`` entry — mirrors ``("sports","trades")``, which
+        #      also has none. Registering one would switch the availability gate ON for the
+        #      live MDT sports fleet (the hazard @57bcc7c5 refused for PLAYER_STATS).
+        #   3. NOT in ``total_universe`` — that enumerates data_types for cefi/defi/tradfi only.
+        # Readers are filename-scoped too: the quarantined objects are written as
+        # ``inplay_ticks.parquet`` (never ``ticks.parquet``), because
+        # ``reprocess_sports_odds.py::_is_consumable_trades_blob`` matches on FILENAME alone.
+        "trades_inplay",
     ],
     "prediction": [
         # Canonical names — aligned with CeFi. Legacy prediction_* names retired
