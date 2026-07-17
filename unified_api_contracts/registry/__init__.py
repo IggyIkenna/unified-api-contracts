@@ -4,6 +4,10 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from unified_api_contracts.canonical.coverage_exclusions import (
+    is_out_of_bounds,
+)
+
 from ._sports_venue_constants import (
     SPORTS_AUTH_MAP,
     SPORTS_CAPTCHA_RISK,
@@ -1123,6 +1127,7 @@ __all__ = [
     "is_league_entity_covered",
     "is_lst",
     "is_non_trading_day",
+    "is_out_of_bounds",
     "is_per_instrument_shard_data_type",
     "is_prediction_market_venue",
     "is_processed_data_type",
