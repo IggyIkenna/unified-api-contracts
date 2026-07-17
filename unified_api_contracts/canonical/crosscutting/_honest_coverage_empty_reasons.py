@@ -272,6 +272,40 @@ class EmptyConfirmedReason(StrEnum):
     2026-05-20 round 3 per mega-audit Phase A2 gap closure (R8). Operator fills the registry
     when new pauses are discovered."""
 
+    EXPECTED_UPSTREAM_OUT_OF_BOUNDS = "EXPECTED_UPSTREAM_OUT_OF_BOUNDS"
+    """A BOUNDED, EVIDENCED date interval that was genuinely never capturable from any source —
+    the cell is OUT OF MODEL (neither captured nor missing) and is therefore clipped from BOTH
+    the numerator and the denominator via ``OUT_OF_COVERAGE_WINDOW_REASONS``.
+
+    Registry SSOT: ``unified_api_contracts.canonical.coverage_exclusions.COVERAGE_EXCLUSIONS``
+    — keyed by ``(asset_group, source, data_type)`` → closed ``(start, end)`` intervals, each
+    carrying MANDATORY provenance (typed ``ExclusionReason`` + machine-checkable ``evidence_uri``
+    + re-runnable ``evidence_probe`` + ``verified_at`` + ``verified_by``), enforced at
+    construction. Operator proposal 2026-07-17.
+
+    **REGISTRY-DERIVED ONLY — never hand-stamp this reason at a callsite.** It is emitted solely
+    by the ``expected_coverage()`` oracle gate reading the evidenced registry. A callsite that
+    passes ``reason="EXPECTED_UPSTREAM_OUT_OF_BOUNDS"`` directly is asserting an unevidenced,
+    unfalsifiable exclusion — exactly the failure mode this reason exists to prevent — and is
+    review-blocking. That is why this is a NEW reason rather than a reuse of
+    ``EXPECTED_KNOWN_SOURCE_GAP``: the latter has live hand-stamped callsites (PYTH pre-archive,
+    VIX 15m) and stays WITHIN-window, so widening its denominator semantics would have silently
+    moved live coverage numbers.
+
+    Distinct from its neighbours:
+    * ``EXPECTED_PRE_SOURCE_COVERAGE_START`` — a FLOOR (before the archive begins), not a bounded
+      mid-history interval.
+    * ``EXPECTED_KNOWN_SOURCE_GAP`` — a documented mid-history gap that still COUNTS in the
+      denominator (within-window honest absence, hand-stamped).
+    * ``EXPECTED_PROTOCOL_PAUSED`` — DeFi-only, detector-populated from on-chain governance.
+    * ``EXPECTED_HOLIDAY`` / ``EXPECTED_WEEKEND`` — recurring calendar closure, owned by
+      ``venue_trading_calendar``.
+
+    Every declaration is continuously FALSIFIED by ``scripts/check_coverage_exclusions.py``:
+    if real data is found inside a declared interval, the declaration is WRONG and the check
+    FAILS. See the ``coverage_exclusions`` module docstring for why (SOURCE_COVERAGE_START was
+    wrong for months because it had no such check). Codex: ``codex/02-data/honest-coverage-model.md``."""
+
     EXPECTED_OUTSIDE_PROCESSING_SCOPE = "EXPECTED_OUTSIDE_PROCESSING_SCOPE"
     """Instrument exists in the instruments-service catalog but is not included in the downstream
     service's subscription_list / MVP-scope configuration. The service explicitly skips it rather
@@ -457,6 +491,15 @@ OUT_OF_COVERAGE_WINDOW_REASONS: Final[frozenset[str]] = frozenset(
         EmptyConfirmedReason.EXPECTED_PRE_VENUE_LAUNCH.value,
         EmptyConfirmedReason.EXPECTED_PRE_SOURCE_COVERAGE_START.value,
         EmptyConfirmedReason.EXPECTED_PAST_SOURCE_COVERAGE_END.value,
+        # Bounded, evidenced, falsifiable out-of-bounds interval (operator 2026-07-17).
+        # Membership HERE is what makes the range OUT OF MODEL — clipped from numerator AND
+        # denominator — rather than silently credited as a within-window honest empty. The raw
+        # manifest rows stay honestly ``empty_confirmed`` + reason, and the reason keeps its own
+        # visible reported line (deployment-api ``EMPTY_REASON_KEYS`` + the UI reason badges), so
+        # an out-of-model range is always VISIBLE, never silently dropped
+        # (``codex/02-data/honest-absence-downstream-handling.md``). Registry is EMPTY by design,
+        # so adding this member changes no reported number today.
+        EmptyConfirmedReason.EXPECTED_UPSTREAM_OUT_OF_BOUNDS.value,
         EmptyConfirmedReason.EXPECTED_INSTRUMENT_NOT_LISTED.value,
         EmptyConfirmedReason.EXPECTED_INSTRUMENT_DELISTED.value,
         EmptyConfirmedReason.EXPECTED_NOT_ENOUGH_TVL.value,

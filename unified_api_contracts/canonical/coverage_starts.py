@@ -194,24 +194,26 @@ PREDICTION_SOURCE_COVERAGE_START: dict[str, date] = {
     # Polymarket: CLOB (central-limit order book) launched 2022-11-21, which is
     # the canonical "tradeable history" cutoff. The platform itself launched
     # 2020-06-12 on Matic with AMM-style markets, but pre-CLOB data has no
-    # order-book trading history that can be backtested. The pre-CLOB window
-    # is captured in PREDICTION_KNOWN_COVERAGE_GAPS so data-status drops
-    # those days from the denominator instead of flagging them missing.
+    # order-book trading history that can be backtested. The pre-CLOB window is
+    # entirely BELOW this floor, so the floor alone already clips it.
     "POLYMARKET": date(2022, 11, 21),
     "KALSHI": date(2021, 7, 19),
     "MANIFOLD": date(2022, 1, 1),
 }
 
 
-# Known provider-side gaps within the source-coverage window. data-status drops
-# these from the denominator (don't count as missing) and the orchestrator
-# pre-skips them so VMs don't waste rate-limit on known-empty windows.
-# Keys: (source_token_uppercase, "*" for all data_types or specific data_type)
-# Values: list of (start_date, end_date) inclusive ranges.
-PREDICTION_KNOWN_COVERAGE_GAPS: dict[tuple[str, str], list[tuple[date, date]]] = {
-    # Polymarket pre-CLOB AMM era — markets existed but no order-book trades.
-    ("POLYMARKET", "*"): [(date(2020, 6, 12), date(2022, 11, 20))],
-}
+# NOTE — ``PREDICTION_KNOWN_COVERAGE_GAPS`` was DELETED 2026-07-17.
+# It declared a bounded range (POLYMARKET pre-CLOB 2020-06-12 → 2022-11-20) and its
+# comment claimed data-status dropped it from the denominator and the orchestrator
+# pre-skipped it. Neither was true: it was never exported in ``__all__`` and had ZERO
+# importers workspace-wide — dead code asserting an effect it did not have. It was also
+# redundant: its range ended exactly one day below the POLYMARKET floor above, so the
+# floor already clipped every day it named. It was, in miniature, the failure mode that
+# motivated the evidenced registry: a bounded exclusion typed in without provenance,
+# without a consumer, and without anything that could ever prove it wrong.
+#
+# Bounded out-of-bounds ranges now live in ONE cross-asset, evidence-gated, falsifiable
+# SSOT: ``unified_api_contracts.canonical.coverage_exclusions.COVERAGE_EXCLUSIONS``.
 
 
 # ---------------------------------------------------------------------------
