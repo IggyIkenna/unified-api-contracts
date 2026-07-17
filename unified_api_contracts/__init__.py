@@ -888,6 +888,9 @@ from .canonical.crosscutting.source_priority import (
 from .canonical.crosscutting.venue_thresholds import (
     VenueTestnetEndpoints as VenueTestnetEndpoints,
 )
+from .canonical.domain.cefi_wire_canonical import (
+    CeFiWireCanonicalMap as CeFiWireCanonicalMap,
+)
 from .canonical.domain.derivatives.tradfi_etfs import (
     ETFMetadata as ETFMetadata,
 )
@@ -2391,6 +2394,7 @@ __all__ = [
     "CanonicalQuestionGroup",
     "CapitalAtRiskCeilingTrigger",
     "CatalogRow",
+    "CeFiWireCanonicalMap",
     "CorrelationRegimeChange",
     "CounterpartyRatioCapTrigger",
     "CoverageResult",
