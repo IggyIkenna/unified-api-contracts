@@ -141,6 +141,22 @@ class InstrumentRecord(BaseModel):
             "(e.g. exchange code 'ES' → 'SP500'). None when no registry mapping resolves."
         ),
     )
+    # Additive + optional (non-breaking: added-optional-field), same pattern as
+    # canonical_instrument_id above. Human-readable market question / title — TODAY
+    # populated only by the PREDICTION adapters (Polymarket ``question`` /
+    # Kalshi ``title — yes_sub_title``), which already resolve it at parse time but
+    # had no field to persist it into (pydantic's default extra='ignore' silently
+    # DROPPED it — that is why the prediction catalogue label fell back to the raw
+    # slug). None for every instrument whose adapter does not resolve one.
+    # Plan: data_status_page_ux_and_canonicalisation_2026_07_16 A4 (forward-only).
+    question: str | None = Field(
+        default=None,
+        description=(
+            "Human-readable market question / title (prediction markets: Polymarket "
+            "'question' / Kalshi 'title — yes_sub_title'). None when the adapter "
+            "resolves no human title (the raw symbol/slug remains the label floor)."
+        ),
+    )
     status: InstrumentStatus = InstrumentStatus.ACTIVE
     available_from_datetime: datetime | None = Field(
         default=None,
