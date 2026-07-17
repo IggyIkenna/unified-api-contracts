@@ -29,7 +29,11 @@ from unified_api_contracts.canonical.crosscutting.honest_coverage import (
     EmptyConfirmedReason,
     is_out_of_coverage_window,
 )
-from unified_api_contracts.registry.expected_coverage import ExpectedState, expected_coverage
+from unified_api_contracts.registry.expected_coverage import (
+    ExpectedState,
+    expected_coverage,
+    is_bounded_excluded,
+)
 
 _TODAY = date(2026, 7, 17)
 
@@ -283,6 +287,42 @@ def test_oracle_leaves_cells_outside_the_window_alone(monkeypatch: pytest.Monkey
     )
     result = expected_coverage("defi", "AAVE_V3-ETHEREUM", "lending_indices", date(2025, 6, 2))
     assert result.reason != "EXPECTED_UPSTREAM_OUT_OF_BOUNDS"
+
+
+# ---------------------------------------------------------------------------
+# CONSUMER (d) — the VENUE-LEVEL pre-fetch skip (``is_bounded_excluded``)
+#
+# The MTDS orchestrator's ``_build_active_venues_for_date`` pre-skip gates a whole
+# venue BEFORE any data_type is selected — unlike (b)/(c) above, it cannot consult
+# the exact-data_type oracle. ``is_bounded_excluded`` is the wildcard-only sibling:
+# it must fire for a venue-wide (``data_type="*"``) exclusion and must NOT fire for
+# a data_type-scoped one (skipping the whole venue on a partial exclusion would drop
+# data_types the exclusion never covered).
+# ---------------------------------------------------------------------------
+
+
+def test_is_bounded_excluded_fires_for_wildcard_exclusion(monkeypatch: pytest.MonkeyPatch) -> None:
+    wildcard = _valid(asset_group="cefi", source="EXAMPLE-VENUE", data_type="*")
+    monkeypatch.setattr(
+        "unified_api_contracts.canonical.coverage_exclusions._INDEX",
+        {wildcard.key: (wildcard,)},
+    )
+    assert is_bounded_excluded("cefi", "EXAMPLE-VENUE", date(2024, 1, 15)) is True
+    assert is_bounded_excluded("cefi", "EXAMPLE-VENUE", date(2024, 3, 1)) is False
+
+
+def test_is_bounded_excluded_ignores_data_type_scoped_exclusion(monkeypatch: pytest.MonkeyPatch) -> None:
+    """A data_type-scoped exclusion must NOT skip the whole venue — only a wildcard can."""
+    exact = _valid(asset_group="cefi", source="EXAMPLE-VENUE", data_type="TRADES")
+    monkeypatch.setattr(
+        "unified_api_contracts.canonical.coverage_exclusions._INDEX",
+        {exact.key: (exact,)},
+    )
+    assert is_bounded_excluded("cefi", "EXAMPLE-VENUE", date(2024, 1, 15)) is False
+
+
+def test_is_bounded_excluded_empty_registry_never_fires() -> None:
+    assert is_bounded_excluded("cefi", "BINANCE", date(2024, 1, 15)) is False
 
 
 # ---------------------------------------------------------------------------
