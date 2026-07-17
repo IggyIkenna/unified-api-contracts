@@ -184,8 +184,26 @@ DATA_TYPE_COVERAGE_START: dict[tuple[str, str], date] = {
 #
 # This dict is ONLY for SOURCE-LEVEL gaps: complete provider outages or
 # protocol-level blackout periods where the source produced NO data at all
-# for a date range. Population happens as such gaps are discovered from
-# data audits or provider communications.
+# for a date range.
+#
+# ***FROZEN EMPTY 2026-07-17 — DO NOT ADD ENTRIES HERE.***
+# This registry is the unevidenced ancestor of the bounded out-of-bounds construct: it
+# accepts a bare (start, end) tuple with NO reason, NO evidence, NO verified_at/by, and
+# nothing that could ever prove an entry wrong. That is exactly how SOURCE_COVERAGE_START
+# stayed wrong for months (UAC@c280e1ff) — floors declared 2018-2020 uncapturable while we
+# held ~22,327 real objects for those dates. An entry typed in here would drop days out of
+# the sports denominator on nothing but a reviewer's say-so.
+#
+# Declare bounded uncapturable ranges in the evidence-gated, falsifiable SSOT instead:
+#   ``unified_api_contracts.canonical.coverage_exclusions.COVERAGE_EXCLUSIONS``
+# — mandatory typed reason + machine-checkable evidence + re-runnable probe + verified_at/by
+# (enforced at construction), cross-asset, and continuously falsified by
+# ``scripts/check_coverage_exclusions.py``. The oracle gate for it is cross-asset and fires
+# BEFORE this one, so sports is already covered by the evidenced path.
+#
+# ``test_sports_known_coverage_gaps_stays_frozen_empty`` enforces this. The accessors below
+# are retained only because MTDS' sports manifest-rebuild classifiers still import them;
+# migrating those callsites and deleting this registry outright is a filed follow-up.
 KNOWN_COVERAGE_GAPS: dict[tuple[str, str], list[tuple[str, str]]] = {}
 
 

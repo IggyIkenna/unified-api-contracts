@@ -793,12 +793,19 @@ def expected_coverage(
        ``EXPECTED_PRE_VENUE_LAUNCH`` if before venue_launch_dates entry.
     3. **Pre-chain-genesis (DeFi only)** — ``NOT_YET_LIVE`` +
        ``EXPECTED_PRE_GENESIS_CHAIN`` if before chain genesis.
-    4. **Pre-source-coverage-start** — ``EXPECTED_EMPTY`` +
+    4. **Bounded out-of-bounds (cross-asset)** — ``EXPECTED_EMPTY`` +
+       ``EXPECTED_UPSTREAM_OUT_OF_BOUNDS`` if the cell falls inside an evidenced
+       closed interval in
+       ``canonical.coverage_exclusions.COVERAGE_EXCLUSIONS``. Fires BEFORE the
+       floor + sports known-gap gates (a proven-uncapturable window is the more
+       specific claim) and takes the cell OUT OF MODEL. Registry is empty by
+       design, so this gate never fires until a range is PROVEN.
+    5. **Pre-source-coverage-start** — ``EXPECTED_EMPTY`` +
        ``EXPECTED_PRE_SOURCE_COVERAGE_START`` if before
        ``SourceCapability.coverage_start[data_type]``. Composes with the
        Phase 4 helper :func:`is_before_source_coverage_start`.
-    5. **TradFi calendar** — weekend / holiday / half-day.
-    6. **Default** → ``SHOULD_HAVE_DATA``.
+    6. **TradFi calendar** — weekend / holiday / half-day.
+    7. **Default** → ``SHOULD_HAVE_DATA``.
 
     Args:
         asset_group: workspace-canonical lowercase (``cefi`` / ``defi`` /
@@ -891,6 +898,26 @@ def expected_coverage(
                     reason="EXPECTED_PROTOCOL_PAUSED",
                     diagnostic=pause_desc or f"{protocol}-{chain} in pause window covering {target_date.isoformat()}",
                 )
+
+    # Bounded evidenced out-of-bounds ranges (operator 2026-07-17) — CROSS-ASSET, and
+    # deliberately checked BEFORE the source-coverage-start floor and the sports-only
+    # known-gap gate: a proven-uncapturable window is a stronger, more specific statement
+    # than either, and it must win so the cell leaves the model rather than being credited
+    # as a within-window empty. Registry is EMPTY by design (nothing is proven yet), so this
+    # gate never fires today — the honest default, mirroring PROTOCOL_PAUSE_WINDOWS.
+    from unified_api_contracts.canonical.coverage_exclusions import (  # noqa: imports-inside-functions
+        find_coverage_exclusion,
+    )
+
+    _exclusion = find_coverage_exclusion(ag, data_source, data_type, target_date)
+    if _exclusion is not None:
+        return ExpectedCoverageResult(
+            state=ExpectedState.EXPECTED_EMPTY,
+            reason="EXPECTED_UPSTREAM_OUT_OF_BOUNDS",
+            # Carry the provenance into the diagnostic: an out-of-model cell must always be
+            # explainable + auditable at the point of use, never an unattributed hole.
+            diagnostic=_exclusion.describe(),
+        )
 
     # Sports source-level known gaps (added 2026-05-20 round 2 — operator Q1 fix).
     # Composes with sports.league_data.is_in_known_gap which reads the canonical
