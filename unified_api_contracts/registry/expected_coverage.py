@@ -550,6 +550,7 @@ __all__ = [
     "get_expected_venues_in_scope",
     "get_source_coverage_start_for_data_type",
     "is_before_source_coverage_start",
+    "is_bounded_excluded",
     "is_expected",
 ]
 
@@ -965,3 +966,23 @@ def expected_coverage(
         reason=None,
         diagnostic=f"({ag}, {data_source}, {data_type}) in scope on {target_date.isoformat()}",
     )
+
+
+def is_bounded_excluded(asset_group: str, source: str, target_date: _date) -> bool:
+    """Cheap venue-level pre-fetch check for a WILDCARD-scoped bounded exclusion.
+
+    ``expected_coverage()`` composes ``canonical.coverage_exclusions`` at the exact
+    ``(asset_group, source, data_type)`` cell, but some callers (e.g. the MTDS
+    orchestrator's venue pre-skip) gate an entire venue BEFORE any data_type is
+    selected. Checking a specific data_type there would be wrong: a data_type-scoped
+    exclusion must not skip data_types it never covers. So this helper checks ONLY the
+    ``DATA_TYPE_WILDCARD`` bucket — the one case where "this venue produces nothing at
+    all for this window" is actually true venue-wide. Callers that already know the
+    data_type should call :func:`expected_coverage` instead.
+    """
+    from unified_api_contracts.canonical.coverage_exclusions import (  # noqa: imports-inside-functions
+        DATA_TYPE_WILDCARD,
+        is_out_of_bounds,
+    )
+
+    return is_out_of_bounds(asset_group, source, DATA_TYPE_WILDCARD, target_date)
