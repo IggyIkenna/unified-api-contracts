@@ -21,8 +21,9 @@ Wire-format SSOT (matches deployed Terraform at
 - Test-mode buckets: insert ``test-`` before ``{project_id}``
   (``...-prd-test-{project_id}``).
 - Strategy catalogue bucket (single, cross-asset):
-    ``strategy-store-{project_id}`` (unified FLAT bucket, no asset-group or env
-    segment — cloud-providers.yaml kind ``strategy-store``; see
+    ``strategy-store-prd-{project_id}`` (unified bucket, no asset-group segment —
+    cloud-providers.yaml kind ``strategy-store``; env-tiered to ``prd`` per
+    strategy FOLD D fold_d_cutover_spec 2026-07-18; see
     plans/active/issues/strategy_store_split_brain_2026_07_13.md).
 
 The canonical resolver (UTL ``resolve_bucket_name``) reads the live process env
@@ -114,12 +115,18 @@ BUCKET_TEMPLATES_BY_ASSET_GROUP_KIND: dict[tuple[AssetGroup, BucketKind], str | 
 # in this single bucket regardless of asset_group. Sub-prefixes inside the
 # bucket carve up by artefact family (catalogue/strategy/, catalogue/instrument/, …).
 # Unified FLAT bucket (cloud-providers.yaml storage kind `strategy-store` — no
-# `-cefi-`/`-tradfi-`/`-defi-` segment): per the operator-ratified 2026-05-20
-# (D6 Phase 4) decision the yaml is canonical and every live strategy-service
-# writer resolves the flat name; this template previously drifted onto the
-# stale per-AG `strategy-store-cefi-{project_id}` bucket — see
+# `-cefi-`/`-tradfi-`/`-defi-` asset_group segment): per the operator-ratified
+# 2026-05-20 (D6 Phase 4) decision the yaml is canonical and every live
+# strategy-service writer resolves this name; this template previously drifted
+# onto the stale per-AG `strategy-store-cefi-{project_id}` bucket — see
 # plans/active/issues/strategy_store_split_brain_2026_07_13.md.
-STRATEGY_STORE_BUCKET_TEMPLATE = "strategy-store-{project_id}"
+# strategy FOLD D (fold_d_cutover_spec, 2026-07-18): the bucket is now
+# env-tiered `strategy-store-prd-{project_id}` (was un-tiered
+# `strategy-store-{project_id}`). This facade hardcodes the `prd` tier — the
+# `-test-` twin is only reached by services running DEPLOYMENT_ENV=test via
+# the UTL yaml resolver, never this UAC literal (UAC is a lower tier than
+# unified-trading-library, so `resolve_bucket_name()` can't be imported here).
+STRATEGY_STORE_BUCKET_TEMPLATE = "strategy-store-prd-{project_id}"
 
 
 # ---------------------------------------------------------------------------
