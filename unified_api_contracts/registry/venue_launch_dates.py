@@ -146,23 +146,37 @@ EXPECTED_PRE_VENUE_LAUNCH rows in the default window.
 # ---------------------------------------------------------------------------
 
 DEFI_VENUE_LAUNCH_DATES: dict[str, str] = {
-    # Aave V3 — March 16 2022 multi-chain launch (ETH/POLY/AVAX/ARB/OPT).
+    # Aave V3 — March 16 2022 multi-chain launch (POLY/AVAX/ARB/OPT). ETHEREUM is
+    # the exception: Aave V3 did NOT deploy on Ethereum mainnet until 2023-01-27
+    # (2022-03-16 was the L2/side-chain cohort date, NOT Ethereum). Corrected
+    # 2026-07-18 to match the subgraph-audited `chain_env.PROTOCOL_LAUNCH_DATES`
+    # (("ETHEREUM","AAVE_V3")="2023-01-27", first reserveParamsHistoryItems event
+    # 2023-01-27 08:00:11 UTC, audit 2026-05-08) — the old 2022-03-16 mis-classified
+    # 11 months of legitimate 2022-03→2023-01 Aave-V3-ETH data as empty_confirmed.
+    # Also aligns with this registry's own "prefer LATER when uncertain" principle.
+    # SSOT-reconciliation issue: uac_defi_launch_date_registry_drift_2026_07_18.
     # BSC/LINEA/ZKSYNC/SCROLL came later per official deployment timelines.
-    "AAVE_V3-ETHEREUM": "2022-03-16",
+    "AAVE_V3-ETHEREUM": "2023-01-27",
     "AAVE_V3-POLYGON": "2022-03-16",
     "AAVE_V3-AVALANCHE": "2022-03-16",
     "AAVE_V3-ARBITRUM": "2022-03-16",
     "AAVE_V3-OPTIMISM": "2022-03-16",
-    "AAVE_V3-BSC": "2023-04-06",
-    "AAVE_V3-LINEA": "2024-09-26",
+    # On-chain verified 2026-07-18 (issue uac_defi_launch_date_registry_drift): Aave's own
+    # changelog dates BNB Chain market go-live 2024-01-23 (2023-04-06 was the ARFC governance
+    # date) and Linea 2025-02-11 (2024-09-26 matched no Linea deployment/vote/changelog event).
+    "AAVE_V3-BSC": "2024-01-23",
+    "AAVE_V3-LINEA": "2025-02-11",
     "AAVE_V3-ZKSYNC": "2024-04-09",
     "AAVE_V3-SCROLL": "2024-04-29",
     # Compound V3 ("Comet") — Aug 26 2022 on Ethereum; multi-chain later.
     "COMPOUND_V3-ETHEREUM": "2022-08-26",
     "COMPOUND_V3-POLYGON": "2023-02-15",
-    "COMPOUND_V3-ARBITRUM": "2023-04-14",
+    # On-chain verified 2026-07-18 (medium conf — governance-execution-derived, Dune first-event
+    # confirmation blocked by credits): Compound III cUSDCv3 Arbitrum went live ~2023-05-15
+    # (Prop 160 executed ~May 14) and Optimism ~2024-04-16 — both prior registry values were off.
+    "COMPOUND_V3-ARBITRUM": "2023-05-15",
     "COMPOUND_V3-BASE": "2023-08-11",
-    "COMPOUND_V3-OPTIMISM": "2024-02-16",
+    "COMPOUND_V3-OPTIMISM": "2024-04-16",
     "COMPOUND_V3-SCROLL": "2024-04-23",
     # Uniswap V2 (May 2020), V3 (May 2021 ETH, Dec 2021 Polygon), V4 (Jan 2025).
     "UNISWAP_V2-ETHEREUM": "2020-05-05",

@@ -77,7 +77,7 @@ _PRE_GENESIS_SUBGRAPH_INDEXED_ALLOWLIST: frozenset[tuple[str, str]] = frozenset(
         ("OPTIMISM", "UNISWAP_V3"),  # canonical alias for UNISWAP_V3
         ("BASE", "UNISWAP_V3"),  # subgraph indexes 2023-07-31; BASE public mainnet 2023-08-09
         ("BASE", "UNISWAP_V3"),  # canonical alias for UNISWAP_V3
-        ("BASE", "COMPOUND_V3"),  # subgraph indexes 2023-08-04; BASE public mainnet 2023-08-09
+        ("BASE", "COMPOUND_V3"),  # Comet cUSDbCv3 Base contract creation 2023-08-11 (corrected 2026-07-18)
         ("BASE", "COMPOUND_V3"),  # canonical alias for COMPOUND_V3
     }
 )
@@ -146,7 +146,7 @@ def test_pending_investigation_disjoint_from_declared() -> None:
         ("BASE", "AAVE_V3", "2023-08-22"),  # Tab 14 audit 2026-05-08
         ("OPTIMISM", "AAVE_V3", "2022-03-15"),  # Tab 14 audit 2026-05-08
         ("BSC", "AAVE_V3", "2024-01-23"),  # Tab 14 audit 2026-05-08
-        ("ETHEREUM", "COMPOUND_V3", "2022-08-13"),  # Tab 14 audit 2026-05-08
+        ("ETHEREUM", "COMPOUND_V3", "2022-08-26"),  # fixed 2026-07-18: Comet mainnet creation (was 2022-08-13)
         ("ARBITRUM", "UNISWAP_V3", "2021-06-01"),  # Tab 14 audit; pre-mainnet-open indexed
         ("ETHEREUM", "SPARK", "2023-03-07"),  # Tab 14 audit; added 2026-05-08
         ("ETHEREUM", "UNISWAP_V3", "2021-05-04"),
@@ -174,3 +174,66 @@ def test_compose_with_chain_genesis_takes_max() -> None:
     assert protocol_launch == "2022-03-16"
     # max of the two iso strings is the protocol launch (later)
     assert max(chain_genesis, protocol_launch) == "2022-03-16"
+
+
+def test_venue_launch_dates_no_new_drift_vs_chain_env() -> None:
+    """Cross-registry consistency guard — SSOT issue
+    ``uac_defi_launch_date_registry_drift_2026_07_18``.
+
+    ``venue_launch_dates.DEFI_VENUE_LAUNCH_DATES`` (PROTOCOL-CHAIN string keys) and
+    ``chain_env.PROTOCOL_LAUNCH_DATES`` ((CHAIN, PROTOCOL) tuple keys) both carry DeFi
+    launch dates; where they OVERLAP they must agree. ``AAVE_V3-ETHEREUM`` was corrected
+    2026-07-18 (2022-03-16 was the debunked L2-cohort date -> 2023-01-27, the
+    subgraph-audited value chain_env's own comment documents). The remaining overlaps
+    below are KNOWN drifts (deltas 1-292d) PENDING per-pair on-chain re-verification —
+    allowlisted so a NEW divergence FAILS this test; resolving one means REMOVING it here.
+    """
+    from unified_api_contracts.registry.venue_launch_dates import DEFI_VENUE_LAUNCH_DATES
+
+    # The 6 drifts >=7d were ON-CHAIN VERIFIED + corrected 2026-07-18 (both registries now agree);
+    # only the <=4d tail remains, pending a cheap re-audit (low-impact for the expected-window
+    # denominator). Resolving one = REMOVING it here.
+    known_drifts_pending_audit = {
+        "AAVE_V3-POLYGON",  # 4d
+        "AAVE_V3-AVALANCHE",  # 4d
+        "AAVE_V3-OPTIMISM",  # 1d
+        "COMPOUND_V3-SCROLL",  # 1d
+        "UNISWAP_V2-ETHEREUM",  # 1d
+        "UNISWAP_V3-ETHEREUM",  # 1d
+        "UNISWAP_V3-POLYGON",  # 1d
+        "ROCKETPOOL-ETHEREUM",  # 1d
+        "ETHENA-ETHEREUM",  # 1d
+        "ETHERFI-ETHEREUM",  # 1d
+        "KAMINO-SOLANA",  # 1d
+        "JITO-SOLANA",  # 1d
+        "GMX-AVALANCHE",  # 1d
+    }
+    drifts: set[str] = set()
+    for vkey, vdate in DEFI_VENUE_LAUNCH_DATES.items():
+        if "-" not in vkey:
+            continue
+        protocol, chain = vkey.rsplit("-", 1)
+        chain_env_date = PROTOCOL_LAUNCH_DATES.get((chain, protocol))
+        if chain_env_date is not None and chain_env_date != vdate:
+            drifts.add(vkey)
+
+    new_drifts = drifts - known_drifts_pending_audit
+    assert not new_drifts, (
+        "NEW venue_launch_dates↔chain_env launch-date drift — reconcile the pair or, if a genuine "
+        f"per-purpose divergence, add it to known_drifts_pending_audit with a comment: {sorted(new_drifts)}"
+    )
+    # The 2026-07-18 on-chain-verified corrections must hold (both registries agree on the verified value).
+    assert "AAVE_V3-ETHEREUM" not in drifts
+    on_chain_verified_2026_07_18 = (
+        "AAVE_V3-BSC",
+        "AAVE_V3-LINEA",
+        "COMPOUND_V3-ETHEREUM",
+        "COMPOUND_V3-BASE",
+        "COMPOUND_V3-ARBITRUM",
+        "COMPOUND_V3-OPTIMISM",
+    )
+    for resolved in on_chain_verified_2026_07_18:
+        assert resolved not in drifts, f"{resolved} regressed — its 2026-07-18 verified correction was reverted"
+    assert DEFI_VENUE_LAUNCH_DATES["AAVE_V3-ETHEREUM"] == "2023-01-27"
+    assert DEFI_VENUE_LAUNCH_DATES["AAVE_V3-BSC"] == "2024-01-23"
+    assert DEFI_VENUE_LAUNCH_DATES["AAVE_V3-LINEA"] == "2025-02-11"

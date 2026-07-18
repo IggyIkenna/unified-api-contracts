@@ -222,19 +222,31 @@ PROTOCOL_LAUNCH_DATES: dict[tuple[str, str], str] = {
     # UTC (Tab 14 audit 2026-05-08); pre-fix 2022-08-25 was 12 days late —
     # caused 12d of legitimate post-deploy ETH Compound V3 data to be
     # silently clipped as pre-launch.
-    ("ETHEREUM", "COMPOUND_V3"): "2022-08-13",
+    (
+        "ETHEREUM",
+        "COMPOUND_V3",
+    ): "2022-08-26",  # corrected 2026-07-18 (issue uac_defi_launch_date_registry_drift): Comet cUSDCv3 mainnet contract creation is 2022-08-26 (a launch date cannot precede it; the prior 2022-08-13 was too early)
     # ARBITRUM earliest event 2023-05-04 22:00:26 UTC (Tab 14 audit
     # 2026-05-08); pre-fix 2023-04-13 was 21 days early — caused 21d of
     # ``SOURCE_RETURNED_ZERO`` false-empty rows.
-    ("ARBITRUM", "COMPOUND_V3"): "2023-05-04",
+    (
+        "ARBITRUM",
+        "COMPOUND_V3",
+    ): "2023-05-15",  # corrected 2026-07-18 (med conf): Compound Prop 160 (cUSDCv3 Arbitrum) executed ~May 14 2023, first market May 15
     # BASE earliest event 2023-08-04 23:29:21 UTC (subgraph indexes
     # pre-mainnet-open BASE blocks); pre-fix 2023-08-26 was 22 days late —
     # caused 22d of legitimate post-deploy BASE data to be silently clipped.
-    ("BASE", "COMPOUND_V3"): "2023-08-04",
+    (
+        "BASE",
+        "COMPOUND_V3",
+    ): "2023-08-11",  # corrected 2026-07-18: Comet cUSDbCv3 Base contract creation 2023-08-11 (venue_launch_dates was right; the prior 2023-08-04 was too early)
     # OPTIMISM earliest event 2024-04-06 17:09:21 UTC (Tab 14 audit
     # 2026-05-08); pre-fix 2024-02-15 was 51 days early — caused 51d of
     # false-empty rows.
-    ("OPTIMISM", "COMPOUND_V3"): "2024-04-06",
+    (
+        "OPTIMISM",
+        "COMPOUND_V3",
+    ): "2024-04-16",  # corrected 2026-07-18 (med conf): Comet cUSDCv3 Optimism first activity ~Apr 16 2024
     # POLYGON entry removed 2026-05-08 — Tab 14 audit confirmed
     # ``SUBGRAPH_IDS["compound_v3"]`` has no POLYGON entry (subgraph returned
     # 0 markets, Compound V3 not active on Polygon). The lingering UAC entry
