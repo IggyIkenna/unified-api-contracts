@@ -168,15 +168,19 @@ DEFI_VENUE_LAUNCH_DATES: dict[str, str] = {
     "AAVE_V3-LINEA": "2025-02-11",
     "AAVE_V3-ZKSYNC": "2024-04-09",
     "AAVE_V3-SCROLL": "2024-04-29",
-    # Compound V3 ("Comet") — Aug 26 2022 on Ethereum; multi-chain later.
-    "COMPOUND_V3-ETHEREUM": "2022-08-26",
+    # Compound V3 ("Comet") — aligned 2026-07-18 to chain_env.PROTOCOL_LAUNCH_DATES, whose
+    # Tab-14 subgraph audit (2026-05-08) gives day-precise FIRST-MARKET-ACTIVITY dates (the
+    # "launch" the data denominator needs) for these pairs. A 2026-07-18 pass had briefly
+    # overridden ARBITRUM/OPTIMISM with medium-confidence GOVERNANCE-execution dates
+    # (2023-05-15 / 2024-04-16) — reverted: the subgraph audit outranks a governance date, and
+    # the instruments-service evm_creation_resolver test pins the audited values. ETHEREUM's
+    # 2022-08-26 (a launch-blog date) vs the audited 2022-08-13 first-event is a residual
+    # contract-creation-vs-subgraph question flagged in the SSOT issue doc (needs Dune re-verify).
+    "COMPOUND_V3-ETHEREUM": "2022-08-13",
     "COMPOUND_V3-POLYGON": "2023-02-15",
-    # On-chain verified 2026-07-18 (medium conf — governance-execution-derived, Dune first-event
-    # confirmation blocked by credits): Compound III cUSDCv3 Arbitrum went live ~2023-05-15
-    # (Prop 160 executed ~May 14) and Optimism ~2024-04-16 — both prior registry values were off.
-    "COMPOUND_V3-ARBITRUM": "2023-05-15",
-    "COMPOUND_V3-BASE": "2023-08-11",
-    "COMPOUND_V3-OPTIMISM": "2024-04-16",
+    "COMPOUND_V3-ARBITRUM": "2023-05-04",
+    "COMPOUND_V3-BASE": "2023-08-04",
+    "COMPOUND_V3-OPTIMISM": "2024-04-06",
     "COMPOUND_V3-SCROLL": "2024-04-23",
     # Uniswap V2 (May 2020), V3 (May 2021 ETH, Dec 2021 Polygon), V4 (Jan 2025).
     "UNISWAP_V2-ETHEREUM": "2020-05-05",

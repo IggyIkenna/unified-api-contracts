@@ -146,7 +146,7 @@ def test_pending_investigation_disjoint_from_declared() -> None:
         ("BASE", "AAVE_V3", "2023-08-22"),  # Tab 14 audit 2026-05-08
         ("OPTIMISM", "AAVE_V3", "2022-03-15"),  # Tab 14 audit 2026-05-08
         ("BSC", "AAVE_V3", "2024-01-23"),  # Tab 14 audit 2026-05-08
-        ("ETHEREUM", "COMPOUND_V3", "2022-08-26"),  # fixed 2026-07-18: Comet mainnet creation (was 2022-08-13)
+        ("ETHEREUM", "COMPOUND_V3", "2022-08-13"),  # Tab 14 subgraph audit 2026-05-08
         ("ARBITRUM", "UNISWAP_V3", "2021-06-01"),  # Tab 14 audit; pre-mainnet-open indexed
         ("ETHEREUM", "SPARK", "2023-03-07"),  # Tab 14 audit; added 2026-05-08
         ("ETHEREUM", "UNISWAP_V3", "2021-05-04"),
