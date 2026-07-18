@@ -468,6 +468,38 @@ class TestDefiMajorAssets:
         assert DEFI_MAJOR_ASSET_ADDRESSES["ETHFI"] == "0xFe0c30065B384F05761f15d0CC899D4F9F9Cc0eB"
 
 
+class TestDefiForceInclude:
+    """TVL-exempt force-include governance/forced token marker (IS R2c)."""
+
+    def test_governance_token_at_issuing_venue_is_force_include(self) -> None:
+        from unified_api_contracts import is_defi_force_include
+
+        # PROTOCOL and PROTOCOL-CHAIN venue forms both resolve.
+        assert is_defi_force_include("EIGENLAYER-ETHEREUM", "EIGEN") is True
+        assert is_defi_force_include("EIGENLAYER", "EIGEN") is True
+        assert is_defi_force_include("ETHERFI-ETHEREUM", "ETHFI") is True
+        # Case-insensitive.
+        assert is_defi_force_include("etherfi-ethereum", "ethfi") is True
+
+    def test_coincidental_dex_liquidity_is_not_force_include(self) -> None:
+        from unified_api_contracts import is_defi_force_include
+
+        # A DEX pool that merely CONTAINS the token → not forced (coincidental liquidity).
+        assert is_defi_force_include("UNISWAP_V3-ETHEREUM", "EIGEN") is False
+        assert is_defi_force_include("CURVE-ETHEREUM", "ETHFI") is False
+        # Right venue, wrong (non-forced) token → not forced.
+        assert is_defi_force_include("EIGENLAYER-ETHEREUM", "WETH") is False
+        # Non-DeFi / blank venue → not forced.
+        assert is_defi_force_include("BINANCE-FUTURES", "EIGEN") is False
+        assert is_defi_force_include("", "") is False
+
+    def test_registry_shape_is_protocol_keyed(self) -> None:
+        from unified_api_contracts import DEFI_FORCE_INCLUDE_TOKENS
+
+        assert DEFI_FORCE_INCLUDE_TOKENS["EIGENLAYER"] == frozenset({"EIGEN"})
+        assert DEFI_FORCE_INCLUDE_TOKENS["ETHERFI"] == frozenset({"ETHFI"})
+
+
 # ---------------------------------------------------------------------------
 # Share Class
 # ---------------------------------------------------------------------------

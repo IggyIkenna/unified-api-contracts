@@ -123,3 +123,48 @@ DEFI_MAJOR_ASSET_ADDRESSES: dict[str, str] = {
 
 # Flat list of all addresses for GraphQL where-in clauses
 DEFI_MAJOR_ASSET_ADDRESS_LIST: list[str] = sorted(DEFI_MAJOR_ASSET_ADDRESSES.values())
+
+
+# TVL-exempt FORCE-INCLUDE governance / forced tokens (IS R2c — instruments-service
+# availability-denominator honesty). These protocol-native governance / restaking-
+# reward tokens enter the instrument catalogue because a dedicated instruments-service
+# governance-token adapter (``reference_data/adapters/defi/eigenlayer.py`` /
+# ``ethfi.py`` — each declares a ``_GOVERNANCE_TOKENS`` list of ``token_type ==
+# "GOVERNANCE_TOKEN"``) emits them directly, NOT because they crossed a DEX
+# liquidity / TVL threshold. Marking them ``force_include`` lets the catalogue (and
+# every coverage denominator downstream) distinguish a FORCED inclusion from
+# COINCIDENTAL liquidity: a ``UNISWAP_V3-ETHEREUM`` EIGEN/WETH pool is coincidental
+# liquidity that happens to contain the token, whereas the ``EIGENLAYER-ETHEREUM``
+# EIGEN governance instrument is a forced inclusion we track regardless of TVL.
+#
+# Keyed by canonical PROTOCOL (the venue prefix left of the ``-<chain>`` suffix), so
+# a pool that merely CONTAINS a force-include token is never mis-flagged — only the
+# governance-token venue that actually issues it. Extend this map (never a bare
+# symbol set) when a new protocol's governance/forced token is wired in the same
+# adapter shape. SSOT for the catalogue ``force_include`` column + the
+# ``is_defi_force_include`` predicate below.
+DEFI_FORCE_INCLUDE_TOKENS: dict[str, frozenset[str]] = {
+    "EIGENLAYER": frozenset({"EIGEN"}),
+    "ETHERFI": frozenset({"ETHFI"}),
+}
+
+
+def is_defi_force_include(venue: str, base_asset: str) -> bool:
+    """Return True when a DeFi catalogue row is a TVL-exempt forced governance token.
+
+    ``venue`` is the catalogue venue in either ``PROTOCOL`` or ``PROTOCOL-CHAIN``
+    form (e.g. ``EIGENLAYER-ETHEREUM``); the protocol prefix left of the first
+    ``-`` is matched against :data:`DEFI_FORCE_INCLUDE_TOKENS`. ``base_asset`` is
+    the token symbol. Both compare case-insensitively.
+
+    A DEX pool that merely CONTAINS EIGEN/ETHFI is NOT force-included: its venue
+    protocol (``UNISWAP_V3`` / ``CURVE`` / …) is absent from the map, so coincidental
+    liquidity stays distinguishable from a forced governance inclusion. Pure +
+    idempotent; a no-op ``False`` for every non-governance-token row and every
+    non-DeFi asset group (whose venues never match a DeFi protocol key).
+    """
+    protocol = (venue or "").strip().upper().split("-", 1)[0]
+    forced = DEFI_FORCE_INCLUDE_TOKENS.get(protocol)
+    if not forced:
+        return False
+    return (base_asset or "").strip().upper() in forced
