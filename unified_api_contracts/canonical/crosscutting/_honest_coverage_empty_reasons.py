@@ -307,6 +307,31 @@ class EmptyConfirmedReason(StrEnum):
     FAILS. See the ``coverage_exclusions`` module docstring for why (SOURCE_COVERAGE_START was
     wrong for months because it had no such check). Codex: ``codex/02-data/honest-coverage-model.md``."""
 
+    EXPECTED_ACQUISITION_PENDING = "EXPECTED_ACQUISITION_PENDING"
+    """Instrument is LISTED in the instruments-service catalogue but its venue has NO
+    market-data acquisition pipeline yet — the reference-data adapter produces the
+    instrument (so it is honestly "expected") while the MTDS market-data capture for
+    that venue has not been wired / first-backfilled. Without this reason such a cell
+    dangles permanently as ``expected_unattempted`` (read as "should have captured but
+    never attempted" = a coverage gap), overstating the denominator for a venue nothing
+    can yet capture.
+
+    Registry SSOT: ``unified_api_contracts.registry.DEFI_INSTRUMENTS_NOT_YET_COLLECTED``
+    (the ``PROTOCOL-CHAIN`` set of IS-listed / MTDS-acquisition-pending DeFi venues —
+    e.g. SANCTUM-SOLANA / SOLBLAZE-SOLANA whose IS adapters shipped 2026-07-18 while
+    their MTDS wiring / first backfill has not landed). Emitted by the v2 expected-
+    universe enumerator (``instruments-service/scripts/enumerate_expected_universe.py``
+    ``_enumerate_v2_defi``) for an alive-with-no-manifest-row cell whose venue is in
+    that set — the IS-side analogue of MTDS ``record_catalogue_residual_empty`` (IS R2c).
+    OUT-OF-window (below): the venue is not yet coverable, so the cell is clipped from
+    the coverage-% denominator until acquisition lands + the venue leaves the registry.
+    Self-heals to real ``captured`` rows the moment the MTDS pipeline ships.
+
+    Distinct from ``EXPECTED_OUTSIDE_PROCESSING_SCOPE`` (instrument IS acquired but a
+    downstream consumer skips it by config) and ``EXPECTED_NO_PROVIDER_COVERAGE`` (no
+    provider can EVER cover it) — here a provider CAN cover it, the acquisition is
+    merely not yet built."""
+
     EXPECTED_OUTSIDE_PROCESSING_SCOPE = "EXPECTED_OUTSIDE_PROCESSING_SCOPE"
     """Instrument exists in the instruments-service catalog but is not included in the downstream
     service's subscription_list / MVP-scope configuration. The service explicitly skips it rather
@@ -513,6 +538,12 @@ OUT_OF_COVERAGE_WINDOW_REASONS: Final[frozenset[str]] = frozenset(
         EmptyConfirmedReason.EXPECTED_OUT_OF_COVERAGE_WINDOW.value,
         EmptyConfirmedReason.EXPECTED_DEPRECATED_DATA_TYPE.value,
         EmptyConfirmedReason.EXPECTED_OUTSIDE_PROCESSING_SCOPE.value,
+        # IS-listed but the venue's MTDS acquisition pipeline is not yet built — the
+        # cell is not yet coverable (nothing can capture it), so it is clipped from the
+        # coverage-% denominator until acquisition lands (IS R2c). Self-heals to
+        # ``captured`` when the MTDS wiring ships + the venue leaves
+        # ``DEFI_INSTRUMENTS_NOT_YET_COLLECTED``.
+        EmptyConfirmedReason.EXPECTED_ACQUISITION_PENDING.value,
         EmptyConfirmedReason.EXPECTED_NO_FIXTURE.value,
         EmptyConfirmedReason.EXPECTED_NO_MAPPING.value,
         EmptyConfirmedReason.EXPECTED_LEGACY_MIGRATION_MISSING_EXPIRY.value,
