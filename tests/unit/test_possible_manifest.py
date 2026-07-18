@@ -120,7 +120,8 @@ class TestCanonicalPathTemplates:
         no entry for them, so their templates are byte-for-byte unchanged)."""
         # Baseline pipeline_mode-prefix counts are purely capability/registry-derived
         # for the non-prediction AGs — the prediction-scoped extra-probe must not move them.
-        expected_pipeline_mode_counts = {"cefi": 16, "defi": 15, "tradfi": 6, "sports": 0}
+        # cefi 16→17 (2026-07-18): +batch_lighter_api (LIGHTER-ZKSYNC native REST ohlcv_1m source).
+        expected_pipeline_mode_counts = {"cefi": 17, "defi": 15, "tradfi": 6, "sports": 0}
         for ag, expected in expected_pipeline_mode_counts.items():
             templates = canonical_path_templates(ag)
             pmode = [t for t in templates if "pipeline_mode=" in t]

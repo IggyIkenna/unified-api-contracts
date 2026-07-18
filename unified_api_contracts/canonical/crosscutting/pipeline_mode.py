@@ -109,6 +109,14 @@ class PipelineMode(StrEnum):
     # like ASTER/HYPERLIQUID → batch_extended via UTL ``_VENUE_OVERRIDES["EXTENDED-STARKNET"]``.
     # SSOT: data_completion_to_100_all_ag_2026_06_21.md task-085.
     BATCH_EXTENDED = "batch_extended"
+    # LIGHTER-ZKSYNC (zkSync L2 perp CLOB) self-archives ohlcv_1m via its own public REST
+    # /candles endpoint (source=lighter_api, mainnet.zkln.elliot.ai) — NOT Tardis. Gives
+    # source-aware derivation an HONEST concrete stamp so native rows are batch_lighter_api,
+    # not fabricated batch_tardis (the bug) nor a bare None. Trades/book_snapshot_5/
+    # derivative_ticker for LIGHTER use the Tardis archive (from 2026-04-17), so lighter_api
+    # is a batch-only source (SOURCE_MODE_CAPABILITY = {BATCH}). SSOT:
+    # non_tardis_dexperp_venue_data_status_smoketest_2026_07_07.md.
+    BATCH_LIGHTER_API = "batch_lighter_api"
     # BATCH_PACIFICA removed 2026-07-16 (operator ruling: all Solana perp
     # DEXes dropped except Jupiter, not integrated — the "pacifica" source was
     # removed from SOURCE_PRIORITY in the same landing to preserve the

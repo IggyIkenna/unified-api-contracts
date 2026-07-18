@@ -111,6 +111,10 @@ EXPECTED_SOURCE_MODE_CAPABILITY: dict[str, frozenset[Mode]] = {
     # Extended (EXTENDED-STARKNET CeFi on-chain perp CLOB, api.starknet.extended.exchange):
     # self-archiving native REST → {BATCH, LIVE, REPLAY}. BATCH_CAPABLE_CEFI_VENUES exception.
     "extended": _BLR,
+    # LIGHTER-ZKSYNC native REST /candles (mainnet.zkln.elliot.ai) self-archives ohlcv_1m only
+    # → BATCH-only (_B). Its trades/book/derivative_ticker + live capture use the Tardis archive
+    # (from 2026-04-17), so no LIVE/REPLAY member.
+    "lighter_api": _B,
     # "pacifica" source removed 2026-07-16 (operator ruling: all Solana perp
     # DEXes dropped except Jupiter, not integrated).
 }
