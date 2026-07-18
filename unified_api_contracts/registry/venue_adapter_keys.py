@@ -152,6 +152,14 @@ VENUE_TO_ADAPTER_KEY: dict[str, str] = {
     "KELPDAO-ETHEREUM": "kelpdao",
     "PUFFER-ETHEREUM": "puffer",
     "SYMBIOTIC-ETHEREUM": "symbiotic",
+    # Exchange-issued single-token LSTs (cbeth.py / wbeth.py, 2026-07-18). Venue
+    # base is the ISSUING protocol (Coinbase cbETH / Binance wBETH) — distinct
+    # from the CeFi COINBASE-SPOT / BINANCE-SPOT venues. wBETH is the same
+    # contract on ETHEREUM + BSC; both map to the wbeth adapter (chain parsed
+    # from the venue suffix in the IS factory's _DEFI_GRAPH_ADAPTERS branch).
+    "COINBASE-ETHEREUM": "cbeth",
+    "BINANCE-ETHEREUM": "wbeth",
+    "BINANCE-BSC": "wbeth",
     "KARAK-ETHEREUM": "karak",
     "KARAK-ARBITRUM": "karak",
     # DeFi — Vault/yield-aggregator protocols (Ethereum + L2, static curated registry)
