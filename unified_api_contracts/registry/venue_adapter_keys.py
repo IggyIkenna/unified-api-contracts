@@ -250,3 +250,42 @@ for _prefix, _protocol_slug in VENUE_PREFIX_TO_PROTOCOL.items():
 VENUES_WITH_REFERENCE_ADAPTER: frozenset[str] = frozenset(
     venue for venue, key in VENUE_TO_ADAPTER_KEY.items() if key != NO_ADAPTER_YET
 )
+
+#: Decommissioned/removed venue BASE names — the SSOT for "this protocol has
+#: been fully retired from the tradable/reference universe" (base = the venue
+#: string split on its first ``-``, e.g. ``DRIFT-SOLANA`` -> ``DRIFT``).
+#:
+#: These bases no longer appear anywhere in :data:`VENUE_TO_ADAPTER_KEY` /
+#: ``VENUES_BY_ASSET_GROUP`` (grep-confirmed at each removal below), but
+#: historical rows for them can still exist in older availability-index /
+#: manifest data. A general "active-venue intersection" is UNSAFE here — the
+#: availability-index venue spelling diverges from the registry (bare vs
+#: ``-<CHAIN>`` suffixed forms), so intersecting against the active set would
+#: over-hide legitimate venues. This explicit, narrow, base-prefix-matched
+#: removal set is the deliberately safe alternative: consumers that display or
+#: aggregate manifest rows by venue (e.g. the deployment-api data-status
+#: drilldown) exclude any row whose venue BASE is a member of this set, via a
+#: base-prefix match (not exact-string) so both the bare form and any
+#: ``-<CHAIN>`` suffixed form of a removed protocol are excluded.
+#:
+#: Adding an entry is a deliberate operator-ruled decision, never a shortcut —
+#: each member carries the removal date + reason inline. SSOT:
+#: codex/04-architecture/solana-defi-coverage.md.
+DECOMMISSIONED_VENUE_BASES: frozenset[str] = frozenset(
+    {
+        # Solana perp DEXes — operator ruling 2026-07-16: Drift was hacked for
+        # ~$280M on 2026-04-01 (Lazarus-attributed), offline 3 months, then
+        # rebranded "Velocity DEX" 2026-07-01 (~2-week-old private beta, ~$0
+        # TVL). All Solana perp DEXes dropped except Jupiter (not integrated).
+        "DRIFT",
+        # Same 2026-07-16 Solana-perp-DEX sweep as DRIFT above.
+        "PACIFICA",
+        # MANGO-SOLANA/ZETA-SOLANA/FLASH-SOLANA removed 2026-07-15 (operator
+        # ruling): all 3 declared API hosts are dead (api.mngo.cloud /
+        # api.flash.trade NXDOMAIN, dex.zeta.markets/api returns HTML not
+        # JSON), ~$0 DeFiLlama TVL, zero MTDS market-data capture ever wired.
+        "MANGO",
+        "ZETA",
+        "FLASH",
+    }
+)
