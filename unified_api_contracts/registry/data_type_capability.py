@@ -653,13 +653,20 @@ DATA_TYPE_CAPABILITY_REGISTRY: Final[tuple[DataTypeCapability, ...]] = (
     # (PACIFICA (Solana) was a third venue in this loop until removed entirely
     # 2026-07-16 — operator ruling: all Solana perp DEXes dropped except
     # Jupiter, not integrated.)
+    # live_capable=False (2026-07-18): the live WS connectors for these two venues
+    # (live/connectors/{extended_starknet,lighter_zksync}_perp_ws.py) are
+    # BLOCKED-CREDENTIALS stubs that yield 0 ticks — declaring live_capable=True was
+    # dishonest. batch_capable stays True (the MVP batch scaffold is real: Tardis /
+    # native REST). Flip live_capable back to True per data_type when a real live
+    # connector + credentials land. (live_capable does NOT feed the coverage
+    # denominator / batch_ready / MVP scope — it gates only the live-readiness surface.)
     *(
         DataTypeCapability(
             asset_group=AssetGroup.CEFI,
             data_type=_dt,
             venue=_venue,
             instrument_type=_itype,
-            live_capable=True,
+            live_capable=False,
             batch_capable=True,
             streaming_protocol="ws",
         )
