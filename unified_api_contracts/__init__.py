@@ -1239,6 +1239,7 @@ from .internal.reference.ticker_registry import (
     resolve_exchange,
 )
 from .internal.reference.tradfi_id_canonicalizer import (
+    TRADFI_CASH_TYPE_VALUES,
     assert_tradfi_derivative_ids_canonical,
     canonicalize_raw_tradfi_id,
 )
@@ -2274,6 +2275,7 @@ __all__ = [
     "candidate_parquet_paths",
     "canonical_path_violations",
     "canonicalize_raw_tradfi_id",
+    "TRADFI_CASH_TYPE_VALUES",
     "classify_cloud_run_service",
     "classify_experiment_run",
     "classify_scheduled_job",
