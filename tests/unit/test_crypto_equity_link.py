@@ -142,3 +142,42 @@ def test_equity_perp_bases_are_in_universe() -> None:
     for base in ("NVDA", "META", "AAPL", "TSLA"):
         assert base in CEFI_EQUITY_PERP_BASE_UNIVERSE
         assert tracks_equity(base) == base
+
+
+def test_binance_20260718_full_listing_widen_bases_in_universe() -> None:
+    """2026-07-18 widen: the full live pull of every Binance
+    ``contractType=TRADIFI_PERPETUAL`` (operator "get all the Binance listings")
+    added 20 NEW bases (15 US EQUITY/ETF + 5 HK_EQUITY). Each must be in
+    CEFI_EQUITY_PERP_BASE_UNIVERSE so an IS PERPETUAL on that base stamps
+    is_equity_perp=True. tracks_equity stays "" for these (no wired Databento
+    twin yet) — is_equity_perp is the un-filter/tag flag, exactly like the
+    standalone SPCX/OPENAI/ANTHROPIC pre-IPO perps."""
+    widen_2026_07_18 = frozenset(
+        {
+            # US equities / ETFs (underlyingType=EQUITY)
+            "APP",
+            "BNC",
+            "BOT",
+            "FWDI",
+            "GEV",
+            "INTW",
+            "MUU",
+            "SKHY",
+            "SNOW",
+            "SNXX",
+            "SOXS",
+            "TZA",
+            "VRT",
+            "WEN",
+            "XBI",
+            # Hong Kong equities (underlyingType=HK_EQUITY — new category)
+            "HK0700",
+            "HK1810",
+            "MINIMAX",
+            "TENCENT",
+            "ZHIPU",
+        }
+    )
+    assert len(widen_2026_07_18) == 20
+    missing = widen_2026_07_18 - CEFI_EQUITY_PERP_BASE_UNIVERSE
+    assert not missing, f"2026-07-18 widen bases missing from universe: {sorted(missing)}"

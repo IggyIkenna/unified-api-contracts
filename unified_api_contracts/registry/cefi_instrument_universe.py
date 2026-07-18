@@ -242,6 +242,22 @@ CEFI_OPTIONS_UNDERLYINGS: frozenset[str] = frozenset({
 #     audit (does OKX/Bybit's same-ticker perp reuse the SAME crypto token, or
 #     a genuine surviving equity-basis product?) rather than a unilateral
 #     removal here. FLAGGED for follow-up, not silently dropped.
+#
+# WIDENED 2026-07-18 (operator: "get all the Binance listings, it's recent data
+# so not that much, we can curate it our end") — full live pull of EVERY
+# ``contractType=TRADIFI_PERPETUAL`` from ``fapi/v1/exchangeInfo`` (139 contracts
+# / 138 distinct bases; underlyingType ∈ {EQUITY, COMMODITY, HK_EQUITY,
+# KR_EQUITY, PREMARKET}, underlyingSubType=["TradFi"]). 20 NEW bases added below
+# (was 124 → now 144) grouped under the dated comment inside the frozenset. NEW
+# ``HK_EQUITY`` category (Tencent / Xiaomi / Zhipu / MiniMax). NOTHING excluded
+# as non-equity: ``contractType=TRADIFI_PERPETUAL`` already partitions equity
+# perps from crypto (crypto = ``contractType=PERPETUAL``, ``underlyingType=COIN``)
+# — the 3 crypto INDEX perps live today (DEFI / BTCDOM / ALL, all
+# ``contractType=PERPETUAL``) are correctly NOT here. Bases stay in the RAW
+# Binance ``baseAsset`` form (matching the existing entries); the Databento
+# real-equity twin (``tracks_equity``) is left UNWIRED for the new bases (they
+# tag ``is_equity_perp=True`` / ``tracks_equity=""`` like SPCX/OPENAI/ANTHROPIC)
+# until the tradfi DBEQ.BASIC leg is added in Phase 1b — honest, not a regression.
 CEFI_EQUITY_PERP_BASE_UNIVERSE: frozenset[str] = frozenset({
     # --- US equities (OKX 17-perp universe + Binance/Bybit verified coverage) ---
     "AAPL",     # Apple
@@ -284,6 +300,19 @@ CEFI_EQUITY_PERP_BASE_UNIVERSE: frozenset[str] = frozenset({
     "SPX", "SPY", "QQQ", "IWM", "DIA", "SOXL", "XLE", "EWJ", "EWZ", "EWT",
     "EWY", "ROBO", "SLX", "URNM", "UVXY", "INX",
     "SQQQ", "TQQQ",  # 2026-07-08 re-sync additions (leveraged QQQ ETFs)
+    # --- Binance 2026-07-18 full-listing widen (ALL live TRADIFI_PERPETUAL) ---
+    # US equities / ETFs (underlyingType=EQUITY). Clear real twins: APP=AppLovin,
+    # GEV=GE Vernova, SNOW=Snowflake, VRT=Vertiv, WEN=Wendy's; SOXS/TZA=Direxion
+    # daily 3x bear ETFs (SOXS = bear pair of SOXL, already above), XBI=SPDR S&P
+    # Biotech ETF. Binance collision-avoidance / mangled tickers whose real twin
+    # is unresolved (kept per "get all, curate our end" — tracks_equity stays ""):
+    # BNC, BOT, FWDI, INTW, MUU, SKHY, SNXX.
+    "APP", "BNC", "BOT", "FWDI", "GEV", "INTW", "MUU", "SKHY", "SNOW", "SNXX",
+    "SOXS", "TZA", "VRT", "WEN", "XBI",
+    # Hong Kong equities (underlyingType=HK_EQUITY — NEW category 2026-07-18):
+    # HK0700=Tencent (HKEX 0700), HK1810=Xiaomi (HKEX 1810), TENCENT=Tencent
+    # (named baseAsset variant), MINIMAX + ZHIPU = Chinese-AI listings.
+    "HK0700", "HK1810", "MINIMAX", "TENCENT", "ZHIPU",
 })
 
 # Staking / restaking / liquid-staking (LST) / liquid-restaking (LRT) tokens
