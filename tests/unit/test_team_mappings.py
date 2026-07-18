@@ -254,3 +254,50 @@ class TestKalshiTeamAliases:
         assert validate_team_resolution("Paris") == "PARIS_FC"
         assert validate_team_resolution("PSG") == "PSG"
         assert validate_team_resolution("Paris Saint Germain") == "PSG"
+
+
+# (South-American rendering, canonical_team_id). Each rendering is the EXACT string
+# a real provider emits: the API-Football FIXTURES short form (af_home_name, verified
+# in the captured CHILE_PRIMERA / ARGENTINA_PRIMERA fixture + teams parquets) and, for
+# Universidad Católica, the Odds API "(CHI)" country-disambiguated form. Before this
+# fix every one fell through to a slug, so ``validate_team_resolution`` raised on the
+# fixture side and the odds↔fixture join dropped the fixture (Phase-E L2a: the ~66%
+# odds-side football fixture match-rate cap, 100% ``UNRESOLVED_TEAM_NAME`` for SA clubs).
+# All six map to a canonical id that ALREADY existed in the registry (additive alias
+# only — no new canonical invented).
+_SOUTH_AMERICAN_RENDERINGS = [
+    # Chile PRIMERA_DIVISION (af_league_id 265)
+    ("A. Italiano", "AUDAX_ITALIANO"),
+    ("U. Catolica", "UNIVERSIDAD_CATOLICA"),
+    ("Universidad Católica (CHI)", "UNIVERSIDAD_CATOLICA"),
+    # Argentina PRIMERA (af_league_id 128)
+    ("Argentinos JRS", "ARGENTINOS_JUNIORS"),
+    ("Central Cordoba de Santiago", "CENTRAL_CORDOBA"),
+    ("Estudiantes L.P.", "ESTUDIANTES"),
+]
+
+
+class TestSouthAmericanClubAliases:
+    """Phase-E Leg-2 remainder (a): South-American club team-alias gap that capped the
+    odds-side football fixture match-rate at ~66%. Each rendering MUST canonicalise
+    through the shared ``validate_team_resolution`` alias index the FixtureIdResolver
+    reads for BOTH sides of the odds↔fixture join."""
+
+    @pytest.mark.parametrize(("rendering", "expected"), _SOUTH_AMERICAN_RENDERINGS)
+    def test_sa_rendering_resolves(self, rendering: str, expected: str) -> None:
+        assert validate_team_resolution(rendering, provider="api_football") == expected
+
+    def test_u_catolica_chi_does_not_steal_rio_cuarto_or_bare_estudiantes(self) -> None:
+        # "Estudiantes L.P." (La Plata) must NOT shadow ESTUDIANTES_RIO_CUARTO nor be
+        # shadowed by the bare "ESTUDIANTES" alias — the three normalise to distinct keys.
+        assert validate_team_resolution("Estudiantes L.P.") == "ESTUDIANTES"
+        assert validate_team_resolution("Estudiantes de Rio Cuarto") == "ESTUDIANTES_RIO_CUARTO"
+
+    def test_universidad_catolica_chi_accent_and_ascii_collapse(self) -> None:
+        # The Odds API "(CHI)" disambiguator + the accent both collapse under
+        # _normalize_key to the same key, so accented and ascii-stripped odds forms
+        # resolve identically to the pre-existing Chilean canonical.
+        assert validate_team_resolution("Universidad Católica (CHI)") == "UNIVERSIDAD_CATOLICA"
+        assert validate_team_resolution("Universidad Catolica (CHI)") == "UNIVERSIDAD_CATOLICA"
+        # The bare Chilean rendering still resolves (no regression).
+        assert validate_team_resolution("Universidad Catolica") == "UNIVERSIDAD_CATOLICA"

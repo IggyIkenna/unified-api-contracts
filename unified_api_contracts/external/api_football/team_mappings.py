@@ -586,7 +586,12 @@ ARGENTINA_PRIMERA_TEAM_ALIASES: dict[str, list[str]] = {
     "INDEPENDIENTE": ["INDEPENDIENTE", "CA Independiente"],
     "SAN_LORENZO": ["SAN LORENZO", "San Lorenzo"],
     "VELEZ_SARSFIELD": ["VELEZ SARSFIELD", "Velez Sarsfield"],
-    "ESTUDIANTES": ["ESTUDIANTES", "Estudiantes LP"],
+    # "Estudiantes L.P.": API-Football FIXTURES render Estudiantes (La Plata) as
+    # "Estudiantes L.P." (af_home_name) — verified in the captured ARGENTINA_PRIMERA
+    # FIXTURES parquet — which slugged to ESTUDIANTES_L_P. SA odds-join gap
+    # (Phase-E L2a, 2026-07-18); canonical ESTUDIANTES pre-exists. Distinct from the
+    # ESTUDIANTES_RIO_CUARTO club below (normalises to "ESTUDIANTES L P").
+    "ESTUDIANTES": ["ESTUDIANTES", "Estudiantes LP", "Estudiantes L.P."],
     "LANUS": ["LANUS", "Lanus"],
     "TALLERES": ["TALLERES", "Talleres Cordoba"],
     "BELGRANO": ["BELGRANO", "BELGRANO DE CORDOBA", "Belgrano de Cordoba", "Belgrano Cordoba"],
@@ -599,9 +604,17 @@ ARGENTINA_PRIMERA_TEAM_ALIASES: dict[str, list[str]] = {
         "Instituto Cordoba",
     ],
     "DEFENSA_JUSTICIA": ["DEFENSA Y JUSTICIA", "Defensa y Justicia"],
-    "ARGENTINOS_JUNIORS": ["ARGENTINOS JUNIORS", "Argentinos Juniors"],
+    # "Argentinos JRS": API-Football FIXTURES short form for Argentinos Juniors
+    # (af_home_name) — verified in the captured ARGENTINA_PRIMERA teams parquet.
+    # SA odds-join gap (Phase-E L2a, 2026-07-18); canonical ARGENTINOS_JUNIORS pre-exists.
+    "ARGENTINOS_JUNIORS": ["ARGENTINOS JUNIORS", "Argentinos Juniors", "Argentinos JRS"],
     "BANFIELD": ["BANFIELD", "CA Banfield"],
-    "CENTRAL_CORDOBA": ["CENTRAL CORDOBA", "Central Cordoba SE"],
+    # "Central Cordoba de Santiago": API-Football FIXTURES render Central Córdoba
+    # (Santiago del Estero) with the full geo-qualifier (af_home_name) — verified in the
+    # captured ARGENTINA_PRIMERA teams parquet — which slugged to
+    # CENTRAL_CORDOBA_DE_SANTIAGO. SA odds-join gap (Phase-E L2a, 2026-07-18); canonical
+    # CENTRAL_CORDOBA pre-exists.
+    "CENTRAL_CORDOBA": ["CENTRAL CORDOBA", "Central Cordoba SE", "Central Cordoba de Santiago"],
     "COLON": ["COLON", "Colon Santa Fe"],
     "GODOY_CRUZ": ["GODOY CRUZ", "Godoy Cruz"],
     "HURACAN": ["HURACAN", "CA Huracan"],
@@ -818,12 +831,29 @@ K_LEAGUE_1_TEAM_ALIASES: dict[str, list[str]] = {
 CHILE_PRIMERA_TEAM_ALIASES: dict[str, list[str]] = {
     "COLO_COLO": ["COLO COLO", "Colo-Colo"],
     "UNIVERSIDAD_DE_CHILE": ["UNIVERSIDAD DE CHILE", "Universidad de Chile"],
-    "UNIVERSIDAD_CATOLICA": ["UNIVERSIDAD CATOLICA", "CD Universidad Catolica"],
+    "UNIVERSIDAD_CATOLICA": [
+        "UNIVERSIDAD CATOLICA",
+        "CD Universidad Catolica",
+        # SA odds-join gap (Phase-E L2a, 2026-07-18). API-Football FIXTURES render
+        # this club as the short "U. Catolica" (fixture side), and the Odds API renders
+        # it with a "(CHI)" country disambiguator "Universidad Católica (CHI)" (there is
+        # also a Universidad Católica in Ecuador). Both fell through to a slug → the
+        # odds↔fixture join dropped the fixture. Verified against the af_home_name in the
+        # captured CHILE_PRIMERA FIXTURES parquet; canonical UNIVERSIDAD_CATOLICA
+        # pre-exists. "(CHI)" and the accent both collapse under _normalize_key to
+        # "UNIVERSIDAD CATOLICA CHI" (one key covers accented + stripped odds forms).
+        "U. Catolica",
+        "Universidad Católica (CHI)",
+    ],
     "COBRELOA": ["COBRELOA", "Club de Deportes Cobreloa"],
     "HUACHIPATO": ["HUACHIPATO", "CD Huachipato"],
     "UNION_ESPANOLA": ["UNION ESPANOLA", "Union Espanola"],
     "COBRESAL": ["COBRESAL", "CD Cobresal"],
-    "AUDAX_ITALIANO": ["AUDAX ITALIANO", "Audax Italiano"],
+    # "A. Italiano": API-Football FIXTURES render Audax Italiano in the short form
+    # "A. Italiano" (af_home_name) — verified in the captured CHILE_PRIMERA FIXTURES
+    # parquet — which slugged to A_ITALIANO and dropped the fixture from the odds join.
+    # SA odds-join gap (Phase-E L2a, 2026-07-18); canonical AUDAX_ITALIANO pre-exists.
+    "AUDAX_ITALIANO": ["AUDAX ITALIANO", "Audax Italiano", "A. Italiano"],
     "OHIGGINS": ["O'HIGGINS", "OHIGGINS", "O'Higgins FC"],
     "PALESTINO": ["PALESTINO", "CD Palestino"],
     "EVERTON_CHILE": ["EVERTON DE VINA", "Everton de Vina del Mar"],
