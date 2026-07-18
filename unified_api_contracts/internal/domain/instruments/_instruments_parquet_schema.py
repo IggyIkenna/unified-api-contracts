@@ -562,6 +562,54 @@ INSTRUMENTS_PARQUET_SCHEMA: list[dict[str, str | bool]] = [
         "nullable": True,
         "description": "ISO date YYYY-MM-DD when delisted. Post-delisting → EXPECTED_INSTRUMENT_DELISTED.",
     },
+    # ── Prediction fixture-match columns (aligned 1:1 with InstrumentRecord
+    #     .af_league_id / .home_team_canonical_id / .away_team_canonical_id /
+    #     .fixture_date / .af_fixture_id / .af_fixture_match_status). Prediction
+    #     (Polymarket/Kalshi soccer) adapters populate them from the fixture-match
+    #     side-table; None for every other instrument. Additive + nullable
+    #     (non-breaking). Plan: prediction_consolidated_closeout_2026_07_18 A4. ──
+    {
+        "name": "af_league_id",
+        "type": "string",
+        "required": False,
+        "nullable": True,
+        "description": "Canonical API-Football league id for a soccer prediction market. None otherwise.",
+    },
+    {
+        "name": "home_team_canonical_id",
+        "type": "string",
+        "required": False,
+        "nullable": True,
+        "description": "Canonical home-team id for a soccer prediction market. None if unresolved.",
+    },
+    {
+        "name": "away_team_canonical_id",
+        "type": "string",
+        "required": False,
+        "nullable": True,
+        "description": "Canonical away-team id for a soccer prediction market. None if unresolved.",
+    },
+    {
+        "name": "fixture_date",
+        "type": "string",
+        "required": False,
+        "nullable": True,
+        "description": "ISO date YYYY-MM-DD of the matched soccer fixture. None when no fixture day is known.",
+    },
+    {
+        "name": "af_fixture_id",
+        "type": "int64",
+        "required": False,
+        "nullable": True,
+        "description": "API-Football fixture id on MATCHED; nullable int (no sentinel). None otherwise.",
+    },
+    {
+        "name": "af_fixture_match_status",
+        "type": "string",
+        "required": False,
+        "nullable": True,
+        "description": "Closed-set outcome: MATCHED / UNRESOLVED_TEAM_NAME / NO_FIXTURE_DATA. None otherwise.",
+    },
     {
         "name": "timestamp",
         "type": "datetime64[ns]",
