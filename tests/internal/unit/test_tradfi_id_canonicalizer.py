@@ -236,6 +236,15 @@ class TestCanonicalizeRawTradfiIdCashTypes:
         assert result.status == "QUARANTINE_UNPARSEABLE"
         assert result.canonical_id is None
 
+    def test_massive_index_ticker_strips_i_prefix(self) -> None:
+        # Massive/Polygon.io index tickers carry an "I:" vendor prefix (e.g. a real
+        # live catalogue row raw_symbol="I:VIX") — must NOT leak into the symbol
+        # segment as "CBOE:INDEX:I:VIX-USD"; same convention already stripped by
+        # external.massive.normalize.normalize_massive_index.
+        result = canonicalize_raw_tradfi_id("I:VIX", venue="CBOE", instrument_type="INDEX")
+        assert result.status == "OK"
+        assert result.canonical_id == "CBOE:INDEX:VIX-USD"
+
     def test_prefix_stripped_empty_body_is_null_or_empty(self) -> None:
         result = canonicalize_raw_tradfi_id("NASDAQ:EQUITY:", venue="NASDAQ", instrument_type="EQUITY")
         assert result.status == "NULL_OR_EMPTY"
