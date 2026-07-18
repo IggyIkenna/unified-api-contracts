@@ -65,6 +65,12 @@ from unified_api_contracts.internal.reference.ticker_registry import (
     normalize_underlying,
     resolve_exchange,
 )
+from unified_api_contracts.internal.reference.tradfi_id_canonicalizer import (
+    TARGET_TRADFI_DERIVATIVE_ID_RE,
+    CanonResult,
+    assert_tradfi_derivative_ids_canonical,
+    canonicalize_raw_tradfi_id,
+)
 from unified_api_contracts.internal.reference.universe_snapshot import UniverseSnapshot
 
 __all__ = [
@@ -75,9 +81,11 @@ __all__ = [
     "MARKET_TICK_FRESHNESS",
     "ML_FRESHNESS",
     "SUPPORTED_INSTRUMENT_TYPES",
+    "TARGET_TRADFI_DERIVATIVE_ID_RE",
     "UNDERLYING_NORMALIZATION",
     "UNSUPPORTED_BY_DESIGN",
     "AssetClass",
+    "CanonResult",
     "CircuitBreakerConfigRegistry",
     "ClientFeeSchedule",
     "ClientPrimeBrokerLink",
@@ -103,11 +111,13 @@ __all__ = [
     "UniverseSnapshot",
     "UnknownInstrumentTypeError",
     "VenueCircuitBreakerConfig",
+    "assert_tradfi_derivative_ids_canonical",
     "asset_class_for_instrument_type",
     "build_canonical_instrument_id",
     "build_combo_id",
     "build_instrument_id",
     "build_leg",
+    "canonicalize_raw_tradfi_id",
     "derive_ledger_asset_fields",
     "get_instruments_available_on",
     "instrument_type_for_action",
