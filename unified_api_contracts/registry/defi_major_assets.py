@@ -16,7 +16,7 @@ from __future__ import annotations
 # fmt: off
 DEFI_MAJOR_ASSET_SYMBOLS: frozenset[str] = frozenset({
     # ETH and liquid staking/restaking derivatives
-    "ETH", "WETH", "STETH", "WSTETH", "CBETH", "RETH", "WEETH", "EETH",
+    "ETH", "WETH", "STETH", "WSTETH", "CBETH", "WBETH", "RETH", "WEETH", "EETH",
     "SFRXETH", "FRXETH", "OETH", "OSETH", "SWETH", "ETHX", "METH",
     "EZETH", "RSETH", "PUFETH", "ANKRETH",
     # BTC and wrapped variants
@@ -94,6 +94,7 @@ DEFI_MAJOR_ASSET_ADDRESSES: dict[str, str] = {
     "STETH": "0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84",  # DERIVED ethereum etherscan
     "WSTETH": "0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0",  # DERIVED ethereum etherscan
     "CBETH": "0xBe9895146f7AF43049ca1c1AE358B0541Ea49704",  # DERIVED ethereum etherscan
+    "WBETH": "0xa2E3356610840701BDf5611a53974510Ae27E2e1",  # DERIVED ethereum etherscan (wBETH; same on BSC)
     "RETH": "0xae78736Cd615f374D3085123A210448E74Fc6393",  # DERIVED ethereum etherscan
     "WEETH": "0xCd5fE23C85820F7B72D0926FC9b05b43E359b7ee",  # DERIVED ethereum etherscan
     "SFRXETH": "0xac3E018457B222d93114458476f3E3416Abbe38F",  # DERIVED ethereum etherscan

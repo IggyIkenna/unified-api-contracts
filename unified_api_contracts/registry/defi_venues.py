@@ -207,6 +207,20 @@ ALL_DEFI_VENUES: list[str] = [
     "JUPITER-SOLANA",
     "SOLBLAZE-SOLANA",
     "JITORESTAKING-SOLANA",
+    # ── Solana LST / native-staking (2026-07-18 IS-wiring — sanctum.py /
+    #    solana_native_staking.py adapters produce real rows; flipped to
+    #    phase="live" below). SANCTUM = LST marketplace (INF + partner LSTs);
+    #    SOLANA-NATIVE = native SOL staking (venue distinct from the LST venues). ──
+    "SANCTUM-SOLANA",
+    "SOLANA-NATIVE-SOLANA",
+    # ── Exchange-issued single-token LSTs (2026-07-18 IS-wiring — cbeth.py /
+    #    wbeth.py). cbETH = Coinbase (ETHEREUM); wBETH = Binance (ETHEREUM + BSC,
+    #    same contract address on both chains). Venue base is the ISSUING protocol
+    #    (Coinbase / Binance) — distinct full strings from the CeFi COINBASE-SPOT /
+    #    BINANCE-SPOT venues, so no VENUE_TO_ASSET_GROUP collision. ──
+    "COINBASE-ETHEREUM",
+    "BINANCE-ETHEREUM",
+    "BINANCE-BSC",
 ]
 
 # ── Canonical underscore-name aliases (additive beside ghost names above) ──
@@ -407,7 +421,6 @@ DEFI_VENUE_PHASE: dict[str, str] = {
     "PANCAKESWAP_V3-ETHEREUM": "live",
     # ── Pipeline (Ethereum vaults / analytics — NOT IS-producible) ──
     "MORPHOVAULTS-ETHEREUM": "pipeline",
-    "YEARN_V3-ETHEREUM": "pipeline",
     "FRAX-ETHEREUM": "pipeline",
     "MAKER-ETHEREUM": "pipeline",
     # ── Live (Ethereum LST / staking-yield — IS-producible) ──
@@ -415,26 +428,33 @@ DEFI_VENUE_PHASE: dict[str, str] = {
     "ETHERFI-ETHEREUM": "live",
     "ETHENA-ETHEREUM": "live",
     "EIGENLAYER-ETHEREUM": "live",
-    # ── Pipeline (Ethereum LST/staking — NOT IS-producible) ──
+    # ── Live (Ethereum LST / restaking / vault / yield — IS-wired 2026-07-18;
+    #    adapters had populated curated registries but the IS venue list never
+    #    requested them, so 0 catalogue rows were produced. Flipped pipeline→live
+    #    per the phase=="live" ⟺ IS-producible invariant, same pattern as the
+    #    2026-07-10 VENUS/RADIANT/BENQI flip. COINBASE = Coinbase cbETH LST,
+    #    BINANCE = Binance wBETH LST (new cbeth.py / wbeth.py adapters). ──
+    "ROCKETPOOL-ETHEREUM": "live",
+    "PUFFER-ETHEREUM": "live",
+    "CONVEX-ETHEREUM": "live",
+    "BEEFY-ETHEREUM": "live",
+    "PENDLE-ETHEREUM": "live",
+    "IDLE-ETHEREUM": "live",
+    "SYMBIOTIC-ETHEREUM": "live",
+    "KARAK-ETHEREUM": "live",
+    "RENZO-ETHEREUM": "live",
+    "KELPDAO-ETHEREUM": "live",
+    "YEARN_V3-ETHEREUM": "live",
+    "COINBASE-ETHEREUM": "live",
+    "BINANCE-ETHEREUM": "live",
+    # ── Pipeline (Ethereum LST/staking — NOT IS-producible; no adapter wired) ──
     "ANKR-ETHEREUM": "pipeline",
-    "ROCKETPOOL-ETHEREUM": "pipeline",
     "STADER-ETHEREUM": "pipeline",
     "STAKEWISE-ETHEREUM": "pipeline",
     "SWELL-ETHEREUM": "pipeline",
-    "PUFFER-ETHEREUM": "pipeline",
     "MANTLE-ETHEREUM": "pipeline",
     # ── Pipeline (Ethereum gas oracles — NOT IS-producible) ──
     "ALCHEMY-ETHEREUM": "pipeline",
-    # ── Pipeline (Ethereum catalogue Phase 1A vault + restaking primitives,
-    #    slot 5 2026-05-11) ──
-    "CONVEX-ETHEREUM": "pipeline",
-    "BEEFY-ETHEREUM": "pipeline",
-    "PENDLE-ETHEREUM": "pipeline",
-    "IDLE-ETHEREUM": "pipeline",
-    "SYMBIOTIC-ETHEREUM": "pipeline",
-    "KARAK-ETHEREUM": "pipeline",
-    "RENZO-ETHEREUM": "pipeline",
-    "KELPDAO-ETHEREUM": "pipeline",
     # ── Live (Arbitrum — IS-producible per _build_defi_venues()) ──
     "UNISWAP_V3-ARBITRUM": "live",
     "AAVE_V3-ARBITRUM": "live",
@@ -449,13 +469,17 @@ DEFI_VENUE_PHASE: dict[str, str] = {
     "RADIANT-ARBITRUM": "live",
     # ── Pipeline (Arbitrum — NOT IS-producible) ──
     "PANCAKESWAP_V3-ARBITRUM": "pipeline",
-    # ── Pipeline (Arbitrum catalogue Phase 1A, slot 5 2026-05-11) ──
-    "YEARN_V3-ARBITRUM": "pipeline",
-    "BEEFY-ARBITRUM": "pipeline",
-    "PENDLE-ARBITRUM": "pipeline",
+    # ── Live (Arbitrum LST / vault / yield — IS-wired 2026-07-18, populated
+    #    curated registries) ──
+    "YEARN_V3-ARBITRUM": "live",
+    "BEEFY-ARBITRUM": "live",
+    "PENDLE-ARBITRUM": "live",
+    "KARAK-ARBITRUM": "live",
+    "RENZO-ARBITRUM": "live",
+    # ── Pipeline (Arbitrum — NOT IS-producible: idle.py has NO Arbitrum vault
+    #    entries in _IDLE_VAULTS_BY_CHAIN, so IDLE-ARBITRUM returns 0 rows and is
+    #    deliberately left un-enumerated until the curated addresses land) ──
     "IDLE-ARBITRUM": "pipeline",
-    "KARAK-ARBITRUM": "pipeline",
-    "RENZO-ARBITRUM": "pipeline",
     # ── Pipeline (Arbitrum lending — not IS-producible) ──
     # EULER_V2-ARBITRUM + FLUID-ARBITRUM: no UAC subgraph_id registered → 0 captured rows.
     # MORPHO-ARBITRUM: not in IS-producible set despite having rows (not in _build_defi_venues()).
@@ -471,8 +495,8 @@ DEFI_VENUE_PHASE: dict[str, str] = {
     "SUSHISWAP_V3-BASE": "live",
     "PANCAKESWAP_V3-BASE": "live",
     "AERODROME_V3-BASE": "live",
-    # ── Pipeline (Base catalogue Phase 1A, slot 5 2026-05-11) ──
-    "BEEFY-BASE": "pipeline",
+    # ── Live (Base — BEEFY IS-wired 2026-07-18, populated curated registry) ──
+    "BEEFY-BASE": "live",
     # ── Live (Optimism — IS-producible per _build_defi_venues()) ──
     "UNISWAP_V3-OPTIMISM": "live",
     "AAVE_V3-OPTIMISM": "live",
@@ -504,8 +528,8 @@ DEFI_VENUE_PHASE: dict[str, str] = {
     # BENQI-AVALANCHE: 2026-07-10 — wired into _build_defi_venues() (mtds_is_full_
     # adapter_smoketest_findings_2026_07_07.md P1). Flipped pipeline→live.
     "BENQI-AVALANCHE": "live",
-    # ── Pipeline (Avalanche catalogue Phase 1A, slot 5 2026-05-11) ──
-    "BEEFY-AVALANCHE": "pipeline",
+    # ── Live (Avalanche — BEEFY IS-wired 2026-07-18, populated curated registry) ──
+    "BEEFY-AVALANCHE": "live",
     # ── Live (BSC — IS-producible per _build_defi_venues()) ──
     "AAVE_V3-BSC": "live",
     "PANCAKESWAP_V3-BSC": "live",
@@ -516,8 +540,10 @@ DEFI_VENUE_PHASE: dict[str, str] = {
     "VENUS-BSC": "live",
     "VENUS-ETHEREUM": "live",
     "RADIANT-ETHEREUM": "live",
-    # ── Pipeline (BSC catalogue Phase 1A, slot 5 2026-05-11) ──
-    "BEEFY-BSC": "pipeline",
+    # ── Live (BSC — BEEFY (curated registry) + BINANCE wBETH (wbeth.py) IS-wired
+    #    2026-07-18) ──
+    "BEEFY-BSC": "live",
+    "BINANCE-BSC": "live",
     # ── Pipeline (Ethereum analytics / governance / MEV — NOT IS-producible) ──
     "AAVE-ETHEREUM": "pipeline",
     "COMPOUND-ETHEREUM": "pipeline",
@@ -557,10 +583,15 @@ DEFI_VENUE_PHASE: dict[str, str] = {
     # wired into instruments-service's factory + the Solana venue list).
     "MARGINFI-SOLANA": "live",
     "SOLEND-SOLANA": "live",
-    # ── Pipeline (Solana catalogue Phase 1A, slot 5 2026-05-11) ──
+    # ── Live (Solana LST / restaking / native-staking — IS-wired 2026-07-18:
+    #    sanctum.py / solblaze.py / jito_restaking.py / solana_native_staking.py
+    #    adapters produce real rows via _build_defi_venues()) ──
+    "SOLBLAZE-SOLANA": "live",
+    "JITORESTAKING-SOLANA": "live",
+    "SANCTUM-SOLANA": "live",
+    "SOLANA-NATIVE-SOLANA": "live",
+    # ── Pipeline (Solana — JUPITER is execution-only aggregator, no IS adapter) ──
     "JUPITER-SOLANA": "pipeline",
-    "SOLBLAZE-SOLANA": "pipeline",
-    "JITORESTAKING-SOLANA": "pipeline",
 }
 
 

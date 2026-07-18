@@ -115,8 +115,21 @@ _canonical_repr = canonical_config_repr
 # ---------------------------------------------------------------------------
 
 
-MVP_SCOPE_CONFIG_VERSION: Final[int] = 16
+MVP_SCOPE_CONFIG_VERSION: Final[int] = 17
 """Monotonic version of :data:`MVP_SCOPE`. Bump on any content change.
+
+v17 (2026-07-18): 26 LST / restaking / vault DeFi venues onboarded to the
+IS-producible set P (``instruments-service`` wired their factory adapters — which
+already had populated curated registries — into ``_build_defi_venues()``), so they
+flip ``DEFI_VENUE_PHASE`` "pipeline"→"live" and, since ``_mvp_defi_venues()`` == P,
+become MVP automatically (the "newly-live ⇒ MVP" derivation). New: ROCKETPOOL /
+RENZO(ETH,ARB) / KELPDAO / PUFFER / KARAK(ETH,ARB) / SYMBIOTIC / YEARN_V3(ETH,ARB) /
+BEEFY(ETH,ARB,BASE,AVAX,BSC) / PENDLE(ETH,ARB) / CONVEX / IDLE-ETHEREUM /
+SANCTUM / SOLBLAZE / JITORESTAKING / SOLANA-NATIVE (Solana) + 2 new single-token
+LST adapters COINBASE-ETHEREUM (cbETH) / BINANCE-ETHEREUM,BINANCE-BSC (wBETH).
+Empty-per-chain-registry venues (YEARN_V3-OPTIMISM / BEEFY-POLYGON / IDLE-ARBITRUM /
+IDLE-POLYGON) stay "pipeline" (0 rows → not producible → not MVP), preserving the
+MVP⊆P invariant. Same pattern as v13 (MarginFi/Solend onboarding).
 
 v16 (2026-07-16): ``COMBO`` added to ``CeFiMvpRule.instrument_types`` (operator
 decision on cefi_deribit_combo_and_okx_bare_venue_gaps_2026_07_12.md's

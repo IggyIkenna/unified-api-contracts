@@ -261,6 +261,15 @@ DEFI_VENUE_LAUNCH_DATES: dict[str, str] = {
     "ANKR": "2020-12-22",  # Ankr ankrETH liquid staking
     "COINBASE": "2022-08-24",  # Coinbase cbETH wrapped staked ETH launch
     "EIGENLAYER": "2023-06-14",  # EigenLayer restaking mainnet stage-1
+    # PROTOCOL-CHAIN forms for the LST/vault venues IS-wired 2026-07-18. Each
+    # AGREES with chain_env.PROTOCOL_LAUNCH_DATES (drift guard
+    # test_venue_launch_dates_no_new_drift_vs_chain_env).
+    "COINBASE-ETHEREUM": "2022-08-24",  # Coinbase cbETH LST
+    "BINANCE-ETHEREUM": "2023-04-27",  # Binance wBETH LST (ETH Staking GA)
+    "BINANCE-BSC": "2023-04-27",  # Binance wBETH LST on BSC (same-address deploy)
+    "SANCTUM-SOLANA": "2023-06-01",  # Sanctum v1 LST marketplace
+    "SOLBLAZE-SOLANA": "2022-10-15",  # SolBlaze bSOL stake-pool (conservative floor)
+    "SOLANA-NATIVE-SOLANA": "2020-03-16",  # native SOL staking == mainnet-beta genesis
 }
 """DeFi venue (``PROTOCOL-CHAIN`` or bare ``PROTOCOL``) → public-launch date.
 

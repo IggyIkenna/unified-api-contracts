@@ -514,6 +514,20 @@ PROTOCOL_LAUNCH_DATES: dict[tuple[str, str], str] = {
     ("ETHEREUM", "VENUS"): "2023-06-01",  # Venus v4 cross-chain expansion incl. ETH per Venus blog; medium
     # Radiant Capital Ethereum expansion (V2 multi-chain after Arbitrum V1):
     ("ETHEREUM", "RADIANT"): "2023-07-18",  # Radiant V2 Ethereum deploy per Radiant Twitter + DLNews; medium
+    # ── Exchange-issued LSTs + Solana native/LST (2026-07-18 IS-wiring) ──
+    # Coinbase cbETH — mainnet launch per Coinbase; mirrors DEFI_VENUE_LAUNCH_DATES["COINBASE"].
+    ("ETHEREUM", "COINBASE"): "2022-08-24",  # Coinbase cbETH (Wrapped Staked ETH) mainnet; high
+    # Binance wBETH — WBETH live on ETH Staking 2023-04-27 08:00 UTC per Binance announcement;
+    # same contract address on ETHEREUM + BSC (Etherscan / BscScan-verified).
+    ("ETHEREUM", "BINANCE"): "2023-04-27",  # Binance wBETH (Wrapped Beacon ETH) mainnet; high
+    ("BSC", "BINANCE"): "2023-04-27",  # Binance wBETH on BSC (same-address deploy); high
+    # Solana native SOL staking = Solana mainnet-beta genesis (no protocol pre-date possible).
+    ("SOLANA", "SOLANA-NATIVE"): "2020-03-16",  # Solana native staking == mainnet-beta genesis; high
+    # SolBlaze bSOL — conservative floor from the in-repo slot-5 research note
+    # (Solanacompass stake-pool Epoch 345 + Nov 2022 X promo); moved out of
+    # _PROTOCOL_LAUNCH_PENDING_INVESTIGATION_BASE 2026-07-18 now that SOLBLAZE-SOLANA
+    # is IS-producible (needs a resolvable launch floor for the coverage denominator).
+    ("SOLANA", "SOLBLAZE"): "2022-10-15",  # SolBlaze bSOL stake-pool (conservative); medium
 }
 
 # ── Canonical underscore-name aliases for protocol names ──
@@ -561,13 +575,12 @@ _PROTOCOL_LAUNCH_PENDING_INVESTIGATION_BASE: frozenset[tuple[str, str]] = frozen
         # from ``PROTOCOL_LAUNCH_DATES`` 2026-05-08 (Tab 14 audit) to stop
         # inflating the data-status denominator with always-empty days.
         ("POLYGON", "COMPOUND_V3"),
-        # (SOLANA, SOLBLAZE) — slot 5 2026-05-12 Sub-agent B research returned
-        # only medium-low confidence (date 2022-10-15 anchored to Solanacompass
-        # stake-pool Epoch 345 + Nov 2022 X promo; no primary-source pool-
-        # creation-tx audit done). Operator follow-up via Solscan stake-pool
-        # creation tx for pool address `stk9ApL5HeVAwPLr3TLhDXdZS8ptVu7zp6ov8HFDuMi`
-        # before tightening the floor.
-        ("SOLANA", "SOLBLAZE"),
+        # (SOLANA, SOLBLAZE) moved to PROTOCOL_LAUNCH_DATES 2026-07-18 (conservative
+        # floor 2022-10-15 from the slot-5 research note) — SOLBLAZE-SOLANA is now
+        # IS-producible (solblaze.py wired into _build_defi_venues()) and needs a
+        # resolvable launch date for the coverage denominator. A tighter Solscan
+        # stake-pool-creation-tx audit (pool stk9ApL5HeVAwPLr3TLhDXdZS8ptVu7zp6ov8HFDuMi)
+        # can still refine it later.
         # ── Slot 6 2026-05-22: venues added for parity; dates pending subgraph audit ──
         # Morpho Blue on L2s — launched on Base 2024-06-18 (in PROTOCOL_LAUNCH_DATES);
         # Arbitrum / Optimism / Polygon deployments in late 2024; exact dates TBD.

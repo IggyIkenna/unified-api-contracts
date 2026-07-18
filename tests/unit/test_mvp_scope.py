@@ -289,17 +289,17 @@ class TestDeFiMvp:
         assert is_mvp("defi", "ORCA-SOLANA", "POOL", "dex_pool_swaps")
 
     def test_non_mvp_defi_venue_returns_false(self) -> None:
-        """YEARN_V3-ETHEREUM is in ALL_DEFI_VENUES but NOT IS-producible (not in P) → False.
+        """YEARN_V3-OPTIMISM is in ALL_DEFI_VENUES but NOT IS-producible (not in P) → False.
 
-        Still excluded post-v13: v13 broadened DeFi MVP to "everything we
-        capture" == P (``VENUES_BY_ASSET_GROUP["defi"]``), not the broader
-        declarative ``ALL_DEFI_VENUES`` registry — YEARN_V3-ETHEREUM has a
-        real adapter but isn't part of the batch orchestrator's per-day
-        venue walk (``_build_defi_venues()``), so it stays phase="pipeline"
-        and out of MVP, same as ROCKETPOOL-ETHEREUM (see
-        ``TestDeFiMvpExclusionV12``).
+        MVP DeFi == P (``VENUES_BY_ASSET_GROUP["defi"]``, phase=="live"), not the
+        broader declarative ``ALL_DEFI_VENUES`` registry. YEARN_V3-OPTIMISM has a
+        real adapter CLASS (yearn.py) but ``_YEARN_VAULTS_BY_CHAIN`` has NO Optimism
+        vault entries, so ``get_instruments()`` returns 0 rows and it is deliberately
+        left out of ``_build_defi_venues()`` (phase="pipeline") — no phantom
+        expected-but-never-captured cell. (Pre-2026-07-18 this test used
+        YEARN_V3-ETHEREUM, which was onboarded to P in the v17 LST/vault wiring pass.)
         """
-        assert not is_mvp("defi", "YEARN_V3-ETHEREUM", "POOL", "dex_pool_state")
+        assert not is_mvp("defi", "YEARN_V3-OPTIMISM", "POOL", "dex_pool_state")
 
     def test_non_mvp_defi_data_type_returns_false(self) -> None:
         """trades is a CeFi/prediction data_type, NOT a real DeFi data_type → False.
@@ -438,12 +438,12 @@ class TestTradFiOptionUnderlierNarrowingV14:
         assert frozenset({"ES"}) == TRADFI_MVP_OPTION_UNDERLYING_ROOTS
 
     def test_config_version_is_latest(self) -> None:
-        """MVP_SCOPE_CONFIG_VERSION == 16 exactly (v16 = COMBO instrument_type
-        addition for DERIBIT-COMBO; v15 was the liquidations PERPETUAL-leg MVP
-        restoration)."""
+        """MVP_SCOPE_CONFIG_VERSION == 17 exactly (v17 = 26 LST/restaking/vault DeFi
+        venues onboarded to P → live → MVP; v16 = COMBO instrument_type addition for
+        DERIBIT-COMBO; v15 was the liquidations PERPETUAL-leg MVP restoration)."""
         from unified_api_contracts.canonical.crosscutting.mvp_scope import MVP_SCOPE_CONFIG_VERSION
 
-        assert MVP_SCOPE_CONFIG_VERSION == 16
+        assert MVP_SCOPE_CONFIG_VERSION == 17
 
 
 # ---------------------------------------------------------------------------
@@ -634,8 +634,13 @@ class TestAbsentPairs:
         assert not is_mvp("cefi", "FAKE_VENUE_XYZ", "PERPETUAL", "trades", base_ccy="BTC")
 
     def test_defi_venue_not_in_rule_returns_false(self) -> None:
-        """A defi venue not in the MVP config → False."""
-        assert not is_mvp("defi", "CONVEX-ETHEREUM", "POOL", "dex_pool_state")
+        """A defi venue not in the MVP config → False.
+
+        IDLE-ARBITRUM: wired adapter class (idle.py) but ``_IDLE_VAULTS_BY_CHAIN``
+        has no Arbitrum entries → 0 rows → phase="pipeline" → not in P → not MVP.
+        (Pre-2026-07-18 this used CONVEX-ETHEREUM, onboarded to P in the v17 pass.)
+        """
+        assert not is_mvp("defi", "IDLE-ARBITRUM", "POOL", "dex_pool_state")
 
     def test_tradfi_impossible_pair_returns_false(self) -> None:
         """A TradFi venue/instrument_type combo that's not in MVP → False."""
@@ -1361,21 +1366,30 @@ class TestCoinbaseVenueOverrideV11Continued:
 
 
 class TestDeFiMvpExclusionV12:
-    """v12: ROCKETPOOL-ETHEREUM removed from DeFi MVP (not IS-producible)."""
+    """v12 established MVP⊆P (a wired adapter CLASS alone does not make a venue MVP —
+    it must be IS-producible / in ``_build_defi_venues()``). ROCKETPOOL-ETHEREUM was
+    the original example; v17 (2026-07-18) wired rocket_pool.py into
+    ``_build_defi_venues()`` (1 real rETH row) so ROCKETPOOL is now producible and
+    therefore MVP. The MVP⊆P invariant itself is unchanged and is re-pinned below
+    with a still-pipeline example (YEARN_V3-OPTIMISM: wired class, empty per-chain
+    registry, 0 rows)."""
 
-    def test_rocketpool_ethereum_not_defi_mvp(self) -> None:
-        """ROCKETPOOL-ETHEREUM is NOT in DeFiMvpRule.venues (Decision D, v12)."""
+    def test_rocketpool_ethereum_now_defi_mvp(self) -> None:
+        """ROCKETPOOL-ETHEREUM IS in DeFiMvpRule.venues post-v17 (now IS-producible);
+        MVP⊆P still holds — YEARN_V3-OPTIMISM (wired class, empty registry) stays out."""
         from unified_api_contracts.canonical.crosscutting.mvp_scope import (
             DeFiMvpRule,
         )
 
         rule = MVP_SCOPE["defi"]
         assert isinstance(rule, DeFiMvpRule)
-        assert "ROCKETPOOL-ETHEREUM" not in rule.venues
+        assert "ROCKETPOOL-ETHEREUM" in rule.venues
+        # MVP⊆P invariant: a wired-but-not-producible venue is still excluded.
+        assert "YEARN_V3-OPTIMISM" not in rule.venues
 
-    def test_is_mvp_rocketpool_ethereum_returns_false(self) -> None:
-        """is_mvp(defi, ROCKETPOOL-ETHEREUM, ...) → False (not in MVP set, v12)."""
-        assert not is_mvp("defi", "ROCKETPOOL-ETHEREUM", "LST", "lst_rates")
+    def test_is_mvp_rocketpool_ethereum_returns_true(self) -> None:
+        """is_mvp(defi, ROCKETPOOL-ETHEREUM, ...) → True (onboarded to P in v17)."""
+        assert is_mvp("defi", "ROCKETPOOL-ETHEREUM", "LST", "lst_rates")
 
     def test_lido_ethereum_still_defi_mvp(self) -> None:
         """LIDO-ETHEREUM remains in DeFiMvpRule (IS-producible, in P)."""
@@ -1475,9 +1489,13 @@ class TestDeFiMvpV13Broadening:
     # longer exists; the venue itself is gone from the system. SSOT:
     # unified-trading-pm/codex/04-architecture/solana-defi-coverage.md.
 
-    def test_rocketpool_ethereum_still_excluded_post_v13(self) -> None:
-        """ROCKETPOOL-ETHEREUM stays excluded post-v13 — MVP venues are still ⊆ P."""
-        assert not is_mvp("defi", "ROCKETPOOL-ETHEREUM", "LST", "lst_rates")
+    def test_mvp_venues_still_subset_of_producible_post_v17(self) -> None:
+        """MVP venues are still ⊆ P post-v17. ROCKETPOOL-ETHEREUM was the pre-v17
+        excluded example; it is now producible (rocket_pool.py wired into
+        ``_build_defi_venues()``), so the invariant is re-pinned with a venue that
+        remains pipeline: IDLE-ARBITRUM (wired class, empty per-chain registry)."""
+        assert is_mvp("defi", "ROCKETPOOL-ETHEREUM", "LST", "lst_rates")
+        assert not is_mvp("defi", "IDLE-ARBITRUM", "POOL", "dex_pool_state")
 
     def test_marginfi_solend_are_is_producible(self) -> None:
         """MARGINFI-SOLANA / SOLEND-SOLANA are phase="live" (IS-producible) post-wiring."""
