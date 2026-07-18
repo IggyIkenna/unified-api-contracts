@@ -150,7 +150,7 @@ def test_pending_investigation_disjoint_from_declared() -> None:
         ("ARBITRUM", "UNISWAP_V3", "2021-06-01"),  # Tab 14 audit; pre-mainnet-open indexed
         ("ETHEREUM", "SPARK", "2023-03-07"),  # Tab 14 audit; added 2026-05-08
         ("ETHEREUM", "UNISWAP_V3", "2021-05-04"),
-        ("SOLANA", "JITO", "2022-08-15"),
+        ("SOLANA", "JITO", "2022-08-16"),  # aligned to P3-verified venue_launch_dates 2026-07-18
     ],
 )
 def test_get_protocol_launch_date_known(chain: str, protocol: str, expected: str) -> None:
@@ -182,32 +182,21 @@ def test_venue_launch_dates_no_new_drift_vs_chain_env() -> None:
 
     ``venue_launch_dates.DEFI_VENUE_LAUNCH_DATES`` (PROTOCOL-CHAIN string keys) and
     ``chain_env.PROTOCOL_LAUNCH_DATES`` ((CHAIN, PROTOCOL) tuple keys) both carry DeFi
-    launch dates; where they OVERLAP they must agree. ``AAVE_V3-ETHEREUM`` was corrected
-    2026-07-18 (2022-03-16 was the debunked L2-cohort date -> 2023-01-27, the
-    subgraph-audited value chain_env's own comment documents). The remaining overlaps
-    below are KNOWN drifts (deltas 1-292d) PENDING per-pair on-chain re-verification —
-    allowlisted so a NEW divergence FAILS this test; resolving one means REMOVING it here.
+    launch dates; where they OVERLAP they must AGREE — the registries are FULLY reconciled
+    as of 2026-07-18 (issue resolved), so the allowlist is EMPTY and ANY drift fails.
+    ``AAVE_V3-ETHEREUM`` was corrected 2026-07-18 (2022-03-16 was the debunked L2-cohort date
+    -> 2023-01-27, the subgraph-audited value chain_env's own comment documents). The 6 drifts
+    >=7d were on-chain re-verified + corrected; the <=4d EVM tail was aligned to chain_env's
+    Tab-14 subgraph first-event dates (the day-precise authority — confirmed by the ETHEREUM
+    Etherscan contract-creation matching chain_env); the 2 Solana pairs (KAMINO/JITO) were
+    reconciled the other way (chain_env aligned to the P3-verified venue_launch_dates, since
+    Solana has no Graph subgraph for the Tab-14 audit to cover).
     """
     from unified_api_contracts.registry.venue_launch_dates import DEFI_VENUE_LAUNCH_DATES
 
-    # The 6 drifts >=7d were ON-CHAIN VERIFIED + corrected 2026-07-18 (both registries now agree);
-    # only the <=4d tail remains, pending a cheap re-audit (low-impact for the expected-window
-    # denominator). Resolving one = REMOVING it here.
-    known_drifts_pending_audit = {
-        "AAVE_V3-POLYGON",  # 4d
-        "AAVE_V3-AVALANCHE",  # 4d
-        "AAVE_V3-OPTIMISM",  # 1d
-        "COMPOUND_V3-SCROLL",  # 1d
-        "UNISWAP_V2-ETHEREUM",  # 1d
-        "UNISWAP_V3-ETHEREUM",  # 1d
-        "UNISWAP_V3-POLYGON",  # 1d
-        "ROCKETPOOL-ETHEREUM",  # 1d
-        "ETHENA-ETHEREUM",  # 1d
-        "ETHERFI-ETHEREUM",  # 1d
-        "KAMINO-SOLANA",  # 1d
-        "JITO-SOLANA",  # 1d
-        "GMX-AVALANCHE",  # 1d
-    }
+    # Fully reconciled 2026-07-18 — no pending drifts. A new overlap that DISAGREES fails
+    # here; reconcile the pair (do NOT re-add to this allowlist without a per-purpose reason).
+    known_drifts_pending_audit: set[str] = set()
     drifts: set[str] = set()
     for vkey, vdate in DEFI_VENUE_LAUNCH_DATES.items():
         if "-" not in vkey:
@@ -222,18 +211,40 @@ def test_venue_launch_dates_no_new_drift_vs_chain_env() -> None:
         "NEW venue_launch_dates↔chain_env launch-date drift — reconcile the pair or, if a genuine "
         f"per-purpose divergence, add it to known_drifts_pending_audit with a comment: {sorted(new_drifts)}"
     )
-    # The 2026-07-18 on-chain-verified corrections must hold (both registries agree on the verified value).
-    assert "AAVE_V3-ETHEREUM" not in drifts
-    on_chain_verified_2026_07_18 = (
+    # Full reconciliation — zero drift is the standing contract now, not just "no NEW drift".
+    assert not drifts, (
+        f"venue_launch_dates↔chain_env must be FULLY reconciled (issue resolved 2026-07-18): {sorted(drifts)}"
+    )
+    # The 2026-07-18 corrections must hold (both registries agree on the verified value):
+    # 6 pairs >=7d on-chain re-verified, 11 EVM tail aligned to chain_env's subgraph, 2 Solana
+    # reconciled to the P3-verified venue dates.
+    reconciled_2026_07_18 = (
+        "AAVE_V3-ETHEREUM",
         "AAVE_V3-BSC",
         "AAVE_V3-LINEA",
         "COMPOUND_V3-ETHEREUM",
         "COMPOUND_V3-BASE",
         "COMPOUND_V3-ARBITRUM",
         "COMPOUND_V3-OPTIMISM",
+        "AAVE_V3-POLYGON",
+        "AAVE_V3-AVALANCHE",
+        "AAVE_V3-OPTIMISM",
+        "COMPOUND_V3-SCROLL",
+        "UNISWAP_V2-ETHEREUM",
+        "UNISWAP_V3-ETHEREUM",
+        "UNISWAP_V3-POLYGON",
+        "ROCKETPOOL-ETHEREUM",
+        "ETHENA-ETHEREUM",
+        "ETHERFI-ETHEREUM",
+        "KAMINO-SOLANA",
+        "JITO-SOLANA",
+        "GMX-AVALANCHE",
     )
-    for resolved in on_chain_verified_2026_07_18:
-        assert resolved not in drifts, f"{resolved} regressed — its 2026-07-18 verified correction was reverted"
+    for resolved in reconciled_2026_07_18:
+        assert resolved not in drifts, f"{resolved} regressed — its 2026-07-18 reconciliation was reverted"
     assert DEFI_VENUE_LAUNCH_DATES["AAVE_V3-ETHEREUM"] == "2023-01-27"
     assert DEFI_VENUE_LAUNCH_DATES["AAVE_V3-BSC"] == "2024-01-23"
     assert DEFI_VENUE_LAUNCH_DATES["AAVE_V3-LINEA"] == "2025-02-11"
+    # Solana pairs kept the P3-verified venue values (chain_env aligned to them, not vice versa).
+    assert DEFI_VENUE_LAUNCH_DATES["KAMINO-SOLANA"] == "2022-08-24"
+    assert DEFI_VENUE_LAUNCH_DATES["JITO-SOLANA"] == "2022-08-16"

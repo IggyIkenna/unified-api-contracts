@@ -288,11 +288,13 @@ PROTOCOL_LAUNCH_DATES: dict[tuple[str, str], str] = {
     # See plans/archive/issues/defi_fork1_prep_audit_2026_05_08.md.
     ("ETHEREUM", "SPARK"): "2023-03-07",
     # ── Solana ──
-    ("SOLANA", "JITO"): "2022-08-15",
+    # Solana has no Graph subgraph — the Tab-14 EVM-subgraph audit does not cover it;
+    # aligned 2026-07-18 to the P3-verified venue_launch_dates first-mainnet-activity dates.
+    ("SOLANA", "JITO"): "2022-08-16",
     ("SOLANA", "MARINADE"): "2021-08-02",
     ("SOLANA", "RAYDIUM"): "2021-02-21",
     ("SOLANA", "ORCA"): "2021-02-09",
-    ("SOLANA", "KAMINO"): "2022-08-23",
+    ("SOLANA", "KAMINO"): "2022-08-24",
     # ("SOLANA", "DRIFT") removed 2026-07-16 (operator ruling: all Solana
     # perp DEXes dropped except Jupiter, not integrated).
     # ── Perp DEXes / aggregators ──
