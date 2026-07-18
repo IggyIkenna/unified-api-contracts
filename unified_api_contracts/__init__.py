@@ -1238,6 +1238,10 @@ from .internal.reference.ticker_registry import (
     normalize_underlying,
     resolve_exchange,
 )
+from .internal.reference.tradfi_id_canonicalizer import (
+    assert_tradfi_derivative_ids_canonical,
+    canonicalize_raw_tradfi_id,
+)
 from .internal.reporting import FeeStructure
 from .internal.schemas.contracts import (
     CEFI_FUTURES_CHAIN_TRADES,
@@ -2256,6 +2260,7 @@ __all__ = [
     "american_to_decimal",
     "assert_bar_boundary_contract",
     "assert_no_cross_client_transfer",
+    "assert_tradfi_derivative_ids_canonical",
     "bar_window_for_close",
     "breaker_fired_event",
     "build_canonical_instrument_id",
@@ -2268,6 +2273,7 @@ __all__ = [
     "build_tradfi_partition_path",
     "candidate_parquet_paths",
     "canonical_path_violations",
+    "canonicalize_raw_tradfi_id",
     "classify_cloud_run_service",
     "classify_experiment_run",
     "classify_scheduled_job",
