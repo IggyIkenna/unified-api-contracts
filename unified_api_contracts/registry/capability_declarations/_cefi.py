@@ -1207,6 +1207,30 @@ _POLYMARKET_PERP = SourceCapability(
 # 04-architecture/solana-defi-coverage.md.
 
 
+# LIGHTER-ZKSYNC (zkSync L2 perp CLOB) — self-archiving native REST for ohlcv_1m only
+# (source=lighter_api, mainnet.zkln.elliot.ai/api/v1, no auth for market-data reads). Same
+# self-archiving pattern as _EXTENDED/_ASTER but market-data-only + no auth (we do not trade
+# on Lighter). trades/book/derivative_ticker for this venue use the Tardis archive from
+# 2026-04-17, so lighter_api is a BATCH-only source (no live/replay member). SSOT:
+# non_tardis_dexperp_venue_data_status_smoketest_2026_07_07.md.
+_LIGHTER = SourceCapability(
+    source="lighter_api",
+    domains=["market"],
+    crosscutting=["errors", "rate_limits", "latency", "connectivity"],
+    supports_live=False,
+    supports_batch=True,
+    supports_historical=True,
+    supports_testnet=False,
+    supports_mainnet=True,
+    auth_scope=[],
+    operations={"market": ["candles", "trades", "orderbook"]},
+    base_urls={"mainnet": "https://mainnet.zkln.elliot.ai/api/v1"},
+    margin_model={"mainnet": "cross"},
+    chain="zksync",
+    kind="perp_dex",
+)
+
+
 # ---------------------------------------------------------------------------
 # Ordered list -- CeFi
 # ---------------------------------------------------------------------------
@@ -1231,6 +1255,7 @@ CEFI_CAPABILITIES: list[SourceCapability] = [
     _TARDIS,
     _ASTER,
     _EXTENDED,
+    _LIGHTER,
     # FIX protocol / trading connectors
     _FIX,
     _NAUTILUS,

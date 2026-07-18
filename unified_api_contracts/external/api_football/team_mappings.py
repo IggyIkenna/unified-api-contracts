@@ -60,6 +60,7 @@ EPL_TEAM_ALIASES: dict[str, list[str]] = {
         "NOTTM FOREST",
         "FOREST",
         "Nottingham Forest",
+        "Nottingham",  # Kalshi soccer-title rendering (E2 2026-07-18)
     ],
     "SHEFFIELD_UNITED": [
         "SHEFFIELD UNITED",
@@ -109,6 +110,12 @@ BUNDESLIGA_TEAM_ALIASES: dict[str, list[str]] = {
         "M'GLADBACH",
         "Borussia Monchengladbach",
         "Borussia Mönchengladbach",
+        # Kalshi soccer-title rendering (E2 2026-07-18). The key MUST carry the EXACT
+        # U+00B4 ACUTE ACCENT: _normalize_key collapses U+00B4 to a space, so this
+        # rendering normalises to "M GLADBACH" (a DISTINCT key from the U+0027-apostrophe
+        # "M'GLADBACH" → "MGLADBACH" above). Without the exact-U+00B4 alias the Kalshi
+        # rendering falls through to a slug.
+        "M´gladbach",
     ],
     "COLOGNE": ["COLOGNE", "FC KOLN", "FC COLOGNE", "KOLN", "FC Cologne", "1.FC Köln", "FC Koln"],
     "DARMSTADT": ["DARMSTADT", "DARMSTADT 98", "SV Darmstadt 98"],
@@ -157,13 +164,20 @@ BUNDESLIGA_TEAM_ALIASES: dict[str, list[str]] = {
 # ---------------------------------------------------------------------------
 
 LA_LIGA_TEAM_ALIASES: dict[str, list[str]] = {
-    "ATHLETIC_CLUB": ["ATHLETIC CLUB", "ATHLETIC BILBAO", "Athletic Club", "Athletic Bilbao"],
+    "ATHLETIC_CLUB": [
+        "ATHLETIC CLUB",
+        "ATHLETIC BILBAO",
+        "Athletic Club",
+        "Athletic Bilbao",
+        "Bilbao",  # Kalshi soccer-title rendering (E2 2026-07-18)
+    ],
     "ATLETICO_MADRID": [
         "ATLETICO MADRID",
         "ATLETICO DE MADRID",
         "Atlético Madrid",
         "Atletico Madrid",
         "Atletico de Madrid",
+        "Atletico",  # Kalshi soccer-title rendering (E2 2026-07-18)
     ],
     "BARCELONA": ["BARCELONA", "FC BARCELONA", "Barcelona", "FC Barcelona"],
     "REAL_MADRID": ["REAL MADRID", "Real Madrid", "Real Madrid CF"],
@@ -178,7 +192,7 @@ LA_LIGA_TEAM_ALIASES: dict[str, list[str]] = {
     "VALENCIA": ["VALENCIA", "Valencia", "Valencia CF"],
     "MALLORCA": ["MALLORCA", "RCD Mallorca", "Mallorca"],
     "OSASUNA": ["OSASUNA", "CA Osasuna", "Osasuna"],
-    "RAYO_VALLECANO": ["RAYO VALLECANO", "Rayo Vallecano"],
+    "RAYO_VALLECANO": ["RAYO VALLECANO", "Rayo Vallecano", "Vallecano"],  # Vallecano: Kalshi (E2 2026-07-18)
     "ALAVES": ["ALAVES", "Deportivo Alaves", "Alaves"],
     "LEGANES": ["LEGANES", "CD Leganes", "Leganes"],
     "ESPANYOL": ["ESPANYOL", "RCD Espanyol", "Espanyol"],
@@ -213,7 +227,7 @@ SERIE_A_TEAM_ALIASES: dict[str, list[str]] = {
     "MONZA": ["MONZA", "Monza", "AC Monza"],
     "VERONA": ["VERONA", "HELLAS VERONA", "Hellas Verona"],
     "COMO": ["COMO", "Como", "Como 1907"],
-    "PARMA": ["PARMA", "Parma", "Parma Calcio 1913"],
+    "PARMA": ["PARMA", "Parma", "Parma Calcio 1913", "Parma Calcio"],  # Parma Calcio: Kalshi (E2 2026-07-18)
     "VENEZIA": ["VENEZIA", "Venezia", "Venezia FC"],
     "SALERNITANA": ["SALERNITANA", "Salernitana"],
     "SASSUOLO": ["SASSUOLO", "Sassuolo"],
@@ -237,7 +251,7 @@ LIGUE_1_TEAM_ALIASES: dict[str, list[str]] = {
     "STRASBOURG": ["STRASBOURG", "RC Strasbourg", "Strasbourg"],
     "NANTES": ["NANTES", "FC Nantes", "Nantes"],
     "MONTPELLIER": ["MONTPELLIER", "Montpellier HSC", "Montpellier"],
-    "BREST": ["BREST", "Stade Brestois", "Brest"],
+    "BREST": ["BREST", "Stade Brestois", "Brest", "Stade Brest"],  # Stade Brest: Kalshi (E2 2026-07-18)
     "TOULOUSE": ["TOULOUSE", "Toulouse FC", "Toulouse"],
     "REIMS": ["REIMS", "Stade de Reims", "Reims"],
     "AUXERRE": ["AUXERRE", "AJ Auxerre", "Auxerre"],
@@ -1077,7 +1091,10 @@ LIGUE_2_TEAM_ALIASES: dict[str, list[str]] = {
     "RODEZ": ["RODEZ", "Rodez AF"],
     "DUNKERQUE": ["DUNKERQUE", "USL Dunkerque"],
     "PAU": ["PAU", "Pau FC"],
-    "PARIS_FC": ["PARIS FC", "Paris FC"],
+    # "Paris": Kalshi renders Paris FC as "Paris" (E2 2026-07-18) — NOT PSG (Kalshi
+    # renders Paris Saint-Germain as "PSG"). Normalises to "PARIS"; PSG's variants all
+    # normalise to "PARIS SAINT GERMAIN" / "PSG", so there is no collision.
+    "PARIS_FC": ["PARIS FC", "Paris FC", "Paris"],
     "RED_STAR": ["RED STAR", "Red Star FC"],
     "BASTIA": ["BASTIA", "SC Bastia"],
     "NANCY": ["NANCY", "AS Nancy", "AS Nancy-Lorraine", "Nancy-Lorraine"],

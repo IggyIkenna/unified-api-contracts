@@ -182,6 +182,14 @@ def _canonicalize_cash(original: str, venue: str, cash_type: InstrumentType) -> 
     (``unified-api-contracts@33e3f369``).
     """
     body = _resolve_venue_prefix(original)
+    # Massive/Polygon.io index tickers carry an "I:" vendor prefix (e.g. "I:VIX") that
+    # is NOT part of the symbol identity — same established convention already stripped
+    # by external.massive.normalize.normalize_massive_index ("Index tickers carry an I:
+    # prefix; the canonical raw_symbol strips it"). Left unstripped, a live catalogue row
+    # (raw_symbol="I:VIX") would mint the wrong-shaped "CBOE:INDEX:I:VIX-USD" (embeds a
+    # stray ":" in the symbol segment) instead of "CBOE:INDEX:VIX-USD".
+    if body[:2].upper() == "I:":
+        body = body[2:]
     body = _TRAILING_USD_QUOTE_RE.sub("", body).strip()
     if not body:
         return CanonResult(

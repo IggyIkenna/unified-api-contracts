@@ -214,3 +214,43 @@ def test_resolve_team_parametrized(name: str, expected: str) -> None:
 def test_validate_raises_for_unknown_teams(unknown_name: str) -> None:
     with pytest.raises(TeamResolutionError):
         validate_team_resolution(unknown_name)
+
+
+# (Kalshi rendering, canonical_team_id). The ``M´gladbach`` key carries the EXACT
+# U+00B4 ACUTE ACCENT — the normalizer collapses U+00B4 to a space, so this is a
+# distinct key from the U+0027-apostrophe "M'gladbach".
+_KALSHI_RENDERINGS = [
+    ("Bilbao", "ATHLETIC_CLUB"),
+    ("Vallecano", "RAYO_VALLECANO"),
+    ("Atletico", "ATLETICO_MADRID"),
+    ("Nottingham", "NOTTM_FOREST"),
+    ("Parma Calcio", "PARMA"),
+    ("Stade Brest", "BREST"),
+    ("Paris", "PARIS_FC"),
+    ("M´gladbach", "MGLADBACH"),
+]
+
+
+class TestKalshiTeamAliases:
+    """E2 (prediction_consolidated_closeout_2026_07_18): the 8 Kalshi soccer-title
+    team renderings MUST canonicalise through the shared ``validate_team_resolution``
+    alias index (they previously fell through to a slug → 0% team-matching)."""
+
+    @pytest.mark.parametrize(("rendering", "expected"), _KALSHI_RENDERINGS)
+    def test_kalshi_rendering_resolves(self, rendering: str, expected: str) -> None:
+        assert validate_team_resolution(rendering, provider="kalshi") == expected
+
+    def test_mgladbach_key_carries_exact_u00b4(self) -> None:
+        # Regression guard for the U+00B4 subtlety: the acute-accent rendering must
+        # resolve, and it is a DISTINCT key from the apostrophe form (both resolve to
+        # the same canonical, but via different normalised keys).
+        assert validate_team_resolution("M´gladbach") == "MGLADBACH"
+        assert validate_team_resolution("M'gladbach") == "MGLADBACH"
+
+    def test_paris_does_not_steal_psg(self) -> None:
+        # ``Paris`` → PARIS_FC must NOT shadow PSG: Kalshi renders Paris Saint-Germain
+        # as "PSG", which stays PSG (no collision — PSG's variants normalise to
+        # "PSG" / "PARIS SAINT GERMAIN", never bare "PARIS").
+        assert validate_team_resolution("Paris") == "PARIS_FC"
+        assert validate_team_resolution("PSG") == "PSG"
+        assert validate_team_resolution("Paris Saint Germain") == "PSG"

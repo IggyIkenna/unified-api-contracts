@@ -99,6 +99,43 @@ class TestCanonicalPathTemplates:
         # combined venue-chain legacy overload (EIGENLAYER restaking)
         assert "venue={venue}-{chain}/" in joined
 
+    def test_prediction_union_live_prefixes_enumerated(self) -> None:
+        """§5 UNION (prediction_consolidated_closeout_2026_07_18, operator 2026-07-18):
+        a batch prediction manifest row is satisfied by live-only object evidence, so
+        the probe set MUST enumerate ``live_kalshi`` / ``live_polymarket_clob`` /
+        ``live_polymarket_gamma_api`` — including ``polymarket_gamma_api``, which is
+        registered BATCH-only in ``SOURCE_MODE_CAPABILITY`` (no ``LIVE_`` enum member)
+        so the capability-derived batch+live loop cannot emit it. The prefix is added
+        as a prediction-scoped probe WITHOUT claiming gamma_api is live-capable."""
+        joined = "\n".join(canonical_path_templates("prediction"))
+        for live_val in ("live_kalshi", "live_polymarket_clob", "live_polymarket_gamma_api"):
+            needle = f"pipeline_mode={live_val}/asset_group=prediction/"
+            assert needle in joined, f"prediction: template set missing UNION live prefix {needle}"
+
+    def test_prediction_live_union_is_prediction_scoped_only(self) -> None:
+        """RULE 11 cross-AG guard: the §5 prediction UNION must NOT leak into any other
+        AG's template set — no cefi/tradfi/defi/sports template may carry the
+        ``live_polymarket_gamma_api`` shape, and each other AG's pipeline_mode prefix
+        count stays exactly at its capability-derived baseline (the extra-probe dict has
+        no entry for them, so their templates are byte-for-byte unchanged)."""
+        # Baseline pipeline_mode-prefix counts are purely capability/registry-derived
+        # for the non-prediction AGs — the prediction-scoped extra-probe must not move them.
+        # cefi 16→17 (2026-07-18): +batch_lighter_api (LIGHTER-ZKSYNC native REST ohlcv_1m source).
+        expected_pipeline_mode_counts = {"cefi": 17, "defi": 15, "tradfi": 6, "sports": 0}
+        for ag, expected in expected_pipeline_mode_counts.items():
+            templates = canonical_path_templates(ag)
+            pmode = [t for t in templates if "pipeline_mode=" in t]
+            assert len(pmode) == expected, f"{ag}: pipeline_mode prefix count changed ({len(pmode)} != {expected})"
+            assert not any("live_polymarket_gamma_api" in t for t in templates), (
+                f"{ag}: prediction UNION live_polymarket_gamma_api leaked into a non-prediction AG"
+            )
+
+    def test_prediction_templates_have_no_duplicate_prefixes(self) -> None:
+        """The append-if-absent extra-probe must not duplicate the LIVE-capable
+        (kalshi / polymarket_clob) live prefixes the batch+live loop already emits."""
+        templates = canonical_path_templates("prediction")
+        assert len(templates) == len(set(templates))
+
     def test_sports_has_no_inline_templates(self) -> None:
         """Sports dispatches to its own UAC ``candidate_parquet_paths`` SSOT — the
         possible-manifest registry returns an empty template list (NOT 'no paths')."""

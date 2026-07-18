@@ -110,7 +110,12 @@ SOURCE_PRIORITY: Final[dict[tuple[str, str], list[str]]] = {
         "polymarket_perp",
         "extended",
     ],
-    ("cefi", "ohlcv_1m"): ["tardis", "aster", "hyperliquid", "extended"],
+    # lighter_api appended LAST (2026-07-18) — LIGHTER-ZKSYNC self-archives ohlcv_1m via its
+    # own REST /candles. LAST so source-blind priority[0] stays tardis for every OTHER cefi
+    # venue; LIGHTER-ZKSYNC ohlcv_1m is handled source-blind → None by the UTL resolver guard,
+    # and source-aware (source=lighter_api) → batch_lighter_api. Registered here to satisfy the
+    # PipelineMode↔SOURCE_PRIORITY closed-set round-trip for BATCH_LIGHTER_API.
+    ("cefi", "ohlcv_1m"): ["tardis", "aster", "hyperliquid", "extended", "lighter_api"],
     # ("cefi", "ohlcv_15m") RETIRED 2026-06-09 (operator-directed): cefi has no
     # 15m candles — the tardis entry was a planning placeholder. tradfi ohlcv_15m
     # remains (databento/massive/yahoo/barchart produce it). Exclusion entry in
@@ -568,6 +573,12 @@ SOURCE_MODE_CAPABILITY: Final[dict[str, frozenset[Mode]]] = {
     # Scaffold registered for {BATCH, LIVE} recovery (no replay confirmed yet).
     # SSOT: prediction_venue_perps_and_live_clob_depth_2026_06_20.md.
     "polymarket_perp": frozenset({Mode.BATCH, Mode.LIVE}),
+    # lighter_api (LIGHTER-ZKSYNC native REST /candles, mainnet.zkln.elliot.ai) self-archives
+    # ohlcv_1m only → BATCH-only. Its trades/book/derivative_ticker use the Tardis archive
+    # (from 2026-04-17), and its live capture is Tardis too — so no LIVE/REPLAY member here
+    # (that would demand LIVE_/REPLAY_LIGHTER_API PipelineMode values it does not need). SSOT:
+    # non_tardis_dexperp_venue_data_status_smoketest_2026_07_07.md.
+    "lighter_api": frozenset({Mode.BATCH}),
 }
 
 CEFI_LIVE_VENUES: Final[frozenset[str]] = frozenset(
@@ -664,6 +675,7 @@ EMISSION_LATENCY_MS_BY_SOURCE: Final[dict[str, int]] = {
     "hyperliquid": 1_000,  # 1s: HL REST API polling cadence (source=hyperliquid, transport=rest)
     "aster": 1_000,  # 1s: Aster native REST polling cadence (source=aster, transport=rest)
     "extended": 1_000,  # 1s: EXTENDED-STARKNET native REST polling cadence (source=extended, transport=rest)
+    "lighter_api": 1_000,  # 1s: LIGHTER-ZKSYNC native REST /candles polling cadence (transport=rest)
     # "pacifica" latency entry removed 2026-07-16 (operator ruling: all Solana
     # perp DEXes dropped except Jupiter, not integrated).
     # DVOL history endpoint serves hourly/daily OHLC resolutions (no sub-minute

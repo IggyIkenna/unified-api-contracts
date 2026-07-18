@@ -55,6 +55,14 @@ gcp:
     # SPORTS key REMOVED 2026-07-17 (asset-group parity sweep) — sports is not an accepted
     # delta-one asset_group (cli/parser.py CATEGORIES = CEFI/TRADFI/DEFI/PREDICTION). Bucket
     # confirmed empty and deleted.
+    # features FOLD A (fold_a_cutover_spec, 2026-07-18): folded per-asset_group key; the 5 retired
+    # per-kind buckets collapse into features-{ag}-${DEPLOYMENT_ENV_SHORT}-{pid}, per-kind → key prefix.
+    features:
+      CEFI: "features-cefi-${DEPLOYMENT_ENV_SHORT}-${GCP_PROJECT_ID}"
+      TRADFI: "features-tradfi-${DEPLOYMENT_ENV_SHORT}-${GCP_PROJECT_ID}"
+      DEFI: "features-defi-${DEPLOYMENT_ENV_SHORT}-${GCP_PROJECT_ID}"
+      PREDICTION: "features-pred-${DEPLOYMENT_ENV_SHORT}-${GCP_PROJECT_ID}"
+      SPORTS: "features-sports-${DEPLOYMENT_ENV_SHORT}-${GCP_PROJECT_ID}"
     features-delta-one:
       CEFI: "features-delta-one-cefi-${GCP_PROJECT_ID}"
       TRADFI: "features-delta-one-tradfi-${GCP_PROJECT_ID}"
@@ -141,21 +149,12 @@ gcp:
     # `_KIND_ALIASES` maps the five retired consumer kinds → this key. The five keys above are
     # RETAINED during the soft-transition reader-fallback window and retire at the delete phase.
     ml-store: "ml-store-${DEPLOYMENT_ENV_SHORT}-${GCP_PROJECT_ID}"
-    # Unified flat bucket — cross-asset strategies share one bucket (D6 Phase 4, operator decision 2026-05-20).
-    # Per-AG per-env split deferred; migration from old per-AG buckets sequenced under mtds_mdps_master Phase 1.
-    strategy-store: "strategy-store-${GCP_PROJECT_ID}"
-    strategy-store-test: "strategy-store-test-${GCP_PROJECT_ID}"
-    # NOTE: execution-store env-split ROLLED BACK — non-env-split shape until provisioning lands.
-    execution-store:
-      CEFI: "execution-store-cefi-${GCP_PROJECT_ID}"
-      TRADFI: "execution-store-tradfi-${GCP_PROJECT_ID}"
-      DEFI: "execution-store-defi-${GCP_PROJECT_ID}"
-      # Sports execution-store — separate per-AG fill/order/manifest store. Sports execution
-      # is event-driven venue-API placement (no canonical GCS reads); results land here so
-      # they are queryable by asset_group=sports rather than in the CeFi bucket. Non-env-split
-      # to match the execution-store family rollback + the shape ExecutionServicesConfig
-      # constructs (execution-store-sports-{pid}).
-      SPORTS: "execution-store-sports-${GCP_PROJECT_ID}"
+    # Unified flat bucket (D6 Phase 4, 2026-05-20). strategy FOLD D (fold_d_cutover_spec, 2026-07-18):
+    # add ${DEPLOYMENT_ENV_SHORT}- tier; strategy-store-test retired (tiered key derives -test- at env=test).
+    strategy-store: "strategy-store-${DEPLOYMENT_ENV_SHORT}-${GCP_PROJECT_ID}"
+    # execution FOLD C (fold_c_cutover_spec, 2026-07-18): folded per-asset_group DICT → ONE
+    # env-tiered bucket; asset_group moves to a top-level object-key prefix ({ag}/execution/…).
+    execution-store: "execution-store-${DEPLOYMENT_ENV_SHORT}-${GCP_PROJECT_ID}"
     # Sports pipeline buckets
     features-sports: "features-sports-${DEPLOYMENT_ENV_SHORT}-${GCP_PROJECT_ID}"
     # Sports venue-balance snapshot store — EOD snapshots written by VenueBalanceTracker.
@@ -284,6 +283,13 @@ aws:
     # NOTE: features-delta-one env-split ROLLED BACK — mirrors GCP rollback (Phase D).
     # SPORTS key REMOVED 2026-07-17 (asset-group parity sweep) — mirrors the GCP section removal
     # above; delta-one is never computed for sports.
+    # features FOLD A (fold_a_cutover_spec, 2026-07-18): folded per-asset_group key; mirrors GCP.
+    features:
+      CEFI: "features-cefi-${DEPLOYMENT_ENV_SHORT}-${AWS_ACCOUNT_ID}"
+      TRADFI: "features-tradfi-${DEPLOYMENT_ENV_SHORT}-${AWS_ACCOUNT_ID}"
+      DEFI: "features-defi-${DEPLOYMENT_ENV_SHORT}-${AWS_ACCOUNT_ID}"
+      PREDICTION: "features-pred-${DEPLOYMENT_ENV_SHORT}-${AWS_ACCOUNT_ID}"
+      SPORTS: "features-sports-${DEPLOYMENT_ENV_SHORT}-${AWS_ACCOUNT_ID}"
     features-delta-one:
       CEFI: "features-delta-one-cefi-${AWS_ACCOUNT_ID}"
       TRADFI: "features-delta-one-tradfi-${AWS_ACCOUNT_ID}"
@@ -327,16 +333,12 @@ aws:
     ml-artifacts: "ml-artifacts-${AWS_ACCOUNT_ID}"
     # ml-store = FOLDED ml bucket (Fold B) — mirrors GCP; see the GCP § comment.
     ml-store: "ml-store-${DEPLOYMENT_ENV_SHORT}-${AWS_ACCOUNT_ID}"
-    # Unified flat bucket — mirrors GCP strategy-store consolidation (D6 Phase 4, operator decision 2026-05-20).
-    strategy-store: "strategy-store-${AWS_ACCOUNT_ID}"
-    strategy-store-test: "strategy-store-test-${AWS_ACCOUNT_ID}"
-    # NOTE: execution-store env-split ROLLED BACK — mirrors GCP rollback (Phase D).
-    execution-store:
-      CEFI: "execution-store-cefi-${AWS_ACCOUNT_ID}"
-      TRADFI: "execution-store-tradfi-${AWS_ACCOUNT_ID}"
-      DEFI: "execution-store-defi-${AWS_ACCOUNT_ID}"
-      # Sports execution-store — mirrors GCP (separate per-AG fill/order/manifest store).
-      SPORTS: "execution-store-sports-${AWS_ACCOUNT_ID}"
+    # strategy FOLD D (fold_d_cutover_spec, 2026-07-18): add ${DEPLOYMENT_ENV_SHORT}- tier; mirrors GCP
+    # (D6 Phase 4, 2026-05-20); strategy-store-test retired (tiered key derives -test- at env=test).
+    strategy-store: "strategy-store-${DEPLOYMENT_ENV_SHORT}-${AWS_ACCOUNT_ID}"
+    # execution FOLD C (fold_c_cutover_spec, 2026-07-18): folded per-asset_group DICT → ONE env-tiered
+    # bucket; mirrors GCP; asset_group → top-level object-key prefix ({ag}/execution/…).
+    execution-store: "execution-store-${DEPLOYMENT_ENV_SHORT}-${AWS_ACCOUNT_ID}"
     # Sports pipeline buckets
     features-sports: "features-sports-${DEPLOYMENT_ENV_SHORT}-${AWS_ACCOUNT_ID}"
     # Sports venue-balance snapshot store — mirrors GCP position-store-sports.

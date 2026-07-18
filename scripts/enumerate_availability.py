@@ -40,14 +40,16 @@ from enumerate_envelope import (  # noqa: E402  # placed after conditional setup
     _timeframes_for,
 )
 
-# Unified FLAT strategy-store bucket (cloud-providers.yaml storage kind
+# Unified strategy-store bucket (cloud-providers.yaml storage kind
 # `strategy-store` — asset-group-agnostic). Per the operator-ratified
 # 2026-05-20 (D6 Phase 4) decision + the split-brain fix
 # (plans/active/issues/strategy_store_split_brain_2026_07_13.md); UAC is a
 # lower tier than unified-trading-library, so UTL's `resolve_bucket_name()`
-# can't be imported here — derive the flat name from the project id.
+# can't be imported here — derive the name from the project id.
+# strategy FOLD D (fold_d_cutover_spec, 2026-07-18): now env-tiered
+# `strategy-store-prd-{pid}` (was un-tiered); `prd` is hardcoded here.
 _PROJECT_ID = "central-element-323112"
-GCS_BUCKET = f"strategy-store-{_PROJECT_ID}"
+GCS_BUCKET = f"strategy-store-prd-{_PROJECT_ID}"
 GCS_OBJECT_PATH = "catalogue/availability.json"
 
 

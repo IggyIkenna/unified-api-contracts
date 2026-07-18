@@ -98,10 +98,11 @@ def test_sports_facade_parity() -> None:
 
 
 def test_strategy_store_bucket() -> None:
-    """Catalogue artefacts live in the unified FLAT strategy-store bucket
+    """Catalogue artefacts live in the unified strategy-store bucket
     (cloud-providers.yaml kind ``strategy-store`` — no asset-group segment; see
-    plans/active/issues/strategy_store_split_brain_2026_07_13.md)."""
-    assert strategy_store_bucket(PID) == f"strategy-store-{PID}"
+    plans/active/issues/strategy_store_split_brain_2026_07_13.md). strategy FOLD D
+    (fold_d_cutover_spec, 2026-07-18): env-tiered ``strategy-store-prd-{pid}``."""
+    assert strategy_store_bucket(PID) == f"strategy-store-prd-{PID}"
 
 
 def test_generic_bucket_template_keeps_both_placeholders() -> None:

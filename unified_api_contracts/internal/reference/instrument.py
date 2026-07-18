@@ -315,6 +315,62 @@ class InstrumentRecord(BaseModel):
         ),
     )
 
+    # --- Prediction fixture-match (soccer prediction markets only; None for every
+    #     other instrument). ADDITIVE + nullable, aligned 1:1 with the parquet schema
+    #     columns of the same names. These MATERIALISE the six honest-absence
+    #     attributes the instruments-service prediction fixture-match side-table
+    #     already stamps (``reference_data/adapters/prediction/fixture_match.py`` ::
+    #     ``FixtureMatchAttributes``, keyed by ``instrument_key``) — threading the
+    #     canonical API-Football fixture identity onto a Polymarket/Kalshi soccer
+    #     market, the SAME odds↔instruments row-level join-key MTDS already ships.
+    #     Non-breaking (added-optional-field): the model_validator never references
+    #     them and every existing row leaves them None. ``af_fixture_id`` stays a
+    #     genuine nullable int (no sentinel); ``af_fixture_match_status`` is the
+    #     closed-set companion (MATCHED / UNRESOLVED_TEAM_NAME / NO_FIXTURE_DATA,
+    #     mirroring ``FixtureMatchStatus``) that keeps an attempt-with-no-match
+    #     distinguishable from a genuine null. Materialising these as the parquet
+    #     JOIN (IS ``_records_to_dataframe``) is downstream + deferred; this ships the
+    #     shared schema landing spot. Plan: prediction_consolidated_closeout_2026_07_18 A4. ---
+    af_league_id: str | None = Field(
+        default=None,
+        description="Canonical API-Football league id for a soccer prediction market. None for every other instrument.",
+    )
+    home_team_canonical_id: str | None = Field(
+        default=None,
+        description=(
+            "Canonical home-team id (shared team-alias namespace) for a soccer prediction "
+            "market. None when the venue rendering does not canonicalise / not a soccer market."
+        ),
+    )
+    away_team_canonical_id: str | None = Field(
+        default=None,
+        description=(
+            "Canonical away-team id (shared team-alias namespace) for a soccer prediction "
+            "market. None when the venue rendering does not canonicalise / not a soccer market."
+        ),
+    )
+    fixture_date: date | None = Field(
+        default=None,
+        description=(
+            "Calendar date (UTC) of the matched soccer fixture. None when no fixture day is "
+            "known. Serialised as ISO date string 'YYYY-MM-DD' in parquet."
+        ),
+    )
+    af_fixture_id: int | None = Field(
+        default=None,
+        description=(
+            "API-Football numeric fixture id when the market MATCHED a fixture; genuine "
+            "nullable int (no sentinel). None when unmatched / not a soccer market."
+        ),
+    )
+    af_fixture_match_status: str | None = Field(
+        default=None,
+        description=(
+            "Closed-set fixture-match outcome mirroring instruments-service FixtureMatchStatus: "
+            "MATCHED / UNRESOLVED_TEAM_NAME / NO_FIXTURE_DATA. None for non-prediction / non-soccer rows."
+        ),
+    )
+
     # ─────────────────────────────────────────────────────────────────
     # Per-asset-group hard-required field enforcement
     # (hard_schema_enforcement_2026_05_08 Phase 1 — slot 5 RE-TASK 2026-05-11)

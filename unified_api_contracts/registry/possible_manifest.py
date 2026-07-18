@@ -231,6 +231,26 @@ _LEGACY_PIPELINE_MODE_SOURCES: dict[str, tuple[str, ...]] = {
     DEFI: ("hyperliquid_rest",),
 }
 
+# Extra ``live_<source>`` probe prefixes to enumerate for an asset_group EVEN WHEN the
+# source's ``SOURCE_MODE_CAPABILITY`` does not register :attr:`Mode.LIVE` (so the
+# generated batch+live loop cannot emit them). PREDICTION §5 UNION (operator
+# 2026-07-18): a batch manifest row is satisfied by live-only object evidence, so the
+# phantom-existence probe must ALSO look under every prediction source's ``live_``
+# prefix — including ``polymarket_gamma_api``, which is registered BATCH-only ("market
+# metadata; not a tick series") and therefore has NO ``LIVE_POLYMARKET_GAMMA_API``
+# member in the shared ``PipelineMode`` enum. Emitting the probe prefix here keeps the
+# shared enum / capability matrix HONEST (gamma_api stays batch-only) while still
+# probing the live shape. Per the batch+live rationale in
+# :func:`_canonical_pipeline_mode_prefixes`, adding a probe prefix can only REDUCE
+# false-demotion, never introduce one. ``kalshi`` / ``polymarket_clob`` live prefixes
+# are ALREADY emitted by that loop (both are LIVE-capable) — listing them here makes
+# the operator's UNION decision explicit + self-documenting; the emitter de-dups so
+# they are not duplicated. PREDICTION-SCOPED ONLY: no entry for cefi/tradfi/defi/sports,
+# so their template sets are byte-for-byte unchanged.
+_EXTRA_LIVE_PROBE_SOURCES_BY_AG: dict[str, tuple[str, ...]] = {
+    PREDICTION: ("kalshi", "polymarket_clob", "polymarket_gamma_api"),
+}
+
 
 def external_batch_sources_for_asset_group(asset_group: str) -> tuple[str, ...]:
     """Return the deduped, sorted external batch SOURCES for an asset_group.
@@ -301,6 +321,15 @@ def _canonical_pipeline_mode_prefixes(asset_group: str) -> list[str]:
                     )
         for pmode_value in pmodes:
             prefixes.append(f"{_DAY_PREFIX}pipeline_mode={pmode_value}/asset_group={ag}/{seg}")
+    # PREDICTION §5 UNION extra live-probe prefixes (see _EXTRA_LIVE_PROBE_SOURCES_BY_AG):
+    # append every ``live_<source>`` shape the operator's union requires that the
+    # capability-derived loop above could not emit (e.g. batch-only polymarket_gamma_api).
+    # Append-if-absent so the LIVE-capable sources already emitted above are not
+    # duplicated; the dict has no entry for non-prediction AGs, so this is a no-op there.
+    for source in _EXTRA_LIVE_PROBE_SOURCES_BY_AG.get(ag, ()):
+        extra = f"{_DAY_PREFIX}pipeline_mode={Mode.LIVE.value}_{source}/asset_group={ag}/{seg}"
+        if extra not in prefixes:
+            prefixes.append(extra)
     return prefixes
 
 
