@@ -15,6 +15,7 @@ from __future__ import annotations
 import re
 
 from unified_api_contracts.registry import (
+    DECOMMISSIONED_VENUE_BASES,
     NO_ADAPTER_YET,
     PROTOCOL_TO_ADAPTER_KEY,
     VENUE_PREFIX_TO_PROTOCOL,
@@ -110,3 +111,36 @@ class TestVenueAdapterKeyShape:
         for protocol, target in PROTOCOL_TO_ADAPTER_KEY.items():
             assert protocol in known_protocols, f"reuse source {protocol!r} not in VENUE_PREFIX_TO_PROTOCOL"
             assert _ADAPTER_KEY_RE.match(target), f"reuse target {target!r} not snake_case"
+
+
+class TestDecommissionedVenueBases:
+    """``DECOMMISSIONED_VENUE_BASES`` is the machine-readable removed-venue SSOT.
+
+    Consumers (e.g. deployment-api's data-status drilldown) base-prefix-match
+    against this set to hide manifest rows for fully-retired protocols. The
+    gate here: no CURRENTLY REGISTERED venue (bare or ``-<CHAIN>`` suffixed)
+    may resolve to a base in this set — a removal recorded here while an
+    active venue entry still exists would be a contradiction (either the
+    removal or the venue registration is stale).
+    """
+
+    def test_no_active_venue_has_a_decommissioned_base(self) -> None:
+        offenders = {
+            venue for venue in VENUE_TO_ADAPTER_KEY if venue.split("-", 1)[0].upper() in DECOMMISSIONED_VENUE_BASES
+        }
+        assert not offenders, (
+            f"Venues still registered under a decommissioned base: {sorted(offenders)}. Either the "
+            "venue needs to be removed from VENUE_TO_ADAPTER_KEY, or it was wrongly added to "
+            "DECOMMISSIONED_VENUE_BASES."
+        )
+
+    def test_bases_are_uppercase(self) -> None:
+        assert all(base == base.upper() for base in DECOMMISSIONED_VENUE_BASES)
+        assert all("-" not in base for base in DECOMMISSIONED_VENUE_BASES), (
+            "Members must be BASE names (pre-first-'-'), not full venue strings."
+        )
+
+    def test_matches_the_declared_removed_set(self) -> None:
+        # Locks exact membership so a future removal/addition is a conscious,
+        # reviewed change (same discipline as EXPECTED_SENTINEL_VENUES above).
+        assert frozenset({"DRIFT", "PACIFICA", "MANGO", "ZETA", "FLASH"}) == DECOMMISSIONED_VENUE_BASES
