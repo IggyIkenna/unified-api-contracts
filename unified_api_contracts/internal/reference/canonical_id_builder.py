@@ -442,6 +442,26 @@ def _build_defi(
     return f"{_venue_token(venue, chain)}:{itype.value}:{symbol}"
 
 
+# TradFi cash types that carry the explicit base-quote suffix (operator
+# decision, 2026-07-18 — tradfi_consolidated_closeout_2026_07_18.md "Equity id
+# = -USD on ALL FOUR surfaces", extended by the same ruling to every other
+# TradFi cash type so the pattern is uniform regardless of asset class). CDS
+# is intentionally excluded: a CDS index (e.g. ITRAXX_EUR) is quoted in basis
+# points on notional, not a base/quote currency pair, so the quote-suffix
+# convention doesn't apply — keep it in the plain ``VENUE:TYPE:SYMBOL`` form
+# unless/until an operator decision says otherwise.
+_TRADFI_CASH_QUOTE_SUFFIXED_TYPES: Final[frozenset[InstrumentType]] = frozenset(
+    {
+        InstrumentType.INDEX,
+        InstrumentType.EQUITY,
+        InstrumentType.CURRENCY,
+        InstrumentType.ETF,
+        InstrumentType.BOND,
+        InstrumentType.COMMODITY,
+    }
+)
+
+
 def _build_tradfi_cash(
     venue: str,
     itype: InstrumentType,
@@ -450,15 +470,21 @@ def _build_tradfi_cash(
 ) -> str:
     """Build the canonical key for TradFi cash/reference instruments.
 
-    ``INDEX`` carries the base-quote suffix (e.g. ``CBOE:INDEX:US10Y-USD``) to
-    match the symbology GCS key and the ``data_source_continuity`` resolver keys —
-    a bare ``VENUE:INDEX:SYMBOL`` mismatches the captured-data path and silently
-    breaks source/data-status resolution. ``quote_asset`` defaults to ``USD`` for
-    indices (all listed index levels are USD-denominated). Other cash types
-    (equity/ETF/bond/…) keep the plain ``VENUE:TYPE:SYMBOL`` form.
+    Every TradFi cash type — ``INDEX``, ``EQUITY``, ``CURRENCY``, ``ETF``,
+    ``BOND``, ``COMMODITY`` — carries an explicit base-quote suffix (e.g.
+    ``CBOE:INDEX:US10Y-USD``, ``NASDAQ:EQUITY:AAPL-USD``, ``FX:CURRENCY:KRW-USD``)
+    to match the symbology GCS key and the ``data_source_continuity`` resolver
+    keys — a bare ``VENUE:TYPE:SYMBOL`` mismatches the captured-data path and
+    silently breaks source/data-status resolution. This is the operator-decided
+    target (2026-07-18, ``tradfi_consolidated_closeout_2026_07_18.md``):
+    "same pattern regardless of asset class." ``quote_asset`` defaults to
+    ``USD`` for these types (every listed cash instrument today is
+    USD-denominated); pass ``quote_asset="EUR"`` etc. to override. ``CDS`` is
+    excluded — it has no base/quote currency dimension — and keeps the plain
+    ``VENUE:CDS:SYMBOL`` form.
     """
     base = f"{_venue_token(venue, None)}:{itype.value}:{symbol.upper()}"
-    if itype is InstrumentType.INDEX:
+    if itype in _TRADFI_CASH_QUOTE_SUFFIXED_TYPES:
         quote = (quote_asset or "USD").upper()
         return f"{base}-{quote}"
     return base

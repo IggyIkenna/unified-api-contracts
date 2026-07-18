@@ -62,36 +62,36 @@ there are no silent defaults (e.g. `OPTION` without `expiry_date` + `strike`
 
 ### Per-InstrumentType formats
 
-| `InstrumentType`    | Category (typical) | Format                                        | Example                                                  |
-| ------------------- | ------------------ | --------------------------------------------- | -------------------------------------------------------- |
-| `SPOT_PAIR`         | cefi               | `V:SPOT_PAIR:S`                               | `BINANCE:SPOT_PAIR:BTCUSDT`                              |
-| `PERPETUAL`         | cefi               | `V:PERPETUAL:S`                               | `BINANCE_FUTURES:PERPETUAL:BTCUSDT`                      |
-| `FUTURE`            | cefi / tradfi      | `V:FUTURE:S-YYYYMMDD`                         | `CME:FUTURE:ES-20260620`                                 |
-| `OPTION`            | cefi / tradfi      | `V:OPTION:S-YYYYMMDD-STRIKE-[C\|P]`           | `DERIBIT:OPTION:BTC-20260328-65000-C`                    |
-| `POOL`              | defi               | `V-C:POOL:S`                                  | `UNISWAP_V3-ETHEREUM:POOL:USDC-WETH-500`                 |
-| `LENDING`           | defi               | `V-C:LENDING:S`                               | `AAVE_V3-ETHEREUM:LENDING:USDC`                          |
-| `A_TOKEN`           | defi               | `V-C:A_TOKEN:S` (case-sensitive)              | `AAVE_V3-ETHEREUM:A_TOKEN:aUSDC`                         |
-| `DEBT_TOKEN`        | defi               | `V-C:DEBT_TOKEN:S` (case-sensitive)           | `AAVE_V3-ETHEREUM:DEBT_TOKEN:variableDebtUSDC`           |
-| `LST`               | defi               | `V-C:LST:S` (case-sensitive)                  | `LIDO-ETHEREUM:LST:stETH`                                |
-| `YIELD_BEARING`     | defi               | `V-C:YIELD_BEARING:S`                         | `ETHENA-ETHEREUM:YIELD_BEARING:sUSDe`                    |
-| `STAKING`           | defi               | `V-C:STAKING:S`                               | `LIDO-ETHEREUM:STAKING:stETH`                            |
-| `SPOT_ASSET`        | defi               | `V-C:SPOT_ASSET:S`                            | `UNISWAP_V3-ETHEREUM:SPOT_ASSET:WETH`                    |
-| `ETF`               | tradfi             | `V:ETF:S`                                     | `NYSE:ETF:SPY`                                           |
-| `EQUITY`            | tradfi             | `V:EQUITY:S`                                  | `NASDAQ:EQUITY:AAPL`                                     |
-| `COMMODITY`         | tradfi             | `V:COMMODITY:S`                               | `CME:COMMODITY:CL`                                       |
-| `CURRENCY`          | tradfi             | `V:CURRENCY:S`                                | `FX:CURRENCY:EURUSD`                                     |
-| `INDEX`             | tradfi             | `V:INDEX:S`                                   | `CBOE:INDEX:VIX`                                         |
-| `BOND`              | tradfi             | `V:BOND:S`                                    | `CME:BOND:US10Y`                                         |
-| `CDS`               | tradfi             | `V:CDS:S`                                     | `ICE:CDS:ITRAXX`                                         |
-| `COMBO`             | multi-leg          | `V:COMBO:S` (opaque combo id)                 | `DERIBIT:COMBO:BTC-20260328-CONDOR-A`                    |
-| `PREDICTION_MARKET` | prediction         | `V:PREDICTION_MARKET:S` (pre-built domain id) | `POLYMARKET:PREDICTION_MARKET:event-xxx-yes`             |
-| `EXCHANGE_ODDS`     | sports             | `V:EXCHANGE_ODDS:S`                           | `BETFAIR_EX:EXCHANGE_ODDS:epl-2026-04-17-match-123-home` |
-| `FIXED_ODDS`        | sports             | `V:FIXED_ODDS:S`                              | `PINNACLE:FIXED_ODDS:epl-2026-04-17-match-123-over2_5`   |
-| `PROP`              | sports             | `V:PROP:S`                                    | `DRAFTKINGS:PROP:nba-player-points-over-30`              |
+| `InstrumentType`    | Category (typical) | Format                                              | Example                                                  |
+| ------------------- | ------------------ | --------------------------------------------------- | -------------------------------------------------------- |
+| `SPOT_PAIR`         | cefi               | `V:SPOT_PAIR:BASE-QUOTE`                            | `BINANCE:SPOT_PAIR:BTC-USDT`                             |
+| `PERPETUAL`         | cefi               | `V:PERPETUAL:BASE-QUOTE@MARGIN`                     | `BINANCE-FUTURES:PERPETUAL:BTC-USDT@LIN`                 |
+| `FUTURE`            | cefi / tradfi      | `V:FUTURE:ROOT-USD@LIN-YYYYMMDD`                    | `CME:FUTURE:ES-USD@LIN-20260620`                         |
+| `OPTION`            | cefi / tradfi      | `V:OPTION:BASE-QUOTE@MARGIN-YYYYMMDD-STRIKE-[C\|P]` | `DERIBIT:OPTION:BTC-USD@INV-20260328-65000-C`            |
+| `POOL`              | defi               | `V-C:POOL:S`                                        | `UNISWAP_V3-ETHEREUM:POOL:USDC-WETH-500`                 |
+| `A_TOKEN`           | defi               | `V-C:A_TOKEN:S` (case-sensitive)                    | `AAVE_V3-ETHEREUM:A_TOKEN:aUSDC`                         |
+| `DEBT_TOKEN`        | defi               | `V-C:DEBT_TOKEN:S` (case-sensitive)                 | `AAVE_V3-ETHEREUM:DEBT_TOKEN:variableDebtUSDC`           |
+| `LST`               | defi               | `V-C:LST:S` (case-sensitive)                        | `LIDO-ETHEREUM:LST:stETH`                                |
+| `YIELD_BEARING`     | defi               | `V-C:YIELD_BEARING:S`                               | `ETHENA-ETHEREUM:YIELD_BEARING:sUSDe`                    |
+| `STAKING`           | defi               | `V-C:STAKING:S`                                     | `LIDO-ETHEREUM:STAKING:stETH`                            |
+| `SPOT_ASSET`        | defi               | `V-C:SPOT_ASSET:S`                                  | `UNISWAP_V3-ETHEREUM:SPOT_ASSET:WETH`                    |
+| `ETF`               | tradfi             | `V:ETF:S`                                           | `NYSE:ETF:SPY`                                           |
+| `EQUITY`            | tradfi             | `V:EQUITY:S`                                        | `NASDAQ:EQUITY:AAPL`                                     |
+| `COMMODITY`         | tradfi             | `V:COMMODITY:S`                                     | `CME:COMMODITY:CL`                                       |
+| `CURRENCY`          | tradfi             | `V:CURRENCY:S`                                      | `FX:CURRENCY:EURUSD`                                     |
+| `INDEX`             | tradfi             | `V:INDEX:S`                                         | `CBOE:INDEX:VIX`                                         |
+| `BOND`              | tradfi             | `V:BOND:S`                                          | `CME:BOND:US10Y`                                         |
+| `CDS`               | tradfi             | `V:CDS:S`                                           | `ICE:CDS:ITRAXX`                                         |
+| `COMBO`             | multi-leg          | `V:COMBO:S` (opaque combo id)                       | `DERIBIT:COMBO:BTC-20260328-CONDOR-A`                    |
+| `PREDICTION_MARKET` | prediction         | `V:PREDICTION_MARKET:S` (pre-built domain id)       | `POLYMARKET:PREDICTION_MARKET:event-xxx-yes`             |
+| `EXCHANGE_ODDS`     | sports             | `V:EXCHANGE_ODDS:S`                                 | `BETFAIR_EX:EXCHANGE_ODDS:epl-2026-04-17-match-123-home` |
+| `FIXED_ODDS`        | sports             | `V:FIXED_ODDS:S`                                    | `PINNACLE:FIXED_ODDS:epl-2026-04-17-match-123-over2_5`   |
+| `PROP`              | sports             | `V:PROP:S`                                          | `DRAFTKINGS:PROP:nba-player-points-over-30`              |
 
-All 24 `InstrumentType` values are covered — `SUPPORTED_INSTRUMENT_TYPES`
+All active `InstrumentType` values are covered — `SUPPORTED_INSTRUMENT_TYPES`
 in the module asserts this and a unit test blocks accidental enum
-additions without a corresponding builder update.
+additions without a corresponding builder update. The legacy flat `LENDING`
+type is retired; lending markets resolve to `A_TOKEN` / `DEBT_TOKEN` only.
 
 Sports / prediction `SYMBOL` is the domain canonical id pre-built by
 `canonical/domain/sports/canonical_ids.py` or
@@ -154,18 +154,17 @@ An empty `list[Violation]` means the frame passes.
 
 All entries below are exposed through `CONTRACT_REGISTRY`:
 
-| Key                                               |
-| ------------------------------------------------- |
-| `("cefi", "perpetual", "trades")`                 |
-| `("cefi", "perpetual", "book_snapshot_5")`        |
-| `("cefi", "options_chain", "trades")`             |
-| `("cefi", "futures_chain", "trades")`             |
-| `("tradfi", "future", "trades")`                  |
-| `("tradfi", "options_chain", "trades")`           |
-| `("tradfi", "equity", "trades")`                  |
-| `("defi", "lending_position", "lending_indices")` |
-| `("defi", "dex_pool", "dex_pool_swaps")`          |
-| `("defi", "lst", "lst_rates")`                    |
+| Key                                        |
+| ------------------------------------------ |
+| `("cefi", "perpetual", "trades")`          |
+| `("cefi", "perpetual", "book_snapshot_5")` |
+| `("cefi", "options_chain", "trades")`      |
+| `("cefi", "futures_chain", "trades")`      |
+| `("tradfi", "future", "trades")`           |
+| `("tradfi", "options_chain", "trades")`    |
+| `("tradfi", "equity", "trades")`           |
+| `("defi", "dex_pool", "dex_pool_swaps")`   |
+| `("defi", "lst", "lst_rates")`             |
 
 Add new (category, instrument_type, data_type) triples by appending a new
 `SchemaContract` constant in `contracts.py` and registering it in

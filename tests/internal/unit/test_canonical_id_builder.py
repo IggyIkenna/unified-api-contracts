@@ -118,7 +118,10 @@ class TestTradfiHappyPath:
         )
 
     def test_equity(self) -> None:
-        assert build_instrument_id("nasdaq", InstrumentType.EQUITY, "AAPL") == "NASDAQ:EQUITY:AAPL"
+        # Operator decision 2026-07-18 (tradfi_consolidated_closeout_2026_07_18.md):
+        # every TradFi cash type carries an explicit -USD quote suffix, "same
+        # pattern regardless of asset class."
+        assert build_instrument_id("nasdaq", InstrumentType.EQUITY, "AAPL") == "NASDAQ:EQUITY:AAPL-USD"
 
     def test_index(self) -> None:
         # INDEX carries the canonical -USD base-quote suffix (matches the
@@ -129,20 +132,26 @@ class TestTradfiHappyPath:
         assert build_instrument_id("cboe", InstrumentType.INDEX, "US10Y", quote_asset="USD") == "CBOE:INDEX:US10Y-USD"
 
     def test_etf(self) -> None:
-        # Non-index cash types keep the plain VENUE:TYPE:SYMBOL form (no -USD).
-        assert build_instrument_id("arca", InstrumentType.ETF, "SPY") == "ARCA:ETF:SPY"
+        assert build_instrument_id("arca", InstrumentType.ETF, "SPY") == "ARCA:ETF:SPY-USD"
 
     def test_commodity(self) -> None:
-        assert build_instrument_id("nymex", InstrumentType.COMMODITY, "CL") == "NYMEX:COMMODITY:CL"
+        assert build_instrument_id("nymex", InstrumentType.COMMODITY, "CL") == "NYMEX:COMMODITY:CL-USD"
 
     def test_currency(self) -> None:
-        assert build_instrument_id("ibkr", InstrumentType.CURRENCY, "EURUSD") == "IBKR:CURRENCY:EURUSD"
+        assert build_instrument_id("fx", InstrumentType.CURRENCY, "KRW") == "FX:CURRENCY:KRW-USD"
 
     def test_bond(self) -> None:
-        assert build_instrument_id("cbot", InstrumentType.BOND, "UST10Y") == "CBOT:BOND:UST10Y"
+        assert build_instrument_id("cbot", InstrumentType.BOND, "UST10Y") == "CBOT:BOND:UST10Y-USD"
 
     def test_cds(self) -> None:
+        # CDS is intentionally excluded from the -USD suffix convention — it's
+        # quoted in basis points on notional, not a base/quote currency pair.
         assert build_instrument_id("ice", InstrumentType.CDS, "ITRAXX_EUR") == "ICE:CDS:ITRAXX_EUR"
+
+    def test_cash_type_explicit_quote_override(self) -> None:
+        # quote_asset override still works for non-USD-denominated cash
+        # instruments (e.g. a EUR-quoted equity).
+        assert build_instrument_id("xetra", InstrumentType.EQUITY, "SAP", quote_asset="EUR") == "XETRA:EQUITY:SAP-EUR"
 
 
 class TestDefiHappyPath:
