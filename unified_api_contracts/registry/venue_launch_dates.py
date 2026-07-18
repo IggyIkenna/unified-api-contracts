@@ -146,28 +146,46 @@ EXPECTED_PRE_VENUE_LAUNCH rows in the default window.
 # ---------------------------------------------------------------------------
 
 DEFI_VENUE_LAUNCH_DATES: dict[str, str] = {
-    # Aave V3 — March 16 2022 multi-chain launch (ETH/POLY/AVAX/ARB/OPT).
+    # Aave V3 — March 16 2022 multi-chain launch (POLY/AVAX/ARB/OPT). ETHEREUM is
+    # the exception: Aave V3 did NOT deploy on Ethereum mainnet until 2023-01-27
+    # (2022-03-16 was the L2/side-chain cohort date, NOT Ethereum). Corrected
+    # 2026-07-18 to match the subgraph-audited `chain_env.PROTOCOL_LAUNCH_DATES`
+    # (("ETHEREUM","AAVE_V3")="2023-01-27", first reserveParamsHistoryItems event
+    # 2023-01-27 08:00:11 UTC, audit 2026-05-08) — the old 2022-03-16 mis-classified
+    # 11 months of legitimate 2022-03→2023-01 Aave-V3-ETH data as empty_confirmed.
+    # Also aligns with this registry's own "prefer LATER when uncertain" principle.
+    # SSOT-reconciliation issue: uac_defi_launch_date_registry_drift_2026_07_18.
     # BSC/LINEA/ZKSYNC/SCROLL came later per official deployment timelines.
-    "AAVE_V3-ETHEREUM": "2022-03-16",
-    "AAVE_V3-POLYGON": "2022-03-16",
-    "AAVE_V3-AVALANCHE": "2022-03-16",
+    "AAVE_V3-ETHEREUM": "2023-01-27",
+    "AAVE_V3-POLYGON": "2022-03-12",
+    "AAVE_V3-AVALANCHE": "2022-03-12",
     "AAVE_V3-ARBITRUM": "2022-03-16",
-    "AAVE_V3-OPTIMISM": "2022-03-16",
-    "AAVE_V3-BSC": "2023-04-06",
-    "AAVE_V3-LINEA": "2024-09-26",
+    "AAVE_V3-OPTIMISM": "2022-03-15",
+    # On-chain verified 2026-07-18 (issue uac_defi_launch_date_registry_drift): Aave's own
+    # changelog dates BNB Chain market go-live 2024-01-23 (2023-04-06 was the ARFC governance
+    # date) and Linea 2025-02-11 (2024-09-26 matched no Linea deployment/vote/changelog event).
+    "AAVE_V3-BSC": "2024-01-23",
+    "AAVE_V3-LINEA": "2025-02-11",
     "AAVE_V3-ZKSYNC": "2024-04-09",
     "AAVE_V3-SCROLL": "2024-04-29",
-    # Compound V3 ("Comet") — Aug 26 2022 on Ethereum; multi-chain later.
-    "COMPOUND_V3-ETHEREUM": "2022-08-26",
+    # Compound V3 ("Comet") — aligned 2026-07-18 to chain_env.PROTOCOL_LAUNCH_DATES, whose
+    # Tab-14 subgraph audit (2026-05-08) gives day-precise FIRST-MARKET-ACTIVITY dates (the
+    # "launch" the data denominator needs) for these pairs. A 2026-07-18 pass had briefly
+    # overridden ARBITRUM/OPTIMISM with medium-confidence GOVERNANCE-execution dates
+    # (2023-05-15 / 2024-04-16) — reverted: the subgraph audit outranks a governance date, and
+    # the instruments-service evm_creation_resolver test pins the audited values. ETHEREUM's
+    # 2022-08-26 (a launch-blog date) vs the audited 2022-08-13 first-event is a residual
+    # contract-creation-vs-subgraph question flagged in the SSOT issue doc (needs Dune re-verify).
+    "COMPOUND_V3-ETHEREUM": "2022-08-13",
     "COMPOUND_V3-POLYGON": "2023-02-15",
-    "COMPOUND_V3-ARBITRUM": "2023-04-14",
-    "COMPOUND_V3-BASE": "2023-08-11",
-    "COMPOUND_V3-OPTIMISM": "2024-02-16",
-    "COMPOUND_V3-SCROLL": "2024-04-23",
+    "COMPOUND_V3-ARBITRUM": "2023-05-04",
+    "COMPOUND_V3-BASE": "2023-08-04",
+    "COMPOUND_V3-OPTIMISM": "2024-04-06",
+    "COMPOUND_V3-SCROLL": "2024-04-22",
     # Uniswap V2 (May 2020), V3 (May 2021 ETH, Dec 2021 Polygon), V4 (Jan 2025).
-    "UNISWAP_V2-ETHEREUM": "2020-05-05",
-    "UNISWAP_V3-ETHEREUM": "2021-05-05",
-    "UNISWAP_V3-POLYGON": "2021-12-22",
+    "UNISWAP_V2-ETHEREUM": "2020-05-04",
+    "UNISWAP_V3-ETHEREUM": "2021-05-04",
+    "UNISWAP_V3-POLYGON": "2021-12-21",
     "UNISWAP_V4-ETHEREUM": "2025-01-31",
     # SushiSwap V3 — April 2023.
     "SUSHISWAP_V3-ETHEREUM": "2023-04-04",
@@ -181,12 +199,12 @@ DEFI_VENUE_LAUNCH_DATES: dict[str, str] = {
     "FRAX-ETHEREUM": "2020-12-21",
     "FRAX": "2020-12-21",  # bare-protocol variant
     # Rocket Pool Atlas — Nov 9 2021 (rETH liquid staking).
-    "ROCKETPOOL-ETHEREUM": "2021-11-09",
+    "ROCKETPOOL-ETHEREUM": "2021-11-08",
     # Ethena USDe — Feb 20 2024 mainnet launch.
-    "ETHENA-ETHEREUM": "2024-02-20",
+    "ETHENA-ETHEREUM": "2024-02-19",
     "ETHENA": "2024-02-20",  # bare-protocol variant
     # ether.fi liquid restaking — April 26 2023 mainnet.
-    "ETHERFI-ETHEREUM": "2023-04-26",
+    "ETHERFI-ETHEREUM": "2023-04-25",
     # Solana DeFi protocols
     "KAMINO-SOLANA": "2022-08-24",  # Kamino Aug 2022
     "JITO-SOLANA": "2022-08-16",  # Jito MEV+staking Aug 2022
@@ -197,7 +215,7 @@ DEFI_VENUE_LAUNCH_DATES: dict[str, str] = {
     "ORCA-SOLANA": "2021-02-09",  # Orca AMM launch
     # GMX — Sept 2021 Arbitrum, Jan 2022 Avalanche.
     "GMX-ARBITRUM": "2021-09-01",
-    "GMX-AVALANCHE": "2022-01-06",
+    "GMX-AVALANCHE": "2022-01-05",
     # Yearn V3 — March 13 2024 launch (V2 earlier but V3 is referenced here).
     "YEARN_V3": "2024-03-13",
     # Morpho Vaults (MetaMorpho) — Jan 4 2024 launch.

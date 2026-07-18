@@ -222,19 +222,31 @@ PROTOCOL_LAUNCH_DATES: dict[tuple[str, str], str] = {
     # UTC (Tab 14 audit 2026-05-08); pre-fix 2022-08-25 was 12 days late —
     # caused 12d of legitimate post-deploy ETH Compound V3 data to be
     # silently clipped as pre-launch.
-    ("ETHEREUM", "COMPOUND_V3"): "2022-08-13",
+    (
+        "ETHEREUM",
+        "COMPOUND_V3",
+    ): "2022-08-13",  # Tab 14 subgraph audit (first-market-activity); a 2026-07-18 contract-creation argument for 2022-08-26 is flagged in uac_defi_launch_date_registry_drift for Dune re-verify
     # ARBITRUM earliest event 2023-05-04 22:00:26 UTC (Tab 14 audit
     # 2026-05-08); pre-fix 2023-04-13 was 21 days early — caused 21d of
     # ``SOURCE_RETURNED_ZERO`` false-empty rows.
-    ("ARBITRUM", "COMPOUND_V3"): "2023-05-04",
+    (
+        "ARBITRUM",
+        "COMPOUND_V3",
+    ): "2023-05-04",  # Tab 14 subgraph audit (earliest dailyMarketAccountings 2023-05-04 22:00:26 UTC); a 2026-07-18 governance-derived 2023-05-15 was reverted (subgraph outranks governance)
     # BASE earliest event 2023-08-04 23:29:21 UTC (subgraph indexes
     # pre-mainnet-open BASE blocks); pre-fix 2023-08-26 was 22 days late —
     # caused 22d of legitimate post-deploy BASE data to be silently clipped.
-    ("BASE", "COMPOUND_V3"): "2023-08-04",
+    (
+        "BASE",
+        "COMPOUND_V3",
+    ): "2023-08-04",  # Tab 14 subgraph audit; a 2026-07-18 contract-creation 2023-08-11 override was reverted (subgraph first-activity is the denominator date)
     # OPTIMISM earliest event 2024-04-06 17:09:21 UTC (Tab 14 audit
     # 2026-05-08); pre-fix 2024-02-15 was 51 days early — caused 51d of
     # false-empty rows.
-    ("OPTIMISM", "COMPOUND_V3"): "2024-04-06",
+    (
+        "OPTIMISM",
+        "COMPOUND_V3",
+    ): "2024-04-06",  # Tab 14 subgraph audit; a 2026-07-18 governance-derived 2024-04-16 was reverted
     # POLYGON entry removed 2026-05-08 — Tab 14 audit confirmed
     # ``SUBGRAPH_IDS["compound_v3"]`` has no POLYGON entry (subgraph returned
     # 0 markets, Compound V3 not active on Polygon). The lingering UAC entry
@@ -276,11 +288,13 @@ PROTOCOL_LAUNCH_DATES: dict[tuple[str, str], str] = {
     # See plans/archive/issues/defi_fork1_prep_audit_2026_05_08.md.
     ("ETHEREUM", "SPARK"): "2023-03-07",
     # ── Solana ──
-    ("SOLANA", "JITO"): "2022-08-15",
+    # Solana has no Graph subgraph — the Tab-14 EVM-subgraph audit does not cover it;
+    # aligned 2026-07-18 to the P3-verified venue_launch_dates first-mainnet-activity dates.
+    ("SOLANA", "JITO"): "2022-08-16",
     ("SOLANA", "MARINADE"): "2021-08-02",
     ("SOLANA", "RAYDIUM"): "2021-02-21",
     ("SOLANA", "ORCA"): "2021-02-09",
-    ("SOLANA", "KAMINO"): "2022-08-23",
+    ("SOLANA", "KAMINO"): "2022-08-24",
     # ("SOLANA", "DRIFT") removed 2026-07-16 (operator ruling: all Solana
     # perp DEXes dropped except Jupiter, not integrated).
     # ── Perp DEXes / aggregators ──

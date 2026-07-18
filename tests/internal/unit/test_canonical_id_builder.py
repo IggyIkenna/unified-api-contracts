@@ -982,3 +982,102 @@ class TestMarginMarker:
             margin_marker="LIN",
         )
         assert leg.instrument_key == "BINANCE-FUTURES:PERPETUAL:BTC-USDT@LIN"
+
+
+# ---------------------------------------------------------------------------
+# TradFi explicit -USD quote on the margin-marker path (operator ruling
+# 2026-07-18): every TradFi FUTURE/OPTION carries an explicit ``-USD`` quote so
+# "same pattern regardless of asset class" is literally true and consistent
+# with the DERIBIT quote ruling. quote_asset composes onto the *bare* product
+# root as ``PRODUCT_ROOT-USD@LIN``. Additive + opt-in: omitting quote_asset
+# keeps every existing CeFi ``margin_marker`` caller byte-identical.
+# SSOT: tradfi_consolidated_closeout_2026_07_18.md Phase A1.
+# ---------------------------------------------------------------------------
+
+
+class TestTradfiUsdMarginMarker:
+    def test_future_usd_lin(self) -> None:
+        assert (
+            build_instrument_id(
+                "cme",
+                InstrumentType.FUTURE,
+                "SP500",
+                expiry_date=_dt.date(2030, 6, 21),
+                margin_marker="LIN",
+                quote_asset="USD",
+            )
+            == "CME:FUTURE:SP500-USD@LIN-20300621"
+        )
+
+    def test_option_usd_lin(self) -> None:
+        assert (
+            build_instrument_id(
+                "cme",
+                InstrumentType.OPTION,
+                "SP500",
+                expiry_date=_dt.date(2025, 10, 17),
+                strike=Decimal("5000"),
+                option_right="C",
+                margin_marker="LIN",
+                quote_asset="USD",
+            )
+            == "CME:OPTION:SP500-USD@LIN-20251017-5000-C"
+        )
+
+    def test_vix_future_usd_lin(self) -> None:
+        assert (
+            build_instrument_id(
+                "cboe",
+                InstrumentType.FUTURE,
+                "VIX",
+                expiry_date=_dt.date(2026, 7, 22),
+                margin_marker="LIN",
+                quote_asset="USD",
+            )
+            == "CBOE:FUTURE:VIX-USD@LIN-20260722"
+        )
+
+    def test_quote_asset_case_and_whitespace_normalised(self) -> None:
+        assert (
+            build_instrument_id(
+                "cme",
+                InstrumentType.FUTURE,
+                "SP500",
+                expiry_date=_dt.date(2030, 6, 21),
+                margin_marker="LIN",
+                quote_asset=" usd ",
+            )
+            == "CME:FUTURE:SP500-USD@LIN-20300621"
+        )
+
+    def test_omitting_quote_asset_keeps_cefi_byte_identical(self) -> None:
+        # The additivity guarantee: default quote_asset="" must not perturb any
+        # existing CeFi margin_marker caller (symbol already embeds its quote).
+        assert (
+            build_instrument_id("binance_futures", InstrumentType.PERPETUAL, "BTC-USDT", margin_marker="LIN")
+            == "BINANCE_FUTURES:PERPETUAL:BTC-USDT@LIN"
+        )
+        assert (
+            build_instrument_id(
+                "binance_delivery",
+                InstrumentType.FUTURE,
+                "BTC-USD",
+                expiry_date=_dt.date(2026, 9, 25),
+                margin_marker="INV",
+            )
+            == "BINANCE_DELIVERY:FUTURE:BTC-USD@INV-20260925"
+        )
+
+    def test_usd_quote_forwarded_through_build_canonical_instrument_id(self) -> None:
+        assert (
+            build_canonical_instrument_id(
+                AssetGroup.TRADFI,
+                "cme",
+                InstrumentType.FUTURE,
+                "SP500",
+                expiry_date=_dt.date(2030, 6, 21),
+                margin_marker="LIN",
+                quote_asset="USD",
+            )
+            == "CME:FUTURE:SP500-USD@LIN-20300621"
+        )

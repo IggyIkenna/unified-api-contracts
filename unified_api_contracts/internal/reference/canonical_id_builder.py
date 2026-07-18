@@ -297,8 +297,9 @@ def _build_with_margin_marker(
     expiry_date: _dt.date | None,
     strike: Decimal | None,
     option_right: Literal["C", "P"] | None,
+    quote_asset: str = "",
 ) -> str:
-    """Build ``VENUE:TYPE:BASE-QUOTE@LIN|INV[-YYYYMMDD[-STRIKE-C|P]]``.
+    """Build ``VENUE:TYPE:BASE[-QUOTE]@LIN|INV[-YYYYMMDD[-STRIKE-C|P]]``.
 
     The margin marker rides directly on the ``symbol`` segment (e.g.
     ``BTC-USDT@LIN``), immediately before any dated-derivative suffix — this
@@ -308,8 +309,23 @@ def _build_with_margin_marker(
     by :func:`_build_future`/:func:`_build_option` when their legacy
     ``quote_asset``/``margin_type`` kwargs are used directly (kept unchanged
     for existing callers — this is a purely additive, opt-in code path).
+
+    ``quote_asset`` (additive, opt-in — default ``""`` keeps every existing
+    ``margin_marker`` caller byte-identical) composes an explicit quote onto
+    the *bare* product-root symbol segment as ``PRODUCT_ROOT-QUOTE@marker``.
+    This is the operator-decided TradFi shape (2026-07-18):
+    ``CME:FUTURE:SP500-USD@LIN-20300621`` /
+    ``CME:OPTION:SP500-USD@LIN-20251017-5000-C`` /
+    ``CBOE:FUTURE:VIX-USD@LIN-20260722`` — every TradFi FUTURE/OPTION carries
+    an explicit ``-USD`` quote so "same pattern regardless of asset class" is
+    literally true and consistent with the 2026-07-18 DERIBIT quote ruling.
+    Do NOT pass ``quote_asset`` when the ``symbol`` already embeds its quote
+    (the CeFi convention, e.g. ``BTC-USDT``) — that would double-append.
     """
     sym_up = symbol.upper()
+    quote = quote_asset.strip().upper()
+    if quote:
+        sym_up = f"{sym_up}-{quote}"
     venue_token = _venue_token(venue, None)
 
     if instrument_type is InstrumentType.PERPETUAL:
@@ -744,7 +760,9 @@ def build_instrument_id(
             )
             raise ValueError(msg)
         marker = _normalize_margin_marker(margin_marker)
-        return _build_with_margin_marker(venue, instrument_type, symbol, marker, expiry_date, strike, option_right)
+        return _build_with_margin_marker(
+            venue, instrument_type, symbol, marker, expiry_date, strike, option_right, quote_asset
+        )
 
     if passthrough:
         return _build_passthrough(venue, instrument_type, symbol, chain)
