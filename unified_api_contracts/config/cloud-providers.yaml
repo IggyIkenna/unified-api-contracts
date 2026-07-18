@@ -244,6 +244,9 @@ gcp:
     # `gs://archetype-state-{env}-{pid}/tenderly_budget/{archetype}/day={YYYY-MM-DD}.json`
     # per `execution_service/providers/tenderly_budget.py`.
     archetype-state: "archetype-state-${DEPLOYMENT_ENV_SHORT}-${GCP_PROJECT_ID}"
+    # portfolio-state FOLD E (bucket_fold_portfolio_state_2026_07_17): folded target for the 6 position/pnl/risk
+    # stores; per-domain key prefixes; archetype-state + position-store-sports KEPT above (soft window).
+    portfolio-state: "portfolio-state-${DEPLOYMENT_ENV_SHORT}-${GCP_PROJECT_ID}"
     # Per-client NAV / PnL / positions / attribution parquets for the client-reporting MVP
     # (client_reporting_pnl_attribution_mvp_2026_05_10.md Phase 2). Cross-cutting; no asset_group axis.
     # Path: gs://{pid}-client-reports/{client_id}/{archetype}/{YYYY-MM-DD}/attribution.parquet
@@ -389,6 +392,9 @@ aws:
     # Per-archetype daily Tenderly bundle-sim budget state (mirrors GCP). Single env-tiered
     # bucket; asset_group axis ignored (flat-string kind). See GCP § for full reference.
     archetype-state: "archetype-state-${DEPLOYMENT_ENV_SHORT}-${AWS_ACCOUNT_ID}"
+    # portfolio-state FOLD E (bucket_fold_portfolio_state_2026_07_17): mirrors GCP; folded target for the 6
+    # position/pnl/risk stores; per-domain key prefixes; archetype-state + position-store-sports KEPT (soft window).
+    portfolio-state: "portfolio-state-${DEPLOYMENT_ENV_SHORT}-${AWS_ACCOUNT_ID}"
     # Per-client reports — env-less mirrors GCP ${GCP_PROJECT_ID}-client-reports env-less shape.
     client-reports: "unified-trading-client-reports-${AWS_ACCOUNT_ID}"
     # Per-client fee recognition + HWM ledger + daily statements — env-less mirrors GCP.

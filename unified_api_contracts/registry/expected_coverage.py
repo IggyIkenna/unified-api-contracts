@@ -318,6 +318,39 @@ _DEFI: dict[str, list[str]] = {
     "MARINADE": list(_DEFI_LST_PAIRS),  # Solana marinade
     "JITO": list(_DEFI_LST_PAIRS),  # jitoSOL / Solana
     "FRAX": list(_DEFI_LST_PAIRS),  # sFRAX staked yield
+    # --- Newly-acquired LST / LRT / vault venues (MTDS@8746708c, 2026-07-18) ---
+    # Real single-call share/exchange rates, RPC-verified via live Alchemy eth_call
+    # (EVM: _lst_extended_rates._EVM_EXTENDED_RATE_CONFIGS) / getAccountInfo (Solana:
+    # _solana_jupsol). The acquisition records data_type=lst_rates for ALL of these
+    # (a vault pricePerShare / getPricePerFullShare / tokenPrice is the same
+    # underlying-per-share shape as an LST exchange rate). Registered so the rows the
+    # acquisition lands are EXPECTED rather than captured-but-unexpected.
+    #
+    # lst_rates ONLY (NOT the full _DEFI_LST_PAIRS): these venues emit NO staking_yields
+    # shard — staking_yields_handler.venues covers only LIDO/ETHERFI/EIGENLAYER — so
+    # registering staking_yields here would manufacture a false MISSING (dishonest
+    # coverage the other way).
+    #
+    # FLAT venue keys (chain is a SEPARATE manifest dimension via
+    # DefiManifestRecorder._normalise_venue = protocol.upper()): "BINANCE" covers wBETH
+    # on BOTH ETHEREUM + BSC; SANCTUM's jupSOL is chain=SOLANA. All chains
+    # (ETHEREUM/BSC/SOLANA) are already in the canonical DeFi chain set — no new chains.
+    #
+    # Honest-empty siblings are DELIBERATELY NOT registered (they land zero rows — see
+    # _lst_extended_rates._EVM_HONEST_EMPTY_VENUES): karak, symbiotic, convex,
+    # Pendle PT/YT, Solana INF/laineSOL, jitorestaking VRTs, solana-native-staking.
+    #
+    # coinbase (cbETH) / rocketpool (rETH) / puffer (pufETH) are NOT here — they acquire
+    # via the pre-existing _EVM_LST_ABI_METADATA path and are already registered above
+    # (COINBASE / ROCKETPOOL / PUFFER).
+    "BINANCE": ["lst_rates"],  # wBETH exchangeRate() — ETHEREUM + BSC
+    "KELPDAO": ["lst_rates"],  # rsETH via LRTOracle rsETHPrice() — ETHEREUM
+    "RENZO": ["lst_rates"],  # ezETH Balancer rate-provider getRate() — ETHEREUM
+    "YEARN_V3": ["lst_rates"],  # V3 vault pricePerShare() — ETHEREUM
+    "BEEFY": ["lst_rates"],  # moo vault getPricePerFullShare() — ETHEREUM
+    "IDLE": ["lst_rates"],  # senior-tranche vault tokenPrice() — ETHEREUM
+    "PENDLE": ["lst_rates"],  # SY exchangeRate() (PT/YT honest-empty) — ETHEREUM
+    "SANCTUM": ["lst_rates"],  # jupSOL SPL stake-pool rate — SOLANA
     # Legacy VENUE-CHAIN format for LST (411k migrated rows):
     "LIDO-ETHEREUM": list(_DEFI_LST_PAIRS),
     "ETHERFI-ETHEREUM": [*_DEFI_LST_PAIRS, "eigenlayer_rewards"],
