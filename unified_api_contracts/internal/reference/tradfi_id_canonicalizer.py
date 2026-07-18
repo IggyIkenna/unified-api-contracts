@@ -43,6 +43,7 @@ if TYPE_CHECKING:
 
 __all__ = [
     "TARGET_TRADFI_DERIVATIVE_ID_RE",
+    "TRADFI_CASH_TYPE_VALUES",
     "CanonResult",
     "CanonStatus",
     "assert_tradfi_derivative_ids_canonical",
@@ -110,6 +111,92 @@ _WHITESPACE_RE: Final[re.Pattern[str]] = re.compile(r"\s")
 
 _MAX_VIOLATIONS_SAMPLE: Final[int] = 50
 
+# TradFi CASH/reference instrument types that carry the operator-decided
+# (2026-07-18, tradfi_consolidated_closeout_2026_07_18.md "Equity id = -USD on
+# ALL FOUR surfaces", extended to every cash type "same pattern regardless of
+# asset class") explicit ``-USD`` quote suffix — mirrors
+# ``canonical_id_builder._TRADFI_CASH_QUOTE_SUFFIXED_TYPES`` exactly (CDS is
+# excluded there — no base/quote dimension — so it's excluded here too).
+TRADFI_CASH_TYPE_VALUES: Final[frozenset[str]] = frozenset(
+    {
+        InstrumentType.EQUITY.value,
+        InstrumentType.CURRENCY.value,
+        InstrumentType.ETF.value,
+        InstrumentType.BOND.value,
+        InstrumentType.COMMODITY.value,
+        InstrumentType.INDEX.value,
+    }
+)
+
+_CASH_INSTRUMENT_TYPES_BY_VALUE: Final[dict[str, InstrumentType]] = {
+    InstrumentType.EQUITY.value: InstrumentType.EQUITY,
+    InstrumentType.CURRENCY.value: InstrumentType.CURRENCY,
+    InstrumentType.ETF.value: InstrumentType.ETF,
+    InstrumentType.BOND.value: InstrumentType.BOND,
+    InstrumentType.COMMODITY.value: InstrumentType.COMMODITY,
+    InstrumentType.INDEX.value: InstrumentType.INDEX,
+}
+
+# ``-USD`` suffix already present in a persisted raw id (forward-writes since
+# ``_build_tradfi_cash`` started appending it, uac@33e3f369) — stripped before
+# rebuilding so the cash path never double-appends the quote.
+_TRAILING_USD_QUOTE_RE: Final[re.Pattern[str]] = re.compile(r"-USD$", re.IGNORECASE)
+
+
+def _resolve_cash_instrument_type(original: str, instrument_type: str) -> InstrumentType | None:
+    """Resolve a TradFi CASH type (EQUITY/CURRENCY/ETF/BOND/COMMODITY/INDEX) for ``original``.
+
+    Two sources, tried in order — either is sufficient, neither is the
+    classifier (``classify_databento_symbol`` guesses EQUITY by default for
+    ANY bare alpha ticker including currency codes like ``KRW``, which would
+    be wrong for CURRENCY; the cash path deliberately never calls it):
+
+    1. The ``VENUE:TYPE:`` prefix already embedded in ``original`` itself
+       (e.g. ``NASDAQ:EQUITY:AAPL``, ``FX:CURRENCY:KRW``) — this is how
+       historical catalogue/manifest cash rows are actually persisted, and
+       the embedded TYPE segment travelled with the row so it is at least as
+       trustworthy as the stored column.
+    2. The caller-supplied ``instrument_type`` (the row's stored column) —
+       the fallback for a bare raw id with no embedded prefix (e.g. a raw
+       manifest ticker like ``ASTS``).
+
+    Returns ``None`` when neither source names a known cash type — the
+    caller then falls through to the unchanged FUTURE/OPTION/COMBO
+    derivative path below.
+    """
+    match = _VENUE_TYPE_PREFIX_RE.match(original)
+    if match is not None:
+        prefix_segments = original[: match.end()].split(":")
+        if len(prefix_segments) >= 2:
+            embedded = _CASH_INSTRUMENT_TYPES_BY_VALUE.get(prefix_segments[1].strip().upper())
+            if embedded is not None:
+                return embedded
+    return _CASH_INSTRUMENT_TYPES_BY_VALUE.get((instrument_type or "").strip().upper())
+
+
+def _canonicalize_cash(original: str, venue: str, cash_type: InstrumentType) -> CanonResult:
+    """Canonicalize a TradFi CASH id — always ``OK``/``ALREADY_CANONICAL``/``NULL_OR_EMPTY``,
+    never quarantined (cash tickers don't need the FUTURE/OPTION dated-symbol grammar the
+    classifier enforces). Builds via the shared :func:`build_instrument_id`, which now appends
+    the explicit ``-USD`` quote for every cash type in :data:`TRADFI_CASH_TYPE_VALUES`
+    (``unified-api-contracts@33e3f369``).
+    """
+    body = _resolve_venue_prefix(original)
+    body = _TRAILING_USD_QUOTE_RE.sub("", body).strip()
+    if not body:
+        return CanonResult(
+            status="NULL_OR_EMPTY", canonical_id=None, derived_instrument_type=None, derived_underlying_human=None
+        )
+
+    built = build_instrument_id(venue, cash_type, body)
+    status: CanonStatus = "ALREADY_CANONICAL" if built == original else "OK"
+    return CanonResult(
+        status=status,
+        canonical_id=built,
+        derived_instrument_type=cash_type.value,
+        derived_underlying_human=body.upper(),
+    )
+
 
 def _resolve_venue_prefix(body: str) -> str:
     """Strip step (a) — see :data:`_VENUE_TYPE_PREFIX_RE`."""
@@ -160,7 +247,7 @@ def _classify(body: str) -> DatabentoClassification | None:
 
 
 def canonicalize_raw_tradfi_id(raw: str, venue: str, instrument_type: str) -> CanonResult:
-    """Canonicalize one raw TradFi FUTURE/OPTION id — the Phase-B SSOT primitive.
+    """Canonicalize one raw TradFi FUTURE/OPTION/CASH id — the Phase-B SSOT primitive.
 
     Shared by the IS/MTDS writers, the Phase-B migration scripts, and
     :func:`assert_tradfi_derivative_ids_canonical` so none of them can drift
@@ -170,25 +257,34 @@ def canonicalize_raw_tradfi_id(raw: str, venue: str, instrument_type: str) -> Ca
 
     Args:
         raw: The raw persisted id — either a bare exchange-native symbol
-            (``ESM6``, ``E1AF0 C1600``, ``EW1H0_P2785``) or one already
-            ``VENUE:TYPE:``-prefixed by the pre-fix IS catalogue adapter
-            (``CME:FUTURE:GCQ26``). Any embedded VENUE segment is stripped
-            and discarded — never trusted for the output venue.
+            (``ESM6``, ``E1AF0 C1600``, ``EW1H0_P2785``, ``AAPL``, ``KRW``) or
+            one already ``VENUE:TYPE:``-prefixed by the pre-fix IS catalogue
+            adapter (``CME:FUTURE:GCQ26``, ``NASDAQ:EQUITY:AAPL``,
+            ``FX:CURRENCY:KRW``). Any embedded VENUE segment is stripped and
+            discarded — never trusted for the output venue.
         venue: The row's ``venue`` column (e.g. ``"CME"``, ``"CBOE"``,
-            ``"ICE"``) — the ONLY source of truth for the output id's venue
-            segment. Never parsed from ``raw`` and never defaulted to
-            ``"CME"``.
+            ``"ICE"``, ``"NASDAQ"``, ``"FX"``) — the ONLY source of truth for
+            the output id's venue segment. Never parsed from ``raw`` and
+            never defaulted to ``"CME"``.
         instrument_type: The row's stored ``instrument_type`` column.
-            Accepted for call-site parity but intentionally NOT trusted —
-            live manifest data carries ~400k mislabeled rows (options/combos
-            stamped ``FUTURE``); the classifier-derived type is always
-            authoritative instead.
+            Intentionally NOT trusted for the FUTURE/OPTION/COMBO derivative
+            path — live manifest data carries ~400k mislabeled rows
+            (options/combos stamped ``FUTURE``); the classifier-derived type
+            is always authoritative there instead. It IS consulted (as a
+            fallback behind the id's own embedded ``VENUE:TYPE:`` prefix) to
+            recognise a CASH row (EQUITY/CURRENCY/ETF/BOND/COMMODITY/INDEX,
+            see :data:`TRADFI_CASH_TYPE_VALUES`) — that mislabeling class is
+            specific to derivatives, not cash.
 
     Returns:
-        A :class:`CanonResult`.
+        A :class:`CanonResult`. Callers migrating persisted rows: a
+        ``QUARANTINE_COMBO`` result's ``derived_instrument_type`` is always
+        ``"COMBO"`` — re-stamp the row's stored ``instrument_type`` column to
+        that value while leaving the row's own id UNCHANGED (``canonical_id``
+        is ``None``; combo-ID canonicalization itself is the separate
+        ``canonical_id_p1_tradfi_combo_leg_canonicalization_2026_07_08.md``
+        track, out of scope here).
     """
-    del instrument_type  # never trusted — see docstring; classifier-derived type is authoritative.
-
     if raw is None or not raw.strip():
         return CanonResult(
             status="NULL_OR_EMPTY",
@@ -199,6 +295,16 @@ def canonicalize_raw_tradfi_id(raw: str, venue: str, instrument_type: str) -> Ca
 
     original = raw.strip()
     venue_up = venue.strip().upper()
+
+    # CASH path (EQUITY/CURRENCY/ETF/BOND/COMMODITY/INDEX) — checked before
+    # the FUTURE/OPTION-only fast path/classifier below, since a cash id
+    # never carries @LIN/@INV and the classifier's default EQUITY guess for a
+    # bare ticker like "KRW" would be wrong for CURRENCY (see Args above).
+    cash_type = _resolve_cash_instrument_type(original, instrument_type)
+    if cash_type is not None:
+        return _canonicalize_cash(original, venue, cash_type)
+
+    del instrument_type  # never trusted for FUTURE/OPTION/COMBO — see docstring.
 
     # Already-canonical fast path: if the FULL raw string (including any
     # VENUE:TYPE: prefix) already matches TARGET and its venue segment

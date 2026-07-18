@@ -169,6 +169,108 @@ class TestCanonicalizeRawTradfiIdNeverTrustsInstrumentTypeColumn:
         assert result.derived_instrument_type == "OPTION"
 
 
+class TestCanonicalizeRawTradfiIdCashTypes:
+    """Coverage for the Phase-B cash-type ``-USD`` extension
+    (``tradfi_consolidated_closeout_2026_07_18.md`` Phase B follow-up (B)):
+    EQUITY/CURRENCY/ETF/BOND/COMMODITY/INDEX rows return ``OK`` with the
+    explicit ``-USD`` quote built via ``build_instrument_id`` (which now
+    appends it, ``unified-api-contracts@33e3f369``) — never quarantined.
+    """
+
+    def test_prefixed_equity_gets_usd_suffix(self) -> None:
+        result = canonicalize_raw_tradfi_id("NASDAQ:EQUITY:AAPL", venue="NASDAQ", instrument_type="EQUITY")
+        assert result.status == "OK"
+        assert result.canonical_id == "NASDAQ:EQUITY:AAPL-USD"
+        assert result.derived_instrument_type == "EQUITY"
+        assert result.derived_underlying_human == "AAPL"
+
+    def test_prefixed_currency_gets_usd_suffix(self) -> None:
+        # CURRENCY is the case the classifier would get WRONG (a bare "KRW"
+        # ticker default-classifies as EQUITY, see classify_databento_symbol
+        # step 6) — proves the embedded VENUE:TYPE: prefix wins over any
+        # classifier guess (the cash path never calls the classifier).
+        result = canonicalize_raw_tradfi_id("FX:CURRENCY:KRW", venue="FX", instrument_type="CURRENCY")
+        assert result.status == "OK"
+        assert result.canonical_id == "FX:CURRENCY:KRW-USD"
+        assert result.derived_instrument_type == "CURRENCY"
+
+    def test_bare_raw_ticker_uses_stored_column_for_cash_type(self) -> None:
+        # No embedded VENUE:TYPE: prefix at all (a raw manifest ticker row,
+        # e.g. "ASTS") — falls back to the caller-supplied stored
+        # instrument_type column to recognise the cash type.
+        result = canonicalize_raw_tradfi_id("ASTS", venue="NASDAQ", instrument_type="EQUITY")
+        assert result.status == "OK"
+        assert result.canonical_id == "NASDAQ:EQUITY:ASTS-USD"
+
+    def test_cash_already_canonical_with_usd_suffix_is_passthrough(self) -> None:
+        already = "NASDAQ:EQUITY:AAPL-USD"
+        result = canonicalize_raw_tradfi_id(already, venue="NASDAQ", instrument_type="EQUITY")
+        assert result.status == "ALREADY_CANONICAL"
+        assert result.canonical_id == already
+
+    def test_cash_never_double_appends_usd(self) -> None:
+        # A bare-ticker raw id that already happens to carry a -USD suffix
+        # (e.g. a partially-migrated row) must not become "...-USD-USD".
+        result = canonicalize_raw_tradfi_id("AAPL-USD", venue="NASDAQ", instrument_type="EQUITY")
+        assert result.status == "OK"
+        assert result.canonical_id == "NASDAQ:EQUITY:AAPL-USD"
+
+    @pytest.mark.parametrize(
+        ("cash_type", "symbol"),
+        [("ETF", "IBIT"), ("BOND", "US10Y"), ("COMMODITY", "XAU"), ("INDEX", "SPX")],
+    )
+    def test_every_cash_type_gets_usd_suffix(self, cash_type: str, symbol: str) -> None:
+        result = canonicalize_raw_tradfi_id(symbol, venue="CBOE", instrument_type=cash_type)
+        assert result.status == "OK"
+        assert result.canonical_id == f"CBOE:{cash_type}:{symbol}-USD"
+        assert result.derived_instrument_type == cash_type
+
+    def test_cds_excluded_from_cash_quote_suffix_falls_through(self) -> None:
+        # CDS is intentionally excluded from the -USD convention
+        # (canonical_id_builder._TRADFI_CASH_QUOTE_SUFFIXED_TYPES — no
+        # base/quote dimension) so it must NOT be caught by the cash
+        # short-circuit; it falls through to the unrelated FUTURE/OPTION/
+        # COMBO path and quarantines rather than silently minting a
+        # wrong-shaped id.
+        result = canonicalize_raw_tradfi_id("ITRAXX_EUR", venue="ICE", instrument_type="CDS")
+        assert result.status == "QUARANTINE_UNPARSEABLE"
+        assert result.canonical_id is None
+
+    def test_prefix_stripped_empty_body_is_null_or_empty(self) -> None:
+        result = canonicalize_raw_tradfi_id("NASDAQ:EQUITY:", venue="NASDAQ", instrument_type="EQUITY")
+        assert result.status == "NULL_OR_EMPTY"
+        assert result.canonical_id is None
+
+
+class TestCanonicalizeRawTradfiIdComboRestampSignal:
+    """Coverage for the Phase-B combo re-stamp contract
+    (``tradfi_consolidated_closeout_2026_07_18.md`` Phase B follow-up (A)): a
+    ``QUARANTINE_COMBO`` row's raw id is intentionally left UNCHANGED
+    (``canonical_id`` is ``None`` — combo-ID canonicalization itself is the
+    separate ``canonical_id_p1_tradfi_combo_leg_canonicalization_2026_07_08.md``
+    track), but ``derived_instrument_type`` is always the UPPERCASE ``"COMBO"``
+    enum value so a migration script can re-stamp the row's WRONG stored
+    ``instrument_type`` (a mislabeled ``future``/``FUTURE``) without touching
+    the id.
+    """
+
+    def test_cboe_combo_mislabeled_future_signals_combo_restamp(self) -> None:
+        # Real live shape: a CBOE UD_ combo persisted with a stale stored
+        # instrument_type=FUTURE (the ~400k-mislabel class) — the primitive
+        # must derive COMBO regardless of the (wrong) stored column.
+        result = canonicalize_raw_tradfi_id("UD_1V__VT_0319838460", venue="CBOE", instrument_type="FUTURE")
+        assert result.status == "QUARANTINE_COMBO"
+        assert result.canonical_id is None  # id intentionally left unchanged
+        assert result.derived_instrument_type == "COMBO"  # migration re-stamp signal
+
+    def test_cboe_combo_mislabeled_lowercase_future_signals_combo_restamp(self) -> None:
+        # Same, but the live manifest's mixed-case mislabel variant.
+        result = canonicalize_raw_tradfi_id("UD:1V: GN 0113805462", venue="CBOE", instrument_type="future")
+        assert result.status == "QUARANTINE_COMBO"
+        assert result.canonical_id is None
+        assert result.derived_instrument_type == "COMBO"
+
+
 class TestAssertTradfiDerivativeIdsCanonical:
     def test_all_canonical(self) -> None:
         ids = [
