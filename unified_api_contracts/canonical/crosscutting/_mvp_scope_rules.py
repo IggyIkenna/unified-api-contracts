@@ -792,8 +792,28 @@ MVP_SCOPE: Final[dict[str, object]] = {
     # market_groups: the PredictionMarketCategory values in scope.
     #   crypto, politics, sports — the categories the arb-overlap spans.
     #
-    # data_types: trades (CLOB fills), prediction_canonical_question_group
-    #   (cluster-grain), market_lifecycle (market lifecycle events).
+    # data_types: trades (CLOB fills), book_snapshot_5 (top-5 CLOB depth ladder),
+    #   prediction_canonical_question_group (cluster-grain), market_lifecycle
+    #   (market lifecycle events).
+    #
+    #   book_snapshot_5 (added 2026-07-18, prediction_consolidated_closeout_
+    #   2026_07_18.md P1 reconcile): this ALIGNS the prediction MVP rule with the
+    #   OTHER two registries that already carry it — DATA_TYPES_BY_ASSET_GROUP
+    #   ["prediction"] + VENUE_DATA_TYPE_CAPABILITIES["POLYMARKET"/"KALSHI"] +
+    #   expected_coverage._PREDICTION (all three re-added it 2026-06-23 when BOTH
+    #   venues began genuinely emitting it: LIVE via polymarket_clob_ws/
+    #   kalshi_clob_ws top-5 ladder, BATCH via the REST /book path, mtds@7c849d7)
+    #   — AND with the captured data (live A0 measured 399,713 book_snapshot_5
+    #   prediction rows). Before this, book_snapshot_5 sat in 2 of the 3
+    #   registries but not here, so a plain MTDS shard matrix yielded 4 shards
+    #   ({POLYMARKET,KALSHI} x {trades,book_snapshot_5}) while an ``--mvp-only`` run
+    #   silently tested only ``trades`` (2 shards) — the CLOB-depth shard that
+    #   actually flows and is a real prediction arb-dispersion (price-dispersion)
+    #   input went untested. The outlier was THIS rule; reconciled by adding it.
+    #   NOTE (operator): to narrow the prediction MVP back to trades-only (drop
+    #   the depth shard from --mvp-only), remove "book_snapshot_5" here — but keep
+    #   it in the capability/expected_coverage registries so the plain matrix +
+    #   honest-coverage denominator still count the captured depth data.
     # ------------------------------------------------------------------
     "prediction": PredictionMvpRule(
         venues=frozenset({"POLYMARKET", "KALSHI"}),
@@ -809,6 +829,10 @@ MVP_SCOPE: Final[dict[str, object]] = {
         data_types=frozenset(
             {
                 "trades",
+                # Top-5 CLOB depth ladder — instrument-day grain (same grain as
+                # trades), in scope for BOTH POLYMARKET + KALSHI. See the
+                # data_types note above for the 3-registry reconcile rationale.
+                "book_snapshot_5",
                 "prediction_canonical_question_group",
                 "market_lifecycle",
                 "MARKET_LIFECYCLE",  # uppercase alias (instruments-service)

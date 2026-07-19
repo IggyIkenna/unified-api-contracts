@@ -21,6 +21,9 @@ import pytest
 
 # Public import surface — must be importable from the top-level facade
 from unified_api_contracts import MVP_SCOPE, is_mvp
+from unified_api_contracts.canonical.crosscutting._mvp_scope_rules import (
+    _mvp_defi_data_types,
+)
 from unified_api_contracts.canonical.crosscutting.mvp_scope import (
     CeFiMvpRule,
     DeFiMvpRule,
@@ -438,12 +441,13 @@ class TestTradFiOptionUnderlierNarrowingV14:
         assert frozenset({"ES"}) == TRADFI_MVP_OPTION_UNDERLYING_ROOTS
 
     def test_config_version_is_latest(self) -> None:
-        """MVP_SCOPE_CONFIG_VERSION == 17 exactly (v17 = 26 LST/restaking/vault DeFi
-        venues onboarded to P → live → MVP; v16 = COMBO instrument_type addition for
-        DERIBIT-COMBO; v15 was the liquidations PERPETUAL-leg MVP restoration)."""
+        """MVP_SCOPE_CONFIG_VERSION == 18 exactly (v18 = book_snapshot_5 added to
+        PredictionMvpRule.data_types — prediction MVP-scope reconcile; v17 = 26
+        LST/restaking/vault DeFi venues onboarded to P → live → MVP; v16 = COMBO
+        instrument_type addition for DERIBIT-COMBO)."""
         from unified_api_contracts.canonical.crosscutting.mvp_scope import MVP_SCOPE_CONFIG_VERSION
 
-        assert MVP_SCOPE_CONFIG_VERSION == 17
+        assert MVP_SCOPE_CONFIG_VERSION == 18
 
 
 # ---------------------------------------------------------------------------
@@ -596,14 +600,51 @@ class TestPredictionMvp:
             market_group="crypto",
         )
 
-    def test_non_mvp_prediction_data_type_returns_false(self) -> None:
-        """book_snapshot_5 is a prediction data_type but NOT in MVP → False."""
-        assert not is_mvp(
+    def test_prediction_book_snapshot_5_is_mvp(self) -> None:
+        """book_snapshot_5 IS a prediction MVP data_type for BOTH venues.
+
+        Reconcile (prediction_consolidated_closeout_2026_07_18.md P1, 2026-07-18):
+        book_snapshot_5 was already in DATA_TYPES_BY_ASSET_GROUP["prediction"] +
+        VENUE_DATA_TYPE_CAPABILITIES["POLYMARKET"/"KALSHI"] +
+        expected_coverage._PREDICTION, and the depth data is genuinely captured
+        (live A0 measured 399,713 book_snapshot_5 prediction rows) — but was
+        ABSENT from PredictionMvpRule.data_types, so ``--mvp-only`` silently
+        dropped the CLOB-depth shard. Added to the rule to align it with the
+        other two registries + the captured data. (This flips the pre-2026-07-18
+        ``test_non_mvp_prediction_data_type_returns_false`` — that assertion
+        pinned the accidental omission, not a deliberate trades-only decision.)
+        """
+        assert is_mvp(
             "prediction",
             "POLYMARKET",
             "PREDICTION_MARKET",
             "book_snapshot_5",
             market_group="crypto",
+        )
+        # Both venues — the arb-overlap MVP requires the depth leg on each side.
+        assert is_mvp(
+            "prediction",
+            "KALSHI",
+            "PREDICTION_MARKET",
+            "book_snapshot_5",
+            market_group="crypto",
+        )
+        # Unbound market_group (the IS catalogue rollup passes none) still MVP.
+        assert is_mvp("prediction", "POLYMARKET", "PREDICTION_MARKET", "book_snapshot_5")
+        assert is_mvp("prediction", "KALSHI", "PREDICTION_MARKET", "book_snapshot_5")
+
+    def test_prediction_mvp_data_types_exact_set(self) -> None:
+        """PredictionMvpRule.data_types is exactly the reconciled 5-entry set."""
+        rule = MVP_SCOPE["prediction"]
+        assert isinstance(rule, PredictionMvpRule)
+        assert rule.data_types == frozenset(
+            {
+                "trades",
+                "book_snapshot_5",
+                "prediction_canonical_question_group",
+                "market_lifecycle",
+                "MARKET_LIFECYCLE",
+            }
         )
 
     def test_prediction_canonical_question_group_is_mvp(self) -> None:
@@ -615,6 +656,42 @@ class TestPredictionMvp:
             "prediction_canonical_question_group",
             market_group="crypto",
         )
+
+
+# ---------------------------------------------------------------------------
+# Rule-11 blast-radius guard: the prediction book_snapshot_5 reconcile
+# (prediction_consolidated_closeout_2026_07_18.md P1) must NOT change any
+# OTHER asset_group's MVP data_types set.
+# ---------------------------------------------------------------------------
+
+
+class TestPredictionReconcileCrossAgUnchanged:
+    """Adding book_snapshot_5 to prediction MVP leaves cefi/tradfi/defi/sports untouched."""
+
+    def test_cefi_flat_data_types_unchanged(self) -> None:
+        """CeFi flat data_types is exactly the unchanged trades/book5/funding set."""
+        rule = MVP_SCOPE["cefi"]
+        assert isinstance(rule, CeFiMvpRule)
+        assert rule.data_types == frozenset({"trades", "book_snapshot_5", "derivative_ticker", "funding_rate"})
+
+    def test_tradfi_data_types_unchanged(self) -> None:
+        """TradFi MVP data_types is exactly {ohlcv_1m} — no book_snapshot_5 leak."""
+        rule = MVP_SCOPE["tradfi"]
+        assert isinstance(rule, TradFiMvpRule)
+        assert rule.data_types == frozenset({"ohlcv_1m"})
+        assert not is_mvp("tradfi", "CME", "FUTURE", "book_snapshot_5", base_ccy="ES")
+
+    def test_sports_data_types_unchanged(self) -> None:
+        """Sports MVP data_types is the exact odds/markets set — no book_snapshot_5 leak."""
+        rule = MVP_SCOPE["sports"]
+        assert isinstance(rule, SportsMvpRule)
+        assert rule.data_types == frozenset({"odds", "ODDS", "odds_snapshot", "markets", "outcomes", "settlements"})
+
+    def test_defi_data_types_unchanged(self) -> None:
+        """DeFi MVP data_types stays == the derived DATA_TYPES_BY_ASSET_GROUP['defi']."""
+        rule = MVP_SCOPE["defi"]
+        assert isinstance(rule, DeFiMvpRule)
+        assert rule.data_types == _mvp_defi_data_types()
 
 
 # ---------------------------------------------------------------------------

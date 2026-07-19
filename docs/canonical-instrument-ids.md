@@ -90,8 +90,14 @@ there are no silent defaults (e.g. `OPTION` without `expiry_date` + `strike`
 
 All active `InstrumentType` values are covered — `SUPPORTED_INSTRUMENT_TYPES`
 in the module asserts this and a unit test blocks accidental enum
-additions without a corresponding builder update. The legacy flat `LENDING`
-type is retired; lending markets resolve to `A_TOKEN` / `DEBT_TOKEN` only.
+additions without a corresponding builder update. Lending is two-layer:
+lending **HOLDINGS** resolve to `A_TOKEN` / `DEBT_TOKEN` (the operator-ruled
+SSOT), while the market-level flat `LENDING` / `SOLANA_LENDING` types remain
+SUPPORTED (interim) for the market/event lending data_types (`lending_indices`
+/ `liquidation_events` / `flash_loan_events` / `position_data`) — the Wave-B
+`LENDING`-retire over-reached (broke 5+ MTDS writers) and was reversed; whether
+those data_types adopt `A_TOKEN` / `DEBT_TOKEN` is PARKED for the operator (PM
+`issues/canonical_closeout_open_questions_2026_07_18.md` § D).
 
 Sports / prediction `SYMBOL` is the domain canonical id pre-built by
 `canonical/domain/sports/canonical_ids.py` or
