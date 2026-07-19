@@ -157,6 +157,134 @@ def test_tradfi_partition_path_canonical() -> None:
     )
 
 
+def test_tradfi_partition_path_chain_v6() -> None:
+    """chain bundle (options_chain / futures_chain) with all three dims populated →
+    ``underlying=/quote=/margin=/ticks.parquet`` tail (mirrors CeFi v6 + the executor)."""
+    path = build_tradfi_partition_path(
+        venue="cme",
+        instrument_type="futures_chain",  # not in the InstrumentType enum → str token
+        data_type="trades",
+        day=DAY,
+        file_name="ticks.parquet",
+        pipeline_mode="batch_databento",
+        underlying="sp500",
+        quote_asset="usd",
+        margin_type="LINEAR",
+    )
+    assert path == (
+        "raw_tick_data/by_date/day=2026-04-17/pipeline_mode=batch_databento/asset_group=tradfi/"
+        "venue=CME/instrument_type=futures_chain/data_type=trades/"
+        "underlying=SP500/quote=USD/margin=linear/ticks.parquet"
+    )
+
+
+def test_tradfi_partition_path_chain_backcompat_when_dims_empty() -> None:
+    """chain itype with empty dims → back-compat flat ``{file_name}`` form (no tail)."""
+    path = build_tradfi_partition_path(
+        venue="cme",
+        instrument_type="futures_chain",
+        data_type="trades",
+        day=DAY,
+        file_name="SP500.parquet",
+    )
+    assert path.endswith("/instrument_type=futures_chain/data_type=trades/SP500.parquet")
+
+
+# ---------------------------------------------------------------------------
+# Write-time canonical guard — tradfi rules (canonical_path_violations)
+# ---------------------------------------------------------------------------
+
+
+def _tradfi_chain_path() -> str:
+    return build_tradfi_partition_path(
+        venue="CME",
+        instrument_type="futures_chain",
+        data_type="trades",
+        day=DAY,
+        file_name="ticks.parquet",
+        pipeline_mode="batch_databento",
+        underlying="SP500",
+        quote_asset="USD",
+        margin_type="linear",
+    )
+
+
+def test_guard_accepts_canonical_tradfi_chain_and_single() -> None:
+    from unified_api_contracts import canonical_path_violations
+
+    assert canonical_path_violations(_tradfi_chain_path(), require_pipeline_mode=True) == []
+    single = build_tradfi_partition_path(
+        venue="NYSE",
+        instrument_type=InstrumentType.EQUITY,
+        data_type="ohlcv_1d",
+        day=DAY,
+        file_name="NYSE:EQUITY:ABBV-USD.parquet",
+        pipeline_mode="batch_databento",
+    )
+    assert canonical_path_violations(single, require_pipeline_mode=True) == []
+
+
+def test_guard_rejects_chain_missing_quote_margin() -> None:
+    from unified_api_contracts import canonical_path_violations
+
+    path = (
+        "raw_tick_data/by_date/day=2026-04-17/pipeline_mode=batch_databento/asset_group=tradfi/"
+        "venue=CME/instrument_type=futures_chain/data_type=trades/underlying=SP500/ticks.parquet"
+    )
+    violations = canonical_path_violations(path, require_pipeline_mode=True)
+    assert any("underlying=<BASE>/quote=<Q>/margin=<M>/ticks.parquet" in v for v in violations)
+
+
+def test_guard_rejects_single_bare_symbol_and_ticks_parquet() -> None:
+    from unified_api_contracts import canonical_path_violations
+
+    bare = (
+        "raw_tick_data/by_date/day=2026-04-17/pipeline_mode=batch_databento/asset_group=tradfi/"
+        "venue=NYSE/instrument_type=equity/data_type=ohlcv_1d/AAPL.parquet"
+    )
+    assert any("full canonical instrument_id" in v for v in canonical_path_violations(bare, require_pipeline_mode=True))
+
+    fanned = (
+        "raw_tick_data/by_date/day=2026-04-17/pipeline_mode=batch_databento/asset_group=tradfi/"
+        "venue=NYSE/instrument_type=equity/data_type=ohlcv_1d/ticks.parquet"
+    )
+    fanned_violations = canonical_path_violations(fanned, require_pipeline_mode=True)
+    assert any("symbol-less 'ticks.parquet'" in v for v in fanned_violations)
+
+
+def test_guard_rejects_batch_massive() -> None:
+    from unified_api_contracts import canonical_path_violations
+
+    path = _tradfi_chain_path().replace("pipeline_mode=batch_databento", "pipeline_mode=batch_massive")
+    assert any("batch_massive is forbidden" in v for v in canonical_path_violations(path, require_pipeline_mode=True))
+
+
+def test_guard_rejects_non_hive_day_and_missing_pipeline_mode() -> None:
+    from unified_api_contracts import canonical_path_violations
+
+    hyphen = _tradfi_chain_path().replace("day=2026-04-17", "day-2026-04-17")
+    assert any("hyphen day" in v for v in canonical_path_violations(hyphen, require_pipeline_mode=True))
+
+    # A chain path WITHOUT the pipeline_mode segment fails the required-segment check.
+    no_pm = (
+        "raw_tick_data/by_date/day=2026-04-17/asset_group=tradfi/venue=CME/"
+        "instrument_type=futures_chain/data_type=trades/underlying=SP500/quote=USD/margin=linear/ticks.parquet"
+    )
+    assert any("pipeline_mode=" in v for v in canonical_path_violations(no_pm, require_pipeline_mode=True))
+
+
+def test_guard_combo_stays_bare_symbol_accepted() -> None:
+    """combo is EXCLUDED from the single full-id rule (leg-id unsettled) — its bare
+    ``underlying=…/ticks.parquet`` shape passes the guard."""
+    from unified_api_contracts import canonical_path_violations
+
+    combo = (
+        "raw_tick_data/by_date/day=2026-04-17/pipeline_mode=batch_databento/asset_group=tradfi/"
+        "venue=CME/instrument_type=combo/data_type=trades/underlying=SP500/ticks.parquet"
+    )
+    assert canonical_path_violations(combo, require_pipeline_mode=True) == []
+
+
 # ---------------------------------------------------------------------------
 # Prediction
 # ---------------------------------------------------------------------------
