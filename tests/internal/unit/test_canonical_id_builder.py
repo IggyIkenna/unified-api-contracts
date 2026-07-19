@@ -190,13 +190,16 @@ class TestDefiHappyPath:
             == "AAVE_V3-ETHEREUM:DEBT_TOKEN:variableDebtUSDC"
         )
 
-    def test_lending_is_retired_unsupported_by_design(self) -> None:
-        # Legacy flat LENDING is retired to the A_TOKEN/DEBT_TOKEN split
-        # (operator 2026-07-18) — the builder now fails LOUD rather than minting
-        # a ``…:LENDING:…`` id. The enum member is kept for reading legacy data.
-        assert InstrumentType.LENDING in UNSUPPORTED_BY_DESIGN
-        with pytest.raises(ValueError, match="unsupported by design"):
-            build_instrument_id("aave_v3", InstrumentType.LENDING, "USDC", chain="ethereum")
+    def test_lending(self) -> None:
+        assert (
+            build_instrument_id(
+                "aave_v3",
+                InstrumentType.LENDING,
+                "USDC",
+                chain="ethereum",
+            )
+            == "AAVE_V3-ETHEREUM:LENDING:USDC"
+        )
 
     def test_lst(self) -> None:
         assert (
@@ -356,11 +359,11 @@ class TestVenueNormalisation:
     def test_defi_venue_chain_composition(self) -> None:
         result = build_instrument_id(
             "aave_v3",
-            InstrumentType.A_TOKEN,
-            "aUSDC",
+            InstrumentType.LENDING,
+            "USDC",
             chain="arbitrum",
         )
-        assert result == "AAVE_V3-ARBITRUM:A_TOKEN:aUSDC"
+        assert result == "AAVE_V3-ARBITRUM:LENDING:USDC"
 
     def test_defi_chain_is_uppercased(self) -> None:
         result = build_instrument_id(
@@ -509,16 +512,12 @@ class TestCoverage:
             f"InstrumentType values must not be both supported and unsupported: {sorted(t.value for t in overlap)}"
         )
 
-    def test_lending_is_the_only_unsupported_type(self) -> None:
-        # Legacy flat LENDING is retired (operator 2026-07-18) → the ONLY
-        # unsupported-by-design type. Every OTHER enum value stays supported.
-        # If this ever changes, update SUPPORTED_INSTRUMENT_TYPES or
+    def test_supported_set_matches_enum_today(self) -> None:
+        # Today every enum value is supported — UNSUPPORTED_BY_DESIGN is empty.
+        # If this ever fails, update SUPPORTED_INSTRUMENT_TYPES or
         # UNSUPPORTED_BY_DESIGN with an explicit justification.
-        assert InstrumentType.LENDING in UNSUPPORTED_BY_DESIGN
-        assert len(UNSUPPORTED_BY_DESIGN) == 1
-        assert InstrumentType.LENDING not in SUPPORTED_INSTRUMENT_TYPES
-        non_lending = {t for t in InstrumentType if t is not InstrumentType.LENDING}
-        assert non_lending <= SUPPORTED_INSTRUMENT_TYPES
+        assert frozenset(InstrumentType) == SUPPORTED_INSTRUMENT_TYPES
+        assert frozenset() == UNSUPPORTED_BY_DESIGN
 
 
 # ---------------------------------------------------------------------------
@@ -786,14 +785,9 @@ class TestBuildCanonicalInstrumentId:
 
     def test_defi_delegates_with_chain(self) -> None:
         assert (
-            build_canonical_instrument_id(AssetGroup.DEFI, "aave_v3", InstrumentType.A_TOKEN, "aUSDC", chain="arbitrum")
-            == "AAVE_V3-ARBITRUM:A_TOKEN:aUSDC"
-        )
-
-    def test_defi_lending_is_rejected(self) -> None:
-        # LENDING retired → the one-entry-point dispatcher also fails loud.
-        with pytest.raises(ValueError, match="unsupported by design"):
             build_canonical_instrument_id(AssetGroup.DEFI, "aave_v3", InstrumentType.LENDING, "USDC", chain="arbitrum")
+            == "AAVE_V3-ARBITRUM:LENDING:USDC"
+        )
 
     def test_defi_gmx_types_as_perpetual_no_chain(self) -> None:
         # GMX (on-chain perp DEX) types as PERPETUAL, routed through the
