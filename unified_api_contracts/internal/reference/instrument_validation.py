@@ -66,8 +66,50 @@ _DEFI_VENUE_PREFIXES = frozenset(
         # Solana lending adapters (2026-07-09) — same gap as above.
         "MARGINFI",
         "SOLEND",
+        # R2 LST / restaking / vault / native-staking wiring (2026-07-18) —
+        # instruments-service _DEFI_VENUES grew 63→89 (defi.py _STATIC_DEFI_VENUES
+        # + _SOLANA_DEFI_VENUES) but these prefixes were never added here, so every
+        # record they produced was rejected at _validate_venue with "unknown venue"
+        # and never reached the catalogue / coverage denominator — the exact same
+        # class of gap as the 2026-07-10 VENUS/RADIANT/BENQI/EULER_V2/MARGINFI/SOLEND
+        # finding above. These prefixes are collision-free (none names a CeFi venue);
+        # the COINBASE/BINANCE exchange-issued-LST venues are handled chain-aware in
+        # _CHAIN_AWARE_DEFI_PREFIXES below because their prefixes DO also name CeFi
+        # venues (COINBASE-SPOT / BINANCE-FUTURES).
+        "ROCKETPOOL",
+        "RENZO",
+        "KELPDAO",
+        "PUFFER",
+        "KARAK",
+        "SYMBIOTIC",
+        "YEARN_V3",
+        "BEEFY",
+        "PENDLE",
+        "CONVEX",
+        "IDLE",
+        # Solana LST / restaking / native-staking (2026-07-18). "SOLANA" is the
+        # first-dash prefix of the native-staking venue SOLANA-NATIVE-SOLANA
+        # (protocol="SOLANA-NATIVE", chain="SOLANA"); the chain is resolved from
+        # the TRAILING dash-segment (see _defi_protocol_and_chain) so the middle
+        # "NATIVE" token no longer corrupts the chain parse.
+        "SANCTUM",
+        "SOLBLAZE",
+        "JITORESTAKING",
+        "SOLANA",
     }
 )
+
+# Prefixes that name a DeFi protocol AND a CeFi venue — disambiguate by chain.
+# Coinbase's cbETH LST lives at COINBASE-ETHEREUM and Binance's wBETH at
+# BINANCE-ETHEREUM / BINANCE-BSC, yet COINBASE-SPOT / BINANCE-FUTURES /
+# BINANCE-DELIVERY / COINBASE-CDE are CeFi venues. A bare add to
+# _DEFI_VENUE_PREFIXES would misclassify the CeFi venues as DEFI in
+# _infer_asset_group, so these resolve to DEFI ONLY when the trailing venue
+# segment is a mainnet chain (PROTOCOL-<mainnet chain> → DEFI); a non-chain
+# suffix (SPOT / FUTURES / …) stays CEFI. The CeFi forms are additionally
+# accepted by exact match against _ALL_KNOWN_VENUES before the prefix logic
+# runs, so their validation never depends on this set.
+_CHAIN_AWARE_DEFI_PREFIXES: frozenset[str] = frozenset({"COINBASE", "BINANCE"})
 
 # Sourced from the SSOT (registry/market_data_categories.py:VENUES_BY_ASSET_GROUP)
 # so adding a venue there is the only edit needed. CeFi covers Tardis canonical
@@ -130,6 +172,25 @@ _SINGLE_ASSET_DEFI_TYPES = frozenset(
 )
 
 
+def _defi_protocol_and_chain(venue: str) -> tuple[str, str] | None:
+    """Split a DeFi ``PROTOCOL-CHAIN`` venue into ``(protocol, chain)``.
+
+    The chain is the TRAILING ``-``-segment. Chain tokens never contain a dash
+    (every ``MAINNET_CHAIN_IDS`` key is a single token), so a protocol whose own
+    name contains a dash — the Solana native-staking venue
+    ``SOLANA-NATIVE-SOLANA`` → protocol ``SOLANA-NATIVE``, chain ``SOLANA`` —
+    resolves to its real chain instead of the malformed ``NATIVE-SOLANA`` that a
+    first-dash split produces. For every single-dash venue (all others) this is
+    identical to a first-dash split. Returns ``None`` when the venue has no
+    ``-`` (a bare prefix is not ``PROTOCOL-CHAIN`` form).
+    """
+    venue_upper = venue.upper()
+    if "-" not in venue_upper:
+        return None
+    protocol, chain = venue_upper.rsplit("-", 1)
+    return protocol, chain
+
+
 def _infer_asset_group(venue: str) -> str:
     """Infer CEFI/DEFI/TRADFI/SPORTS/PREDICTION from venue name."""
     venue_upper = venue.upper()
@@ -140,6 +201,12 @@ def _infer_asset_group(venue: str) -> str:
     prefix = venue_upper.split("-")[0]
     if prefix in _DEFI_VENUE_PREFIXES:
         return "DEFI"
+    if prefix in _CHAIN_AWARE_DEFI_PREFIXES:
+        # DEFI only when the trailing segment is a mainnet chain; otherwise this
+        # is the CeFi venue form (COINBASE-SPOT / BINANCE-FUTURES) → CEFI.
+        pc = _defi_protocol_and_chain(venue_upper)
+        if pc is not None and pc[1] in MAINNET_CHAIN_IDS:
+            return "DEFI"
     return "CEFI"
 
 
@@ -190,13 +257,19 @@ def _validate_venue(venue: str) -> str | None:
     if venue_upper in _ALL_KNOWN_VENUES:
         return None
 
-    # DeFi venues: must be PROTOCOL-CHAIN format with known prefix and chain
-    prefix = venue.split("-")[0]
-    if prefix in _DEFI_VENUE_PREFIXES:
-        parts = venue.split("-", 1)
-        if len(parts) != 2 or not parts[1]:
+    # DeFi venues: must be PROTOCOL-CHAIN format with known prefix and chain.
+    # The chain is the TRAILING dash-segment (see _defi_protocol_and_chain), so
+    # a protocol whose name itself contains a dash (SOLANA-NATIVE-SOLANA) still
+    # resolves to its real chain. Chain-aware prefixes (COINBASE/BINANCE) share
+    # a name with CeFi venues but their CeFi forms already returned above via the
+    # _ALL_KNOWN_VENUES exact match, so reaching here with one means the DeFi
+    # (PROTOCOL-<mainnet chain>) form or a genuinely unknown chain suffix.
+    prefix = venue_upper.split("-")[0]
+    if prefix in _DEFI_VENUE_PREFIXES or prefix in _CHAIN_AWARE_DEFI_PREFIXES:
+        pc = _defi_protocol_and_chain(venue)
+        if pc is None:
             return f"DeFi venue must be PROTOCOL-CHAIN format (got {venue!r})"
-        chain = parts[1]
+        chain = pc[1]
         if chain not in MAINNET_CHAIN_IDS:
             return f"unknown chain {chain!r} in DeFi venue {venue!r} (known: {sorted(MAINNET_CHAIN_IDS.keys())})"
         return None
@@ -249,9 +322,9 @@ def _check_record(rec: InstrumentRecord, as_of_date: date | None = None) -> str 
 
     # --- DeFi address validation ---
     if asset_group == "DEFI":
-        parts = rec.venue.split("-", 1)
-        if len(parts) == 2:
-            protocol, chain = parts[0], parts[1]
+        pc = _defi_protocol_and_chain(rec.venue)
+        if pc is not None:
+            protocol, chain = pc
             addr_err = _validate_defi_raw_symbol(rec, protocol, chain)
             if addr_err:
                 return addr_err
