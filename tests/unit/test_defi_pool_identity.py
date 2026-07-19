@@ -70,7 +70,27 @@ class TestBuildPoolIdentity:
             quote_asset="USDC",
             fee=100,
         )
-        assert pid.glued_pair_id == "UNISWAP_V3-ARBITRUM:POOL:AAVE-USDC:100"
+        assert pid.glued_pair_id == "UNISWAP_V3-ARBITRUM:POOL:AAVE-USDC-100"
+
+    def test_two_id_model_pool_rows_diverge(self) -> None:
+        # DeFi two-id model (operator ruling 2026-07-18, Option A): a POOL row's
+        # machine id (canonical_instrument_id property) is the pool ADDRESS,
+        # while the SYMBOLIC canonical id (glued_pair_id, → catalogue
+        # canonical_instrument_id column) is the 3-segment key. They DIVERGE.
+        pid = build_pool_identity(
+            venue="UNISWAP_V3",
+            chain="ARBITRUM",
+            pool_address="0x88E6A0c2dDD26FEEb64F039a2c41296FcB3f5640",
+            base_asset="AAVE",
+            quote_asset="USDC",
+            fee=100,
+        )
+        # machine instrument_id = address
+        assert pid.canonical_instrument_id == "0x88e6a0c2ddd26feeb64f039a2c41296fcb3f5640"
+        # symbolic canonical id = 3-segment glued key, fee hyphen-glued (NOT a 4th colon)
+        assert pid.glued_pair_id == "UNISWAP_V3-ARBITRUM:POOL:AAVE-USDC-100"
+        assert pid.canonical_instrument_id != pid.glued_pair_id
+        assert pid.glued_pair_id.count(":") == 2  # exactly 3 colon-delimited segments
 
     def test_glued_venue_input_is_split(self) -> None:
         pid = build_pool_identity(
@@ -83,7 +103,7 @@ class TestBuildPoolIdentity:
         )
         assert pid.venue == "UNISWAP_V3"
         assert pid.chain == "POLYGON"
-        assert pid.glued_pair_id == "UNISWAP_V3-POLYGON:POOL:COMP-USDC:10000"
+        assert pid.glued_pair_id == "UNISWAP_V3-POLYGON:POOL:COMP-USDC-10000"
 
     def test_explicit_chain_wins_over_derived(self) -> None:
         pid = build_pool_identity(
@@ -105,7 +125,20 @@ class TestBuildPoolIdentity:
 
 
 class TestParseGluedPoolId:
-    def test_parses_pair_and_fee(self) -> None:
+    def test_parses_canonical_3seg_pair_and_fee(self) -> None:
+        # Canonical 3-segment form: fee hyphen-glued into the symbol.
+        pid = parse_glued_pool_id("UNISWAP_V3-ARBITRUM:POOL:AAVE-USDC-100")
+        assert pid is not None
+        assert pid.venue == "UNISWAP_V3"
+        assert pid.chain == "ARBITRUM"
+        assert pid.base_asset == "AAVE"
+        assert pid.quote_asset == "USDC"
+        assert pid.fee == "100"
+        assert pid.pool_address == ""
+
+    def test_parses_legacy_4seg_pair_and_fee(self) -> None:
+        # Retired 4-segment form (fee-as-4th-colon) still round-trips for any
+        # un-migrated persisted row.
         pid = parse_glued_pool_id("UNISWAPV3-ARBITRUM:POOL:AAVE-USDC:100")
         assert pid is not None
         assert pid.venue == "UNISWAP_V3"
@@ -115,6 +148,14 @@ class TestParseGluedPoolId:
         assert pid.fee == "100"
         # The address is NOT recoverable from the pair-form glued id.
         assert pid.pool_address == ""
+
+    def test_multi_token_curve_symbol_not_misparsed_as_fee(self) -> None:
+        # A non-numeric trailing segment (multi-coin Curve pool) is NOT a fee.
+        pid = parse_glued_pool_id("CURVE-ETHEREUM:POOL:DAI-USDC-USDT")
+        assert pid is not None
+        assert pid.base_asset == "DAI"
+        assert pid.quote_asset == "USDC-USDT"
+        assert pid.fee == ""
 
     def test_recovers_address_from_address_as_symbol_form(self) -> None:
         pid = parse_glued_pool_id("UNISWAP_V3-ETH:POOL:0xF9188AFF")

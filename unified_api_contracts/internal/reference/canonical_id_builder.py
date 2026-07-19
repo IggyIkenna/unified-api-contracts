@@ -80,9 +80,11 @@ One entry point, any asset group (:func:`build_canonical_instrument_id`)::
     # → "BYBIT:PERPETUAL:BTCUSDT"
 
     build_canonical_instrument_id(
-        AssetGroup.DEFI, "aave_v3", InstrumentType.LENDING, "USDC", chain="arbitrum",
+        AssetGroup.DEFI, "aave_v3", InstrumentType.A_TOKEN, "aUSDC", chain="arbitrum",
     )
-    # → "AAVE_V3-ARBITRUM:LENDING:USDC"
+    # → "AAVE_V3-ARBITRUM:A_TOKEN:aUSDC"
+    # (legacy flat LENDING is RETIRED — supply/borrow legs are A_TOKEN/DEBT_TOKEN,
+    #  operator ruling 2026-07-18; mirrors the shipped instruments-service retire.)
 
     build_canonical_instrument_id(
         AssetGroup.SPORTS, "", None,
@@ -114,6 +116,8 @@ __all__ = [
     "build_combo_id",
     "build_instrument_id",
     "build_leg",
+    "is_two_token_pair_symbol",
+    "validate_defi_spot_pair_symbol",
 ]
 
 
@@ -143,7 +147,12 @@ SUPPORTED_INSTRUMENT_TYPES: Final[frozenset[InstrumentType]] = frozenset(
         # Phoenix orderbook / Jupiter quotes / Orca trades don't collide
         # with the EVM AMM pool contract.
         InstrumentType.DEX_POOL,
-        InstrumentType.LENDING,
+        # NOTE: legacy flat ``LENDING`` is intentionally ABSENT — retired to the
+        # A_TOKEN (supply) / DEBT_TOKEN (borrow) split (operator ruling
+        # 2026-07-18; mirrors the shipped instruments-service adapter retire that
+        # rejects LENDING). It is declared in UNSUPPORTED_BY_DESIGN below so the
+        # builder fails LOUD on any new LENDING id construction. The enum member
+        # is kept for READING the un-migrated legacy corpus (Wave-D migration).
         InstrumentType.LST,
         InstrumentType.YIELD_BEARING,
         InstrumentType.A_TOKEN,
@@ -175,10 +184,17 @@ SUPPORTED_INSTRUMENT_TYPES: Final[frozenset[InstrumentType]] = frozenset(
 )
 
 # InstrumentType values that this builder intentionally does not support.
-# Empty today — every enum value is handled. Keep the constant so the coverage
-# test has a single place to declare opt-outs if the enum grows non-tradable
-# sentinel values in future.
-UNSUPPORTED_BY_DESIGN: Final[frozenset[InstrumentType]] = frozenset()
+# ``LENDING`` — the legacy flat DeFi lending type — is RETIRED (operator ruling
+# 2026-07-18): supply/borrow legs are the canonical A_TOKEN/DEBT_TOKEN split, so
+# the builder must NOT mint a new ``…:LENDING:…`` id (mirrors the shipped
+# instruments-service adapter retire that rejects LENDING). The enum member is
+# KEPT (for reading the un-migrated legacy corpus — Wave-D data migration) but is
+# declared unsupported here so a NEW LENDING build fails loud rather than
+# emitting a retired shape. Any caller that still routes a legacy ``lending``
+# partition through this builder (e.g. unified-trading-library
+# ``canonical/_derive_instrument_id._DISPATCH``) must be repointed to
+# A_TOKEN/DEBT_TOKEN as part of the retire.
+UNSUPPORTED_BY_DESIGN: Final[frozenset[InstrumentType]] = frozenset({InstrumentType.LENDING})
 
 
 # ---------------------------------------------------------------------------
@@ -191,7 +207,7 @@ _DEFI_TYPES: Final[frozenset[InstrumentType]] = frozenset(
     {
         InstrumentType.POOL,
         InstrumentType.DEX_POOL,
-        InstrumentType.LENDING,
+        # LENDING retired → A_TOKEN/DEBT_TOKEN split (see UNSUPPORTED_BY_DESIGN).
         InstrumentType.LST,
         InstrumentType.YIELD_BEARING,
         InstrumentType.A_TOKEN,
@@ -440,6 +456,52 @@ def _build_defi(
         msg = "POOL requires a non-empty symbol (e.g. 'USDC-WETH-500')"
         raise ValueError(msg)
     return f"{_venue_token(venue, chain)}:{itype.value}:{symbol}"
+
+
+# ---------------------------------------------------------------------------
+# DeFi SPOT_PAIR taxonomy validator (importable by instruments-service adapters)
+# ---------------------------------------------------------------------------
+#
+# Operator ruling 2026-07-18 (defi_consolidated_closeout_2026_07_18.md, "SPOT_ASSET
+# vs SPOT_PAIR vs POOL"): for ``asset_group=defi`` a ``SPOT_PAIR`` MUST be a
+# two-token quoted market (``BASE-QUOTE``). A SINGLE on-chain token you want
+# oracle-price / transfer / gas / bridge data for is a ``SPOT_ASSET``; an AMM/DEX
+# liquidity pool is a ``POOL`` (EVM) or ``DEX_POOL`` / ``SOLANA_AMM_POOL`` (Solana).
+# This guards the SPOT_PAIR-misuse class (single tokens EIGEN/ETHFI + Solana AMM
+# pools meteora/lifinity mis-minted as SPOT_PAIR).
+
+
+def is_two_token_pair_symbol(symbol: str) -> bool:
+    """Return ``True`` iff ``symbol`` is a two-token ``BASE-QUOTE`` (both legs non-empty).
+
+    The base is the segment before the first ``-``; the quote is everything
+    after it (so a multi-hyphen quote like ``"USDC-USDT"`` still counts as
+    two-token). A single bare token (``"WETH"``) or a blank / hanging-hyphen
+    symbol (``"WETH-"`` / ``"-USDC"``) is ``False``.
+    """
+    base, sep, quote = symbol.strip().partition("-")
+    return bool(base.strip()) and bool(sep) and bool(quote.strip())
+
+
+def validate_defi_spot_pair_symbol(symbol: str) -> None:
+    """Enforce the DeFi ``SPOT_PAIR`` two-token rule; raise ``ValueError`` otherwise.
+
+    For ``asset_group=defi`` a ``SPOT_PAIR`` REQUIRES a two-token ``BASE-QUOTE``
+    symbol (operator ruling 2026-07-18). A single token must be typed
+    ``SPOT_ASSET``; an AMM/DEX pool must be a ``POOL`` (EVM) or ``DEX_POOL`` /
+    ``SOLANA_AMM_POOL`` (Solana) type. Importable + callable by the
+    instruments-service adapters so a single-token misuse is rejected at
+    construction time rather than silently minting a wrong canonical id.
+    Enforced at the single UAC entry point :func:`build_canonical_instrument_id`
+    when ``asset_group=defi`` and ``instrument_type=SPOT_PAIR``.
+    """
+    if not is_two_token_pair_symbol(symbol):
+        msg = (
+            f"asset_group=defi SPOT_PAIR requires a two-token BASE-QUOTE symbol, got {symbol!r}. "
+            "A single on-chain token must be typed SPOT_ASSET; an AMM/DEX pool must be POOL "
+            "(EVM) or DEX_POOL/SOLANA_AMM_POOL (Solana)."
+        )
+        raise ValueError(msg)
 
 
 # TradFi cash types that carry the explicit base-quote suffix (operator
@@ -990,9 +1052,10 @@ def build_canonical_instrument_id(
     DeFi::
 
         build_canonical_instrument_id(
-            AssetGroup.DEFI, "aave_v3", InstrumentType.LENDING, "USDC", chain="arbitrum",
+            AssetGroup.DEFI, "aave_v3", InstrumentType.A_TOKEN, "aUSDC", chain="arbitrum",
         )
-        # → "AAVE_V3-ARBITRUM:LENDING:USDC"
+        # → "AAVE_V3-ARBITRUM:A_TOKEN:aUSDC"
+        #   (legacy flat LENDING retired → A_TOKEN/DEBT_TOKEN split, 2026-07-18)
 
     TradFi::
 
@@ -1040,6 +1103,13 @@ def build_canonical_instrument_id(
     if instrument_type is None:
         msg = f"build_canonical_instrument_id: asset_group={group.value} requires instrument_type"
         raise ValueError(msg)
+
+    # DeFi SPOT_PAIR taxonomy hard-enforce (operator ruling 2026-07-18): a defi
+    # SPOT_PAIR must be a two-token BASE-QUOTE — a single token is a SPOT_ASSET,
+    # an AMM is a POOL/DEX_POOL/SOLANA_AMM_POOL. Rejects the misuse at the one
+    # entry point rather than silently minting a wrong id.
+    if group is AssetGroup.DEFI and instrument_type is InstrumentType.SPOT_PAIR:
+        validate_defi_spot_pair_symbol(symbol)
 
     return build_instrument_id(
         venue,

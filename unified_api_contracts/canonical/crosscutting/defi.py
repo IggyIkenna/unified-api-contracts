@@ -260,16 +260,31 @@ class LendingProtocol(StrEnum):
 #     This matches MTDS ``_canonical_defi_id`` + the writer's per-pool
 #     ``record_captured(instrument_id=pool_address.lower(), instrument_type="pool")``.
 #
-#   * GLUED-PAIR (human-readable / UI):
-#       "UNISWAPV3-ARBITRUM:POOL:AAVE-USDC:100"
-#       = <VENUE_PREFIX>-<CHAIN> : POOL : <TOKEN0>-<TOKEN1> : <FEE>
-#     The venue prefix glues the bare venue with the underscore-before-version
-#     token STRIPPED ("UNISWAP_V3" -> "UNISWAPV3"); the pair is token0-token1
-#     (base-quote, canonical order); the fee is the pool's fee amount.
+#   * GLUED-PAIR (symbolic canonical / human-readable / UI):
+#       "UNISWAP_V3-ARBITRUM:POOL:AAVE-USDC-100"
+#       = <VENUE_PREFIX>-<CHAIN> : POOL : <TOKEN0>-<TOKEN1>[-<FEE_BPS>]
+#     3-SEGMENT (colon-delimited): the fee is glued INTO the symbol segment with
+#     a HYPHEN (``AAVE-USDC-100``), NEVER a 4th colon segment (``…:AAVE-USDC:100``
+#     is the RETIRED shape — operator ruling 2026-07-18). The venue prefix keeps
+#     the underscore-before-version token ("UNISWAP_V3", operator-canonical); the
+#     pair is token0-token1 (base-quote, canonical order); the trailing numeric
+#     fee segment is OMITTED when unknown. This is byte-aligned with the MTDS
+#     producer ``market_tick_data_service.cli.handlers._dex_pool_symbol.build_symbol``
+#     + ``live/connectors/dex_swap_uniswap_v3_ws._pool_instrument_id`` ("real
+#     basis points ... never a colon-before-fee") so a batch shard and this
+#     converter emit an IDENTICAL id for the same pool — the join key both sides
+#     rely on.
 #
-# The converter is the SSOT for translating between them. instruments-service's
-# catalogue carries BOTH (``instrument_id`` = canonical; ``glued_pair_id`` =
-# human-readable) so consumers can resolve either; MTDS keys on the canonical.
+# The converter is the SSOT for translating between them. Under the DeFi two-id
+# model (operator ruling 2026-07-18, Option A) instruments-service's catalogue
+# carries BOTH and they legitimately DIVERGE for a POOL row: the machine
+# ``instrument_id`` COLUMN = the pool ADDRESS (:attr:`DefiPoolIdentity.canonical_instrument_id`,
+# the MTDS ``defi_catalog_reader`` join key — do NOT flip it to the symbolic
+# form), while the symbolic ``canonical_instrument_id`` COLUMN is materialized
+# from :attr:`DefiPoolIdentity.glued_pair_id` (the 3-segment key above). MTDS
+# keys market-data joins on the pool ADDRESS. SSOT:
+# ``instruments-service/docs/DEFI_INSTRUMENTS.md`` (two-id model) +
+# ``codex/02-data/defi-canonical-naming-ssot.md``.
 
 
 @dataclass(frozen=True)
@@ -297,23 +312,48 @@ class DefiPoolIdentity:
 
     @property
     def canonical_instrument_id(self) -> str:
-        """The machine/manifest pool id — ``pool_address.lower()``."""
+        """The machine/operational pool ``instrument_id`` — ``pool_address.lower()``.
+
+        Under the DeFi two-id model (operator ruling 2026-07-18, Option A) this
+        is the ADDRESS-anchored **machine** id: the manifest join key + the MTDS
+        content-join key. ``market-tick-data-service``'s
+        ``engine/defi_catalog_reader`` reads it expecting ``pool_address.lower()``
+        for POOL rows across all 13 protocols, so it MUST stay the address —
+        flipping it to the symbolic form would silently break that join.
+
+        This is NOT the operator's symbolic ``canonical_instrument_id`` COLUMN:
+        for a POOL row the two legitimately DIVERGE. The symbolic
+        ``VENUE-CHAIN:POOL:BASE-QUOTE[-FEE_BPS]`` canonical key is
+        :attr:`glued_pair_id` (which materializes that column). SSOT:
+        ``instruments-service/docs/DEFI_INSTRUMENTS.md`` (two-id model) +
+        ``codex/02-data/defi-canonical-naming-ssot.md``.
+        """
         return self.pool_address.lower()
 
     @property
     def glued_pair_id(self) -> str:
-        """The human-readable UI pool id — ``UNISWAP_V3-ARBITRUM:POOL:AAVE-USDC:100``.
+        """The symbolic canonical pool id — ``UNISWAP_V3-ARBITRUM:POOL:AAVE-USDC-100``.
 
-        Falls back to the pool address when the pair/fee are unknown
+        3-segment ``<VENUE_PREFIX>-<CHAIN>:POOL:<BASE>-<QUOTE>[-<FEE_BPS>]`` — the
+        fee is glued INTO the symbol segment with a HYPHEN, never a 4th colon
+        segment (the ``…:POOL:AAVE-USDC:100`` shape is RETIRED, operator ruling
+        2026-07-18). Byte-aligned with the MTDS producer
+        (``_dex_pool_symbol.build_symbol`` + ``dex_swap_uniswap_v3_ws``, "never a
+        colon-before-fee") so a batch shard and this converter emit an IDENTICAL
+        id for the same pool — the data-join key both rely on.
+
+        This IS the operator's symbolic ``canonical_instrument_id`` (materialized
+        as the catalogue ``glued_pair_id`` column); the pool ADDRESS is the
+        separate machine :attr:`canonical_instrument_id` / catalogue
+        ``instrument_id`` (two-id model, Option A — POOL rows DIVERGE). Falls
+        back to the pool address when the pair is unknown
         (``…:POOL:<pool_address>``) so the id is always non-empty + reversible
-        to the canonical form.
+        via :func:`parse_glued_pool_id`.
         """
         prefix = glued_venue_prefix(self.venue, self.chain)
-        pair = f"{self.base_asset}-{self.quote_asset}" if (self.base_asset and self.quote_asset) else ""
-        if pair and self.fee:
-            symbol = f"{pair}:{self.fee}"
-        elif pair:
-            symbol = pair
+        if self.base_asset and self.quote_asset:
+            pair = f"{self.base_asset}-{self.quote_asset}"
+            symbol = f"{pair}-{self.fee}" if self.fee else pair
         else:
             symbol = self.pool_address.lower()
         return f"{prefix}:POOL:{symbol}"
@@ -394,17 +434,28 @@ def build_pool_identity(
 
 
 def parse_glued_pool_id(glued_pair_id: str) -> DefiPoolIdentity | None:
-    """Parse a legacy glued-pair pool id into a :class:`DefiPoolIdentity`.
+    """Parse a symbolic glued-pair pool id into a :class:`DefiPoolIdentity`.
 
-    ``"UNISWAPV3-ARBITRUM:POOL:AAVE-USDC:100"`` →
-    ``DefiPoolIdentity(venue="UNISWAP_V3", chain="ARBITRUM", base_asset="AAVE",
-    quote_asset="USDC", fee="100", pool_address="")``.
+    Round-trips the canonical 3-segment form AND the retired 4-segment form:
 
-    The canonical ``pool_address`` is NOT recoverable from the glued-pair string
-    alone (the glued form encodes the PAIR + fee, not the address), so the
-    returned identity carries an empty ``pool_address`` — the caller resolves it
-    from the instruments-store mapping (``raw_symbol``/``pool_address`` column).
-    A ``…:POOL:<0x…>`` glued form (address-as-symbol) DOES recover the address.
+    * ``"UNISWAP_V3-ARBITRUM:POOL:AAVE-USDC-100"`` (canonical, fee glued into the
+      symbol with a hyphen) →
+      ``DefiPoolIdentity(venue="UNISWAP_V3", chain="ARBITRUM", base_asset="AAVE",
+      quote_asset="USDC", fee="100", pool_address="")``.
+    * ``"UNISWAPV3-ARBITRUM:POOL:AAVE-USDC:100"`` (legacy 4-segment fee-as-4th-
+      colon, still readable for any un-migrated persisted row) → the same result.
+
+    Fee detection mirrors the MTDS ``build_symbol`` grammar: a legacy 4th-colon
+    fee segment wins; otherwise the fee is a TRAILING all-digit hyphen segment of
+    the symbol (``<BASE>-<QUOTE>-<FEE_BPS>``), peeled off before the base/quote
+    split — so a multi-token Curve symbol (``DAI-USDC-USDT``, no numeric fee) is
+    left intact and still round-trips.
+
+    The canonical ``pool_address`` is NOT recoverable from the pair-form glued
+    string alone (it encodes the PAIR + fee, not the address), so the returned
+    identity carries an empty ``pool_address`` — the caller resolves it from the
+    instruments-store mapping (``raw_symbol``/``pool_address`` column). A
+    ``…:POOL:<0x…>`` glued form (address-as-symbol) DOES recover the address.
 
     Returns ``None`` for a string that is not a ``PROTOCOL-CHAIN:POOL:…`` triple.
     """
@@ -413,11 +464,20 @@ def parse_glued_pool_id(glued_pair_id: str) -> DefiPoolIdentity | None:
         return None
     bare_venue, chain = split_glued_venue_chain(parts[0])
     symbol = parts[2]
-    fee = parts[3] if len(parts) >= 4 else ""
     # ``…:POOL:<0x…>`` — the symbol IS the pool address (no pair/fee encoded).
     if symbol.lower().startswith("0x"):
         return DefiPoolIdentity(venue=bare_venue, chain=chain, pool_address=symbol.lower())
-    base, _sep, quote = symbol.partition("-")
+    # A legacy 4th-colon fee segment (``…:POOL:<PAIR>:<FEE>``) takes precedence;
+    # otherwise peel a trailing all-digit hyphen segment from the 3-segment
+    # symbol as the fee (matches ``build_symbol``: fee is real basis points).
+    legacy_fee = parts[3] if len(parts) >= 4 else ""
+    segments = symbol.split("-")
+    fee = legacy_fee
+    if not legacy_fee and len(segments) >= 3 and segments[-1].isdigit():
+        fee = segments[-1]
+        segments = segments[:-1]
+    base = segments[0] if segments else ""
+    quote = "-".join(segments[1:]) if len(segments) > 1 else ""
     return DefiPoolIdentity(
         venue=bare_venue,
         chain=chain,
