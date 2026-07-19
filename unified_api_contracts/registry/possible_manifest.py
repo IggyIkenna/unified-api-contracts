@@ -249,6 +249,16 @@ _LEGACY_PIPELINE_MODE_SOURCES: dict[str, tuple[str, ...]] = {
 # so their template sets are byte-for-byte unchanged.
 _EXTRA_LIVE_PROBE_SOURCES_BY_AG: dict[str, tuple[str, ...]] = {
     PREDICTION: ("kalshi", "polymarket_clob", "polymarket_gamma_api"),
+    # CeFi live-WS CEX venues archive under pipeline_mode=live_{source}, but their BATCH source is
+    # `tardis` (deep history), so they are never standalone registry sources and
+    # `_canonical_pipeline_mode_prefixes` would omit their live_ prefixes — causing the phantom-auditor
+    # to false-flag real live_binance/live_kraken/… shards as phantom_captured_no_parquet_at_canonical_path
+    # (measured 2026-07-18: 20 live_kraken + 15 live_binance real shards mis-demoted;
+    # non_tardis_dexperp_venue_data_status_smoketest). Adding a live-probe prefix can only REDUCE
+    # false-demotion, never introduce one (a prefix that finds nothing is a no-op), so the full
+    # valid-cefi-live-source set is safe + future-proof. Operator-ruled 2026-07-19 to relax the
+    # prediction-scoped RULE 11 baseline (below) to cover cefi too.
+    CEFI: ("binance", "bybit", "kraken", "okx"),
 }
 
 

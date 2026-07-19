@@ -112,23 +112,38 @@ class TestCanonicalPathTemplates:
             needle = f"pipeline_mode={live_val}/asset_group=prediction/"
             assert needle in joined, f"prediction: template set missing UNION live prefix {needle}"
 
-    def test_prediction_live_union_is_prediction_scoped_only(self) -> None:
-        """RULE 11 cross-AG guard: the §5 prediction UNION must NOT leak into any other
-        AG's template set — no cefi/tradfi/defi/sports template may carry the
-        ``live_polymarket_gamma_api`` shape, and each other AG's pipeline_mode prefix
-        count stays exactly at its capability-derived baseline (the extra-probe dict has
-        no entry for them, so their templates are byte-for-byte unchanged)."""
-        # Baseline pipeline_mode-prefix counts are purely capability/registry-derived
-        # for the non-prediction AGs — the prediction-scoped extra-probe must not move them.
-        # cefi 16→17 (2026-07-18): +batch_lighter_api (LIGHTER-ZKSYNC native REST ohlcv_1m source).
-        expected_pipeline_mode_counts = {"cefi": 17, "defi": 15, "tradfi": 6, "sports": 0}
+    def test_extra_live_probe_sources_do_not_leak_cross_ag(self) -> None:
+        """RULE 11 cross-AG guard (relaxed 2026-07-19, operator-ruled): the
+        ``_EXTRA_LIVE_PROBE_SOURCES_BY_AG`` mechanism is now used by BOTH prediction
+        (kalshi / polymarket_*) AND cefi (binance/bybit/kraken/okx live-WS CEX venues whose
+        batch source is tardis) — the earlier "prediction-scoped only" baseline was incidental
+        (prediction was just the only AG that needed it then). The REAL invariant: each AG's
+        extra-probe sources appear ONLY in that AG's templates, never leaking into another AG;
+        each AG's pipeline_mode-prefix count = capability-derived baseline + its own extra-probe."""
+        # cefi 16→17 (2026-07-18: +batch_lighter_api); 17→21 (2026-07-19: +4 live_ CEX probes
+        # binance/bybit/kraken/okx). Other AGs stay at their capability-derived baseline.
+        expected_pipeline_mode_counts = {"cefi": 21, "defi": 15, "tradfi": 6, "sports": 0}
         for ag, expected in expected_pipeline_mode_counts.items():
             templates = canonical_path_templates(ag)
             pmode = [t for t in templates if "pipeline_mode=" in t]
             assert len(pmode) == expected, f"{ag}: pipeline_mode prefix count changed ({len(pmode)} != {expected})"
-            assert not any("live_polymarket_gamma_api" in t for t in templates), (
-                f"{ag}: prediction UNION live_polymarket_gamma_api leaked into a non-prediction AG"
-            )
+        # Cross-AG leak guard: a source in one AG's extra-probe must NOT appear in any other AG.
+        # Match the EXACT pipeline_mode segment (trailing '/') so live_kalshi (prediction) does not
+        # false-match cefi's legitimate live_kalshi_perp.
+        owner_sources = {
+            "prediction": ("polymarket_gamma_api", "kalshi"),
+            "cefi": ("binance", "kraken", "okx"),
+        }
+        for owner_ag, sources in owner_sources.items():
+            for other_ag in ("cefi", "defi", "tradfi", "sports", "prediction"):
+                if other_ag == owner_ag:
+                    continue
+                templates = canonical_path_templates(other_ag)
+                for src in sources:
+                    seg = f"pipeline_mode=live_{src}/"
+                    assert not any(seg in t for t in templates), (
+                        f"{owner_ag} extra-probe source live_{src} leaked into {other_ag} templates"
+                    )
 
     def test_prediction_templates_have_no_duplicate_prefixes(self) -> None:
         """The append-if-absent extra-probe must not duplicate the LIVE-capable
