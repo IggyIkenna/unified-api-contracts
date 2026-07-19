@@ -60,9 +60,12 @@ two-axis categoriser's job, not a tradeable pair).
   settle on a release whose MONTH is the join grain (the exact print
   day/time differs by venue), so the settlement key is the year-month, not the
   full date.
-* **Sports** → reuse :meth:`SportsFixtureKey.pairing_key` (already
-  order-independent ``(league, sorted(teams), date)``), then require the
-  bet-type to match (MATCH / SPREAD / TOTAL must agree).
+* **Sports** → PREFER the resolved API-Football ``af_fixture_id`` (a strong
+  exact key: same fixture + same bet-type ⇒ same market); fall back to the fuzzy
+  :meth:`SportsFixtureKey.pairing_key` (order-independent
+  ``(league, sorted(teams), date)``) only when ``af_fixture_id`` is ``None``
+  (unresolved market). Either path still requires the bet-type to match
+  (MATCH / SPREAD / TOTAL must agree).
 * Unmatched instruments → no row (honest absence; never a false pair).
 
 The matcher is pure + deterministic: same inputs → byte-identical output
@@ -384,6 +387,7 @@ def match_key(
     bet_type: PredictionBetType,
     strike: float | None,
     sports_pairing_key: tuple[str, str, str, str] | None,
+    af_fixture_id: int | None = None,
 ) -> str | None:
     """Order-independent cross-venue join key for ONE prediction instrument.
 
@@ -393,9 +397,20 @@ def match_key(
     by construction: it is built from venue-NEUTRAL fields (underlying, bet-type,
     settlement bucket, strike, or the order-independent fixture pairing key) —
     never from the venue name or a venue-native id.
+
+    For sports, a resolved API-Football ``af_fixture_id`` is a STRONG exact key:
+    when it is set the sports key is ``SPORTS_FIX::{af_fixture_id}::{bet_type}``
+    (two venues on the same fixture + bet-type match EXACTLY, no reliance on
+    fuzzy team-name pairing). When ``af_fixture_id`` is ``None`` (unresolved
+    market / absent column) the join FALLS BACK to the existing fuzzy
+    ``sports_pairing_key`` path, so behaviour is unchanged for those markets.
     """
     del venue, instrument_key, raw_symbol, symbol  # captured upstream into the neutral fields
     if bet_type in _SPORTS_BET_TYPES and underlying in _SPORTS_UNDERLYINGS:
+        if af_fixture_id is not None:
+            # Strong exact key: same API-Football fixture + same bet-type ⇒ same
+            # market, independent of the fuzzy team-name pairing below.
+            return f"SPORTS_FIX::{af_fixture_id}::{bet_type.value}"
         if sports_pairing_key is None:
             return None  # not a single fixture (season-future / unparseable) → no pair
         league, a, b, fdate = sports_pairing_key
@@ -438,6 +453,7 @@ def _classify_kalshi(record: InstrumentRecord, titles: Mapping[str, str]) -> _Cl
         bet_type=bet_type,
         strike=strike,
         sports_pairing_key=sports_key,
+        af_fixture_id=record.af_fixture_id,
     )
     return _Classified(record, key, underlying, bet_type, strike, _canonical_event_id(underlying, bet_type, key), title)
 
@@ -490,6 +506,7 @@ def _classify_polymarket(record: InstrumentRecord, titles: Mapping[str, str]) ->
         bet_type=bet_type,
         strike=strike,
         sports_pairing_key=sports_key,
+        af_fixture_id=record.af_fixture_id,
     )
     return _Classified(record, key, underlying, bet_type, strike, _canonical_event_id(underlying, bet_type, key), title)
 
