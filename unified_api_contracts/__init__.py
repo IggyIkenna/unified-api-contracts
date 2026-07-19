@@ -1231,6 +1231,8 @@ from .internal.reference.canonical_id_builder import (
     build_combo_id,
     build_instrument_id,
     build_leg,
+    is_two_token_pair_symbol,
+    validate_defi_spot_pair_symbol,
 )
 from .internal.reference.ticker_registry import (
     EXCHANGE_BY_TICKER,
@@ -2273,6 +2275,8 @@ __all__ = [
     "build_defi_partition_path",
     "build_instrument_id",
     "build_leg",
+    "is_two_token_pair_symbol",
+    "validate_defi_spot_pair_symbol",
     "build_prediction_partition_path",
     "build_tradfi_partition_path",
     "candidate_parquet_paths",
