@@ -102,8 +102,19 @@ def test_every_source_priority_source_has_pipeline_mode() -> None:
     )
 
 
+# Enum members intentionally RETAINED without a SOURCE_PRIORITY entry — the
+# transitional state until a gated GCS purge removes the historical objects that
+# still carry the pipeline_mode value. ``massive`` routing was dropped 2026-07-19
+# (Databento is the tradfi batch SoT), but ``pipeline_mode=batch_massive/`` objects
+# (~1.47M) still exist, so PipelineMode.BATCH_MASSIVE stays for reader/phantom-audit
+# recognition until the purge. Drop this exemption after the batch_massive GCS purge
+# (issue tradfi_canonical_path_migration_design_2026_07_19.md § Massive removal).
+_LEGACY_ENUM_SOURCES_PENDING_PURGE: frozenset[str] = frozenset({"massive"})
+
+
 def test_every_batch_pipeline_mode_maps_to_source_priority_source() -> None:
-    """Bidirectional: every BATCH_<SOURCE> mode maps to a source in SOURCE_PRIORITY."""
+    """Bidirectional: every BATCH_<SOURCE> mode maps to a source in SOURCE_PRIORITY,
+    except the transitional legacy sources kept for GCS-object recognition until purge."""
 
     sources = _all_source_strings()
     orphan_modes: list[str] = []
@@ -112,6 +123,8 @@ def test_every_batch_pipeline_mode_maps_to_source_priority_source() -> None:
             continue
         source = source_string_for(mode)
         assert source is not None
+        if source in _LEGACY_ENUM_SOURCES_PENDING_PURGE:
+            continue  # enum kept for on-disk recognition; SOURCE_PRIORITY dropped until purge
         if source not in sources:
             orphan_modes.append(mode.value)
     assert not orphan_modes, (

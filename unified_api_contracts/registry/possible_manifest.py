@@ -214,6 +214,12 @@ _KNOWN_BATCH_SOURCES_BY_AG: dict[str, frozenset[str]] = {
     DEFI: frozenset(
         {"onchain_rpc", "onchain_subgraph", "hyperliquid", "chainlink", "pyth_hermes", "helius_rpc", "solana_rpc"}
     ),
+    # NOTE: "massive" is KEPT here even though it was dropped from SOURCE_PRIORITY /
+    # SOURCE_MODE_CAPABILITY on 2026-07-19 — the historical ``pipeline_mode=batch_massive/``
+    # GCS objects still exist, so possible_manifest MUST keep emitting the batch_massive
+    # prefix (via the retained PipelineMode.BATCH_MASSIVE member) or the phantom-audit
+    # would flag ~1.47M real objects as orphans. TODO(purge): drop after batch_massive
+    # GCS purge (issue tradfi_canonical_path_migration_design_2026_07_19.md § Massive removal).
     TRADFI: frozenset({"databento", "massive", "yahoo", "eia"}),  # barchart retired 2026-06-24
     PREDICTION: frozenset({"polymarket_clob", "polymarket_gamma_api"}),
     # sports has its own UAC ``candidate_parquet_paths`` SSOT — no pipeline_mode prefixes here.

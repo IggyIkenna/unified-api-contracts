@@ -316,45 +316,34 @@ SOURCE_PRIORITY: Final[dict[tuple[str, str], list[str]]] = {
     # EIA (US Energy Information Administration) — commodity storage + series data.
     # BATCH_EIA manifest mode: features-commodity-service D5 Phase 1.
     ("tradfi", "energy_data"): ["eia"],
-    # DATABENTO-FIRST (2026-06-24, coordinator-directed; supersedes the 2026-06-11
-    # massive-first ratification): databento is now the PRIMARY tradfi read source —
-    # it is the verified-complete source for the live MVP universe (the Binance
-    # tradfi-perp basis tickers: 56/56 single-equities + 10/10 representative
-    # commodity/crypto ETFs resolve in DBEQ.BASIC ohlcv-1m, live-probed 2026-06-24;
-    # GLBX.MDP3 covers every CME futures root; XCBF.PITCH covers CFE/VX which massive
-    # NEVER carried). massive becomes the FALLBACK [1] + the broad-corpus bulk-backfill
-    # path + the per-venue granular slot via _VENUE_SOURCE_EXCLUSIONS for any future
-    # cell databento genuinely lacks (e.g. a non-US venue). Rationale: there is no
-    # databento gap massive fills for the Binance-perp universe, and databento-first
-    # makes derive_pipeline_mode_for_row stamp batch_databento (provenance-correct).
-    # NOTE: provenance authority — this reorder is coordinator-relayed, not a directly
-    # user-confirmed override of the 2026-06-11 operator decision; it is justified on
-    # the verified coverage facts above. CFE (VX/VIX futures) stays databento-only.
-    ("tradfi", "trades"): ["databento", "massive"],
-    ("tradfi", "tbbo"): ["databento", "massive"],
-    # ohlcv_1s is DATABENTO-ONLY: Massive's flat-file connector does NOT serve a
-    # 1s schema (massive_tradfi_rest_connector.SUPPORTED_DATA_TYPES omits it), so
-    # 1s is fetched from Databento GLBX.MDP3 (L0/free 16y, subscription lockdown
-    # 2026-06-18). databento-primary makes derive_pipeline_mode_for_row stamp
-    # pipeline_mode=batch_databento (provenance-correct) instead of batch_massive.
-    # SSOT: codex/02-data/tradfi-databento-sourcing-ssot.md.
+    # DATABENTO-ONLY tick/chain sourcing (massive REMOVED 2026-07-19, operator
+    # ruling): Databento is the batch source-of-truth — GLBX.MDP3 covers every CME
+    # futures root, DBEQ.BASIC covers the live MVP equity/ETF universe (56/56
+    # single-equities + 10/10 representative commodity/crypto ETFs, live-probed
+    # 2026-06-24), XCBF.PITCH covers CFE/VX (which massive never carried). Yahoo
+    # remains the source for the daily/rolling candle cells (ohlcv_1m/15m/24h) + the
+    # KRX-only Korean underliers. Massive was the pre-2026-07-19 fallback [1]; its
+    # routing is dropped here — a no-op for live traffic (databento was already
+    # index[0], so derive_pipeline_mode_for_row already stamped batch_databento).
+    # The historical ``pipeline_mode=batch_massive/`` GCS objects stay recognised by
+    # possible_manifest + PipelineMode.BATCH_MASSIVE until the separate gated purge.
+    # SSOT: codex/02-data/tradfi-databento-sourcing-ssot.md + issue
+    # tradfi_canonical_path_migration_design_2026_07_19.md § Massive removal.
+    ("tradfi", "trades"): ["databento"],
+    ("tradfi", "tbbo"): ["databento"],
+    # ohlcv_1s is DATABENTO-ONLY: fetched from Databento GLBX.MDP3 (L0/free 16y,
+    # subscription lockdown 2026-06-18); derive_pipeline_mode_for_row stamps
+    # pipeline_mode=batch_databento. SSOT: codex/02-data/tradfi-databento-sourcing-ssot.md.
     ("tradfi", "ohlcv_1s"): ["databento"],
-    # GRANULAR SOURCE STRUCTURE (2026-06-24): databento is priority[0] (primary)
-    # per the DATABENTO-FIRST note above; the source actually USED per fetch is the
-    # per-launch ``--source`` (VM_SOURCE, set to databento) gated by the venue-aware
-    # ``_VENUE_SOURCE_EXCLUSIONS`` (the GRANULAR slice primitive). massive is the
-    # FALLBACK [1] + the slot for any future cell databento genuinely lacks (e.g. a
-    # non-US venue): add such a cell as a ``_VENUE_SOURCE_EXCLUSIONS`` entry excluding
-    # databento for that venue — that is the obvious slot. For the Binance tradfi-perp
-    # BASIS tickers databento covers every US-listed underlying; the KRX-only Korean
-    # underliers (HYUNDAI 005380 / SAMSUNG 005930 / SKHYNIX 000660, venue=KRX) are now
-    # UNBLOCKED (2026-06-24) and served by ``yahoo`` (the ``.KS`` tickers) — see the
-    # KRX ohlcv entries below + ``_VENUE_SOURCE_EXCLUSIONS`` (KRX excludes databento).
-    # SSOT: codex/02-data/tradfi-databento-sourcing-ssot.md.
-    ("tradfi", "ohlcv_1m"): ["databento", "massive", "yahoo"],
+    # ohlcv_1m: databento is priority[0] (primary); the source actually USED per fetch
+    # is the per-launch ``--source`` gated by the venue-aware ``_VENUE_SOURCE_EXCLUSIONS``.
+    # yahoo serves the KRX-only Korean underliers (HYUNDAI 005380 / SAMSUNG 005930 /
+    # SKHYNIX 000660, venue=KRX, the ``.KS`` tickers — KRX excludes databento). SSOT:
+    # codex/02-data/tradfi-databento-sourcing-ssot.md.
+    ("tradfi", "ohlcv_1m"): ["databento", "yahoo"],
     # ohlcv_15m: barchart RETIRED 2026-06-24 (VIX 15m now aggregates from VX futures
     # via databento XCBF.PITCH). yahoo still serves KRX + the rolling VIX window.
-    ("tradfi", "ohlcv_15m"): ["databento", "massive", "yahoo"],
+    ("tradfi", "ohlcv_15m"): ["databento", "yahoo"],
     # ohlcv_24h — Yahoo-only daily bars (FX KRW/USD, KRX single stocks, the DXY +
     # treasury-yield indices). Added 2026-06-24 so the daily provenance resolves
     # via the registry (default_source auto-stamps source=yahoo) instead of an
@@ -363,12 +352,12 @@ SOURCE_PRIORITY: Final[dict[tuple[str, str], list[str]]] = {
     ("tradfi", "ohlcv_24h"): ["yahoo"],
     # ERA-B: options_chain / futures_chain are instrument_types captured as
     # data_type=trades → Era-B source resolves via ``(tradfi, "trades")`` above
-    # (massive, databento). Legacy-data_type keys retained for the pre-migration
-    # rows + the closed-set round-trip (see the cefi note above).
-    ("tradfi", "options_chain"): ["databento", "massive"],
-    ("tradfi", "futures_chain"): ["databento", "massive"],
+    # (databento). Legacy-data_type keys retained for the pre-migration rows + the
+    # closed-set round-trip (see the cefi note above).
+    ("tradfi", "options_chain"): ["databento"],
+    ("tradfi", "futures_chain"): ["databento"],
     # TradFi greeks_snapshot + implied_vol_surface — computed by greeks-service
-    # from the Massive/Databento options chain (same kernel as the crypto rows).
+    # from the Databento options chain (same kernel as the crypto rows).
     ("tradfi", "greeks_snapshot"): ["greeks_service"],
     ("tradfi", "implied_vol_surface"): ["greeks_service"],
     # commodity_signal — emitted by features-service commodity family from
@@ -469,9 +458,10 @@ makes test fixtures first-class. Mock implies dev-tier only."""
 #   not Tardis. Tardis is the CeFi BATCH (T+1 archive) source. (Matrix R1 + CORRECTED
 #   MODEL.) The SAME shard therefore carries source=tardis in batch and source=<venue>
 #   in live/replay — the row-level ``source`` column already models this.
-# * massive (= Polygon.io) = {batch, live, replay}; final live testing is gated on the
-#   paid real-time tier upgrade (a deploy-time gate, not a code gate). Starter-tier
-#   live is 15-min delayed (see EMISSION_LATENCY_MS_BY_SOURCE).
+# * massive (= Polygon.io) removed 2026-07-19 (operator ruling: Databento is the
+#   tradfi batch source-of-truth, Yahoo for daily candles). Only the routing is
+#   dropped — the historical batch_massive/ objects keep PipelineMode.BATCH_MASSIVE
+#   recognition until the separate gated GCS purge.
 # * Internal service sources (instruments_service/execution_service/strategy_service/
 #   features_onchain_service/cross_instrument/mdps_odds_horizon_bucket) = service mode:
 #   batch=live symmetry, re-run = replay.
@@ -480,7 +470,8 @@ SOURCE_MODE_CAPABILITY: Final[dict[str, frozenset[Mode]]] = {
     "tardis": frozenset({Mode.BATCH}),  # batch (archive) ONLY; live/replay = exchanges
     # ---- TradFi ----
     "databento": frozenset({Mode.BATCH, Mode.LIVE, Mode.REPLAY}),
-    "massive": frozenset({Mode.BATCH, Mode.LIVE, Mode.REPLAY}),
+    # "massive" (= Polygon.io) removed 2026-07-19 — routing dropped; the historical
+    # batch_massive/ objects keep PipelineMode.BATCH_MASSIVE recognition until the purge.
     "yahoo": frozenset({Mode.BATCH}),
     # "barchart" RETIRED 2026-06-24 (VIX 15m → VX futures via databento XCBF.PITCH).
     "eia": frozenset({Mode.BATCH, Mode.REPLAY}),  # weekly series re-fetchable by date
@@ -636,7 +627,7 @@ EMISSION_LATENCY_MS_BY_SOURCE: Final[dict[str, int]] = {
     "api_football": 1_000,
     "odds_api": 5_000,
     # Equity / index intraday — free-tier delayed feeds (VIX 15m fallback route).
-    "massive": 900_000,  # 15 min: Massive (formerly Polygon.io) Starter tier delayed feed
+    # "massive" latency entry removed 2026-07-19 (Massive routing dropped).
     "yahoo": 900_000,  # 15 min: Yahoo Finance free-tier intraday delay for CBOE-sourced indices like ^VIX
     # Post-match / batch-only — cadence is hours-to-day.
     "understat": 7_200_000,  # 2h post-match xG

@@ -46,7 +46,8 @@ def test_sources_for_shard_unregistered_is_empty() -> None:
 def test_sources_for_shard_non_cefi_has_no_venue_overlay() -> None:
     """The CeFi venue overlay must NOT leak into non-cefi shards."""
     sources = sources_for_shard("tradfi", "trades")
-    assert sources == frozenset({"massive", "databento"})
+    # tradfi trades is single-source databento since massive routing was dropped 2026-07-19.
+    assert sources == frozenset({"databento"})
     assert "binance" not in sources
 
 
@@ -66,7 +67,7 @@ def test_could_exist_cefi_trades_live_is_true() -> None:
 
 
 def test_could_exist_tradfi_trades_replay_is_true() -> None:
-    """TradFi trades x REPLAY is possible (massive/databento are replay-capable)."""
+    """TradFi trades x REPLAY is possible (databento is replay-capable)."""
     assert could_exist("tradfi", "trades", Mode.REPLAY) is True
 
 
