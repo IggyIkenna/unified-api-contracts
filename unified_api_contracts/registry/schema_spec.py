@@ -47,9 +47,6 @@ from unified_api_contracts.registry._schema_spec_defi import (
     DEFI_REWARDS_COLUMNS,
 )
 from unified_api_contracts.registry._schema_spec_prediction import (
-    PREDICTION_PREDICTION_TRADES_COLUMNS,
-)
-from unified_api_contracts.registry._schema_spec_prediction import (
     PREDICTION_TRADES_COLUMNS as _PREDICTION_TRADES_COLUMNS,
 )
 from unified_api_contracts.registry._schema_spec_tradfi import (
@@ -429,12 +426,6 @@ SCHEMA_SPEC_REGISTRY: Final[tuple[SchemaSpec, ...]] = (
         asset_group=AssetGroup.PREDICTION,
         data_type="trades",
         columns=_PREDICTION_TRADES_COLUMNS,
-        source="manual",
-    ),
-    SchemaSpec(
-        asset_group=AssetGroup.PREDICTION,
-        data_type="prediction_trades",
-        columns=PREDICTION_PREDICTION_TRADES_COLUMNS,
         source="manual",
     ),
     SchemaSpec(

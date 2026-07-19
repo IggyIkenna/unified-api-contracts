@@ -445,8 +445,10 @@ _SPORTS: dict[str, list[str]] = {
 # SHARD_INCOMPLETE), and so the deployment-ui marks the live+batch book rows
 # in-scope (no "out of scope" badge). Batch=live: same canonical data_type.
 # prediction_canonical_question_group: bundled CQG bucket written by MTDS
-# (groups prediction_trades rows by canonical question group x day; added
-# 2026-06-16 — POLYMARKET only).
+# (groups canonical ``trades`` rows by canonical question group x day; added
+# 2026-06-16 — POLYMARKET only). (The legacy ``prediction_trades`` data_type
+# these were once grouped from was retired 2026-04-19 / manifest-folded into
+# ``trades`` 2026-07-19.)
 # ---------------------------------------------------------------------------
 _PREDICTION: dict[str, list[str]] = {
     "POLYMARKET": ["trades", "book_snapshot_5", "prediction_canonical_question_group"],

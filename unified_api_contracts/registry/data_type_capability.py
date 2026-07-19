@@ -1031,10 +1031,13 @@ DATA_TYPE_CAPABILITY_REGISTRY: Final[tuple[DataTypeCapability, ...]] = (
     ),
     # ── Prediction (verified 2026-04-30 against availability_index.parquet) ─
     # POLYMARKET writes data_type=trades (instrument_type=prediction_market) AND
-    # data_type=prediction_trades (per-underlying instrument_type tokens BTC/ETH/
-    # XRP/SOL/SPX/DJIA/NDX/SILVER/GOLD/CRUDE_OIL/...) AND
     # data_type=prediction_canonical_question_group (bundled CQG bucket derived
-    # by the writer — one row per canonical group x day). KALSHI excluded — no US
+    # by the writer — one row per canonical group x day). The legacy
+    # per-underlying data_type=prediction_trades capability rows (BTC/ETH/XRP/SOL/
+    # SPX/DJIA/NDX/SILVER/GOLD/CRUDE_OIL/OTHER) were retired 2026-07-19: the prod
+    # manifest migration folded every prediction_trades row into canonical trades
+    # (0 captured cells lost), so a per-underlying prediction_trades denominator
+    # no longer corresponds to any captured shard. KALSHI excluded — no US
     # account yet. POLYMARKET book_snapshot / market_metadata excluded — adapters
     # do not yet write those data_types to the manifest.
     DataTypeCapability(
@@ -1049,114 +1052,13 @@ DATA_TYPE_CAPABILITY_REGISTRY: Final[tuple[DataTypeCapability, ...]] = (
     ),
     DataTypeCapability(
         asset_group=AssetGroup.PREDICTION,
-        data_type="prediction_trades",
-        venue="POLYMARKET",
-        instrument_type="BTC",
-        live_capable=True,
-        batch_capable=True,
-        streaming_protocol="ws",
-        notes="Per-underlying prediction trades — one capability per underlying token",
-    ),
-    DataTypeCapability(
-        asset_group=AssetGroup.PREDICTION,
-        data_type="prediction_trades",
-        venue="POLYMARKET",
-        instrument_type="ETH",
-        live_capable=True,
-        batch_capable=True,
-        streaming_protocol="ws",
-    ),
-    DataTypeCapability(
-        asset_group=AssetGroup.PREDICTION,
-        data_type="prediction_trades",
-        venue="POLYMARKET",
-        instrument_type="SOL",
-        live_capable=True,
-        batch_capable=True,
-        streaming_protocol="ws",
-    ),
-    DataTypeCapability(
-        asset_group=AssetGroup.PREDICTION,
-        data_type="prediction_trades",
-        venue="POLYMARKET",
-        instrument_type="XRP",
-        live_capable=True,
-        batch_capable=True,
-        streaming_protocol="ws",
-    ),
-    DataTypeCapability(
-        asset_group=AssetGroup.PREDICTION,
-        data_type="prediction_trades",
-        venue="POLYMARKET",
-        instrument_type="SPX",
-        live_capable=True,
-        batch_capable=True,
-        streaming_protocol="ws",
-    ),
-    DataTypeCapability(
-        asset_group=AssetGroup.PREDICTION,
-        data_type="prediction_trades",
-        venue="POLYMARKET",
-        instrument_type="DJIA",
-        live_capable=True,
-        batch_capable=True,
-        streaming_protocol="ws",
-    ),
-    DataTypeCapability(
-        asset_group=AssetGroup.PREDICTION,
-        data_type="prediction_trades",
-        venue="POLYMARKET",
-        instrument_type="NDX",
-        live_capable=True,
-        batch_capable=True,
-        streaming_protocol="ws",
-    ),
-    DataTypeCapability(
-        asset_group=AssetGroup.PREDICTION,
-        data_type="prediction_trades",
-        venue="POLYMARKET",
-        instrument_type="GOLD",
-        live_capable=True,
-        batch_capable=True,
-        streaming_protocol="ws",
-    ),
-    DataTypeCapability(
-        asset_group=AssetGroup.PREDICTION,
-        data_type="prediction_trades",
-        venue="POLYMARKET",
-        instrument_type="SILVER",
-        live_capable=True,
-        batch_capable=True,
-        streaming_protocol="ws",
-    ),
-    DataTypeCapability(
-        asset_group=AssetGroup.PREDICTION,
-        data_type="prediction_trades",
-        venue="POLYMARKET",
-        instrument_type="CRUDE_OIL",
-        live_capable=True,
-        batch_capable=True,
-        streaming_protocol="ws",
-    ),
-    DataTypeCapability(
-        asset_group=AssetGroup.PREDICTION,
-        data_type="prediction_trades",
-        venue="POLYMARKET",
-        instrument_type="OTHER",
-        live_capable=True,
-        batch_capable=True,
-        streaming_protocol="ws",
-        notes="Long-tail / uncategorised prediction-trades bucket",
-    ),
-    DataTypeCapability(
-        asset_group=AssetGroup.PREDICTION,
         data_type="prediction_canonical_question_group",
         venue="POLYMARKET",
         instrument_type="",
         live_capable=True,
         batch_capable=True,
         notes=(
-            "Bundled CQG bucket: writer groups prediction_trades rows by "
+            "Bundled CQG bucket: writer groups canonical ``trades`` rows by "
             "canonical question group (BTC_UP_DOWN_DAILY, OTHER, ...) x day. "
             "Declaring this capability removes the deployment-ui 'out of scope' "
             "badge for POLYMARKET on this data_type (badge = manifest data_type "

@@ -1166,32 +1166,6 @@ _SAMPLED_SOURCE_COLUMNS: dict[tuple[str, str, str], set[str]] = {
         "ts_in_delta",
         "underlying",
     },
-    ("prediction", "prediction_trades", "POLYMARKET"): {
-        "asset",
-        "bio",
-        "conditionId",
-        "condition_id",
-        "data_type",
-        "eventSlug",
-        "icon",
-        "instrument_type",
-        "name",
-        "outcome",
-        "outcomeIndex",
-        "price",
-        "profileImage",
-        "profileImageOptimized",
-        "proxyWallet",
-        "pseudonym",
-        "side",
-        "size",
-        "slug",
-        "symbol",
-        "timestamp",
-        "title",
-        "transactionHash",
-        "underlying",
-    },
     ("prediction", "trades", "POLYMARKET"): {
         "amount",
         "asset",
@@ -1321,7 +1295,7 @@ class TestRegistryRoundTrip:
         assert len(keys) == len(set(keys)), "duplicate (asset_group, data_type) shadows find_schema"
 
     def test_find_schema_accepts_string_asset_group(self) -> None:
-        assert find_schema("prediction", "prediction_trades") is not None
+        assert find_schema("prediction", "trades") is not None
         assert find_schema("defi", "utilization") is not None
         assert find_schema("tradfi", "trades") is not None
 
@@ -1332,7 +1306,7 @@ class TestRegistryRoundTrip:
     def test_every_sampled_data_type_has_a_spec(self, asset_group: str, data_type: str) -> None:
         """The 2026-06-11 coverage gaps (defi rewards/risk_params/utilization/
         dex_pool_state/dex_pools/dex_swaps/lst_rates/oracle_prices/rate_indices,
-        tradfi trades/tbbo/ohlcv_*, prediction prediction_trades) stay closed."""
+        tradfi trades/tbbo/ohlcv_*, prediction trades) stay closed."""
         if not data_type:
             pytest.skip("blank legacy data_type axis — not a contract key")
         assert find_schema(asset_group, data_type) is not None
