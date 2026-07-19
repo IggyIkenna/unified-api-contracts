@@ -35,16 +35,19 @@ class TestSourceCapableForVenue:
         # Databento IS capable for CBOE (XCBF.PITCH).
         assert_source_capable_for_venue("tradfi", "ohlcv_1m", "CBOE", "databento")
 
-    def test_nasdaq_massive_ohlcv_1m_passes(self) -> None:
-        # Massive serves equities 1m — capable.
-        assert_source_capable_for_venue("tradfi", "ohlcv_1m", "NASDAQ", "massive")
+    def test_nasdaq_massive_ohlcv_1m_now_rejected(self) -> None:
+        # massive routing removed 2026-07-19 → no longer a registered source anywhere,
+        # so even the venues it once served (NASDAQ equities) reject it.
+        with pytest.raises(SourceNotCapableForVenueError, match="not a registered source"):
+            assert_source_capable_for_venue("tradfi", "ohlcv_1m", "NASDAQ", "massive")
 
     def test_cme_databento_ohlcv_1m_passes(self) -> None:
         assert_source_capable_for_venue("tradfi", "ohlcv_1m", "CME", "databento")
 
-    def test_cme_massive_ohlcv_1m_passes(self) -> None:
-        # Massive is the 1m primary for CME (flat-file archive).
-        assert_source_capable_for_venue("tradfi", "ohlcv_1m", "CME", "massive")
+    def test_cme_massive_ohlcv_1m_now_rejected(self) -> None:
+        # massive was the CME 1m flat-file archive; routing removed 2026-07-19 → rejected.
+        with pytest.raises(SourceNotCapableForVenueError, match="not a registered source"):
+            assert_source_capable_for_venue("tradfi", "ohlcv_1m", "CME", "massive")
 
     def test_ohlcv_1s_massive_raises_everywhere(self) -> None:
         # ohlcv_1s is databento-only in SOURCE_PRIORITY → massive never capable.
@@ -58,7 +61,8 @@ class TestSourceCapableForVenue:
     def test_is_source_capable_helper(self) -> None:
         assert is_source_capable_for_venue("tradfi", "ohlcv_1m", "CBOE", "databento") is True
         assert is_source_capable_for_venue("tradfi", "ohlcv_1m", "CBOE", "massive") is False
-        assert is_source_capable_for_venue("tradfi", "ohlcv_1m", "NASDAQ", "massive") is True
+        # NASDAQ massive was True pre-2026-07-19; routing removed → massive unregistered → False.
+        assert is_source_capable_for_venue("tradfi", "ohlcv_1m", "NASDAQ", "massive") is False
         # Unregistered pair → False (never raises).
         assert is_source_capable_for_venue("tradfi", "not_a_real_dt", "CME", "databento") is False
 

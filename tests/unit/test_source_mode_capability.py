@@ -47,7 +47,11 @@ EXPECTED_SOURCE_MODE_CAPABILITY: dict[str, frozenset[Mode]] = {
     "tardis": _B,
     # TradFi
     "databento": _BLR,
-    "massive": _BLR,
+    # "massive" (= Polygon.io) removed 2026-07-19 — routing dropped (Databento is the
+    # tradfi batch SoT). The PipelineMode.BATCH_/LIVE_/REPLAY_MASSIVE members are kept
+    # for historical batch_massive/ object recognition until the gated GCS purge, so
+    # massive is now the transitional enum-without-capability case (see
+    # test_no_live_or_replay_member_for_a_non_capable_source).
     "yahoo": _B,
     # "barchart" retired 2026-06-24 (VIX 15m → VX futures via databento)
     "eia": _BR,
@@ -186,14 +190,13 @@ def test_tardis_is_batch_only() -> None:
     assert not source_supports("tardis", Mode.REPLAY)
 
 
-def test_massive_and_databento_are_live_and_replay_capable() -> None:
-    """Operator 2026-06-05 + vendor-doc check: the TradFi vendors stream live AND
-    support intraday replay (today-since-start backfill). databento via the Live-API
-    24h intraday replay (Historical API is 24h-embargoed); massive (=Polygon.io) via
-    REST tick within a time range. (massive live is 15-min delayed on Starter tier.)"""
-    for src in ("massive", "databento"):
-        assert source_supports(src, Mode.LIVE)
-        assert source_supports(src, Mode.REPLAY)
+def test_databento_is_live_and_replay_capable() -> None:
+    """Operator 2026-06-05 + vendor-doc check: databento streams live AND supports
+    intraday replay (Live-API 24h intraday replay; Historical API is 24h-embargoed).
+    (massive was the other tradfi live/replay vendor — routing removed 2026-07-19, so
+    it no longer carries a capability row; see the EXPECTED matrix note.)"""
+    assert source_supports("databento", Mode.LIVE)
+    assert source_supports("databento", Mode.REPLAY)
 
 
 def test_odds_api_is_the_first_live_sports_source() -> None:
@@ -301,13 +304,27 @@ def test_every_capability_live_or_replay_source_has_its_enum_member() -> None:
             assert pipeline_mode_for_source(src, Mode.REPLAY).value == f"replay_{src}"
 
 
+# Enum members intentionally RETAINED without a SOURCE_MODE_CAPABILITY row — the
+# transitional state until a gated GCS purge removes the historical objects that still
+# carry the pipeline_mode value. ``massive`` routing was dropped 2026-07-19 (Databento
+# is the tradfi batch SoT) but ``batch_massive/`` / ``live_massive/`` objects still
+# exist, so LIVE_/REPLAY_/BATCH_MASSIVE stay for reader/phantom-audit recognition. Drop
+# after the purge (tradfi_canonical_path_migration_design_2026_07_19.md § Massive removal).
+_LEGACY_ENUM_SOURCES_PENDING_PURGE: frozenset[str] = frozenset({"massive"})
+
+
 def test_no_live_or_replay_member_for_a_non_capable_source() -> None:
     """(d) No ``live_<source>`` / ``replay_<source>`` member exists for a source whose
     matrix row lacks that mode (e.g. tardis replay, yahoo/barchart live+replay).
-    Every member has a concrete source — no transitional-alias exemption."""
+
+    Exemption: the ``_LEGACY_ENUM_SOURCES_PENDING_PURGE`` transitional sources keep
+    their enum members (for on-disk object recognition) after their capability row was
+    removed — the intended state until the gated GCS purge, not a permanent alias."""
     for member in PipelineMode:
         src = source_string_for(member)
         assert src is not None
+        if src in _LEGACY_ENUM_SOURCES_PENDING_PURGE:
+            continue  # enum kept for on-disk recognition; capability removed until purge
         if is_live(member):
             assert source_supports(src, Mode.LIVE), f"{member.value} has no LIVE capability for {src!r}"
         elif is_replay(member):

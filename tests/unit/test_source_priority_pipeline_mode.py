@@ -261,17 +261,18 @@ def test_get_all_sources_single_source_cell_returns_list_of_one() -> None:
 
 
 def test_get_all_sources_multi_source_cell_returns_ordered_list() -> None:
-    """Multi-source cells (tradfi trades = databento + massive) return both in priority order.
+    """Multi-source cells (tradfi ohlcv_1m = databento + yahoo) return both in priority order.
 
-    DATABENTO-FIRST (2026-06-24, supersedes the 2026-06-11 massive-first): databento is
-    the verified-complete primary; massive is the fallback + bulk-backfill path.
+    databento is the verified-complete primary; yahoo serves the KRX/daily-candle slice.
+    (massive was the pre-2026-07-19 fallback — routing removed, so trades/tbbo/chain
+    cells are now single-source databento; the candle cells keep the yahoo secondary.)
     """
-    results = get_all_sources_with_priority("tradfi", "trades")
+    results = get_all_sources_with_priority("tradfi", "ohlcv_1m")
     assert len(results) >= 2
     sources = [s for s, _ in results]
-    assert sources[0] == "databento", "databento is primary for tradfi trades"
-    assert "massive" in sources, "massive is registered (fallback) for tradfi trades"
-    assert sources.index("databento") < sources.index("massive"), "databento precedes massive"
+    assert sources[0] == "databento", "databento is primary for tradfi ohlcv_1m"
+    assert "yahoo" in sources, "yahoo is registered (secondary) for tradfi ohlcv_1m"
+    assert sources.index("databento") < sources.index("yahoo"), "databento precedes yahoo"
 
 
 def test_get_all_sources_returns_batch_pipeline_modes() -> None:
@@ -318,8 +319,8 @@ def test_select_primary_available_primary_only() -> None:
 
 def test_select_primary_available_multi_source_primary_wins() -> None:
     """When all sources are present, the primary (index-0) wins."""
-    source, mode = select_primary_available_source("tradfi", "trades", {"databento", "massive"})
-    assert source == "databento", "databento is primary for tradfi trades (databento-first 2026-06-24)"
+    source, mode = select_primary_available_source("tradfi", "ohlcv_1m", {"databento", "yahoo"})
+    assert source == "databento", "databento is primary for tradfi ohlcv_1m (databento-first)"
     assert mode is PipelineMode.BATCH_DATABENTO
 
 
@@ -343,7 +344,7 @@ def test_select_primary_available_empty_set_raises() -> None:
 
 def test_select_primary_available_returns_batch_mode() -> None:
     """Tie-breaker always returns a batch pipeline_mode."""
-    _, mode = select_primary_available_source("tradfi", "trades", {"massive"})
+    _, mode = select_primary_available_source("tradfi", "trades", {"databento"})
     assert is_batch(mode)
 
 

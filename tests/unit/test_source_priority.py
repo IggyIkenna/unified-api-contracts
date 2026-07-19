@@ -147,8 +147,10 @@ def test_cefi_book_liq_pairs_kept_by_finding77_narrowed_ruling() -> None:
 
 
 def test_source_required_true_for_tradfi_multi_source() -> None:
-    """TradFi trades has databento + massive → source required."""
-    assert source_required("tradfi", "trades") is True
+    """TradFi candle cells have databento + yahoo → source required. (trades/tbbo/
+    options_chain/futures_chain became single-source databento when massive routing was
+    dropped 2026-07-19 → those auto-stamp databento; see the single-source test below.)"""
+    assert source_required("tradfi", "ohlcv_1m") is True
     assert source_required("tradfi", "ohlcv_15m") is True
 
 
@@ -237,6 +239,9 @@ def test_computed_cells_not_source_required() -> None:
 
 def test_default_source_single_external_returns_that_source() -> None:
     assert default_source("cefi", "options_chain") == "tardis"  # (cefi,trades) multi-source now → no auto-stamp
+    # tradfi trades became single-source databento when massive routing was dropped
+    # 2026-07-19 → now auto-stampable.
+    assert default_source("tradfi", "trades") == "databento"
     assert default_source("defi", "swap") == "onchain_subgraph"
     # Prediction MARKET_LIFECYCLE stays single-source (Gamma metadata); trades/cqg are now multi-source.
     assert default_source("prediction", "MARKET_LIFECYCLE") == "polymarket_gamma_api"
@@ -244,7 +249,9 @@ def test_default_source_single_external_returns_that_source() -> None:
 
 def test_default_source_multi_external_returns_none() -> None:
     """Multi external-source cells cannot be auto-stamped (ambiguous)."""
-    assert default_source("tradfi", "trades") is None
+    # tradfi ohlcv_1m/15m stay multi-source (databento + yahoo); trades became
+    # single-source databento when massive routing was dropped 2026-07-19.
+    assert default_source("tradfi", "ohlcv_1m") is None
     assert default_source("defi", "oracle_prices") is None
     assert default_source("prediction", "trades") is None  # polymarket_clob + kalshi
     assert default_source("sports", "FIXTURES") is None
@@ -452,7 +459,10 @@ def test_valid_manifest_sources_excludes_batch_only_live_vendor() -> None:
 def test_is_valid_manifest_source_tradfi_unaffected() -> None:
     # tradfi has no per-venue live-vendor override map → only batch sources valid.
     assert is_valid_manifest_source("tradfi", "trades", "databento") is True
-    assert is_valid_manifest_source("tradfi", "trades", "massive") is True
+    # massive is no longer a valid write source — routing dropped 2026-07-19 (a NEW
+    # massive-stamped write must fail; the historical batch_massive/ objects are
+    # recognised via the retained pipeline_mode, not this write-time source predicate).
+    assert is_valid_manifest_source("tradfi", "trades", "massive") is False
     assert is_valid_manifest_source("tradfi", "trades", "binance") is False
 
 

@@ -67,7 +67,7 @@ def source_required(asset_group: str, data_type: str) -> bool:
     swap-resilience, per the 2026-06-01 operator decision). Computed/service
     cells (:data:`COMPUTED_SOURCES`) and unregistered pairs are exempt.
 
-    * TradFi ``trades`` (databento + massive)        → True (explicit needed)
+    * TradFi ``ohlcv_1m`` (databento + yahoo)        → True (explicit needed)
     * DeFi ``oracle_prices`` (pyth_hermes+chainlink) → True
     * DeFi ``native_staking_rates`` (solana+helius)  → True
     * Sports ``FIXTURES`` (api_football+footystats)  → True
@@ -268,8 +268,9 @@ def live_source_for_venue(asset_group: str, venue: str, data_type: str) -> str:
     # by venue first. POLYMARKET falls through to the priority primary (polymarket_clob).
     if ag_norm == "prediction" and venue_norm in _PREDICTION_LIVE_SOURCE_FOR_VENUE:
         return _PREDICTION_LIVE_SOURCE_FOR_VENUE[venue_norm]
-    # TradFi live = databento (sole tradfi WS producer); batch primary `massive` has no live
-    # feed → routing live via it mis-stamps `live_massive`. Batch path unchanged (get_primary_source).
+    # TradFi live = databento (sole tradfi WS producer); the batch primary is also
+    # databento (databento-first; massive routing removed 2026-07-19). Batch path
+    # unchanged (get_primary_source).
     if ag_norm == "tradfi":
         return "databento"
     if has_source_priority(ag_norm, data_type):

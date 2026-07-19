@@ -104,11 +104,8 @@ _COMPUTED_SERVICE_SOURCES: frozenset[str] = frozenset(
 # are not computed/service sources). PRE-EXISTING — tracked for capability backfill.
 _KNOWN_SOURCE_WITHOUT_CAPABILITY: frozenset[str] = frozenset(
     {
-        # "massive" is a live S3 flat-file vendor used across tradfi/cefi but has
-        # no SourceCapability declaration (capability registry predates it). It is
-        # a real, wired source (MTDS _route_massive) — only the declaration is
-        # missing. Tracked: codex/02-data/tradfi-databento-sourcing-ssot.md.
-        "massive",
+        # ("massive" removed from this allowlist 2026-07-19 — it is no longer a
+        # SOURCE_PRIORITY source, so it is never parametrised into this gate.)
         # Polymarket prediction vendors — real external sources wired via the
         # prediction adapters, but no SourceCapability row yet. Tracked for
         # capability backfill (prediction capability declarations).
