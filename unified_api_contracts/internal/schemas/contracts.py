@@ -1007,6 +1007,12 @@ CONTRACT_REGISTRY: dict[tuple[str, str, str], SchemaContract] = {
     ("defi", "lending_position", "lending_indices"): DEFI_LENDING_POSITION_LENDING_INDICES,
     ("defi", "a_token", "lending_indices"): DEFI_AAVE_V3_LENDING_INDICES,
     ("defi", "lending", "lending_indices"): DEFI_LENDING_INDICES_MARKET_ID,
+    # Flat LENDING retired to the A_TOKEN/DEBT_TOKEN split (operator ruling 2026-07-18):
+    # EVM lending-market liquidations now key to the reserve's A_TOKEN. The legacy
+    # ``("defi", "lending", "liquidations")`` key is KEPT so historical lending-partitioned
+    # liquidations parquets stay readable (Wave-D data re-key), mirroring the dual
+    # registration Wave B used for ``lending_indices`` above; both point at the same schema.
+    ("defi", "a_token", "liquidations"): DEFI_LENDING_LIQUIDATIONS,
     ("defi", "lending", "liquidations"): DEFI_LENDING_LIQUIDATIONS,
     ("defi", "solana_lending", "lending_indices"): DEFI_SOLANA_LENDING_LENDING_INDICES,
     ("defi", "solana_vault", "dex_pools"): DEFI_SOLANA_VAULT_DEX_POOLS,
