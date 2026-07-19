@@ -80,11 +80,9 @@ One entry point, any asset group (:func:`build_canonical_instrument_id`)::
     # → "BYBIT:PERPETUAL:BTCUSDT"
 
     build_canonical_instrument_id(
-        AssetGroup.DEFI, "aave_v3", InstrumentType.A_TOKEN, "aUSDC", chain="arbitrum",
+        AssetGroup.DEFI, "aave_v3", InstrumentType.LENDING, "USDC", chain="arbitrum",
     )
-    # → "AAVE_V3-ARBITRUM:A_TOKEN:aUSDC"
-    # (legacy flat LENDING is RETIRED — supply/borrow legs are A_TOKEN/DEBT_TOKEN,
-    #  operator ruling 2026-07-18; mirrors the shipped instruments-service retire.)
+    # → "AAVE_V3-ARBITRUM:LENDING:USDC"
 
     build_canonical_instrument_id(
         AssetGroup.SPORTS, "", None,
@@ -147,12 +145,7 @@ SUPPORTED_INSTRUMENT_TYPES: Final[frozenset[InstrumentType]] = frozenset(
         # Phoenix orderbook / Jupiter quotes / Orca trades don't collide
         # with the EVM AMM pool contract.
         InstrumentType.DEX_POOL,
-        # NOTE: legacy flat ``LENDING`` is intentionally ABSENT — retired to the
-        # A_TOKEN (supply) / DEBT_TOKEN (borrow) split (operator ruling
-        # 2026-07-18; mirrors the shipped instruments-service adapter retire that
-        # rejects LENDING). It is declared in UNSUPPORTED_BY_DESIGN below so the
-        # builder fails LOUD on any new LENDING id construction. The enum member
-        # is kept for READING the un-migrated legacy corpus (Wave-D migration).
+        InstrumentType.LENDING,
         InstrumentType.LST,
         InstrumentType.YIELD_BEARING,
         InstrumentType.A_TOKEN,
@@ -184,17 +177,10 @@ SUPPORTED_INSTRUMENT_TYPES: Final[frozenset[InstrumentType]] = frozenset(
 )
 
 # InstrumentType values that this builder intentionally does not support.
-# ``LENDING`` — the legacy flat DeFi lending type — is RETIRED (operator ruling
-# 2026-07-18): supply/borrow legs are the canonical A_TOKEN/DEBT_TOKEN split, so
-# the builder must NOT mint a new ``…:LENDING:…`` id (mirrors the shipped
-# instruments-service adapter retire that rejects LENDING). The enum member is
-# KEPT (for reading the un-migrated legacy corpus — Wave-D data migration) but is
-# declared unsupported here so a NEW LENDING build fails loud rather than
-# emitting a retired shape. Any caller that still routes a legacy ``lending``
-# partition through this builder (e.g. unified-trading-library
-# ``canonical/_derive_instrument_id._DISPATCH``) must be repointed to
-# A_TOKEN/DEBT_TOKEN as part of the retire.
-UNSUPPORTED_BY_DESIGN: Final[frozenset[InstrumentType]] = frozenset({InstrumentType.LENDING})
+# Empty today — every enum value is handled. Keep the constant so the coverage
+# test has a single place to declare opt-outs if the enum grows non-tradable
+# sentinel values in future.
+UNSUPPORTED_BY_DESIGN: Final[frozenset[InstrumentType]] = frozenset()
 
 
 # ---------------------------------------------------------------------------
@@ -207,7 +193,7 @@ _DEFI_TYPES: Final[frozenset[InstrumentType]] = frozenset(
     {
         InstrumentType.POOL,
         InstrumentType.DEX_POOL,
-        # LENDING retired → A_TOKEN/DEBT_TOKEN split (see UNSUPPORTED_BY_DESIGN).
+        InstrumentType.LENDING,
         InstrumentType.LST,
         InstrumentType.YIELD_BEARING,
         InstrumentType.A_TOKEN,
@@ -1052,10 +1038,9 @@ def build_canonical_instrument_id(
     DeFi::
 
         build_canonical_instrument_id(
-            AssetGroup.DEFI, "aave_v3", InstrumentType.A_TOKEN, "aUSDC", chain="arbitrum",
+            AssetGroup.DEFI, "aave_v3", InstrumentType.LENDING, "USDC", chain="arbitrum",
         )
-        # → "AAVE_V3-ARBITRUM:A_TOKEN:aUSDC"
-        #   (legacy flat LENDING retired → A_TOKEN/DEBT_TOKEN split, 2026-07-18)
+        # → "AAVE_V3-ARBITRUM:LENDING:USDC"
 
     TradFi::
 
