@@ -2266,8 +2266,8 @@ def _default_seed_instruments_for(venue: str, data_type: str) -> tuple[str, ...]
         return ()
 
     # CEFI spot_pair path for `trades` + `book_snapshot_5`. PREDICTION
-    # venues also write canonical `trades` (since 2026-04-19
-    # `prediction_trades` rename) so they branch off first.
+    # venues also write canonical `trades` (the legacy `prediction_trades`
+    # data_type was retired 2026-04-19) so they branch off first.
     if data_type in ("trades", "book_snapshot_5"):
         if venue in ("POLYMARKET", "KALSHI"):
             return seed_for_venue_and_data_type(venue, data_type)
@@ -2328,7 +2328,9 @@ def _default_seed_instruments_for(venue: str, data_type: str) -> tuple[str, ...]
         return _OPTION_FUTURE_MVP_SEED_UNDERLYINGS
 
     # DEFI per-instrument dts (dex_pool_state / dex_pool_swaps / lending_indices /
-    # oracle_prices / lst_rates / rewards / risk_params) + PREDICTION
-    # legacy `prediction_trades` / `prediction_book_snapshot` /
-    # `prediction_market_metadata` — delegated to the Wave 8G seed module.
+    # oracle_prices / lst_rates / rewards / risk_params) — delegated to the
+    # Wave 8G seed module. (PREDICTION canonical `trades` is served by the
+    # POLYMARKET/KALSHI branch above; the legacy `prediction_trades` /
+    # `prediction_book_snapshot` / `prediction_market_metadata` data_types were
+    # retired 2026-04-19 and are no longer per-instrument shard types.)
     return seed_for_venue_and_data_type(venue, data_type)

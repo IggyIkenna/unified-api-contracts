@@ -162,15 +162,16 @@ DEFI_MVP_SEED_INSTRUMENTS: dict[tuple[str, str], tuple[str, ...]] = {
 }
 
 PREDICTION_MVP_SEED_INSTRUMENTS: dict[tuple[str, str], tuple[str, ...]] = {
-    # Polymarket + Kalshi emit canonical ``trades`` (prediction_trades was
-    # retired 2026-04-19 for cross-category alignment — see
-    # ``VENUE_DATA_TYPE_CAPABILITIES``). ``_PER_INSTRUMENT_SHARD_DATA_TYPES``
-    # still tolerates the legacy ``prediction_trades`` key during rollout,
-    # so seed both to future-proof callers that haven't migrated.
+    # Polymarket + Kalshi emit canonical ``trades`` (the legacy
+    # ``prediction_trades`` data_type was retired 2026-04-19 for cross-category
+    # alignment — see ``VENUE_DATA_TYPE_CAPABILITIES``). The rollout-window dual
+    # seed on ``("VENUE", "prediction_trades")`` was dropped 2026-07-19 once the
+    # prod manifest migration folded every ``prediction_trades`` row into
+    # ``trades`` (0 captured cells lost) — the captured reality is now
+    # ``trades``-only, so seeding only ``trades`` keeps the expected denominator
+    # aligned with what is actually captured.
     ("POLYMARKET", "trades"): _POLYMARKET_TOP_CONDITION_IDS,
-    ("POLYMARKET", "prediction_trades"): _POLYMARKET_TOP_CONDITION_IDS,
     ("KALSHI", "trades"): _KALSHI_TOP_CONDITION_IDS,
-    ("KALSHI", "prediction_trades"): _KALSHI_TOP_CONDITION_IDS,
 }
 
 
