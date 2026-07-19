@@ -453,8 +453,11 @@ def _build_defi(
 # two-token quoted market (``BASE-QUOTE``). A SINGLE on-chain token you want
 # oracle-price / transfer / gas / bridge data for is a ``SPOT_ASSET``; an AMM/DEX
 # liquidity pool is a ``POOL`` (EVM) or ``DEX_POOL`` / ``SOLANA_AMM_POOL`` (Solana).
-# This guards the SPOT_PAIR-misuse class (single tokens EIGEN/ETHFI + Solana AMM
-# pools meteora/lifinity mis-minted as SPOT_PAIR).
+# This guards the SINGLE-TOKEN SPOT_PAIR-misuse class only (single tokens like
+# EIGEN/ETHFI mis-minted as SPOT_PAIR — they fail the two-token check here).
+# Two-token AMM/DEX pools (meteora/lifinity, e.g. ``SOL-USDC``) PASS the
+# two-token check and are guarded at adapter type-selection (typed
+# SOLANA_AMM_POOL / POOL), NOT by this validator.
 
 
 def is_two_token_pair_symbol(symbol: str) -> bool:
