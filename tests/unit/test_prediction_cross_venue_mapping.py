@@ -35,11 +35,14 @@ def _kalshi(
     title: str = "",
     expiry: datetime | None,
     base_asset: str = "",
+    af_fixture_id: int | None = None,
 ) -> InstrumentRecord:
     """A Kalshi prediction InstrumentRecord in the real adapter shape.
 
     NOTE: the canonical ``InstrumentRecord`` has NO ``symbol``/title field, so
     ``title`` here is documentation only (sports tests pass it via ``titles=``).
+    ``af_fixture_id`` defaults to ``None`` (honest absence) — set it to exercise
+    the fixture-id-primary sports key.
     """
     return InstrumentRecord(
         instrument_key=market_ticker,
@@ -51,6 +54,7 @@ def _kalshi(
         settle_asset="USD",
         expiry=expiry,
         strike=None,
+        af_fixture_id=af_fixture_id,
     )
 
 
@@ -61,6 +65,7 @@ def _polymarket(
     title: str = "",
     expiry: datetime | None,
     base_asset: str = "",
+    af_fixture_id: int | None = None,
 ) -> InstrumentRecord:
     """A Polymarket prediction InstrumentRecord in the real adapter shape."""
     return InstrumentRecord(
@@ -73,6 +78,7 @@ def _polymarket(
         settle_asset="USD",
         expiry=expiry,
         strike=None,
+        af_fixture_id=af_fixture_id,
     )
 
 
@@ -392,6 +398,140 @@ def test_match_key_is_order_independent_for_crypto() -> None:
     p = match_key(venue="POLYMARKET", instrument_key="0xBTC", raw_symbol="bitcoin-above-95000", symbol="y", **common)
     assert k == p
     assert k is not None
+
+
+# ---------------------------------------------------------------------------
+# af_fixture_id-primary sports key — a resolved API-Football fixture id is a
+# strong EXACT key (same fixture + bet-type ⇒ same market), preferred over the
+# fuzzy team-name pairing. None (or absent) ⇒ the fuzzy path is used, unchanged.
+# ---------------------------------------------------------------------------
+
+
+def test_match_key_prefers_af_fixture_id_for_sports() -> None:
+    """Same af_fixture_id + bet-type ⇒ SAME key across venues; a different fixture ⇒ different key."""
+    from unified_api_contracts.predictions import (
+        PredictionBetType,
+        PredictionUnderlying,
+    )
+
+    common = {
+        "expiry": datetime(2026, 6, 26, 23, 10, tzinfo=UTC),
+        "underlying": PredictionUnderlying.SPORTS_MLB,
+        "bet_type": PredictionBetType.MATCH,
+        "strike": None,
+        # Deliberately None: the af_fixture_id path must NOT depend on the fuzzy
+        # pairing key (that is the whole reliability win).
+        "sports_pairing_key": None,
+    }
+    kalshi = match_key(
+        venue="KALSHI",
+        instrument_key="KXMLBGAME-26JUN261910SEACLE-SEA",
+        raw_symbol="KXMLBGAME-26JUN261910SEACLE",
+        symbol="Seattle vs Cleveland",
+        af_fixture_id=99001,
+        **common,
+    )
+    poly = match_key(
+        venue="POLYMARKET",
+        instrument_key="0xMLBSEACLE",
+        raw_symbol="mlb-sea-cle-2026-06-26",
+        symbol="Seattle vs. Cleveland",
+        af_fixture_id=99001,
+        **common,
+    )
+    other_fixture = match_key(
+        venue="POLYMARKET",
+        instrument_key="0xMLBOTHER",
+        raw_symbol="mlb-sea-cle-2026-06-26-game2",
+        symbol="Seattle vs. Cleveland (game 2)",
+        af_fixture_id=99002,
+        **common,
+    )
+    assert kalshi == poly == "SPORTS_FIX::99001::MATCH"
+    assert kalshi != other_fixture
+
+
+def test_match_key_falls_back_to_fuzzy_pairing_when_af_fixture_id_none() -> None:
+    """af_fixture_id=None (or omitted) ⇒ the fuzzy sports_pairing_key path is used, unchanged."""
+    from unified_api_contracts.predictions import (
+        PredictionBetType,
+        PredictionUnderlying,
+    )
+
+    common = {
+        "venue": "KALSHI",
+        "instrument_key": "KXMLBGAME-26JUN261910SEACLE-SEA",
+        "raw_symbol": "KXMLBGAME-26JUN261910SEACLE",
+        "symbol": "Seattle vs Cleveland",
+        "expiry": datetime(2026, 6, 26, 23, 10, tzinfo=UTC),
+        "underlying": PredictionUnderlying.SPORTS_MLB,
+        "bet_type": PredictionBetType.MATCH,
+        "strike": None,
+        "sports_pairing_key": ("MLB", "CLE", "SEA", "2026-06-26"),
+    }
+    explicit_none = match_key(af_fixture_id=None, **common)
+    default_omitted = match_key(**common)  # param defaults to None
+    assert explicit_none == default_omitted == "SPORTS::MLB::MATCH::CLE::SEA::2026-06-26"
+
+
+def test_build_cross_venue_mapping_pairs_on_shared_af_fixture_id() -> None:
+    """End-to-end: both venues threading the SAME af_fixture_id pair EXACTLY on it."""
+    expiry = datetime(2026, 6, 26, 23, 10, tzinfo=UTC)
+    kalshi = _kalshi(
+        market_ticker="KXMLBGAME-26JUN261910SEACLE-SEA",
+        event_ticker="KXMLBGAME-26JUN261910SEACLE",
+        title="Seattle vs Cleveland",
+        expiry=expiry,
+        af_fixture_id=99001,
+    )
+    poly = _polymarket(
+        condition_id="0xMLBSEACLE",
+        slug="mlb-sea-cle-2026-06-26",
+        expiry=expiry,
+        af_fixture_id=99001,
+    )
+    # Titles make the fuzzy pairing FULLY available on both sides; the shared
+    # af_fixture_id is still PREFERRED (SPORTS_FIX:: key, not SPORTS::) — the win.
+    titles = {
+        "KXMLBGAME-26JUN261910SEACLE-SEA": "Seattle vs Cleveland",
+        "0xMLBSEACLE": "Seattle vs. Cleveland",
+    }
+    mappings = build_cross_venue_mapping([kalshi], [poly], titles=titles)
+
+    assert len(mappings) == 1
+    row = mappings[0]
+    assert row.kalshi_market_ticker == "KXMLBGAME-26JUN261910SEACLE-SEA"
+    assert row.polymarket_condition_id == "0xMLBSEACLE"
+    assert row.canonical_event_id == "SPORTS_FIX::99001::MATCH"
+    assert row.underlying is None
+    assert row.strike is None
+
+
+def test_build_cross_venue_mapping_different_af_fixture_id_is_no_pair() -> None:
+    """Distinct af_fixture_ids ⇒ genuinely different fixtures ⇒ NO pair (no false merge)."""
+    expiry = datetime(2026, 6, 26, 23, 10, tzinfo=UTC)
+    kalshi = _kalshi(
+        market_ticker="KXMLBGAME-26JUN261910SEACLE-SEA",
+        event_ticker="KXMLBGAME-26JUN261910SEACLE",
+        title="Seattle vs Cleveland",
+        expiry=expiry,
+        af_fixture_id=99001,
+    )
+    poly = _polymarket(
+        condition_id="0xMLBSEACLE2",
+        slug="mlb-sea-cle-2026-06-26-game2",
+        expiry=expiry,
+        af_fixture_id=99002,  # second leg of a double-header — a different fixture
+    )
+    # Same teams/date on both titles ⇒ the FUZZY pairing WOULD match; the distinct
+    # af_fixture_ids correctly keep the two legs apart (no false merge).
+    titles = {
+        "KXMLBGAME-26JUN261910SEACLE-SEA": "Seattle vs Cleveland",
+        "0xMLBSEACLE2": "Seattle vs. Cleveland",
+    }
+    mappings = build_cross_venue_mapping([kalshi], [poly], titles=titles)
+
+    assert mappings == []
 
 
 # ---------------------------------------------------------------------------
