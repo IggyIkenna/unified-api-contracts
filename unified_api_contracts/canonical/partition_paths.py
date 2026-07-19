@@ -265,15 +265,36 @@ def build_cefi_partition_path(
 # ``instrument_type`` carries the series-class token (e.g. ``rates``,
 # ``options``, ``etf_flows``).
 
+# instrument_types that bundle an entire chain into a single file per
+# underlying per day. Mirrors MTDS
+# ``tradfi/tradfi_shared.py::CHAIN_INSTRUMENT_TYPES`` and the CeFi v6 chain
+# layout. ``combo`` is deliberately EXCLUDED (its leg-aware id format is
+# unsettled — combo chains keep the bare ``underlying=.../ticks.parquet``
+# fan-in without the quote/margin tail).
+TRADFI_CHAIN_INSTRUMENT_TYPES: frozenset[str] = frozenset({"options_chain", "futures_chain"})
+
+# Single-instrument tradfi types whose canonical shard filename is the FULL
+# instrument_id (``NYSE:EQUITY:ABBV-USD.parquet``). Mirrors MTDS
+# ``tradfi/tradfi_shared.py::SINGLE_INSTRUMENT_TYPES`` minus ``combo`` (excluded,
+# bare-symbol). The write-time guard enforces the full-id filename for THESE
+# itypes only — special bundle types (``event_contract`` / ``combo``) that do
+# not yet carry a canonical id are left alone.
+TRADFI_SINGLE_INSTRUMENT_TYPES: frozenset[str] = frozenset(
+    {"equity", "etf", "index", "currency", "bond", "cds", "commodity", "future", "option", "spot_pair"}
+)
+
 
 def build_tradfi_partition_path(
     *,
     venue: str,
-    instrument_type: InstrumentType,
+    instrument_type: InstrumentType | str,
     data_type: str,
     day: _dt.date,
     file_name: str,
     pipeline_mode: str | None = None,
+    underlying: str = "",
+    quote_asset: str = "",
+    margin_type: str = "",
 ) -> str:
     """Build the canonical TradFi partition path (full bucket-relative path).
 
@@ -294,6 +315,23 @@ def build_tradfi_partition_path(
     ``raw_tick_data/by_date/day={YYYY-MM-DD}/asset_group=tradfi/venue={V}/
     instrument_type={IT}/data_type={DT}/{file_name}``
 
+    v6 chain layout (2026-07-19) — only when ``instrument_type`` is a CHAIN
+    bundle (``options_chain`` / ``futures_chain``) AND all three of
+    ``underlying`` / ``quote_asset`` / ``margin_type`` are populated (mirrors
+    :func:`build_cefi_partition_path` byte-for-byte + the shipped migration
+    executor ``migrate_tradfi_canonical_2026_07._canonical_chain_path``):
+
+    ``raw_tick_data/by_date/day=.../instrument_type={IT}/data_type={DT}/
+    underlying={U}/quote={Q}/margin={M}/ticks.parquet``
+
+    For single-instrument (non-chain) shards, the v6 layout does NOT add extra
+    path segments — the ``file_name`` already carries the full canonical
+    instrument_id (``NYSE:EQUITY:ABBV-USD.parquet``).
+
+    Accepts either an ``InstrumentType`` enum member or a raw lowercase string
+    (the chain-bundle tokens ``options_chain`` / ``futures_chain`` are not in
+    the canonical enum so callers pass them as strings — same as CeFi).
+
     Used by FRED (rates curve via DGS series), OPRA (options chains via
     Databento), Tardis (ETF flows / institutional feeds), CME (futures
     chains).
@@ -306,14 +344,24 @@ def build_tradfi_partition_path(
         raise ValueError(msg)
 
     v = _normalize_venue_upper(venue)
-    it = instrument_type.value.lower()
+    it = instrument_type.value.lower() if isinstance(instrument_type, InstrumentType) else instrument_type.lower()
     day_str = day.strftime("%Y-%m-%d")
     pipeline_mode_segment = f"pipeline_mode={pipeline_mode}/" if pipeline_mode else ""
-    return (
+    base = (
         f"{RAW_TICK_DATA_PREFIX}day={day_str}/{pipeline_mode_segment}"
         f"{ASSET_GROUP_HIVE_KEY}=tradfi/"
-        f"venue={v}/instrument_type={it}/data_type={data_type}/{file_name}"
+        f"venue={v}/instrument_type={it}/data_type={data_type}"
     )
+
+    # v6 layout only for CHAIN bundles with all three axes populated.
+    is_chain = it in TRADFI_CHAIN_INSTRUMENT_TYPES
+    if is_chain and underlying and quote_asset and margin_type:
+        return (
+            f"{base}/underlying={underlying.upper()}/quote={quote_asset.upper()}/"
+            f"margin={margin_type.lower()}/ticks.parquet"
+        )
+
+    return f"{base}/{file_name}"
 
 
 # ---------------------------------------------------------------------------
@@ -709,6 +757,46 @@ def canonical_path_violations(path: str, *, require_pipeline_mode: bool = False)
                 "it with an underscore (e.g. 'AAVE_V3', 'UNISWAP_V3')"
             )
 
+    # ── tradfi canonical shape (chain quote/margin tail + single full-id filename) ──
+    # Enforced write-time by the MTDS PartitionedTickWriter (asset_group=tradfi)
+    # so a regressing backfill fails loud instead of silently re-diverging the
+    # migrated corpus (chain object at underlying=/quote=/margin= vs a manifest
+    # atom / new write that dropped the tail). SSOT:
+    # plans/active/issues/tradfi_canonical_path_migration_design_2026_07_19.md.
+    if asset_group_value == "tradfi":
+        file_name = segments[-1]
+        it_value = kv.get("instrument_type")
+        if kv.get("pipeline_mode") == "batch_massive":
+            violations.append(
+                "tradfi pipeline_mode=batch_massive is forbidden — Massive is purged; "
+                "Databento is the batch source of truth"
+            )
+        if it_value in TRADFI_CHAIN_INSTRUMENT_TYPES:
+            # chain shard tail MUST be underlying=.../quote=.../margin=.../ticks.parquet
+            tail_keys = [seg.partition("=")[0] for seg in partition_segments[-3:]]
+            if tail_keys != ["underlying", "quote", "margin"] or file_name != "ticks.parquet":
+                violations.append(
+                    f"tradfi {it_value} shard must end "
+                    "'.../underlying=<BASE>/quote=<Q>/margin=<M>/ticks.parquet' "
+                    f"(got tail {[*partition_segments[-3:], file_name]!r})"
+                )
+        elif it_value in TRADFI_SINGLE_INSTRUMENT_TYPES:
+            # single-instrument shard: filename MUST be the full canonical
+            # instrument_id (VENUE:TYPE:SYMBOL...), never a bare symbol or a
+            # symbol-less ticks.parquet fan-in. Scoped to the canonical single
+            # itypes only — ``combo`` (bare-symbol, leg-id unsettled) and special
+            # bundle types like ``event_contract`` are deliberately NOT enforced.
+            if file_name == "ticks.parquet":
+                violations.append(
+                    "tradfi single-instrument shard filename must be the full canonical "
+                    "instrument_id, got a symbol-less 'ticks.parquet' fan-in"
+                )
+            elif ":" not in file_name:
+                violations.append(
+                    f"tradfi single-instrument shard filename {file_name!r} must be the full "
+                    "canonical instrument_id ('VENUE:TYPE:SYMBOL...'), got a bare symbol"
+                )
+
     return violations
 
 
@@ -728,6 +816,8 @@ __all__ = [
     "ASSET_GROUP_HIVE_KEY",
     "CEFI_CHAIN_INSTRUMENT_TYPES",
     "RAW_TICK_DATA_PREFIX",
+    "TRADFI_CHAIN_INSTRUMENT_TYPES",
+    "TRADFI_SINGLE_INSTRUMENT_TYPES",
     "build_cefi_partition_path",
     "build_defi_partition_path",
     "build_prediction_partition_path",

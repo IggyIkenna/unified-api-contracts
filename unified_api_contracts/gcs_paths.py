@@ -35,6 +35,12 @@ from unified_api_contracts.canonical.partition_paths import (
     RAW_TICK_DATA_PREFIX as RAW_TICK_DATA_PREFIX,
 )
 from unified_api_contracts.canonical.partition_paths import (
+    TRADFI_CHAIN_INSTRUMENT_TYPES as TRADFI_CHAIN_INSTRUMENT_TYPES,
+)
+from unified_api_contracts.canonical.partition_paths import (
+    TRADFI_SINGLE_INSTRUMENT_TYPES as TRADFI_SINGLE_INSTRUMENT_TYPES,
+)
+from unified_api_contracts.canonical.partition_paths import (
     build_cefi_partition_path as build_cefi_partition_path,
 )
 from unified_api_contracts.canonical.partition_paths import (
@@ -56,6 +62,8 @@ __all__ = [
     "CEFI_CHAIN_INSTRUMENT_TYPES",
     "RAW_TICK_DATA_PREFIX",
     "STRATEGY_STORE_BUCKET_TEMPLATE",
+    "TRADFI_CHAIN_INSTRUMENT_TYPES",
+    "TRADFI_SINGLE_INSTRUMENT_TYPES",
     "AssetGroup",
     "BucketKind",
     "bucket_name",
