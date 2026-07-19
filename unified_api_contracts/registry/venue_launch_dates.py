@@ -270,6 +270,23 @@ DEFI_VENUE_LAUNCH_DATES: dict[str, str] = {
     "SANCTUM-SOLANA": "2023-06-01",  # Sanctum v1 LST marketplace
     "SOLBLAZE-SOLANA": "2022-10-15",  # SolBlaze bSOL stake-pool (conservative floor)
     "SOLANA-NATIVE-SOLANA": "2020-03-16",  # native SOL staking == mainnet-beta genesis
+    # 5 more LST/vault venues IS-wired 2026-07-18 (same MTDS@8746708c lst_rates
+    # acquisition as the EXPECTED_COVERAGE_BY_ASSET_GROUP["defi"] flat rows). BEFORE
+    # these entries the FLAT manifest venue (KELPDAO/RENZO/BEEFY/IDLE/PENDLE — chain
+    # is a separate manifest dim) had NO launch clip → the pre-launch gate never
+    # fired → expected_coverage() returned SHOULD_HAVE_DATA back to the 2018 window
+    # start, so honest pre-launch empties were falsely counted MISSING/DIVERGENT_EMPTY
+    # (coverage-denominator inflation). ETHEREUM is the chain each emits lst_rates on
+    # (rsETH / ezETH / moo-vault / senior-tranche / SY exchangeRate). Each value
+    # AGREES with chain_env.PROTOCOL_LAUNCH_DATES (drift guard
+    # test_venue_launch_dates_no_new_drift_vs_chain_env). The flat manifest venue
+    # resolves via _venue_launch_date_for's flat-protocol fallback (min over the
+    # PROTOCOL-* chain rows). SSOT: uac_defi_launch_date_registry_drift_2026_07_18.
+    "KELPDAO-ETHEREUM": "2023-11-09",  # KelpDAO rsETH mainnet
+    "RENZO-ETHEREUM": "2024-04-29",  # Renzo ezETH mainnet
+    "BEEFY-ETHEREUM": "2021-12-01",  # Beefy ETH vaults (multichain founding on BSC 2020-10-08)
+    "IDLE-ETHEREUM": "2019-08-13",  # Idle Finance mainnet launch
+    "PENDLE-ETHEREUM": "2021-06-15",  # Pendle V1 mainnet
 }
 """DeFi venue (``PROTOCOL-CHAIN`` or bare ``PROTOCOL``) → public-launch date.
 
