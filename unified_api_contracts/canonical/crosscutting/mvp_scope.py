@@ -115,8 +115,22 @@ _canonical_repr = canonical_config_repr
 # ---------------------------------------------------------------------------
 
 
-MVP_SCOPE_CONFIG_VERSION: Final[int] = 17
+MVP_SCOPE_CONFIG_VERSION: Final[int] = 18
 """Monotonic version of :data:`MVP_SCOPE`. Bump on any content change.
+
+v18 (2026-07-18): ``book_snapshot_5`` added to ``PredictionMvpRule.data_types``
+(prediction_consolidated_closeout_2026_07_18.md P1 reconcile). It was already in
+the OTHER two prediction registries — ``DATA_TYPES_BY_ASSET_GROUP["prediction"]``
++ ``VENUE_DATA_TYPE_CAPABILITIES["POLYMARKET"/"KALSHI"]`` +
+``expected_coverage._PREDICTION`` (all re-added 2026-06-23 when both CLOB venues
+began genuinely emitting the top-5 depth ladder) — and the depth data is captured
+(live A0 measured 399,713 book_snapshot_5 prediction rows), but was ABSENT from
+this MVP rule, so a plain MTDS matrix gave 4 shards
+({POLYMARKET,KALSHI} x {trades,book_snapshot_5}) while ``--mvp-only`` silently
+tested only ``trades`` (2 shards). This aligns the outlier rule with the other
+registries + the captured data. No OTHER asset_group's data_types set changes
+(cefi/tradfi/defi/sports MVP sets are unchanged — see
+``TestPredictionReconcileCrossAgUnchanged``).
 
 v17 (2026-07-18): 26 LST / restaking / vault DeFi venues onboarded to the
 IS-producible set P (``instruments-service`` wired their factory adapters — which
