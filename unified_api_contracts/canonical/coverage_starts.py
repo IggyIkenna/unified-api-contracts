@@ -135,6 +135,19 @@ DEFI_DATA_TYPE_COVERAGE_START: dict[str, dict[str, date]] = {
         "dex_pool_state": date(2023, 4, 1),
         "dex_pool_swaps": date(2024, 1, 1),
     },
+    # ── LST venues IS-wired 2026-07-18 (MTDS@8746708c lst_rates acquisition) ──
+    # No MEASURED manifest floor yet (freshly acquired), so the honest floor is the
+    # protocol's ETHEREUM on-chain genesis — an lst_rates exchange-rate row cannot
+    # exist before the protocol launched. Same chain_env.PROTOCOL_LAUNCH_DATES
+    # ETHEREUM genesis used for their venue-launch clip in venue_launch_dates.py
+    # (kept consistent). Sibling of STADER/STAKEWISE/SWELL below (also LST lst_rates
+    # floors == their ETH genesis). LOWER these when a backfill measures an earlier
+    # captured date — never raise to mask a real gap.
+    "BEEFY": {"lst_rates": date(2021, 12, 1)},  # Beefy ETH vaults genesis (chain_env ETHEREUM)
+    "IDLE": {"lst_rates": date(2019, 8, 13)},  # Idle Finance ETH mainnet launch
+    "KELPDAO": {"lst_rates": date(2023, 11, 9)},  # KelpDAO rsETH mainnet
+    "PENDLE": {"lst_rates": date(2021, 6, 15)},  # Pendle V1 mainnet
+    "RENZO": {"lst_rates": date(2024, 4, 29)},  # Renzo ezETH mainnet
     "STADER": {"lst_rates": date(2023, 7, 10)},
     "STAKEWISE": {"lst_rates": date(2023, 11, 28)},
     "SUSHISWAP": {

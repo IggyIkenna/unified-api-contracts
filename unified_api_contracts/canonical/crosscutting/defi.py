@@ -342,10 +342,12 @@ class DefiPoolIdentity:
         colon-before-fee") so a batch shard and this converter emit an IDENTICAL
         id for the same pool — the data-join key both rely on.
 
-        This IS the operator's symbolic ``canonical_instrument_id`` (materialized
-        as the catalogue ``glued_pair_id`` column); the pool ADDRESS is the
-        separate machine :attr:`canonical_instrument_id` / catalogue
-        ``instrument_id`` (two-id model, Option A — POOL rows DIVERGE). Falls
+        This IS the operator's symbolic ``canonical_instrument_id`` (it materializes
+        the catalogue ``canonical_instrument_id`` COLUMN for a POOL row — the shipped
+        two-id Option-A mapping, matching this module's header + MTDS
+        ``defi_catalog_reader``); the pool ADDRESS is the separate machine
+        :attr:`canonical_instrument_id` / catalogue ``instrument_id`` column (two-id
+        model, Option A — POOL rows DIVERGE). Falls
         back to the pool address when the pair is unknown
         (``…:POOL:<pool_address>``) so the id is always non-empty + reversible
         via :func:`parse_glued_pool_id`.
