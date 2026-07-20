@@ -229,9 +229,10 @@ ALL_DEFI_VENUES: list[str] = [
     "LIFINITY-SOLANA",
     "PHOENIX-SOLANA",
     # ── Oracle price-feed venues (2026-07-20 DeFi catalogue canonicalization —
-    #    oracle_prices data_type; IS-wired via chainlink.py (per-chain) / pyth.py.
-    #    CHAINLINK = multi-chain aggregator feeds read on-chain via Alchemy RPC;
-    #    PYTH = Solana Hermes/pull oracle). Flipped to phase="live" below. ──
+    #    oracle_prices data_type; PYTH is IS-wired via pyth.py, phase="live" below.
+    #    CHAINLINK-* (multi-chain aggregator feeds via Alchemy RPC) stays
+    #    phase="pipeline" below — declared but not yet IS-wired (no chainlink.py
+    #    adapter exists; 2026-07-20 gate-failure remediation, BLK-0c7b82fe). ──
     "CHAINLINK-ETHEREUM",
     "CHAINLINK-ARBITRUM",
     "CHAINLINK-BASE",
@@ -616,13 +617,18 @@ DEFI_VENUE_PHASE: dict[str, str] = {
     "LIFINITY-SOLANA": "live",
     "PHOENIX-SOLANA": "live",
     # ── Live (Oracle price feeds — 2026-07-20 DeFi catalogue canonicalization;
-    #    chainlink.py (per-chain) / pyth.py adapters produce oracle_prices) ──
-    "CHAINLINK-ETHEREUM": "live",
-    "CHAINLINK-ARBITRUM": "live",
-    "CHAINLINK-BASE": "live",
-    "CHAINLINK-OPTIMISM": "live",
-    "CHAINLINK-POLYGON": "live",
+    #    pyth.py adapter produces oracle_prices) ──
     "PYTH-SOLANA": "live",
+    # ── Pipeline (Oracle price feeds — CHAINLINK-* stays pipeline until the
+    #    per-chain Alchemy-RPC chainlink.py adapter is actually built in
+    #    instruments-service; no VENUE_TO_ADAPTER_KEY entry either, see
+    #    venue_adapter_keys.py — 2026-07-20 gate-failure remediation,
+    #    BLK-0c7b82fe) ──
+    "CHAINLINK-ETHEREUM": "pipeline",
+    "CHAINLINK-ARBITRUM": "pipeline",
+    "CHAINLINK-BASE": "pipeline",
+    "CHAINLINK-OPTIMISM": "pipeline",
+    "CHAINLINK-POLYGON": "pipeline",
 }
 
 
@@ -718,11 +724,8 @@ MTDS_DEFI_VENUES: list[str] = [
     "LIFINITY-SOLANA",
     "PHOENIX-SOLANA",
     # --- Oracle price feeds (2026-07-20 DeFi catalogue canonicalization) ---
-    "CHAINLINK-ETHEREUM",
-    "CHAINLINK-ARBITRUM",
-    "CHAINLINK-BASE",
-    "CHAINLINK-OPTIMISM",
-    "CHAINLINK-POLYGON",
+    # CHAINLINK-* excluded: pipeline phase, no adapter yet (see defi_venues.py
+    # DEFI_VENUE_PHASE + venue_adapter_keys.py, 2026-07-20 BLK-0c7b82fe).
     "PYTH-SOLANA",
 ]
 
