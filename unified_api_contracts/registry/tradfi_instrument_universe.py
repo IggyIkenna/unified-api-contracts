@@ -472,6 +472,17 @@ KRX_EQUITIES: list[KrxEquityDef] = [
 # keys + the data-status / MVP carve-out lookup. Yahoo tickers append ``.KS``.
 KRX_EQUITY_SYMBOLS: frozenset[str] = frozenset(eq.symbol for eq in KRX_EQUITIES)
 
+# Bare-KRX-code -> human-readable issuer name. The SSOT display-name lookup for the
+# KRX single-stock equities, whose canonical ``instrument_key`` is the opaque 6-digit
+# code (``KRX:EQUITY:005930``). Consumed by the instruments-service reference-data
+# adapter (``_create_krx_equity_records`` stamps ``InstrumentRecord.name``) AND the
+# catalogue roll-up's on-the-fly ``name`` stamp (keyed on ``base_asset`` = the bare
+# code), so the data-status Catalogue Explorer / CSV can render "Samsung Electronics"
+# next to ``005930`` without a re-fetch. Keyed on the bare code (the ``base_asset`` the
+# catalogue carries), covering both the bare ``KRX:EQUITY:005930`` and any legacy
+# ``.KS``-suffixed variant (same ``base_asset``).
+KRX_EQUITY_NAMES: dict[str, str] = {eq.symbol: eq.name for eq in KRX_EQUITIES}
+
 
 @dataclass(frozen=True, slots=True)
 class YahooIndexDef:

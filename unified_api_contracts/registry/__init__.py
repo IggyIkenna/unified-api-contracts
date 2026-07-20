@@ -374,6 +374,7 @@ from .token_wrapping import (
 from .tradfi_instrument_universe import (
     FX_SPOT_PAIRS,
     KRX_EQUITIES,
+    KRX_EQUITY_NAMES,
     KRX_EQUITY_SYMBOLS,
     TRADFI_DATABENTO_INSTRUMENTS,
     YAHOO_INDICES,
@@ -795,6 +796,7 @@ __all__ = [
     "KALSHI",
     "KNOWN_ETFS",
     "KRX_EQUITIES",
+    "KRX_EQUITY_NAMES",
     "KRX_EQUITY_SYMBOLS",
     "KRX_INDEX_DAILY_FIRST_DATE",
     "LADBROKES",

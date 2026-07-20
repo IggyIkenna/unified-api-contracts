@@ -157,6 +157,24 @@ class InstrumentRecord(BaseModel):
             "resolves no human title (the raw symbol/slug remains the label floor)."
         ),
     )
+    # Additive + optional (non-breaking: added-optional-field), same pattern as
+    # canonical_instrument_id / question above. Human-readable security / issuer name
+    # for instruments whose ``instrument_key`` is an opaque coded symbol — TODAY the
+    # KRX (Korea Exchange) single-stock equities, whose canonical symbol is the bare
+    # 6-digit KRX code (``KRX:EQUITY:005930``) with no readable label. Sourced from
+    # the reference-data registry (``KRX_EQUITIES[i].name``) so downstream surfaces
+    # (data-status Catalogue Explorer, CSV export, UI) can show "Samsung Electronics"
+    # next to ``005930`` without a re-fetch. None for instruments whose adapter
+    # resolves no display name (the raw symbol/base_asset remains the label floor).
+    # Plan: krx_name + tradfi_catalogue deliverables 2026-07-20 (forward-only).
+    name: str | None = Field(
+        default=None,
+        description=(
+            "Human-readable security / issuer name for an opaque-coded instrument "
+            "(e.g. KRX 'KRX:EQUITY:005930' → 'Samsung Electronics'). None when the "
+            "adapter resolves no display name (raw_symbol/base_asset remains the floor)."
+        ),
+    )
     status: InstrumentStatus = InstrumentStatus.ACTIVE
     available_from_datetime: datetime | None = Field(
         default=None,
