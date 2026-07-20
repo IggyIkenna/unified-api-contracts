@@ -224,15 +224,20 @@ VENUE_TO_ADAPTER_KEY: dict[str, str] = {
     # Solana lending adapters (2026-07-09) — real public REST/JSON APIs.
     "MARGINFI-SOLANA": "marginfi",
     "SOLEND-SOLANA": "solend",
-    # Oracle price-feed venues (2026-07-20 DeFi catalogue canonicalization) — new
-    # IS chainlink.py adapter (per-chain aggregator feeds via Alchemy RPC) + the
-    # existing pyth.py adapter. Chain is parsed from the venue suffix in the IS
-    # factory's _DEFI_GRAPH_ADAPTERS branch. data_type = oracle_prices.
-    "CHAINLINK-ETHEREUM": "chainlink",
-    "CHAINLINK-ARBITRUM": "chainlink",
-    "CHAINLINK-BASE": "chainlink",
-    "CHAINLINK-OPTIMISM": "chainlink",
-    "CHAINLINK-POLYGON": "chainlink",
+    # Oracle price-feed venues (2026-07-20 DeFi catalogue canonicalization).
+    # PYTH = existing pyth.py adapter (real, wired). CHAINLINK-* stays phase=
+    # "pipeline" (defi_venues.py DEFI_VENUE_PHASE) with NO entry here — the
+    # per-chain Alchemy-RPC chainlink.py adapter this key names was never
+    # built in instruments-service (2026-07-20 gate-failure remediation,
+    # BLK-0c7b82fe); adding a real key without the adapter class fails
+    # TestAdapterRoutingUACInvariant.test_every_uac_adapter_key_resolves_to_a_class
+    # on the IS side, and NO_ADAPTER_YET is reserved for the deliberate
+    # MTDS-owned/sentinel set (test_sentinel_set_is_exactly_the_declared_one) —
+    # so "no entry + pipeline phase" (matches YEARN_V3-OPTIMISM/BEEFY-POLYGON/
+    # IDLE-POLYGON precedent) is the correct interim state. Re-add the 5
+    # CHAINLINK-{ETHEREUM,ARBITRUM,BASE,OPTIMISM,POLYGON} -> "chainlink" entries
+    # + flip DEFI_VENUE_PHASE back to "live" in the SAME commit that ships the
+    # real chainlink.py adapter.
     "PYTH-SOLANA": "pyth",
     # RADIANT-BSC (2026-07-10): the auto-gen loop below only covers chains with
     # a registered subgraph_id (SUBGRAPH_IDS["radiant"] = ARBITRUM+ETHEREUM
