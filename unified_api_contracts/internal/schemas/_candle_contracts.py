@@ -86,7 +86,10 @@ _OHLCV_CORE: list[ColumnSpec] = [
 ]
 
 # Trades-derived bars: OHLC is nullable when no trades occur in the interval.
-# Book/derivative bars use _OHLCV_CORE (non-nullable) since a quote always exists.
+# ALSO used by the derivative_ticker bar (``deriv_ohlcv_{tf}``) — see the
+# nullable_ohlcv=True note at its _register() call below. Book bars keep
+# _OHLCV_CORE (non-nullable): the book adapter still LOCF-densifies its grid,
+# so a quote is always present on every emitted bar.
 _OHLCV_CORE_TRADES: list[ColumnSpec] = [
     ColumnSpec(name="open", dtype="float64", nullable=True),
     ColumnSpec(name="high", dtype="float64", nullable=True),
@@ -104,10 +107,20 @@ _TIMEFRAME_COL = ColumnSpec(
 )
 
 _BOOK5_EXT: list[ColumnSpec] = [
-    ColumnSpec(name=spec.name, dtype="float64", nullable=True)
-    for spec in BOOK_SUMMARY_COLUMNS
+    ColumnSpec(name=spec.name, dtype="float64", nullable=True) for spec in BOOK_SUMMARY_COLUMNS
 ]
 
+# derivative_ticker bar extension.
+#
+# NAMING vs SEMANTICS: the ``_mean`` suffix is a MISNOMER retained for on-disk
+# stability — the value is the LAST OBSERVATION IN THE BAR WINDOW, not an
+# arithmetic mean. derivative_ticker is a snapshot stream (funding / mark /
+# index are point-in-time states), so a within-bar average would fabricate a
+# number that never existed on the wire. The producing adapter
+# (``CefiDerivativeAdapter``) and the roll-up rule (``"last"``) are both
+# last-in-window; only the column NAME says "mean". All three are nullable
+# because a bar whose window contained no ticker observation legitimately has
+# no value — see the nullable_ohlcv note on the _register() call below.
 _DERIV_EXT: list[ColumnSpec] = [
     ColumnSpec(name="funding_rate_mean", dtype="float64", nullable=True),
     ColumnSpec(name="mark_price_mean", dtype="float64", nullable=True),
@@ -279,7 +292,32 @@ for _tf in _TIMEFRAMES_CEFI:
     # perpetual
     _register(_build("cefi", "perpetual", _trades_key(_tf), symbol_column="symbol", extra_cols=[], nullable_ohlcv=True))
     _register(_build("cefi", "perpetual", _book5_key(_tf), symbol_column="symbol", extra_cols=_BOOK5_EXT))
-    _register(_build("cefi", "perpetual", _deriv_key(_tf), symbol_column="symbol", extra_cols=_DERIV_EXT))
+    # nullable_ohlcv=True (2026-07-20): the derivative_ticker bar's OHLC is
+    # driven from the mark-price snapshot, and the adapter no longer carries a
+    # stale value forward into a window that had no observation (LOCF removed —
+    # operator ruling: "the last result within the time window we want, else NaN
+    # price and 0 volume, so we don't assume data was in that window and
+    # downstream handles"). A covered-but-empty window therefore has genuinely
+    # no price, and the row is written with NaN OHLC + NaN _DERIV_EXT + volume=0.
+    #
+    # The two "no value here" signals stay SEPARATE and must not be conflated:
+    #   • parquet, per BIN  → row present + NaN price + 0 volume
+    #                         == "we derived this window; nothing to aggregate in it"
+    #   • manifest, per SHARD-DAY → capture_status answers "did we even derive it"
+    #                         (captured / empty_confirmed+reason / attempted_failed /
+    #                          expected_unattempted)
+    # A consumer must never infer "was this fetched?" from a NaN in the parquet.
+    # SSOT: codex/02-data/honest-absence-downstream-handling.md.
+    _register(
+        _build(
+            "cefi",
+            "perpetual",
+            _deriv_key(_tf),
+            symbol_column="symbol",
+            extra_cols=_DERIV_EXT,
+            nullable_ohlcv=True,
+        )
+    )
     _register(
         _build(
             "cefi",
