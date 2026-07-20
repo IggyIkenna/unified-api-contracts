@@ -165,12 +165,14 @@ from .databento_subscription_allowlist import (
     earliest_allowed_start,
 )
 from .defi_major_assets import (
+    DEFI_FORCE_INCLUDE_POOLS,
     DEFI_FORCE_INCLUDE_TOKENS,
     DEFI_MAJOR_ASSET_ADDRESS_LIST,
     DEFI_MAJOR_ASSET_ADDRESSES,
     DEFI_MAJOR_ASSET_SYMBOLS,
     DEX_VENUE_KEYWORDS,
     is_defi_force_include,
+    is_defi_force_include_pool,
 )
 from .defi_protocol_registry import DEFI_PROTOCOLS, DEFI_VENUE_TO_PROTOCOL
 from .defi_reserve_params import (
@@ -732,6 +734,7 @@ __all__ = [
     "DATABENTO_VALID_PARENT_SYMBOLS",
     "DATA_TYPES_BY_ASSET_GROUP",
     "DECOMMISSIONED_VENUE_BASES",
+    "DEFI_FORCE_INCLUDE_POOLS",
     "DEFI_FORCE_INCLUDE_TOKENS",
     "DEFI_INSTRUMENTS",
     "DEFI_INSTRUMENTS_NOT_YET_COLLECTED",
@@ -1126,6 +1129,7 @@ __all__ = [
     "is_bookmaker_league_covered",
     "is_bookmaker_observed",
     "is_defi_force_include",
+    "is_defi_force_include_pool",
     "is_expected",
     "is_expected_for_source",
     "is_half_day_session",

@@ -64,6 +64,10 @@ DEX_VENUE_KEYWORDS: frozenset[str] = frozenset(
         "ORCA",
         "RAYDIUM",
         "KAMINO",
+        # Solana DEX pools (2026-07-20 DeFi catalogue canonicalization)
+        "METEORA",
+        "LIFINITY",
+        "PHOENIX",
     }
 )
 
@@ -168,3 +172,78 @@ def is_defi_force_include(venue: str, base_asset: str) -> bool:
     if not forced:
         return False
     return (base_asset or "").strip().upper() in forced
+
+
+# TVL-exempt FORCE-INCLUDE Raydium pools (2026-07-20 DeFi catalogue
+# canonicalization). The Solana DEX-pool relevance filter (URDI dex adapters +
+# IS ``filter_defi_instruments_by_relevance``) keeps a Raydium pool only when
+# BOTH tokens are in :data:`DEFI_MAJOR_ASSET_SYMBOLS`. That correctly drops the
+# long tail, but it also silently dropped a set of very-high-TVL pools whose
+# non-major token (XMR, BNB, TRX, XRP, LTC, ZEC, meme/ecosystem tokens, …) is
+# not on the major-asset whitelist — pools with tens of millions in TVL that we
+# DO want in the tradable/observable universe.
+#
+# This is the top-32 Raydium pools by TVL from the legacy prod snapshot
+# ``gs://market-data-tick-defi-prd-<project>/dex_pools/raydium/SOLANA/
+# date=2026-04-14/*.parquet`` (98 pools captured; the top-32 cut is the clean
+# TVL >= ~$4.0M slice — the operator-confirmed "32" count, floor $4,005,367
+# with a structural gap to the 33rd pool at $3,954,454).
+#
+# Addresses are LOWERCASED Solana base58 pool ids; the predicate
+# :func:`is_defi_force_include_pool` lowercases its input, so a pool whose token
+# pair fails the major-asset relevance gate is still kept when its lowercased
+# pool address is a member here. SSOT for the catalogue force-include of these
+# pools + the IS DEX relevance-filter carve-out.
+DEFI_FORCE_INCLUDE_POOLS: frozenset[str] = frozenset(
+    {
+        "3cig1jsphfwqfwbvpsargvgh1sozy7ikef5m4gbcvxve",  # PRIME/CASH
+        "3ucnos4nbumplznwztqghnffgkhermbqavemeeomsuxv",  # WSOL/USDC
+        "4usrwhonydfubz1kcupz4xcjeadzqzptby4mzu6wegkm",  # XMR/USDC
+        "58oqchx4ywmvkdwllzzbi4chocc2fqcuwbkwmihlyqo2",  # WSOL/USDC
+        "5egccjkue42yytzy4qg8qtiouwnh6agtvjunryeqcqv1",  # smole/WSOL
+        "6ntgudbjyatkia81aqnsowqszhlurn7tzhsbwv5kbzrv",  # LTC/USDC
+        "879f697iudjgmevrkrcnw21fcxiaeljk1ffsw2atebce",  # MEW/WSOL
+        "89hdpbfmkmox1w6wvo6dmuviug3con9jjyu9nq3hgai6",  # EURC/USDT
+        "8nkmsz1e7vctwtp2pk3u3mlufqnq8vctqediqz2pioyv",  # XMR/USDC
+        "8wwcnqdzjcy5pt7akhupafknv2txca9sq6ybkgzlbvdt",  # WSOL/pippin
+        "9gb28busn8fyigm1dbstb6cpou9mv5a7co1kbnac5hip",  # USDC/BNB
+        "agfnrluscrd2e4nwqxw73hdbsn7ekeub2jhx7tx9ytyc",  # Old Slerf/WSOL
+        "amtpriwxrenbohq4cnmbybajm4mcwltbexvew8trhevk",  # BNB/USDC
+        "aqagyqsdu853wakhxm79cgndoyhrrwxvyhx6qrdyc1fs",  # WSOL/USD1
+        "as5mv3ear4nzpmwxbcsez3adbcaxenq4chdawsvlgkcm",  # USDS/USDC
+        "bcddhonby65iduz3ev3c9v5xjnkzyu5e56krfhpbm4t9",  # USD1/USDC
+        "bzc9nzfmqkxr6fz1dbph7bdf9broyef6pnzesp7v5iiw",  # WSOL/Fartcoin
+        "bztgqeys6exuxicyphecyq7pybqodxqmvkjubp4r8muu",  # USDC/USDT
+        "cdjtzehhd3k6exv9ssw3zafbmvwedf6qhngbyrshytuc",  # XMR/USDC
+        "d8tchx6wmg9gkkoqabej7r5ftssqexbuntcf2pzc7mfj",  # ZEC/USDC
+        "drfmodahqzqsw1azvuc8jes2zrt1snn879auipbalpcn",  # XRP/USDC
+        "dsuvc5qf5ljhhv5e2td184ixotsncnwj7i4jja4xsrmt",  # BOME/WSOL
+        "ep2ib6dydeeqd8mfe2ezhcxx3kp3k2elkkirfpm5eymx",  # $WIF/WSOL
+        "ewivkwntcxupsu6ryd7pfvs7u9yv8nq79tj7xggyprp6",  # USX/USDC
+        "fqed3ay883zucgclaubkv56jjbweiyjxpstc84yuxqnd",  # $NAP/WSOL
+        "fuemmjepntbzthvsevmdgnfq7ywr8uebzraxjrp46vtf",  # LIKE/WSOL
+        "g39wywqukbhk8f2wzzzfx3fcsyg91vccbbr6wevp5axy",  # CRCLx/USDC
+        "hhsv4hkx2xgdzevqzhcqsznth4jpcgal8qmrqlsh6en7",  # USDC/LTC
+        "hlooxritsiz9ampwkf6wvjpccvvgk1xjdtdxdsacn1re",  # TRX/USDC
+        "hpgv2jnzgrgfrzjezgkhgtnegrfahtzcvuk3brftfjwk",  # USDC/TRX
+        "j3b6dvhes2y1cbmtvz5tcwxnegsjjdbukxduvdpoqms7",  # WSOL/arc
+        "mypzpagsrxm1ndqsjrw9e4nkdetqbz7xdkr2tolwzur",  # HYPE/USDC
+    }
+)
+
+
+def is_defi_force_include_pool(pool_address: str) -> bool:
+    """Return True when a DeFi DEX pool is a TVL-exempt force-included pool.
+
+    ``pool_address`` is a pool contract / account id (EVM hex or Solana base58);
+    it is compared case-insensitively against :data:`DEFI_FORCE_INCLUDE_POOLS`
+    (stored lowercased). Used by the IS DEX relevance filter to KEEP a
+    high-TVL pool whose token pair would otherwise fail the major-asset gate,
+    and by the catalogue builder to stamp the ``force_include`` column honestly.
+
+    Pure + idempotent; a no-op ``False`` for every pool not on the curated
+    high-TVL allowlist (and for empty / missing addresses).
+    """
+    if not pool_address:
+        return False
+    return pool_address.strip().lower() in DEFI_FORCE_INCLUDE_POOLS

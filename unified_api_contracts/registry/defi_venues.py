@@ -221,6 +221,23 @@ ALL_DEFI_VENUES: list[str] = [
     "COINBASE-ETHEREUM",
     "BINANCE-ETHEREUM",
     "BINANCE-BSC",
+    # ── Solana DEX / CLOB pools (2026-07-20 DeFi catalogue canonicalization —
+    #    IS-wired via meteora.py / lifinity.py / phoenix.py adapters; dex_pool_state).
+    #    METEORA = DLMM + dynamic pools; LIFINITY = proactive-MM; PHOENIX = on-chain
+    #    order-book DEX (Ellipsis Labs). Flipped to phase="live" below. ──
+    "METEORA-SOLANA",
+    "LIFINITY-SOLANA",
+    "PHOENIX-SOLANA",
+    # ── Oracle price-feed venues (2026-07-20 DeFi catalogue canonicalization —
+    #    oracle_prices data_type; IS-wired via chainlink.py (per-chain) / pyth.py.
+    #    CHAINLINK = multi-chain aggregator feeds read on-chain via Alchemy RPC;
+    #    PYTH = Solana Hermes/pull oracle). Flipped to phase="live" below. ──
+    "CHAINLINK-ETHEREUM",
+    "CHAINLINK-ARBITRUM",
+    "CHAINLINK-BASE",
+    "CHAINLINK-OPTIMISM",
+    "CHAINLINK-POLYGON",
+    "PYTH-SOLANA",
 ]
 
 # ── Canonical underscore-name aliases (additive beside ghost names above) ──
@@ -592,6 +609,20 @@ DEFI_VENUE_PHASE: dict[str, str] = {
     "SOLANA-NATIVE-SOLANA": "live",
     # ── Pipeline (Solana — JUPITER is execution-only aggregator, no IS adapter) ──
     "JUPITER-SOLANA": "pipeline",
+    # ── Live (Solana DEX pools — 2026-07-20 DeFi catalogue canonicalization;
+    #    meteora.py / lifinity.py / phoenix.py adapters produce dex_pool_state
+    #    via _build_defi_venues(), IS-producible per the phase=="live" invariant) ──
+    "METEORA-SOLANA": "live",
+    "LIFINITY-SOLANA": "live",
+    "PHOENIX-SOLANA": "live",
+    # ── Live (Oracle price feeds — 2026-07-20 DeFi catalogue canonicalization;
+    #    chainlink.py (per-chain) / pyth.py adapters produce oracle_prices) ──
+    "CHAINLINK-ETHEREUM": "live",
+    "CHAINLINK-ARBITRUM": "live",
+    "CHAINLINK-BASE": "live",
+    "CHAINLINK-OPTIMISM": "live",
+    "CHAINLINK-POLYGON": "live",
+    "PYTH-SOLANA": "live",
 }
 
 
@@ -682,6 +713,17 @@ MTDS_DEFI_VENUES: list[str] = [
     # DRIFT (Solana) removed 2026-07-16 (operator ruling): all Solana perp DEXes
     # dropped except Jupiter (not integrated). SSOT: unified-trading-pm/codex/
     # 04-architecture/solana-defi-coverage.md.
+    # --- Solana DEX pools (2026-07-20 DeFi catalogue canonicalization) ---
+    "METEORA-SOLANA",
+    "LIFINITY-SOLANA",
+    "PHOENIX-SOLANA",
+    # --- Oracle price feeds (2026-07-20 DeFi catalogue canonicalization) ---
+    "CHAINLINK-ETHEREUM",
+    "CHAINLINK-ARBITRUM",
+    "CHAINLINK-BASE",
+    "CHAINLINK-OPTIMISM",
+    "CHAINLINK-POLYGON",
+    "PYTH-SOLANA",
 ]
 
 

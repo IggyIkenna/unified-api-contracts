@@ -312,6 +312,27 @@ DEFI_VENUE_DATA_TYPE_CAPABILITIES: dict[str, dict[str, str]] = {
     "JITORESTAKING-SOLANA": {"staking_yields": "2024-08-01"},
     # ── DeFi — Solana DEX aggregator (Phase 1A) ──
     "JUPITER-SOLANA": {"dex_pool_swaps": "2021-10-13"},
+    # ── DeFi — Solana DEX pools (2026-07-20 catalogue canonicalization) ──
+    # dex_pool_state ONLY — matches the meteora.py/lifinity.py/phoenix.py adapter
+    # capture surface + the _ProtocolCapability declarations (declaring more would
+    # inflate the could-exist denominator with cells that have no data). Floors
+    # from public protocol-launch records (conservative; adapters gate per-row via
+    # get_venue_data_type_start_date): METEORA DLMM era; LIFINITY v1 proactive-MM;
+    # PHOENIX (Ellipsis Labs) on-chain order book Feb 2023.
+    "METEORA-SOLANA": {"dex_pool_state": "2023-10-01"},
+    "LIFINITY-SOLANA": {"dex_pool_state": "2022-09-01"},
+    "PHOENIX-SOLANA": {"dex_pool_state": "2023-02-01"},
+    # ── DeFi — Oracle price feeds (2026-07-20 catalogue canonicalization) ──
+    # oracle_prices per (venue, chain). CHAINLINK per-chain floors ≈ chain
+    # genesis / first data-feed deploy (feeds went live at/near each chain's
+    # launch; ETH data feeds from ~2020); PYTH Solana mainnet ~2021-08. Further
+    # archive clipping via ORACLE_COVERAGE_START (chainlink / pyth_hermes).
+    "CHAINLINK-ETHEREUM": {"oracle_prices": "2020-01-01"},
+    "CHAINLINK-ARBITRUM": {"oracle_prices": "2021-08-31"},
+    "CHAINLINK-BASE": {"oracle_prices": "2023-08-09"},
+    "CHAINLINK-OPTIMISM": {"oracle_prices": "2021-12-16"},
+    "CHAINLINK-POLYGON": {"oracle_prices": "2020-05-30"},
+    "PYTH-SOLANA": {"oracle_prices": "2021-08-01"},
 }
 
 

@@ -211,6 +211,11 @@ VENUE_TO_ADAPTER_KEY: dict[str, str] = {
     "KAMINO-SOLANA": "kamino",
     "RAYDIUM-SOLANA": "raydium",
     "ORCA-SOLANA": "orca",
+    # Solana DEX pools (2026-07-20 DeFi catalogue canonicalization) — existing IS
+    # adapters (meteora.py / lifinity.py / phoenix.py) that were never registered.
+    "METEORA-SOLANA": "meteora",
+    "LIFINITY-SOLANA": "lifinity",
+    "PHOENIX-SOLANA": "phoenix",
     "MARINADE-SOLANA": "marinade",
     "JITO-SOLANA": "jito",
     "SANCTUM-SOLANA": "sanctum",
@@ -219,6 +224,16 @@ VENUE_TO_ADAPTER_KEY: dict[str, str] = {
     # Solana lending adapters (2026-07-09) — real public REST/JSON APIs.
     "MARGINFI-SOLANA": "marginfi",
     "SOLEND-SOLANA": "solend",
+    # Oracle price-feed venues (2026-07-20 DeFi catalogue canonicalization) — new
+    # IS chainlink.py adapter (per-chain aggregator feeds via Alchemy RPC) + the
+    # existing pyth.py adapter. Chain is parsed from the venue suffix in the IS
+    # factory's _DEFI_GRAPH_ADAPTERS branch. data_type = oracle_prices.
+    "CHAINLINK-ETHEREUM": "chainlink",
+    "CHAINLINK-ARBITRUM": "chainlink",
+    "CHAINLINK-BASE": "chainlink",
+    "CHAINLINK-OPTIMISM": "chainlink",
+    "CHAINLINK-POLYGON": "chainlink",
+    "PYTH-SOLANA": "pyth",
     # RADIANT-BSC (2026-07-10): the auto-gen loop below only covers chains with
     # a registered subgraph_id (SUBGRAPH_IDS["radiant"] = ARBITRUM+ETHEREUM
     # only — Radiant's BSC deployment has no verified subgraph). The IS
