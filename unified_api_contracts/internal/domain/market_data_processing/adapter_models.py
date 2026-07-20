@@ -191,6 +191,29 @@ class CandleOutput:
     index_price: object = None
     funding_rate: object = None
     open_interest: object = None
+
+    # derivative_ticker candle contract columns (``deriv_ohlcv_{tf}`` /
+    # ``_DERIV_EXT`` in ``_candle_contracts.py``). These are the columns the
+    # SchemaContract REQUIRES on a derivative_ticker candle, so the adapter
+    # populates them directly rather than relying on a writer-side rename.
+    #
+    # NAMING vs SEMANTICS — READ BEFORE "FIXING" THIS.
+    # The ``_mean`` suffix is a MISNOMER inherited from the original contract
+    # sketch. The value is the LAST OBSERVATION IN THE BAR WINDOW, never an
+    # arithmetic mean. derivative_ticker is a SNAPSHOT stream (funding / mark /
+    # index are point-in-time states, not flows), so averaging them across a
+    # window would fabricate a price that never existed on the wire. The
+    # roll-up rule in ``aggregation_rules.COLUMN_AGG_RULES`` is therefore
+    # ``"last"`` (last VALID observation), matching the bare ``mark_price`` /
+    # ``funding_rate`` rules directly above. The contract name is kept because
+    # the contract is the SSOT for the on-disk column name; only the semantics
+    # documented here are authoritative for what the number MEANS.
+    #
+    # A bar with NO observation in its window carries NaN here (and NaN OHLC,
+    # volume=0) — see the honest-absence note on ``CefiDerivativeAdapter``.
+    funding_rate_mean: object = None
+    mark_price_mean: object = None
+    index_price_mean: object = None
     implied_volatility: object = None
     strike: object = None
     option_type: object = None

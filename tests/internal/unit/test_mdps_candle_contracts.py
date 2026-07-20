@@ -94,6 +94,27 @@ def test_cefi_perpetual_deriv_candles(tf: str) -> None:
 
 
 @pytest.mark.parametrize("tf", MDPS_TIMEFRAMES_CEFI)
+def test_cefi_perpetual_deriv_ohlcv_is_nullable(tf: str) -> None:
+    """derivative_ticker bars carry NULLABLE OHLC + nullable extension columns.
+
+    The producing adapter no longer LOCF-carries a stale mark price into a
+    window that held no observation (operator ruling 2026-07-20 — "the last
+    result within the time window we want, else NaN price and 0 volume so we
+    don't assume data was in that window and downstream handles"). A
+    covered-but-empty window therefore legitimately has no price, and a
+    non-nullable OHLC pack would reject the write outright — which is exactly
+    the P0 that produced 140 attempted_failed/SCHEMA_VALIDATION_FAILED rows and
+    zero objects. ``volume`` stays 0 (a flow quantity), never null.
+    """
+    contract = lookup_contract(asset_group="cefi", instrument_type="perpetual", data_type=MDPS_KEY_DERIV(tf))
+    by_name = {c.name: c for c in contract.columns}
+    for col in ("open", "high", "low", "close"):
+        assert by_name[col].nullable is True, f"{col} must be nullable on a derivative_ticker bar"
+    for col in ("funding_rate_mean", "mark_price_mean", "index_price_mean"):
+        assert by_name[col].nullable is True
+
+
+@pytest.mark.parametrize("tf", MDPS_TIMEFRAMES_CEFI)
 def test_cefi_perpetual_liq_aggregates(tf: str) -> None:
     contract = lookup_contract(asset_group="cefi", instrument_type="perpetual", data_type=MDPS_KEY_LIQ(tf))
     names = {c.name for c in contract.columns}
