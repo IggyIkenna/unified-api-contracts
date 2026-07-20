@@ -443,6 +443,46 @@ class TestGetExpectedInstrumentsForVenueInjectedProvider:
         assert result[0] == "INST-0"
         assert result[-1] == "INST-49"
 
+    def test_explicit_scope_is_never_truncated_to_an_alphabetical_prefix(self) -> None:
+        """Regression: `cap` must not silently truncate a caller-NAMED scope.
+
+        Root cause of the TradFi equity A-C phantom-failure cluster
+        (2026-07-20). The launchers pass a `sorted()` ticker list, so
+        `resolved[:cap]` is an alphabetical prefix — a systematically biased
+        cut, not a sample. 622 tickers with cap=50 collapsed the denominator to
+        `A..BKNG` and emitted 104,623 phantom absence rows for A-C tickers
+        while D-Z got no per-instrument row at all.
+        """
+        universe = sorted({f"{a}{b}" for a in "ABCXYZ" for b in "ABCDEFGHIJ"})
+        assert len(universe) == 60
+
+        def provider(_venue: str, _data_type: str) -> list[str]:
+            return list(universe)
+
+        result = get_expected_instruments_for_venue(
+            "NASDAQ", "ohlcv_1m", instruments_provider=provider, cap=50, explicit_scope=True
+        )
+
+        assert result == universe, "an explicitly-named instrument scope must be returned whole"
+        # The specific failure shape: a truncated result is a strict prefix of
+        # the sorted universe and loses everything past the cut letter.
+        assert result != universe[:50], "explicit scope was truncated to an alphabetical prefix"
+        assert any(i.startswith("Z") for i in result), (
+            "tail-of-alphabet instruments were dropped — this is the exact A-C truncation signature"
+        )
+
+    def test_cap_still_applies_to_a_discovered_scope(self) -> None:
+        """The cap is a real guard-rail for an unbounded DISCOVERED universe —
+        `explicit_scope` must not disable it by default."""
+
+        def provider(_venue: str, _data_type: str) -> list[str]:
+            return [f"INST-{i}" for i in range(200)]
+
+        result = get_expected_instruments_for_venue(
+            "BINANCE-FUTURES", "derivative_ticker", instruments_provider=provider, cap=50
+        )
+        assert len(result) == 50
+
     def test_cap_of_zero_returns_empty(self) -> None:
         def provider(_venue: str, _data_type: str) -> list[str]:
             return ["A", "B", "C"]
