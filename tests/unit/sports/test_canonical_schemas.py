@@ -17,6 +17,7 @@ from unified_api_contracts.canonical.domain.sports.arbitrage import (
 from unified_api_contracts.canonical.domain.sports.betting import (
     BetExecution,
     BetOrder,
+    BetSide,
     BetStatus,
     BettingSignal,
     SignalSource,
@@ -174,6 +175,39 @@ class TestCanonicalOdds:
                 source="betfair",
             )
 
+    def test_lay_fields_default_none(self) -> None:
+        """Back-only bookmakers leave lay prices unset (honest-None)."""
+        o = CanonicalOdds(
+            fixture_id="af:1",
+            bookmaker_key="pinnacle",
+            market=OddsType.H2H,
+            home_odds=Decimal("2.10"),
+            timestamp_utc=NOW,
+            source="pinnacle",
+        )
+        assert o.home_lay_odds is None
+        assert o.draw_lay_odds is None
+        assert o.away_lay_odds is None
+
+    def test_lay_fields_populated(self) -> None:
+        """A lay-capable exchange can carry both back and lay prices."""
+        o = CanonicalOdds(
+            fixture_id="af:1",
+            bookmaker_key="betfair",
+            market=OddsType.H2H,
+            home_odds=Decimal("2.10"),
+            draw_odds=Decimal("3.50"),
+            away_odds=Decimal("3.80"),
+            home_lay_odds=Decimal("2.12"),
+            draw_lay_odds=Decimal("3.55"),
+            away_lay_odds=Decimal("3.90"),
+            timestamp_utc=NOW,
+            source="betfair",
+        )
+        assert o.home_lay_odds == Decimal("2.12")
+        assert o.draw_lay_odds == Decimal("3.55")
+        assert o.away_lay_odds == Decimal("3.90")
+
 
 @pytest.mark.unit
 class TestCanonicalBookmakerMarket:
@@ -233,6 +267,54 @@ class TestBetOrder:
             created_at_utc=NOW,
         )
         assert o.stake == Decimal("50.00")
+
+    def test_side_defaults_to_back(self) -> None:
+        """Existing callers that omit ``side`` remain valid and default to BACK."""
+        o = BetOrder(
+            order_id="ord1",
+            fixture_id="af:1",
+            bookmaker_key="betfair",
+            market=OddsType.H2H,
+            selection="HOME",
+            requested_odds=Decimal("2.10"),
+            stake=Decimal("50.00"),
+            max_acceptable_odds=Decimal("2.00"),
+            strategy_source=SignalSource.ARBITRAGE,
+            created_at_utc=NOW,
+        )
+        assert o.side is BetSide.BACK
+
+    def test_side_lay_explicit(self) -> None:
+        o = BetOrder(
+            order_id="ord2",
+            fixture_id="af:1",
+            bookmaker_key="betfair",
+            market=OddsType.H2H,
+            selection="HOME",
+            requested_odds=Decimal("2.10"),
+            stake=Decimal("50.00"),
+            max_acceptable_odds=Decimal("2.20"),
+            strategy_source=SignalSource.ARBITRAGE,
+            side=BetSide.LAY,
+            created_at_utc=NOW,
+        )
+        assert o.side is BetSide.LAY
+
+    def test_side_invalid_raises(self) -> None:
+        with pytest.raises(ValidationError):
+            BetOrder(
+                order_id="ord3",
+                fixture_id="af:1",
+                bookmaker_key="betfair",
+                market=OddsType.H2H,
+                selection="HOME",
+                requested_odds=Decimal("2.10"),
+                stake=Decimal("50.00"),
+                max_acceptable_odds=Decimal("2.00"),
+                strategy_source=SignalSource.ARBITRAGE,
+                side="sideways",  # type: ignore[arg-type]
+                created_at_utc=NOW,
+            )
 
 
 @pytest.mark.unit

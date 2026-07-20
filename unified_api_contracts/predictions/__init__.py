@@ -80,9 +80,11 @@ from unified_api_contracts.canonical.domain.predictions.two_axis import (
     underlying_for_group,
 )
 from unified_api_contracts.canonical.domain.predictions.venue_fee_model import (
+    BETFAIR_COMMISSION_FRACTION,
     KALSHI_FEE_COEFF,
     POLYMARKET_FEE_FRACTION,
     PREDICTION_VENUE_FEE_MODEL_VERSION,
+    betfair_fee,
     kalshi_fee,
     net_edge_sell_kalshi,
     net_edge_sell_polymarket,
@@ -90,6 +92,7 @@ from unified_api_contracts.canonical.domain.predictions.venue_fee_model import (
 )
 
 __all__ = [
+    "BETFAIR_COMMISSION_FRACTION",
     "CANONICAL_GROUP_METADATA",
     "CANONICAL_GROUP_TO_BET_TYPE",
     "CANONICAL_GROUP_TO_UNDERLYING",
@@ -109,6 +112,7 @@ __all__ = [
     "PredictionUnderlying",
     "SportsFixtureKey",
     "bet_type_for_group",
+    "betfair_fee",
     "build_cross_venue_mapping",
     "category_for_group",
     "classify_kalshi_to_canonical_group",
