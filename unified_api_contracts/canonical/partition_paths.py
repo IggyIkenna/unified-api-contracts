@@ -50,6 +50,7 @@ from __future__ import annotations
 
 import datetime as _dt
 import re
+from enum import StrEnum
 from typing import Final
 
 from unified_api_contracts._instrument_enums import InstrumentType
@@ -658,7 +659,119 @@ _PIPELINE_MODE_VALUE_RE: Final[re.Pattern[str]] = re.compile(r"^(batch|live|repl
 _GLUED_VERSION_RE: Final[re.Pattern[str]] = re.compile(r"[A-Za-z0-9]V\d")
 
 
-def canonical_path_violations(path: str, *, require_pipeline_mode: bool = False) -> list[str]:
+class CanonicalViolationClass(StrEnum):
+    """Which QUESTION a canonical-path violation answers.
+
+    Path-STRUCTURE canonicality and instrument-id FORM canonicality are
+    ORTHOGONAL — neither alone proves a path is canonical:
+
+    ``STRUCTURAL``
+        The hive skeleton: canonical prefix, ``day=YYYY-MM-DD``, ``key=value``
+        partition segments, ``pipeline_mode={mode}_{source}``, the closed
+        ``asset_group=`` set, the glued ``VENUE-CHAIN`` / ``V{N}`` guards and
+        the tradfi chain quote/margin tail.
+    ``ID_FORM``
+        The FILENAME STEM: whether the per-instrument shard is named for a
+        canonical ``instrument_id`` (``VENUE:ITYPE:BASE-QUOTE[@LIN|@INV]…``)
+        rather than a raw venue wire symbol (``ADAF0:USTF0``) or a
+        double-wrapped ``VENUE:ITYPE:<raw wire>`` catalogue-miss id.
+
+    Until 2026-07-20 this module validated the stem for ``asset_group=tradfi``
+    single-instrument shards ONLY, so a CeFi corpus carrying ~811,200
+    wire-named objects came back CANONICAL (zero violations) from the machine
+    oracle — a FALSE-CLEAN verdict for the exact defect the four-surface
+    reconciliation procedure exists to catch. Both classes are now reported by
+    DEFAULT; ``violation_classes=`` narrows the answer for callers that must
+    enforce one class at a time. SSOT:
+    ``plans/active/issues/canonical_path_oracle_blind_to_filename_stem_2026_07_20.md``.
+    """
+
+    STRUCTURAL = "structural"
+    ID_FORM = "id_form"
+
+
+# Canonical instrument_id shape (the ID-FORM oracle). Mirrors the resolver SSOT
+# ``VENUE:ITYPE:BASE-QUOTE[@LIN|@INV][-YYYYMMDD][-STRIKE-C|P]`` plus the COMBO
+# arm (COMBO ids are canonical but carry a free-form tail).
+_CANONICAL_INSTRUMENT_ID_RE: Final[re.Pattern[str]] = re.compile(
+    r"^[A-Z0-9._-]+:(PERPETUAL|FUTURE|OPTION|SPOT_PAIR):[A-Z0-9]+-[A-Z0-9]+"
+    r"(@(LIN|INV))?(-\d{8})?(-\d+(\.\d+)?-[CP])?$"
+)
+_COMBO_INSTRUMENT_ID_RE: Final[re.Pattern[str]] = re.compile(r"^[A-Z0-9._-]+:COMBO:.+$")
+
+# Fan-in shard filenames that legitimately carry NO per-instrument stem: chain
+# bundles (``underlying=…/ticks.parquet``) and the symbol-less prediction
+# ``book_snapshot_5`` fallback. These must NEVER be flagged by the ID-FORM
+# oracle — they are canonical BY SHAPE, not by stem.
+_STEMLESS_FAN_IN_FILE_NAMES: Final[frozenset[str]] = frozenset({"ticks.parquet"})
+
+# Asset groups whose per-instrument shard filename is contractually the FULL
+# canonical instrument_id. ``defi`` / ``sports`` / ``prediction`` are DELIBERATELY
+# absent: their ids route through the passthrough / domain-specific builders
+# (pool addresses, fixture ids, condition ids) whose grammar is not the
+# ``VENUE:ITYPE:BASE-QUOTE`` shape, so applying this regex there would
+# manufacture false violations. Widening this set requires an id grammar for
+# that asset group first.
+_ID_FORM_CHECKED_ASSET_GROUPS: Final[frozenset[str]] = frozenset({"cefi"})
+
+
+def is_canonical_instrument_id(candidate: str) -> bool:
+    """True iff ``candidate`` is a canonical instrument_id (incl. the COMBO arm).
+
+    The ID-FORM half of canonicality — deliberately independent of
+    :func:`canonical_path_violations`'s path-STRUCTURE checks. A raw venue wire
+    symbol (``ADAF0:USTF0``), a double-wrapped catalogue-miss id
+    (``BITFINEX-FUTURES:PERPETUAL:ADAF0:USTF0``) and a bare symbol (``BTCUSD``)
+    all return False.
+    """
+    return bool(_CANONICAL_INSTRUMENT_ID_RE.match(candidate) or _COMBO_INSTRUMENT_ID_RE.match(candidate))
+
+
+def _stem_id_form_violations(*, asset_group: str, instrument_type: str | None, file_name: str) -> list[str]:
+    """ID-FORM violations for a single-instrument shard's filename stem.
+
+    Returns ``[]`` for every legitimately stem-less shape (chain itypes and the
+    ``ticks.parquet`` fan-in) and for asset groups outside
+    :data:`_ID_FORM_CHECKED_ASSET_GROUPS`.
+    """
+    if asset_group not in _ID_FORM_CHECKED_ASSET_GROUPS:
+        return []
+    if file_name in _STEMLESS_FAN_IN_FILE_NAMES:
+        return []
+    if instrument_type in CEFI_CHAIN_INSTRUMENT_TYPES:
+        return []
+    stem = file_name.removesuffix(".parquet")
+    if is_canonical_instrument_id(stem):
+        return []
+    return [
+        f"{asset_group} single-instrument shard filename {file_name!r} is not a canonical "
+        "instrument_id ('VENUE:ITYPE:BASE-QUOTE[@LIN|@INV][-YYYYMMDD][-STRIKE-C|P]') — "
+        "raw venue wire symbol or double-wrapped catalogue-miss id"
+    ]
+
+
+def _select_violation_classes(
+    structural: list[str],
+    id_form: list[str],
+    violation_classes: frozenset[CanonicalViolationClass] | None,
+) -> list[str]:
+    """Flatten the two violation classes down to the caller's requested selection."""
+    if violation_classes is None:
+        return [*structural, *id_form]
+    selected: list[str] = []
+    if CanonicalViolationClass.STRUCTURAL in violation_classes:
+        selected.extend(structural)
+    if CanonicalViolationClass.ID_FORM in violation_classes:
+        selected.extend(id_form)
+    return selected
+
+
+def canonical_path_violations(
+    path: str,
+    *,
+    require_pipeline_mode: bool = False,
+    violation_classes: frozenset[CanonicalViolationClass] | None = None,
+) -> list[str]:
     """Return the list of canonical-form violations for ``path`` (empty == canonical).
 
     Parses a bucket-relative GCS partition path (the full
@@ -674,13 +787,23 @@ def canonical_path_violations(path: str, *, require_pipeline_mode: bool = False)
             is a violation. Default False accepts the back-compat bare paths
             the builders still emit (the segment is canonical-but-optional for
             CeFi/Prediction and back-compat for DeFi/TradFi).
+        violation_classes: Restrict the answer to these
+            :class:`CanonicalViolationClass` members. Default ``None`` reports
+            BOTH classes — path STRUCTURE *and* filename instrument-id FORM.
+            Pass ``frozenset({CanonicalViolationClass.STRUCTURAL})`` for the
+            skeleton-only question (the pre-2026-07-20 behaviour).
+
+    Note:
+        Structure and id-form are ORTHOGONAL questions — an empty list means
+        canonical only with respect to the classes actually requested.
     """
-    violations: list[str] = []
+    structural: list[str] = []
+    id_form: list[str] = []
     cleaned = path.lstrip("/")
 
     if not cleaned.startswith(RAW_TICK_DATA_PREFIX):
-        violations.append(f"path does not start with the canonical prefix {RAW_TICK_DATA_PREFIX!r}")
-        return violations
+        structural.append(f"path does not start with the canonical prefix {RAW_TICK_DATA_PREFIX!r}")
+        return _select_violation_classes(structural, id_form, violation_classes)
 
     remainder = cleaned[len(RAW_TICK_DATA_PREFIX) :]
     segments = remainder.split("/")
@@ -689,29 +812,29 @@ def canonical_path_violations(path: str, *, require_pipeline_mode: bool = False)
 
     # ── day= segment (must be the first partition, value YYYY-MM-DD) ──────────
     if not partition_segments:
-        violations.append("no partition segments after the prefix")
-        return violations
+        structural.append("no partition segments after the prefix")
+        return _select_violation_classes(structural, id_form, violation_classes)
 
     day_seg = partition_segments[0]
     if day_seg.startswith("day-"):
-        violations.append(f"legacy hyphen day segment {day_seg!r} — must be 'day=YYYY-MM-DD'")
+        structural.append(f"legacy hyphen day segment {day_seg!r} — must be 'day=YYYY-MM-DD'")
     elif not day_seg.startswith("day="):
-        violations.append(f"first partition is {day_seg!r}, expected 'day=YYYY-MM-DD'")
+        structural.append(f"first partition is {day_seg!r}, expected 'day=YYYY-MM-DD'")
     elif not _DAY_VALUE_RE.match(day_seg[len("day=") :]):
-        violations.append(f"day value {day_seg[len('day=') :]!r} is not ISO YYYY-MM-DD")
+        structural.append(f"day value {day_seg[len('day=') :]!r} is not ISO YYYY-MM-DD")
 
     # ── locate the keyed partition map (key=value segments) ──────────────────
     kv: dict[str, str] = {}
     has_pipeline_mode = False
     for seg in partition_segments[1:]:
         if "=" not in seg:
-            violations.append(f"non-canonical partition segment {seg!r} (expected 'key=value')")
+            structural.append(f"non-canonical partition segment {seg!r} (expected 'key=value')")
             continue
         key, _, value = seg.partition("=")
         if key == "pipeline_mode":
             has_pipeline_mode = True
             if not _PIPELINE_MODE_VALUE_RE.match(value):
-                violations.append(
+                structural.append(
                     f"pipeline_mode value {value!r} is not canonical '{{mode}}_{{source}}' "
                     "(mode ∈ batch/live/replay, source = vendor token)"
                 )
@@ -720,16 +843,16 @@ def canonical_path_violations(path: str, *, require_pipeline_mode: bool = False)
     # ── asset_group= (must be present + in the closed set) ───────────────────
     asset_group_value = kv.get(ASSET_GROUP_HIVE_KEY)
     if asset_group_value is None:
-        violations.append(f"missing '{ASSET_GROUP_HIVE_KEY}=' partition segment")
+        structural.append(f"missing '{ASSET_GROUP_HIVE_KEY}=' partition segment")
     elif asset_group_value not in _CANONICAL_ASSET_GROUPS:
-        violations.append(
+        structural.append(
             f"{ASSET_GROUP_HIVE_KEY}={asset_group_value!r} is outside the canonical set "
             f"{sorted(_CANONICAL_ASSET_GROUPS)}"
         )
 
     # ── pipeline_mode required-but-missing (opt-in) ──────────────────────────
     if require_pipeline_mode and not has_pipeline_mode:
-        violations.append(
+        structural.append(
             "missing 'pipeline_mode={mode}_{source}/' segment left of "
             f"'{ASSET_GROUP_HIVE_KEY}=' (required for this check)"
         )
@@ -748,11 +871,11 @@ def canonical_path_violations(path: str, *, require_pipeline_mode: bool = False)
         # live VMs for hours (2026-06-23). Gate on defi so the legacy-glue guard still
         # protects the on-chain paths without false-flagging cefi/tradfi venue names.
         if asset_group_value == "defi" and "-" in venue_value:
-            violations.append(
+            structural.append(
                 f"venue={venue_value!r} carries a glued 'VENUE-CHAIN' token — chain must be a separate 'chain=' segment"
             )
         if _GLUED_VERSION_RE.search(venue_value):
-            violations.append(
+            structural.append(
                 f"venue={venue_value!r} carries a glued 'V{{N}}' version — canonical form separates "
                 "it with an underscore (e.g. 'AAVE_V3', 'UNISWAP_V3')"
             )
@@ -767,7 +890,7 @@ def canonical_path_violations(path: str, *, require_pipeline_mode: bool = False)
         file_name = segments[-1]
         it_value = kv.get("instrument_type")
         if kv.get("pipeline_mode") == "batch_massive":
-            violations.append(
+            structural.append(
                 "tradfi pipeline_mode=batch_massive is forbidden — Massive is purged; "
                 "Databento is the batch source of truth"
             )
@@ -791,7 +914,7 @@ def canonical_path_violations(path: str, *, require_pipeline_mode: bool = False)
             )
 
             if not is_recognized_tradfi_underlying(underlying_value):
-                violations.append(
+                structural.append(
                     f"tradfi underlying={underlying_value!r} is not a real product root / "
                     "named-spread combo (numeric globex group code or opaque CBOE "
                     "user-defined leg code) — quarantine, never fake-canonicalize"
@@ -800,7 +923,7 @@ def canonical_path_violations(path: str, *, require_pipeline_mode: bool = False)
             # chain shard tail MUST be underlying=.../quote=.../margin=.../ticks.parquet
             tail_keys = [seg.partition("=")[0] for seg in partition_segments[-3:]]
             if tail_keys != ["underlying", "quote", "margin"] or file_name != "ticks.parquet":
-                violations.append(
+                structural.append(
                     f"tradfi {it_value} shard must end "
                     "'.../underlying=<BASE>/quote=<Q>/margin=<M>/ticks.parquet' "
                     f"(got tail {[*partition_segments[-3:], file_name]!r})"
@@ -812,29 +935,80 @@ def canonical_path_violations(path: str, *, require_pipeline_mode: bool = False)
             # itypes only — ``combo`` (bare-symbol, leg-id unsettled) and special
             # bundle types like ``event_contract`` are deliberately NOT enforced.
             if file_name == "ticks.parquet":
-                violations.append(
+                id_form.append(
                     "tradfi single-instrument shard filename must be the full canonical "
                     "instrument_id, got a symbol-less 'ticks.parquet' fan-in"
                 )
             elif ":" not in file_name:
-                violations.append(
+                id_form.append(
                     f"tradfi single-instrument shard filename {file_name!r} must be the full "
                     "canonical instrument_id ('VENUE:TYPE:SYMBOL...'), got a bare symbol"
                 )
 
-    return violations
+    # ── ID-FORM: the filename stem must BE a canonical instrument_id ─────────
+    # The gap this closes: before 2026-07-20 the stem was dropped
+    # (``partition_segments = segments[:-1]``) before validation for every
+    # asset_group except tradfi, so a CeFi corpus of raw wire stems
+    # (``ADAF0:USTF0.parquet``) and double-wrapped catalogue-miss ids
+    # (``BITFINEX-FUTURES:PERPETUAL:ADAF0:USTF0.parquet``) measured CANONICAL.
+    if asset_group_value is not None:
+        id_form.extend(
+            _stem_id_form_violations(
+                asset_group=asset_group_value,
+                instrument_type=kv.get("instrument_type"),
+                file_name=segments[-1],
+            )
+        )
+
+    return _select_violation_classes(structural, id_form, violation_classes)
 
 
-def is_canonical(path: str, *, require_pipeline_mode: bool = False) -> bool:
+def canonical_path_violations_classified(
+    path: str,
+    *,
+    require_pipeline_mode: bool = False,
+) -> dict[CanonicalViolationClass, list[str]]:
+    """Canonical-form violations for ``path`` split by :class:`CanonicalViolationClass`.
+
+    The audit-facing view: reconciliation reports need to say *which* surface
+    is non-canonical (a wire-named file under a perfectly-shaped hive skeleton
+    is a very different finding from a ``day-2026-05-01`` legacy prefix), and
+    an enforcement boundary needs to act on one class at a time. Every class is
+    always present as a key; a canonical path maps every class to ``[]``.
+    """
+    return {
+        member: canonical_path_violations(
+            path,
+            require_pipeline_mode=require_pipeline_mode,
+            violation_classes=frozenset({member}),
+        )
+        for member in CanonicalViolationClass
+    }
+
+
+def is_canonical(
+    path: str,
+    *,
+    require_pipeline_mode: bool = False,
+    violation_classes: frozenset[CanonicalViolationClass] | None = None,
+) -> bool:
     """True iff ``path`` is a canonical GCS partition path (no drift violations).
 
     Thin boolean wrapper over :func:`canonical_path_violations` — accepts the
     output of every ``build_*_partition_path`` builder and rejects the
     documented non-canonical drift shapes (hyphen ``day-``, glued
-    ``VENUE-CHAIN`` / ``V{N}``, out-of-set ``asset_group=``, and — when
-    ``require_pipeline_mode=True`` — a missing ``pipeline_mode=`` segment).
+    ``VENUE-CHAIN`` / ``V{N}``, out-of-set ``asset_group=``, a non-canonical
+    filename instrument-id stem, and — when ``require_pipeline_mode=True`` — a
+    missing ``pipeline_mode=`` segment).
+
+    Like :func:`canonical_path_violations` this answers BOTH the STRUCTURAL and
+    the ID_FORM question by default; narrow with ``violation_classes``.
     """
-    return not canonical_path_violations(path, require_pipeline_mode=require_pipeline_mode)
+    return not canonical_path_violations(
+        path,
+        require_pipeline_mode=require_pipeline_mode,
+        violation_classes=violation_classes,
+    )
 
 
 __all__ = [
@@ -843,11 +1017,14 @@ __all__ = [
     "RAW_TICK_DATA_PREFIX",
     "TRADFI_CHAIN_INSTRUMENT_TYPES",
     "TRADFI_SINGLE_INSTRUMENT_TYPES",
+    "CanonicalViolationClass",
     "build_cefi_partition_path",
     "build_defi_partition_path",
     "build_prediction_partition_path",
     "build_tradfi_partition_path",
     "candidate_parquet_paths",
     "canonical_path_violations",
+    "canonical_path_violations_classified",
     "is_canonical",
+    "is_canonical_instrument_id",
 ]
