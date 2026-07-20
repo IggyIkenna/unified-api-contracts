@@ -54,7 +54,8 @@ from __future__ import annotations
 # each tranche. ~540 base assets (incl. the staking/restaking/LST spot-exception
 # set ``STAKING_SPOT_EXCEPTION`` below).
 CEFI_BASE_ASSET_UNIVERSE: frozenset[str] = frozenset({
-    "0G", "1INCH", "2Z", "AAVE", "ABBC", "ACE", "ACH", "ACU",
+    "0G", "1000BONK", "1000CHEEMS", "1000FLOKI", "1000LUNC", "1000NEX", "1000PEPE",
+    "1000SATS", "1000SHIB", "1000WOJAK", "1000XEC", "1INCH", "2Z", "AAVE", "ABBC", "ACE", "ACH", "ACU",
     "ACX", "ADA", "AERGO", "AERO", "AEVO", "AGIX", "AGLD", "AI16Z",
     "AIA", "AIGENSYN", "AIO", "AIOT", "AIXBT", "AKT", "ALCH", "ALGO",
     "ALICE", "ALLO", "ALT", "ANIME", "ANKR", "ANKRETH", "APE", "APEX", "API3",

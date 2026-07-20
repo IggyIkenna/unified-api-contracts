@@ -34,6 +34,14 @@ ORACLE_COVERAGE_START: dict[str, str] = {
     # sub-agent probes at /v2/updates/price/{ts} for SOL/USD feed.
     # Pre-2023-10-01 timestamps return ``Update data not found``.
     "pyth_hermes": "2023-10-01",
+    # Chainlink aggregator feeds are read ON-CHAIN via RPC (no archive-API floor
+    # like Hermes), so this is a global conservative floor composed with each
+    # chain's CHAIN_GENESIS_DATES / PROTOCOL_LAUNCH_DATES via max() by consumers:
+    # 2020-01-01 = Chainlink ETH data feeds live era; later-genesis chains (Base
+    # 2023-08, Optimism 2021-12, Arbitrum 2021-08, Polygon 2020-05) clip further
+    # forward through their per-chain launch floors. Added 2026-07-20 (DeFi
+    # catalogue canonicalization) alongside the CHAINLINK-<chain> oracle venues.
+    "chainlink": "2020-01-01",
 }
 
 

@@ -338,3 +338,35 @@ def test_ice_routes_to_yahoo_finance_in_venue_to_data_provider() -> None:
         "ICE must have venue_to_data_provider['ICE'] = 'yahoo_finance' so the DXY "
         "Yahoo-sourced index is correctly attributed and the parity gate passes."
     )
+
+
+@pytest.mark.unit
+def test_krx_equity_names_maps_every_symbol_to_its_issuer_name() -> None:
+    """KRX_EQUITY_NAMES is the display-name SSOT: bare 6-digit KRX code -> issuer name,
+    one entry per KRX_EQUITIES member, with Samsung Electronics as the worked example.
+    Consumed by the IS adapter (InstrumentRecord.name) + the catalogue name stamp."""
+    from unified_api_contracts.registry import KRX_EQUITIES, KRX_EQUITY_NAMES, KRX_EQUITY_SYMBOLS
+
+    assert set(KRX_EQUITY_NAMES) == set(KRX_EQUITY_SYMBOLS)
+    assert KRX_EQUITY_NAMES["005930"] == "Samsung Electronics"
+    for eq in KRX_EQUITIES:
+        assert KRX_EQUITY_NAMES[eq.symbol] == eq.name, f"{eq.symbol} name drifted from its KrxEquityDef"
+        assert eq.name.strip(), f"KRX equity {eq.symbol} has a blank name"
+
+
+@pytest.mark.unit
+def test_instrument_record_name_is_optional_and_defaults_none() -> None:
+    """InstrumentRecord carries an additive optional human-readable ``name`` (the KRX
+    display-name field) that defaults to None so existing rows are unaffected, and
+    round-trips when set."""
+    from unified_api_contracts.internal.reference.instrument import InstrumentRecord, InstrumentType
+
+    base = InstrumentRecord(instrument_key="KRX:EQUITY:005930", venue="KRX", instrument_type=InstrumentType.EQUITY)
+    assert base.name is None
+    named = InstrumentRecord(
+        instrument_key="KRX:EQUITY:005930",
+        venue="KRX",
+        instrument_type=InstrumentType.EQUITY,
+        name="Samsung Electronics",
+    )
+    assert named.name == "Samsung Electronics"

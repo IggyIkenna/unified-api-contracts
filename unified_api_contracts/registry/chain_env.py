@@ -297,6 +297,15 @@ PROTOCOL_LAUNCH_DATES: dict[tuple[str, str], str] = {
     ("SOLANA", "KAMINO"): "2022-08-24",
     # ("SOLANA", "DRIFT") removed 2026-07-16 (operator ruling: all Solana
     # perp DEXes dropped except Jupiter, not integrated).
+    # ── Solana DEX pools + oracles (2026-07-20 DeFi catalogue canonicalization).
+    #    Conservative public-record floors (≤ first on-chain activity; adapters
+    #    gate per-row). METEORA DLMM era; LIFINITY v1 proactive-MM; PHOENIX
+    #    (Ellipsis Labs) on-chain order book Feb 2023; PYTH Solana mainnet ~Aug
+    #    2021. All ≥ SOLANA genesis 2020-03-16. ──
+    ("SOLANA", "METEORA"): "2023-10-01",  # medium; conservative floor
+    ("SOLANA", "LIFINITY"): "2022-09-01",  # medium; conservative floor
+    ("SOLANA", "PHOENIX"): "2023-02-01",  # high; conservative -13d floor (mainnet 2023-02-14)
+    ("SOLANA", "PYTH"): "2021-08-01",  # high; Pyth Network mainnet on Solana
     # ── Perp DEXes / aggregators ──
     ("ARBITRUM", "GMX"): "2021-09-01",
     ("AVALANCHE", "GMX"): "2022-01-05",
@@ -304,6 +313,15 @@ PROTOCOL_LAUNCH_DATES: dict[tuple[str, str], str] = {
     # Conservative date: Aster DEX launched on BSC ~Q3 2024 per public news; first on-chain event
     # verifiable via BscScan. Eliminates ~759 false-flagged missing rows from defi_988 audit.
     ("BSC", "ASTER"): "2024-09-01",
+    # ── Chainlink aggregator feeds (2026-07-20 DeFi catalogue canonicalization).
+    #    Feeds were deployed at/near each chain's launch; per-chain floors ≈ chain
+    #    genesis (Ethereum uses the ~2020 data-feed era, well after 2015 genesis).
+    #    Additional archive clip via ORACLE_COVERAGE_START["chainlink"]. ──
+    ("ETHEREUM", "CHAINLINK"): "2020-01-01",  # ETH data-feed era; medium
+    ("ARBITRUM", "CHAINLINK"): "2021-08-31",  # Arbitrum genesis; feeds at launch; medium
+    ("BASE", "CHAINLINK"): "2023-08-09",  # Base genesis; feeds at launch; medium
+    ("OPTIMISM", "CHAINLINK"): "2021-12-16",  # OP genesis; feeds at launch; medium
+    ("POLYGON", "CHAINLINK"): "2020-05-30",  # Polygon genesis; feeds at launch; medium
     # ── Catalogue Phase 1A new launch dates (slot 5 2026-05-11 per
     #    defi_catalogue_chain_primitives_2026_05_10.md Phase 1A). Dates
     #    sourced from public mainnet announcements + DefiLlama protocol-

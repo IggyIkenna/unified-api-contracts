@@ -265,6 +265,13 @@ _DEFI: dict[str, list[str]] = {
     "SUSHISWAP_V3-ETHEREUM": list(_DEFI_DEX_PAIRS),
     "ORCA-SOLANA": list(_DEFI_DEX_PAIRS),
     "RAYDIUM-SOLANA": list(_DEFI_DEX_PAIRS),
+    # Solana DEX pools (2026-07-20 catalogue canonicalization) — dex_pool_state
+    # ONLY (matches the meteora.py/lifinity.py/phoenix.py adapter capture surface
+    # + DEFI_VENUE_DATA_TYPE_CAPABILITIES; declaring dex_pool_swaps would mint a
+    # false MISSING for a shard the adapters never write).
+    "METEORA-SOLANA": ["dex_pool_state"],
+    "LIFINITY-SOLANA": ["dex_pool_state"],
+    "PHOENIX-SOLANA": ["dex_pool_state"],
     # --- Lending protocols — evm_defi_handler uses "aave_v3".upper() = "AAVE_V3" ---
     # ALSO: flash_loan_events_handler + position_data_handler hardcode "AAVE_V3"
     # (no underscore) — both names needed until those handlers are normalised (Bug 2).
@@ -367,6 +374,18 @@ _DEFI: dict[str, list[str]] = {
     "ALCHEMY": ["gas_fees", "token_transfers"],
     "CHAINLINK": ["oracle_prices"],
     "PYTH": ["oracle_prices"],
+    # Canonical PROTOCOL-CHAIN oracle venues (2026-07-20 catalogue
+    # canonicalization). Kept ALONGSIDE the flat CHAINLINK/PYTH keys above: the
+    # bare form matches current MTDS oracle_prices_handler writes; the
+    # CHAINLINK-<chain>/PYTH-SOLANA forms match the enumerated canonical venues +
+    # the aligned MTDS venue naming, so expected==captured holds through the
+    # naming cutover.
+    "CHAINLINK-ETHEREUM": ["oracle_prices"],
+    "CHAINLINK-ARBITRUM": ["oracle_prices"],
+    "CHAINLINK-BASE": ["oracle_prices"],
+    "CHAINLINK-OPTIMISM": ["oracle_prices"],
+    "CHAINLINK-POLYGON": ["oracle_prices"],
+    "PYTH-SOLANA": ["oracle_prices"],
     # --- Perp funding (DeFi perpetual protocols) ---
     # perp_funding_handler DEFAULT_PROTOCOLS; venue is protocol-only (chain in shard dim).
     # HYPERLIQUID / ASTER / LIGHTER-ZKSYNC perp_funding RETIRED

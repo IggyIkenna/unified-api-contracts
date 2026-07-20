@@ -96,6 +96,16 @@ _DEFI_VENUE_PREFIXES = frozenset(
         "SOLBLAZE",
         "JITORESTAKING",
         "SOLANA",
+        # 2026-07-20 DeFi catalogue canonicalization — Solana DEX pools
+        # (meteora.py / lifinity.py / phoenix.py) + oracle price-feed venues
+        # (chainlink.py per-chain, pyth.py). Collision-free (none names a CeFi
+        # venue). CHAINLINK/PYTH classify as DEFI for their PROTOCOL-<mainnet
+        # chain> forms via _infer_asset_group's prefix path.
+        "METEORA",
+        "LIFINITY",
+        "PHOENIX",
+        "CHAINLINK",
+        "PYTH",
     }
 )
 

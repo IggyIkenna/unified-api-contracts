@@ -690,6 +690,23 @@ PROTOCOL_CAPABILITIES: dict[str, _ProtocolCapability] = {
         data_types=["dex_pool_state"],
         mtds_operations=["collect-dex-pools"],
     ),
+    # Meteora (DLMM + dynamic pools) + Lifinity (proactive MM) — 2026-07-20 DeFi
+    # catalogue canonicalization. Existing IS adapters (meteora.py / lifinity.py)
+    # that were never registered; produce dex_pool_state via collect-dex-pools.
+    "meteora": _ProtocolCapability(
+        venue_prefix="METEORA",
+        protocol_class=ProtocolClass.DEX,
+        instrument_types=_POOL,
+        data_types=["dex_pool_state"],
+        mtds_operations=["collect-dex-pools"],
+    ),
+    "lifinity": _ProtocolCapability(
+        venue_prefix="LIFINITY",
+        protocol_class=ProtocolClass.DEX,
+        instrument_types=_POOL,
+        data_types=["dex_pool_state"],
+        mtds_operations=["collect-dex-pools"],
+    ),
     "marginfi": _ProtocolCapability(
         venue_prefix="MARGINFI",
         protocol_class=ProtocolClass.LENDING,
@@ -871,6 +888,26 @@ PROTOCOL_CAPABILITIES: dict[str, _ProtocolCapability] = {
         instrument_types=_RESTAKING,  # SPOT_ASSET — chain-level analytics, not a protocol instrument
         data_types=["token_transfers"],  # ERC-20 transfer events via Alchemy RPC (ALCHEMY-ONCHAIN 2020-01-01)
         mtds_operations=["collect-token-transfers"],
+    ),
+    # ── Oracle price feeds (oracle_prices) ────────────────────────────────────
+    # 2026-07-20 DeFi catalogue canonicalization. CHAINLINK = multi-chain
+    # aggregator feeds read on-chain via Alchemy RPC (new IS chainlink.py adapter,
+    # per-chain via _STATIC_VENUE_CHAINS below); PYTH = Solana pull/Hermes oracle
+    # (existing pyth.py adapter). Feeds enumerate as SPOT_PAIR (ETH/USD) +
+    # SPOT_ASSET (single-asset) instrument records.
+    "chainlink": _ProtocolCapability(
+        venue_prefix="CHAINLINK",
+        protocol_class=ProtocolClass.INFRASTRUCTURE,
+        instrument_types=[_IT.SPOT_PAIR.value, _IT.SPOT_ASSET.value],
+        data_types=["oracle_prices"],
+        mtds_operations=["collect-oracle-prices"],
+    ),
+    "pyth": _ProtocolCapability(
+        venue_prefix="PYTH",
+        protocol_class=ProtocolClass.INFRASTRUCTURE,
+        instrument_types=[_IT.SPOT_PAIR.value, _IT.SPOT_ASSET.value],
+        data_types=["oracle_prices"],
+        mtds_operations=["collect-oracle-prices"],
     ),
 }
 
@@ -1133,6 +1170,13 @@ _STATIC_VENUE_CHAINS: dict[str, list[str]] = {
     "raydium": ["SOLANA"],
     "orca": ["SOLANA"],
     "phoenix": ["SOLANA"],
+    # 2026-07-20 DeFi catalogue canonicalization — Solana DEX pools + oracles.
+    "meteora": ["SOLANA"],
+    "lifinity": ["SOLANA"],
+    "pyth": ["SOLANA"],
+    # Chainlink aggregator feeds are deployed on each EVM chain (no subgraph);
+    # per-chain venues CHAINLINK-<chain> for the honest-coverage denominator.
+    "chainlink": ["ETHEREUM", "ARBITRUM", "BASE", "OPTIMISM", "POLYGON"],
     "marginfi": ["SOLANA"],
     "solend": ["SOLANA"],
     "marinade": ["SOLANA"],
