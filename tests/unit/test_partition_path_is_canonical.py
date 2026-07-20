@@ -16,13 +16,16 @@ from datetime import date
 import pytest
 
 from unified_api_contracts import (
+    CanonicalViolationClass,
     InstrumentType,
     build_cefi_partition_path,
     build_defi_partition_path,
     build_prediction_partition_path,
     build_tradfi_partition_path,
     canonical_path_violations,
+    canonical_path_violations_classified,
     is_canonical,
+    is_canonical_instrument_id,
 )
 
 _DAY = date(2026, 4, 17)
@@ -48,12 +51,15 @@ def test_defi_builder_output_is_canonical() -> None:
 
 
 def test_cefi_builder_output_is_canonical() -> None:
+    # ``file_name`` is the FULL canonical instrument_id — the stem is now part of the
+    # canonicality answer (ID_FORM class), so a wire stem like ``BTC-PERPETUAL.parquet``
+    # would (correctly) fail this round-trip.
     path = build_cefi_partition_path(
         venue="BINANCE",
         instrument_type=InstrumentType.PERPETUAL,
         data_type="derivative_ticker",
         day=_DAY,
-        file_name="BTC-PERPETUAL.parquet",
+        file_name="BINANCE:PERPETUAL:BTC-USDT.parquet",
     )
     assert is_canonical(path), canonical_path_violations(path)
 
@@ -136,7 +142,7 @@ def test_cefi_hyphenated_venue_is_canonical() -> None:
             instrument_type=InstrumentType.PERPETUAL,
             data_type="trades",
             day=_DAY,
-            file_name="BTC-PERPETUAL.parquet",
+            file_name=f"{venue}:PERPETUAL:BTC-USDT.parquet",
         )
         violations = canonical_path_violations(path)
         assert is_canonical(path), violations
@@ -244,3 +250,146 @@ def test_tradfi_combo_named_spread_and_recovered_root_pass() -> None:
         assert is_canonical(path, require_pipeline_mode=True), canonical_path_violations(
             path, require_pipeline_mode=True
         )
+
+
+# ---------------------------------------------------------------------------
+# ID-FORM oracle — the filename stem (regression: the oracle was BLIND to it).
+#
+# Before 2026-07-20 ``canonical_path_violations`` dropped the filename
+# (``partition_segments = segments[:-1]``) before validating, so a CeFi corpus
+# of raw wire stems measured 0 violations == CANONICAL. ~811,200 objects
+# carried wire instrument_ids while the machine oracle reported the surface
+# clean. SSOT:
+# ``plans/active/issues/canonical_path_oracle_blind_to_filename_stem_2026_07_20.md``.
+# ---------------------------------------------------------------------------
+
+_CEFI_TPL = (
+    "raw_tick_data/by_date/day=2026-05-01/pipeline_mode=batch_tardis/asset_group=cefi/"
+    "venue={venue}/instrument_type={itype}/data_type={dtype}/{file_name}"
+)
+
+
+def _cefi_path(file_name: str, *, itype: str = "perpetual", venue: str = "BITFINEX-FUTURES") -> str:
+    return _CEFI_TPL.format(venue=venue, itype=itype, dtype="trades", file_name=file_name)
+
+
+@pytest.mark.parametrize(
+    "file_name",
+    [
+        "ADAF0:USTF0.parquet",  # raw Bitfinex wire symbol
+        "AVAX_USDC-PERPETUAL.parquet",  # raw Deribit wire symbol
+        "BTCUSD.parquet",  # bare symbol
+        "BITFINEX-FUTURES:PERPETUAL:ADAF0:USTF0.parquet",  # DOUBLE-WRAPPED catalogue miss
+    ],
+)
+def test_cefi_non_canonical_stem_is_flagged_by_default(file_name: str) -> None:
+    """A wire / double-wrapped stem must NOT come back canonical from the DEFAULT call."""
+    path = _cefi_path(file_name)
+    violations = canonical_path_violations(path)
+    assert any("is not a canonical instrument_id" in v for v in violations), violations
+    assert not is_canonical(path)
+
+
+@pytest.mark.parametrize(
+    "file_name",
+    [
+        "BITFINEX-FUTURES:PERPETUAL:ADA-USDT.parquet",
+        "HYPERLIQUID:PERPETUAL:BTC-USD@LIN.parquet",
+        "DERIBIT:FUTURE:BTC-USD-20260327.parquet",
+        "DERIBIT:OPTION:BTC-USD-20260327-65000-C.parquet",
+        "DERIBIT:COMBO:BTC-PERP-CALENDAR.parquet",
+        "BINANCE-FUTURES:SPOT_PAIR:BTC-USDT.parquet",
+    ],
+)
+def test_cefi_canonical_stem_is_clean(file_name: str) -> None:
+    path = _cefi_path(file_name)
+    assert is_canonical(path), canonical_path_violations(path)
+
+
+@pytest.mark.parametrize("itype", ["options_chain", "futures_chain"])
+def test_cefi_chain_ticks_parquet_is_never_flagged(itype: str) -> None:
+    """Chain shards legitimately have NO per-instrument stem — must not be flagged."""
+    path = _cefi_path("underlying=BTC/ticks.parquet", itype=itype)
+    assert is_canonical(path), canonical_path_violations(path)
+
+
+def test_symbol_less_ticks_parquet_fan_in_is_never_flagged() -> None:
+    """The symbol-less ``ticks.parquet`` fan-in (prediction book_snapshot_5) is canonical."""
+    path = _cefi_path("ticks.parquet")
+    assert is_canonical(path), canonical_path_violations(path)
+
+
+@pytest.mark.parametrize(
+    "path",
+    [
+        # DeFi ids route through the passthrough builder (pool addresses / aTokens) —
+        # the VENUE:ITYPE:BASE-QUOTE grammar does not apply, so no false violations.
+        "raw_tick_data/by_date/day=2026-05-01/pipeline_mode=batch_thegraph/asset_group=defi/"
+        "venue=AAVE_V3/chain=ETHEREUM/instrument_type=a_token/data_type=lending_indices/aUSDC.parquet",
+        # Prediction shards are named for the venue condition_id.
+        "raw_tick_data/by_date/day=2026-05-01/asset_group=prediction/venue=POLYMARKET/"
+        "instrument_type=binary_option/data_type=trades/0xabc123.parquet",
+    ],
+)
+def test_id_form_check_does_not_apply_to_defi_or_prediction(path: str) -> None:
+    assert is_canonical(path), canonical_path_violations(path)
+
+
+def test_violation_classes_partition_the_default_answer() -> None:
+    """STRUCTURAL + ID_FORM must sum to the default (unfiltered) answer."""
+    path = _cefi_path("ADAF0:USTF0.parquet").replace("day=2026-05-01", "day-2026-05-01")
+    default = canonical_path_violations(path)
+    structural = canonical_path_violations(path, violation_classes=frozenset({CanonicalViolationClass.STRUCTURAL}))
+    id_form = canonical_path_violations(path, violation_classes=frozenset({CanonicalViolationClass.ID_FORM}))
+    assert structural, "legacy day- prefix must be a STRUCTURAL violation"
+    assert id_form, "wire stem must be an ID_FORM violation"
+    assert sorted(default) == sorted([*structural, *id_form])
+
+
+def test_structural_only_preserves_pre_change_behaviour_for_cefi() -> None:
+    """The STRUCTURAL pin the MTDS write-guards use must accept a wire stem.
+
+    This pins the contract the two raising CeFi callers
+    (``live_tick_blob_path`` / ``_microstructure_blob_path``) rely on: turning
+    ID_FORM on for them without first fixing ``_sanitize_symbol`` would raise on
+    EVERY live cefi write.
+    """
+    path = _cefi_path("ADAF0:USTF0.parquet")
+    assert canonical_path_violations(path, violation_classes=frozenset({CanonicalViolationClass.STRUCTURAL})) == []
+
+
+def test_classified_view_reports_every_class() -> None:
+    result = canonical_path_violations_classified(_cefi_path("ADAF0:USTF0.parquet"))
+    assert set(result) == set(CanonicalViolationClass)
+    assert result[CanonicalViolationClass.STRUCTURAL] == []
+    assert result[CanonicalViolationClass.ID_FORM]
+
+
+@pytest.mark.parametrize(
+    ("candidate", "expected"),
+    [
+        ("BITFINEX-FUTURES:PERPETUAL:ADA-USDT", True),
+        ("HYPERLIQUID:PERPETUAL:BTC-USD@LIN", True),
+        ("DERIBIT:COMBO:anything-here", True),
+        ("ADAF0:USTF0", False),
+        ("BITFINEX-FUTURES:PERPETUAL:ADAF0:USTF0", False),
+        ("BTCUSD", False),
+        ("", False),
+    ],
+)
+def test_is_canonical_instrument_id(candidate: str, expected: bool) -> None:
+    assert is_canonical_instrument_id(candidate) is expected
+
+
+def test_tradfi_single_instrument_stem_rules_still_fire() -> None:
+    """The pre-existing tradfi stem rules must be unchanged (now classed ID_FORM)."""
+    base = (
+        "raw_tick_data/by_date/day=2026-05-01/pipeline_mode=batch_databento/asset_group=tradfi/"
+        "venue=XNAS/instrument_type=equity/data_type=trades/{file_name}"
+    )
+    bare = canonical_path_violations(base.format(file_name="AAPL.parquet"), require_pipeline_mode=True)
+    assert any("got a bare symbol" in v for v in bare), bare
+    fan_in = canonical_path_violations(base.format(file_name="ticks.parquet"), require_pipeline_mode=True)
+    assert any("ticks.parquet' fan-in" in v for v in fan_in), fan_in
+    ok = base.format(file_name="XNAS:EQUITY:AAPL-USD.parquet")
+    assert is_canonical(ok, require_pipeline_mode=True), canonical_path_violations(ok, require_pipeline_mode=True)

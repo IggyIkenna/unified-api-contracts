@@ -586,13 +586,16 @@ from .canonical.domain.strategy import (
     MinBalancePerVenue,
 )
 from .canonical.partition_paths import (
+    CanonicalViolationClass,
     build_cefi_partition_path,
     build_defi_partition_path,
     build_prediction_partition_path,
     build_tradfi_partition_path,
     candidate_parquet_paths,
     canonical_path_violations,
+    canonical_path_violations_classified,
     is_canonical,
+    is_canonical_instrument_id,
 )
 from .config.trading_validation import (
     CONFIG_REQUIRED_FIELDS,
@@ -1845,6 +1848,7 @@ __all__ = [
     "CanonicalTrade",
     "CanonicalUnknownVenueError",
     "CanonicalVenue",
+    "CanonicalViolationClass",
     "CanonicalWebSocketLifecycle",
     "CanonicalWorkflowRun",
     "CanonicalYieldCurvePoint",
@@ -2287,6 +2291,7 @@ __all__ = [
     "build_tradfi_partition_path",
     "candidate_parquet_paths",
     "canonical_path_violations",
+    "canonical_path_violations_classified",
     "canonicalize_raw_tradfi_id",
     "TRADFI_CASH_TYPE_VALUES",
     "classify_cloud_run_service",
@@ -2355,6 +2360,7 @@ __all__ = [
     "has_source_priority",
     "is_batch",
     "is_canonical",
+    "is_canonical_instrument_id",
     "is_emission_policy_declared",
     "live_pipeline_mode_for_venue",
     "live_source_for_venue",
