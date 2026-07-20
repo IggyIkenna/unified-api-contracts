@@ -151,6 +151,9 @@ SUPPORTED_INSTRUMENT_TYPES: Final[frozenset[InstrumentType]] = frozenset(
         InstrumentType.A_TOKEN,
         InstrumentType.DEBT_TOKEN,
         InstrumentType.STAKING,
+        # Liquid restaking (ezETH/rsETH/pufETH) — same VENUE-CHAIN:TYPE:SYMBOL
+        # DeFi builder shape as LST/STAKING.
+        InstrumentType.RESTAKING,
         InstrumentType.SPOT_ASSET,
         # DeFi Solana (distinct shapes; SchemaContracts at UAC@7e9f4ad9)
         InstrumentType.SOLANA_LENDING,
@@ -199,6 +202,7 @@ _DEFI_TYPES: Final[frozenset[InstrumentType]] = frozenset(
         InstrumentType.A_TOKEN,
         InstrumentType.DEBT_TOKEN,
         InstrumentType.STAKING,
+        InstrumentType.RESTAKING,
         InstrumentType.SPOT_ASSET,
         # Solana DeFi (same VENUE-CHAIN:TYPE:SYMBOL builder; chain="SOLANA")
         InstrumentType.SOLANA_LENDING,

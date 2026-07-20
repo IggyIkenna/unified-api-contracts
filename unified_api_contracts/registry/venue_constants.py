@@ -514,6 +514,9 @@ INSTRUMENT_TYPE_FOLDER_MAP: dict[str, str] = {
     "YIELD_BEARING": "yield_bearing",
     "DEBT_TOKEN": "debt_tokens",
     "LST": "lst",
+    # Liquid restaking (ezETH/rsETH/pufETH). Folder matches the lowercase
+    # instrument_type the DeFi manifest already emits (LST->lst, STAKING->staking).
+    "RESTAKING": "restaking",
     "A_TOKEN": "a_tokens",
     "EXCHANGE_ODDS": "exchange_odds",
     "FIXED_ODDS": "fixed_odds",
