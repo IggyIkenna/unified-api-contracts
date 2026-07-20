@@ -201,6 +201,31 @@ VENUE_TO_ADAPTER_KEY: dict[str, str] = {
     "BETFAIR_EX_EU": NO_ADAPTER_YET,
     "DRAFTKINGS": NO_ADAPTER_YET,
     "FANDUEL": NO_ADAPTER_YET,
+    # ODDS_API fan-out bookmakers promoted into VENUES_BY_ASSET_GROUP["sports"]
+    # 2026-07-20 (operator; distinct_values_noncanonical_audit_2026_07_20.md).
+    # Same disposition as DRAFTKINGS/FANDUEL above: their odds arrive through the
+    # ODDS_API aggregator capture path, so there is NO per-bookmaker IS reference
+    # adapter to register — NO_ADAPTER_YET is the accurate statement, not a stub.
+    "BETMGM": NO_ADAPTER_YET,
+    "BETONLINEAG": NO_ADAPTER_YET,
+    "BETOPENLY": NO_ADAPTER_YET,
+    "BETRIVERS": NO_ADAPTER_YET,
+    "BETSSON": NO_ADAPTER_YET,
+    "BETVICTOR": NO_ADAPTER_YET,
+    "BETWAY": NO_ADAPTER_YET,
+    "BOVADA": NO_ADAPTER_YET,
+    "CASUMO": NO_ADAPTER_YET,
+    "CORAL": NO_ADAPTER_YET,
+    "LIVESCOREBET": NO_ADAPTER_YET,
+    "MATCHBOOK": NO_ADAPTER_YET,
+    "NOVIG": NO_ADAPTER_YET,
+    "ONEXBET": NO_ADAPTER_YET,
+    "PADDYPOWER": NO_ADAPTER_YET,
+    "PROPHETX": NO_ADAPTER_YET,
+    "SKYBET": NO_ADAPTER_YET,
+    "UNIBET": NO_ADAPTER_YET,
+    "VIRGINBET": NO_ADAPTER_YET,
+    "WILLIAMHILL": NO_ADAPTER_YET,
     # DRIFT (Solana) removed 2026-07-16 (operator ruling): Drift was hacked for
     # ~$280M on 2026-04-01 (Lazarus-attributed), offline 3 months, then
     # rebranded to "Velocity DEX" 2026-07-01 — a ~2-week-old private beta with

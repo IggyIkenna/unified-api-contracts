@@ -384,15 +384,29 @@ VENUES_BY_ASSET_GROUP: dict[str, list[str]] = {
     "defi": list(dict.fromkeys(v for v in _ALL_DEFI_VENUES if _DEFI_VENUE_PHASE.get(v) == "live")),
     "sports": [
         # Sports betting exchanges and bookmakers active in the May-23 universe.
-        # DEFERRED-INDEFINITELY 2026-05-12 per operator: scraper bookmakers
-        # (BET365, DRAFTKINGS, FANDUEL, WILLIAMHILL, LADBROKES, CORAL, PADDYPOWER,
-        # SKYBET, BETWAY, BETVICTOR, BOYLESPORTS, BWIN, BET888SPORT, UNIBET,
-        # BETFRED, SBOBET) are out of the active venue universe; their venue
-        # constants + capability flags + execution adapter stubs remain in the
-        # codebase as future-work scaffolding but they do NOT participate in MTDS
-        # market-data ingestion or in `VENUES_BY_ASSET_GROUP["sports"]`. See
+        #
+        # DEFERRED-INDEFINITELY 2026-05-12 per operator: SCRAPER bookmakers are out
+        # of the active venue universe; their venue constants + capability flags +
+        # execution adapter stubs remain as future-work scaffolding. See
         # `unified-trading-pm/plans/epics/sports_master.md` §
         # "Scrapers DEFERRED-INDEFINITELY 2026-05-12 per operator".
+        #
+        # ── SUPERSEDED IN PART (operator 2026-07-20,
+        # `plans/active/distinct_values_noncanonical_audit_2026_07_20.md`) ──
+        # The 2026-05-12 deferral is about the SCRAPER acquisition path, not about
+        # the bookmaker identity. The ODDS_API fan-out already WRITES these
+        # bookmakers as manifest venues, so excluding them from this set made the
+        # canonical vocabulary disagree with what the writer actually emits — they
+        # accounted for the single largest non-canonical cluster on the
+        # data-status drift panel (29 sports venue badges). Every entry below is a
+        # canonical `ODDS_API_KEY_MAP` / `AUDITED_BOOKMAKERS` key (verified
+        # 2026-07-20), added on exactly the DRAFTKINGS/FANDUEL
+        # "via ODDS_API fan-out (manifest-confirmed)" precedent.
+        # NOTE: this EXPANDS the honest-coverage DENOMINATOR (
+        # `instruments-service/scripts/enumerate_expected_universe.py` builds the
+        # expected universe from this set), so measured sports coverage % drops —
+        # the data did not change, the denominator became honest. Operator
+        # explicitly accepted that trade-off.
         "ODDS_API",  # Multi-bookmaker odds aggregator (raw tick data source)
         "PINNACLE",  # Bookmaker API (ODDS_API fan-out + direct)
         "BETFAIR",  # Canonical exchange venue constant (execution/reference)
@@ -401,6 +415,27 @@ VENUES_BY_ASSET_GROUP: dict[str, list[str]] = {
         "BETFAIR_EX_EU",  # MTDS manifest sub-venue: Betfair Exchange EU
         "DRAFTKINGS",  # US bookmaker via ODDS_API fan-out (manifest-confirmed)
         "FANDUEL",  # US bookmaker via ODDS_API fan-out (manifest-confirmed)
+        # ── ODDS_API fan-out bookmakers (operator 2026-07-20; all registry-backed) ──
+        "BETMGM",
+        "BETONLINEAG",
+        "BETOPENLY",
+        "BETRIVERS",
+        "BETSSON",
+        "BETVICTOR",
+        "BETWAY",
+        "BOVADA",
+        "CASUMO",
+        "CORAL",
+        "LIVESCOREBET",
+        "MATCHBOOK",
+        "NOVIG",
+        "ONEXBET",
+        "PADDYPOWER",
+        "PROPHETX",
+        "SKYBET",
+        "UNIBET",
+        "VIRGINBET",
+        "WILLIAMHILL",
     ],
     "prediction": [
         # Prediction markets (binary / multi-outcome)

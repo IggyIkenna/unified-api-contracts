@@ -45,6 +45,35 @@ EXPECTED_SENTINEL_VENUES: frozenset[str] = frozenset(
         "BETFAIR_EX_EU",
         "DRAFTKINGS",
         "FANDUEL",
+        # ODDS_API fan-out bookmakers promoted into VENUES_BY_ASSET_GROUP["sports"]
+        # 2026-07-20 (operator decision, distinct_values_noncanonical_audit_2026_07_20.md).
+        # Sentinel is the ACCURATE statement, not a stub: exactly like
+        # DRAFTKINGS/FANDUEL above, their odds arrive through the ODDS_API
+        # aggregator capture path (Decision C — MTDS-owned), so no per-bookmaker
+        # IS reference adapter exists or is planned. They were added to the venue
+        # set because the canonical vocabulary must match what the writer already
+        # emits (they were the largest non-canonical cluster on the data-status
+        # drift panel), NOT because a new acquisition path was built.
+        "BETMGM",
+        "BETONLINEAG",
+        "BETOPENLY",
+        "BETRIVERS",
+        "BETSSON",
+        "BETVICTOR",
+        "BETWAY",
+        "BOVADA",
+        "CASUMO",
+        "CORAL",
+        "LIVESCOREBET",
+        "MATCHBOOK",
+        "NOVIG",
+        "ONEXBET",
+        "PADDYPOWER",
+        "PROPHETX",
+        "SKYBET",
+        "UNIBET",
+        "VIRGINBET",
+        "WILLIAMHILL",
     }
 )
 
