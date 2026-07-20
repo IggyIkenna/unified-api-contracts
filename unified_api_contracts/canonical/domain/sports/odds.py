@@ -81,6 +81,12 @@ class CanonicalOdds(BaseModel):
     home_odds: Decimal | None = None
     draw_odds: Decimal | None = None
     away_odds: Decimal | None = None
+    # Optional exchange lay prices (bet AGAINST the outcome). Honest-None: only
+    # populated for lay-capable exchanges (e.g. Betfair); back-only bookmakers
+    # leave these unset. No persistence change — the model can now carry lay.
+    home_lay_odds: Decimal | None = None
+    draw_lay_odds: Decimal | None = None
+    away_lay_odds: Decimal | None = None
     over_line: Decimal | None = None
     over_odds: Decimal | None = None
     under_odds: Decimal | None = None

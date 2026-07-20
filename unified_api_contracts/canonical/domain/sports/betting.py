@@ -87,6 +87,9 @@ class BetOrder(BaseModel):
     stake: Decimal
     max_acceptable_odds: Decimal
     strategy_source: SignalSource
+    # Back (bet FOR the outcome) or lay (bet AGAINST it, exchange-only). Defaults
+    # to BACK so existing callers that predate lay support are unchanged.
+    side: BetSide = BetSide.BACK
     signal_id: str | None = None
     opportunity_id: str | None = None
     created_at_utc: datetime

@@ -16,6 +16,10 @@ Fee semantics (per YES share in probability/price units [0, 1])
   — a convex, mid-heavy curve (max ~1.75 ¢ at P=0.5, →0 at the tails).
 * **Polymarket** — currently **0 trading fees** (maker and taker both 0;
   gas/relay is borne off-book).
+* **Betfair** — sports *exchange* commission charged on **net winnings** of a
+  winning bet (back or lay), not on stake/notional: ``fee = BETFAIR_COMMISSION_FRACTION * max(net_winnings, 0)``.
+  The default 5% is the standard base rate; it is an operator-tunable model
+  input (market-base rates vary and are reduced by loyalty discounts).
 
 Versioning
 ----------
@@ -29,9 +33,11 @@ Source: ``help.kalshi.com`` fee schedule (accessed 2026-06).
 from __future__ import annotations
 
 __all__ = [
+    "BETFAIR_COMMISSION_FRACTION",
     "KALSHI_FEE_COEFF",
     "POLYMARKET_FEE_FRACTION",
     "PREDICTION_VENUE_FEE_MODEL_VERSION",
+    "betfair_fee",
     "kalshi_fee",
     "net_edge_sell_kalshi",
     "net_edge_sell_polymarket",
@@ -39,12 +45,15 @@ __all__ = [
 ]
 
 # Bump whenever a coefficient below changes; persisted per arb-store row.
-PREDICTION_VENUE_FEE_MODEL_VERSION: str = "v1_public_2026_06_kalshi0.07_poly0"
+PREDICTION_VENUE_FEE_MODEL_VERSION: str = "v2_public_2026_07_kalshi0.07_poly0_betfair0.05"
 
 # Kalshi general trading fee coefficient (dimensionless): fee_per_contract = COEFF * P * (1 - P).
 KALSHI_FEE_COEFF: float = 0.07
 # Polymarket CLOB trading fee fraction (currently zero; both maker and taker).
 POLYMARKET_FEE_FRACTION: float = 0.0
+# Betfair exchange commission on NET winnings of a winning bet (base rate 5%);
+# operator-tunable model input (see module docstring).
+BETFAIR_COMMISSION_FRACTION: float = 0.05
 
 
 def kalshi_fee(price: float) -> float:
@@ -61,6 +70,17 @@ def polymarket_fee(price: float) -> float:
     """Per-share Polymarket trading fee at YES execution ``price`` (currently 0)."""
     _ = price
     return POLYMARKET_FEE_FRACTION
+
+
+def betfair_fee(net_winnings: float) -> float:
+    """Betfair exchange commission on the ``net_winnings`` of a settled bet.
+
+    ``BETFAIR_COMMISSION_FRACTION * max(net_winnings, 0)`` — commission is charged
+    only on the *net* winnings of a *winning* bet (back or lay), never on stake or
+    notional, so a losing/non-positive ``net_winnings`` yields ``0``. The 5%
+    default is an operator-tunable model input (see module docstring).
+    """
+    return BETFAIR_COMMISSION_FRACTION * max(net_winnings, 0.0)
 
 
 def net_edge_sell_kalshi(kalshi_yes_bid: float, polymarket_yes_ask: float) -> float:
