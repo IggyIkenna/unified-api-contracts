@@ -17,6 +17,7 @@ from __future__ import annotations
 import datetime as _dt
 import re
 from datetime import date as date_type
+from functools import lru_cache
 from typing import Final, Literal
 
 from pydantic import BaseModel
@@ -202,6 +203,24 @@ EXCHANGE_CODE_TO_NAME: dict[str, str] = {
     "EW2": "SP500",
     "EW3": "SP500",
     "EW4": "SP500",
+    # CME Micro E-mini — distinct contract from the full-size ES (own bundle root,
+    # never folded into SP500) — Micro E-mini S&P 500 (GLBX.MDP3, ``MESM26`` etc.).
+    "MES": "MICRO-SP500",
+    # CME futures roots that classify VALID but had no human-name alias yet — a
+    # real ``instrument_type=futures_chain`` root, NOT a garbage/opaque code
+    # (tradfi_canonical_path_migration_design_2026_07_19.md category C). Mapped to
+    # themselves (identity) so ``_exchange_to_product_root`` preserves the real
+    # exchange root as the bundle key; the resolver now recognises them so the
+    # canonical-path guard no longer over-flags their chains as garbage. Replace
+    # the value with the human product name once confirmed with Databento.
+    "XAB": "XAB",
+    "XAF": "XAF",
+    "XAI": "XAI",
+    "XAK": "XAK",
+    "XAP": "XAP",
+    "XAU": "XAU",
+    "XAV": "XAV",
+    "XAY": "XAY",
     "CT": "COTTON",
     "CC": "COCOA",
     "KC": "COFFEE",
@@ -212,6 +231,83 @@ EXCHANGE_CODE_TO_NAME: dict[str, str] = {
     "G": "GASOIL",
     "T": "WTI",
 }
+
+
+# ---------------------------------------------------------------------------
+# Real-product-root recognition (canonical-path garbage-underlying guard)
+# ---------------------------------------------------------------------------
+# A tradfi CHAIN/COMBO bundle path carries ``underlying=<ROOT>`` where ROOT is
+# the human product root (``SP500``) or a real exchange code (``MES``/``XAB``).
+# The forensic sweep (tradfi_canonical_path_migration_design_2026_07_19.md)
+# found 189,830 chain objects whose ``underlying=`` was garbage — numeric CBOE
+# globex GROUP codes (``12``/``13``/``23``) and opaque CBOE user-defined leg
+# codes (``GN``/``VT``/``3W``, the ``UD:1V: GN <id>`` leg). Those must be
+# quarantined (honest absence), never fake-canonicalised. This predicate is the
+# SHARED classifier both the write-time canonical-path guard
+# (:func:`unified_api_contracts.canonical.partition_paths.canonical_path_violations`)
+# and the recovery pass use to tell a REAL root/named-spread from opaque garbage.
+
+_NUMERIC_UNDERLYING_RE: Final[re.Pattern[str]] = re.compile(r"^\d+$")
+
+
+@lru_cache(maxsize=1)
+def _recognized_tradfi_roots() -> frozenset[str]:
+    """Uppercased union of every real TradFi product root + human name.
+
+    Keys AND values of both underlying registries — ``EXCHANGE_CODE_TO_NAME``
+    (raw exchange codes ``ES``/``MES``/``XAB`` + their human names) and
+    ``UNDERLYING_NORMALIZATION`` (``WTI``/``NAT-GAS``/``UST-10Y`` display forms).
+    Lazily imports ``UNDERLYING_NORMALIZATION`` to avoid an import-time cycle
+    (this module is imported by the canonical layer).
+    """
+    from unified_api_contracts.internal.reference.ticker_registry import UNDERLYING_NORMALIZATION
+
+    roots: set[str] = set()
+    for code, name in EXCHANGE_CODE_TO_NAME.items():
+        roots.add(code.upper())
+        roots.add(name.upper())
+    for code, name in UNDERLYING_NORMALIZATION.items():
+        roots.add(code.upper())
+        roots.add(name.upper())
+    return frozenset(roots)
+
+
+def is_recognized_tradfi_underlying(underlying: str) -> bool:
+    """True iff ``underlying`` is a real TradFi product root / named-spread combo.
+
+    Returns ``True`` for:
+      * a real product root or human name (``ES``, ``SP500``, ``MES``,
+        ``MICRO-SP500``, ``XAB``, ``UST-10Y``, ``NAT-GAS`` …) — incl. the hyphenated
+        human names, which are matched whole before the leg split; and
+      * a resolved named-spread combo (``WTI-BZ``, ``NAT-GAS-HH``) — a ``-``-joined
+        underlying carrying at least one recognised product token.
+
+    Returns ``False`` for:
+      * a numeric CBOE globex GROUP code (``12``/``13``/``23``); and
+      * an opaque CBOE user-defined leg code (``GN``/``VT``/``IC``/``3W``) — a short
+        code that is neither a known root nor a ``-``-joined named spread.
+
+    The false cases are the garbage-underlying corpus that must be quarantined
+    (honest absence), never written as a canonical bundle.
+    """
+    u = (underlying or "").strip().upper()
+    if not u:
+        return False
+    if _NUMERIC_UNDERLYING_RE.match(u):
+        return False
+    known = _recognized_tradfi_roots()
+    if u in known:
+        return True
+    if "-" in u:
+        # Named-spread combo. A resolved leg (``WTI`` in ``WTI-BZ``) matches by
+        # token; a hyphenated human name (``NAT-GAS`` in ``NAT-GAS-HH``) matches
+        # by substring. Opaque UD codes never carry a ``-``, so this never
+        # accepts opaque garbage.
+        if any(tok in known for tok in u.split("-")):
+            return True
+        return any(len(name) >= 3 and name in u for name in known)
+    return False
+
 
 # ---------------------------------------------------------------------------
 # Instrument identity / data-source binding types
@@ -525,7 +621,6 @@ SPACE_TO_DOT_SYMBOLS: dict[str, str] = {
 
 # Backward-compatible alias
 TRADFI_INSTRUMENTS_CONFIG: list[dict[str, str | None]] = TRADFI_VENUE_MAPPINGS
-
 
 
 # ---------------------------------------------------------------------------

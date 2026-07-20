@@ -1392,6 +1392,9 @@ from .registry import (
 from .registry import (
     is_expected as is_expected,
 )
+from .registry import (
+    is_recognized_tradfi_underlying as is_recognized_tradfi_underlying,
+)
 from .signal_broadcast import (
     COUNTERPARTY_ENTITLEMENTS as COUNTERPARTY_ENTITLEMENTS,
 )
@@ -2355,6 +2358,7 @@ __all__ = [
     "is_defi_force_include",
     "is_live",
     "is_per_instrument_shard_data_type",
+    "is_recognized_tradfi_underlying",
     "is_replay",
     "linked_question_group",
     "lookup_contract",
