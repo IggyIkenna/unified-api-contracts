@@ -2188,6 +2188,7 @@ def get_expected_instruments_for_venue(
     as_of_date: str | None = None,
     instruments_provider: Callable[[str, str], list[str] | None] | None = None,
     cap: int | None = None,
+    explicit_scope: bool = False,
 ) -> list[str]:
     """Return the per-instrument shard denominator for ``(venue, data_type)``.
 
@@ -2220,6 +2221,31 @@ def get_expected_instruments_for_venue(
         Optional hard ceiling on the returned list size. The MTDS
         orchestrator passes ``cap=_DEFAULT_PER_INSTRUMENT_SENTINEL_CAP``
         (MVP tier = 50) to keep manifest row counts bounded.
+    explicit_scope:
+        ``True`` when ``instruments_provider`` returns an instrument list the
+        CALLER named explicitly (MTDS ``--instrument-ids`` / VM metadata
+        ``VM_INSTRUMENT_IDS``), as opposed to a discovered catalog or a seed
+        table. An explicit scope is NEVER capped.
+
+        Rationale (2026-07-20 root-cause). ``cap`` exists to bound the Tier-3
+        fan-out over an *unbounded, discovered* universe. Applied to an
+        explicitly-named list it does not bound anything — it silently DROPS
+        instruments the operator asked for. Worse, callers hand this function
+        a ``sorted()`` list, so ``resolved[:cap]`` is an **alphabetical
+        prefix**: a systematically biased truncation, not a sample.
+
+        Measured damage: the TradFi equity launchers pass 622 sorted tickers;
+        ``cap=50`` cut the denominator to ``A..BKNG``, which produced 104,623
+        phantom absence rows clustered in tickers A-C (AAPL, AMZN, AVGO, BAC,
+        BRK.B, C, CAT ...) and left D-Z with no per-instrument row at all. The
+        invariant broke visibly in production: VM log
+        ``tradfi-bf-nasdaq-ohlcv-1m-2024-20260719-112444`` reports
+        ``expected_instruments=50 captured=58`` — a denominator SMALLER than
+        its own numerator.
+
+        This flag is not a tier promotion (tier caps stay operator-gated per
+        ``codex/02-data/per-instrument-sentinel-rollout.md`` § 3); it only
+        stops the cap from being applied where it was never meaningful.
 
     Returns
     -------
@@ -2241,7 +2267,11 @@ def get_expected_instruments_for_venue(
     else:
         resolved = list(_default_seed_instruments_for(venue, data_type))
 
-    if cap is not None and cap >= 0:
+    # An explicitly-named scope is never capped: `resolved` is already exactly
+    # what the caller asked for, and `[:cap]` over a sorted list would silently
+    # truncate it to an alphabetical prefix (see `explicit_scope` in the
+    # docstring for the measured NASDAQ/NYSE damage).
+    if cap is not None and cap >= 0 and not explicit_scope:
         resolved = resolved[:cap]
     return resolved
 
