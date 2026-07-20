@@ -78,6 +78,11 @@ _INSTRUMENT_TYPE_TO_LEDGER_ASSET_CLASS: dict[InstrumentType, LedgerAssetClass] =
     InstrumentType.A_TOKEN: LedgerAssetClass.ATOKEN,
     InstrumentType.DEBT_TOKEN: LedgerAssetClass.DEBT_TOKEN,
     InstrumentType.STAKING: LedgerAssetClass.LST,
+    # Liquid restaking tokens (ezETH/rsETH/pufETH). Ledger-side they behave as a
+    # liquid staking receipt (same class as LST/STAKING); the restaking-specific
+    # AVS slashing risk is carried by the distinct ``RESTAKING`` instrument_type,
+    # not by a separate ledger asset class.
+    InstrumentType.RESTAKING: LedgerAssetClass.LST,
     InstrumentType.SOLANA_LENDING: LedgerAssetClass.ATOKEN,
     InstrumentType.SOLANA_VAULT: LedgerAssetClass.VAULT_SHARE,
     InstrumentType.SOLANA_AMM_POOL: LedgerAssetClass.SPOT_TOKEN,

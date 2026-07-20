@@ -201,6 +201,31 @@ VENUE_TO_ADAPTER_KEY: dict[str, str] = {
     "BETFAIR_EX_EU": NO_ADAPTER_YET,
     "DRAFTKINGS": NO_ADAPTER_YET,
     "FANDUEL": NO_ADAPTER_YET,
+    # ODDS_API fan-out bookmakers promoted into VENUES_BY_ASSET_GROUP["sports"]
+    # 2026-07-20 (operator; distinct_values_noncanonical_audit_2026_07_20.md).
+    # Same disposition as DRAFTKINGS/FANDUEL above: their odds arrive through the
+    # ODDS_API aggregator capture path, so there is NO per-bookmaker IS reference
+    # adapter to register — NO_ADAPTER_YET is the accurate statement, not a stub.
+    "BETMGM": NO_ADAPTER_YET,
+    "BETONLINEAG": NO_ADAPTER_YET,
+    "BETOPENLY": NO_ADAPTER_YET,
+    "BETRIVERS": NO_ADAPTER_YET,
+    "BETSSON": NO_ADAPTER_YET,
+    "BETVICTOR": NO_ADAPTER_YET,
+    "BETWAY": NO_ADAPTER_YET,
+    "BOVADA": NO_ADAPTER_YET,
+    "CASUMO": NO_ADAPTER_YET,
+    "CORAL": NO_ADAPTER_YET,
+    "LIVESCOREBET": NO_ADAPTER_YET,
+    "MATCHBOOK": NO_ADAPTER_YET,
+    "NOVIG": NO_ADAPTER_YET,
+    "ONEXBET": NO_ADAPTER_YET,
+    "PADDYPOWER": NO_ADAPTER_YET,
+    "PROPHETX": NO_ADAPTER_YET,
+    "SKYBET": NO_ADAPTER_YET,
+    "UNIBET": NO_ADAPTER_YET,
+    "VIRGINBET": NO_ADAPTER_YET,
+    "WILLIAMHILL": NO_ADAPTER_YET,
     # DRIFT (Solana) removed 2026-07-16 (operator ruling): Drift was hacked for
     # ~$280M on 2026-04-01 (Lazarus-attributed), offline 3 months, then
     # rebranded to "Velocity DEX" 2026-07-01 — a ~2-week-old private beta with
@@ -225,19 +250,16 @@ VENUE_TO_ADAPTER_KEY: dict[str, str] = {
     "MARGINFI-SOLANA": "marginfi",
     "SOLEND-SOLANA": "solend",
     # Oracle price-feed venues (2026-07-20 DeFi catalogue canonicalization).
-    # PYTH = existing pyth.py adapter (real, wired). CHAINLINK-* stays phase=
-    # "pipeline" (defi_venues.py DEFI_VENUE_PHASE) with NO entry here — the
-    # per-chain Alchemy-RPC chainlink.py adapter this key names was never
-    # built in instruments-service (2026-07-20 gate-failure remediation,
-    # BLK-0c7b82fe); adding a real key without the adapter class fails
-    # TestAdapterRoutingUACInvariant.test_every_uac_adapter_key_resolves_to_a_class
-    # on the IS side, and NO_ADAPTER_YET is reserved for the deliberate
-    # MTDS-owned/sentinel set (test_sentinel_set_is_exactly_the_declared_one) —
-    # so "no entry + pipeline phase" (matches YEARN_V3-OPTIMISM/BEEFY-POLYGON/
-    # IDLE-POLYGON precedent) is the correct interim state. Re-add the 5
-    # CHAINLINK-{ETHEREUM,ARBITRUM,BASE,OPTIMISM,POLYGON} -> "chainlink" entries
-    # + flip DEFI_VENUE_PHASE back to "live" in the SAME commit that ships the
-    # real chainlink.py adapter.
+    # BLK-0c7b82fe RESOLVED: instruments-service@6506b505 added + registered
+    # ChainlinkOracleReferenceDataAdapter (45 aggregator addresses, verified
+    # subset of MTDS's production _oracle_prices_constants.py). Re-adding the
+    # real key here + flipping DEFI_VENUE_PHASE back to "live" is the
+    # remaining coordinated step (adapter landed first, declaration second).
+    "CHAINLINK-ETHEREUM": "chainlink",
+    "CHAINLINK-ARBITRUM": "chainlink",
+    "CHAINLINK-BASE": "chainlink",
+    "CHAINLINK-OPTIMISM": "chainlink",
+    "CHAINLINK-POLYGON": "chainlink",
     "PYTH-SOLANA": "pyth",
     # RADIANT-BSC (2026-07-10): the auto-gen loop below only covers chains with
     # a registered subgraph_id (SUBGRAPH_IDS["radiant"] = ARBITRUM+ETHEREUM

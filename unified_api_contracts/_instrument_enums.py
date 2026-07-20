@@ -61,6 +61,16 @@ class InstrumentType(StrEnum):
     A_TOKEN = "A_TOKEN"
     DEBT_TOKEN = "DEBT_TOKEN"
     STAKING = "STAKING"
+    # DeFi — LIQUID RESTAKING tokens (operator decision 2026-07-20,
+    # distinct_values_noncanonical_audit_2026_07_20.md). Renzo ezETH, KelpDAO
+    # rsETH, Puffer pufETH. The DeFi manifest was already emitting
+    # ``instrument_type=restaking`` with NO canonical enum member, so these had
+    # no canonical home and badged non-canonical on the data-status drift panel.
+    # Deliberately NOT folded into ``LST``: a liquid restaking token carries
+    # EigenLayer AVS slashing risk STACKED on the base ETH staking slashing an
+    # LST carries (ezETH depegged 2024), so collapsing the two would lose real
+    # signal for collateral / risk modelling.
+    RESTAKING = "RESTAKING"
     SPOT_ASSET = "SPOT_ASSET"
     # DeFi — Solana (distinct shapes vs EVM lending/pool; see UAC@7e9f4ad9 contracts +
     # plan solana_defi_legacy_migration_2026_05_27).
