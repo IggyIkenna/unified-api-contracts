@@ -771,6 +771,31 @@ def canonical_path_violations(path: str, *, require_pipeline_mode: bool = False)
                 "tradfi pipeline_mode=batch_massive is forbidden — Massive is purged; "
                 "Databento is the batch source of truth"
             )
+        # ── garbage-underlying guard (chain + combo bundles) ─────────────────
+        # A tradfi CHAIN/COMBO bundle carries ``underlying=<ROOT>``. The forensic
+        # sweep found 189,830 objects whose ``underlying=`` was a numeric CBOE
+        # globex GROUP code (``12``/``13``) or an opaque CBOE user-defined leg
+        # code (``GN``/``VT``/``3W``) — the product root is UNRECOVERABLE from the
+        # path, so a fresh write MUST fail loud (shard-level isolation → honest
+        # ``attempted_failed``) rather than fake-canonicalise a garbage bundle.
+        # Real roots (``SP500``/``MES``/``XAB``) and resolved named-spread combos
+        # (``WTI-BZ``/``NAT-GAS-HH``) PASS. Covers combo too (not in
+        # TRADFI_CHAIN_INSTRUMENT_TYPES): the opaque ``UD:1V: GN`` combos land
+        # here. SSOT: tradfi_canonical_path_migration_design_2026_07_19.md.
+        underlying_value = kv.get("underlying")
+        if underlying_value is not None:
+            # Call-time import (canonical→registry) — avoids the load-time cycle
+            # (registry/__init__ imports canonical); at call time both are loaded.
+            from unified_api_contracts.registry.tradfi_symbology import (
+                is_recognized_tradfi_underlying,
+            )
+
+            if not is_recognized_tradfi_underlying(underlying_value):
+                violations.append(
+                    f"tradfi underlying={underlying_value!r} is not a real product root / "
+                    "named-spread combo (numeric globex group code or opaque CBOE "
+                    "user-defined leg code) — quarantine, never fake-canonicalize"
+                )
         if it_value in TRADFI_CHAIN_INSTRUMENT_TYPES:
             # chain shard tail MUST be underlying=.../quote=.../margin=.../ticks.parquet
             tail_keys = [seg.partition("=")[0] for seg in partition_segments[-3:]]

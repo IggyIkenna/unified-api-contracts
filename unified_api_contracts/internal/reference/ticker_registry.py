@@ -47,6 +47,20 @@ UNDERLYING_NORMALIZATION: Final[dict[str, str]] = {
     "RTY": "RUSSELL2000",
     "YM": "DOW",
     "EMD": "SP400",  # S&P MidCap 400 e-mini
+    "MES": "MICRO-SP500",  # CME Micro E-mini S&P 500 — distinct bundle root from ES/SP500
+    # CME futures roots that classify VALID but have no human-name alias yet — real
+    # ``instrument_type=futures_chain`` roots (tradfi_canonical_path_migration_design_
+    # 2026_07_19.md category C), added so the canonical-path guard stops over-flagging
+    # their chains as garbage. Identity-mapped (real exchange root preserved as the
+    # bundle key); replace with the human product name once confirmed with Databento.
+    "XAB": "XAB",
+    "XAF": "XAF",
+    "XAI": "XAI",
+    "XAK": "XAK",
+    "XAP": "XAP",
+    "XAU": "XAU",
+    "XAV": "XAV",
+    "XAY": "XAY",
     # --- CME Energy ---
     "CL": "WTI",
     "NG": "NAT-GAS",

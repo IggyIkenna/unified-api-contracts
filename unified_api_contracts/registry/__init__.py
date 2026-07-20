@@ -400,6 +400,7 @@ from .tradfi_symbology import (
     get_active_es_options_clusters_for_date,
     get_bindings_for_symbol,
     get_primary_binding,
+    is_recognized_tradfi_underlying,
 )
 from .tradfi_ticker_universe import (
     ETF_TICKERS,
@@ -1139,6 +1140,7 @@ __all__ = [
     "is_processed_data_type",
     "is_processed_data_type",
     "is_processed_data_type",
+    "is_recognized_tradfi_underlying",
     "is_shard_axis",
     "is_supported_venue",
     "is_tardis_free_date",

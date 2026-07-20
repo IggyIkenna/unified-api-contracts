@@ -203,11 +203,21 @@ def _classify_databento_combo(symbol: str, asset_class_hint: str | None) -> Data
     #         and preserve the strategy ID for downstream resolution.
     ud_match = CBOE_UD_RE.match(symbol)
     if ud_match:
-        version = ud_match.group(1)
-        globex_code = ud_match.group(2)
+        qualifier = ud_match.group(1)  # ``1V`` version OR a real root ``ZN``/``ZF``/``ZT``
+        globex_code = ud_match.group(2)  # opaque CBOE globex GROUP/leg code (``GN``/``TL``/``12``)
         strategy_id = ud_match.group(3)
+        # Root-qualified UD (``UD:ZN: TL <id>``) carries a RECOVERABLE real product
+        # root in the qualifier — normalise it (``ZN`` → ``UST-10Y``, consistent with
+        # ``_shared_underlying``) and use it as the combo underlying so the row bundles
+        # under the real root. Version-qualified UD (``UD:1V: GN <id>``) has ONLY the
+        # opaque globex GROUP code (``GN``) — an UNRECOVERABLE product root — so it
+        # stays as the underlying and is quarantined downstream (the write-time guard
+        # rejects it; the enrichment drops the row). SSOT:
+        # tradfi_canonical_path_migration_design_2026_07_19.md categories A/D.
+        recovered_root = UNDERLYING_NORMALIZATION.get(qualifier)
+        ud_underlying = recovered_root if recovered_root is not None else globex_code
         leg = ComboLeg(
-            instrument_id=f"CBOE:UD:{version}V:{globex_code}:{strategy_id}",
+            instrument_id=f"CBOE:UD:{qualifier}:{globex_code}:{strategy_id}",
             direction="buy",
             ratio=1,
             venue="CBOE",
@@ -215,14 +225,14 @@ def _classify_databento_combo(symbol: str, asset_class_hint: str | None) -> Data
         multileg = MultiLegInstrument(
             venue="CBOE",
             strategy_type=ComboStrategyType.CUSTOM,
-            underlying=globex_code,
+            underlying=ud_underlying,
             legs=[leg],
             block_trade_only=False,
-            description=f"CBOE user-defined strategy v{version} ({globex_code}) id={strategy_id}",
+            description=f"CBOE user-defined strategy {qualifier} ({globex_code}) id={strategy_id}",
         )
         return DatabentoClassification(
             instrument_type=InstrumentType.COMBO,
-            underlying=globex_code,
+            underlying=ud_underlying,
             expiry_date=None,
             strike=None,
             option_right=None,

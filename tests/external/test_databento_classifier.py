@@ -451,6 +451,9 @@ def test_continuous_prefix_combo_classifies_spread() -> None:
 
 
 def test_cboe_user_defined_strategy_classifies_custom_combo() -> None:
+    # Version-qualified UD (UD:1V:) carries ONLY the opaque globex GROUP code — the real
+    # product root is UNRECOVERABLE, so ``underlying`` stays the opaque code (category A;
+    # quarantined downstream by the guard + dropped by the enrichment).
     cls = classify_databento_symbol("UD:1V: GN 0113805462")
     assert cls.instrument_type is InstrumentType.COMBO
     assert cls.underlying == "GN"
@@ -459,10 +462,21 @@ def test_cboe_user_defined_strategy_classifies_custom_combo() -> None:
     assert isinstance(cls.multileg, MultiLegInstrument)
 
 
-def test_cboe_user_defined_strategy_root_qualified() -> None:
+def test_cboe_user_defined_strategy_root_qualified_recovers_real_root() -> None:
+    # Root-qualified UD (UD:ZN:/UD:ZF:/UD:ZT:) carries a RECOVERABLE real root in the
+    # qualifier — normalised (ZN → UST-10Y), NOT the opaque leg code ``TL`` (category D
+    # forward recovery — tradfi_canonical_path_migration_design_2026_07_19.md).
     cls = classify_databento_symbol("UD:ZN: TL 0219823765")
     assert cls.instrument_type is InstrumentType.COMBO
     assert cls.combo_strategy is ComboStrategyType.CUSTOM
+    assert cls.underlying == "UST-10Y"
+    assert cls.multileg is not None
+    assert cls.multileg.underlying == "UST-10Y"
+
+
+def test_cboe_user_defined_strategy_root_qualified_zt() -> None:
+    cls = classify_databento_symbol("UD:ZT: TL 0201003002")
+    assert cls.underlying == "UST-2Y"
 
 
 # ---------------------------------------------------------------------------

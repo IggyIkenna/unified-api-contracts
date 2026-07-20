@@ -191,3 +191,56 @@ def test_malformed_pipeline_mode_rejected() -> None:
     bad = _GOOD.replace("day=2026-04-17/asset_group=", "day=2026-04-17/pipeline_mode=batch/asset_group=")
     assert not is_canonical(bad)
     assert any("pipeline_mode value" in v for v in canonical_path_violations(bad))
+
+
+# ---------------------------------------------------------------------------
+# TradFi garbage-``underlying=`` guard (chain + combo bundles).
+# tradfi_canonical_path_migration_design_2026_07_19.md categories A/B/C.
+# ---------------------------------------------------------------------------
+
+
+def _tradfi_chain_path(underlying: str, *, instrument_type: str = "futures_chain") -> str:
+    return (
+        "raw_tick_data/by_date/day=2026-04-17/pipeline_mode=batch_databento/asset_group=tradfi/"
+        f"venue=CME/instrument_type={instrument_type}/data_type=trades/"
+        f"underlying={underlying}/quote=USD/margin=linear/ticks.parquet"
+    )
+
+
+def _tradfi_combo_path(underlying: str) -> str:
+    return (
+        "raw_tick_data/by_date/day=2026-04-17/pipeline_mode=batch_databento/asset_group=tradfi/"
+        f"venue=CME/instrument_type=combo/data_type=trades/underlying={underlying}/ticks.parquet"
+    )
+
+
+@pytest.mark.parametrize("underlying", ["SP500", "MES", "XAB", "XAU", "WTI-BZ", "NAT-GAS-HH"])
+def test_tradfi_chain_real_root_or_named_spread_is_canonical(underlying: str) -> None:
+    # C real roots (incl. the newly-resolved MES/XA*) + B named-spreads PASS.
+    path = _tradfi_chain_path(underlying)
+    assert is_canonical(path, require_pipeline_mode=True), canonical_path_violations(path, require_pipeline_mode=True)
+
+
+@pytest.mark.parametrize("underlying", ["12", "13", "23"])
+def test_tradfi_chain_numeric_underlying_rejected(underlying: str) -> None:
+    # A numeric CBOE globex GROUP code — quarantine, never fake-canonicalize.
+    path = _tradfi_chain_path(underlying)
+    violations = canonical_path_violations(path, require_pipeline_mode=True)
+    assert any("is not a real product root" in v for v in violations), violations
+
+
+@pytest.mark.parametrize("underlying", ["GN", "VT", "IC", "3W"])
+def test_tradfi_combo_opaque_ud_underlying_rejected(underlying: str) -> None:
+    # A opaque CBOE user-defined leg code (combo bundle) — quarantine.
+    path = _tradfi_combo_path(underlying)
+    violations = canonical_path_violations(path, require_pipeline_mode=True)
+    assert any("is not a real product root" in v for v in violations), violations
+
+
+def test_tradfi_combo_named_spread_and_recovered_root_pass() -> None:
+    # B named-spread + D recovered root-qualified UD (UD:ZN: → UST-10Y) combos PASS.
+    for underlying in ("WTI-BZ", "UST-10Y", "SP500-NASDAQ100"):
+        path = _tradfi_combo_path(underlying)
+        assert is_canonical(path, require_pipeline_mode=True), canonical_path_violations(
+            path, require_pipeline_mode=True
+        )
