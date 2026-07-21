@@ -4,6 +4,16 @@ Verifies that ``clip_dates_to_source_coverage`` correctly drops pre-coverage
 dates for every (source, data_type) pair in ``SOURCE_COVERAGE_START`` and
 ``DATA_TYPE_COVERAGE_START``.
 
+FLOOR = 2020-06-06 for ALL sports sources (operator ruling 2026-07-21,
+CANONICAL). Odds tick data starts 2020-06-06 (measured: ZERO odds before it);
+without odds nothing downstream is legitimately computable, so 2020-06-06 is
+the floor for every source/coverage/expectation, superseding the per-source
+"evidence-derived" floors (the 2026-07-15 amendment's api_football/footystats/
+understat/transfermarkt/soccer_football_info/open_meteo values, and the
+api_football per-fixture overrides it deleted). All pre-2020-06-06 sports data
+is out-of-scope and is being wiped — a window entirely before the floor is no
+longer "real data that must survive the clip", it is expected-empty.
+
 Plan: data_status_comprehensive_test_coverage_2026_05_07.md § C sports-half.
 """
 
@@ -28,17 +38,20 @@ class TestClipDatesToSourceCoverage:
     @pytest.mark.unit
     def test_range_entirely_before_coverage_returns_inverted_bounds(self) -> None:
         """Entire range pre-coverage → inverted bounds signal."""
-        # footystats starts 2018-01-01; window 2010-2017 is entirely pre-coverage
+        # footystats floor is 2020-06-06 (canonical, 2026-07-21); window
+        # 2010-2017 is entirely pre-coverage either way.
         start, end = clip_dates_to_source_coverage("footystats", "2010-01-01", "2017-12-31")
         assert end == "" or start > end
 
     @pytest.mark.unit
     def test_range_straddles_coverage_start_clips_to_coverage(self) -> None:
         """Range that starts before coverage and ends after → clipped to coverage start."""
-        # footystats starts 2018-01-01 (evidence-derived floor, 2026-07-15)
-        start, end = clip_dates_to_source_coverage("footystats", "2017-01-01", "2019-06-01")
-        assert start == "2018-01-01"
-        assert end == "2019-06-01"
+        # footystats floor is 2020-06-06 (canonical sports floor, operator
+        # ruling 2026-07-21 — supersedes the old 2018-01-01 evidence-derived
+        # value). Window opens in 2019 and closes in 2021, straddling it.
+        start, end = clip_dates_to_source_coverage("footystats", "2019-01-01", "2021-06-01")
+        assert start == "2020-06-06"
+        assert end == "2021-06-01"
 
     @pytest.mark.unit
     def test_range_entirely_within_coverage_unchanged(self) -> None:
@@ -56,45 +69,82 @@ class TestClipDatesToSourceCoverage:
 
     @pytest.mark.unit
     def test_data_type_override_applied_when_specified(self) -> None:
-        """Per-(source, data_type) override takes precedence over source-wide value."""
-        # soccer_football_info source-wide: 2019-01-01
-        # SFI_PROGRESSIVE_STATS override: 2020-01-01
+        """Per-(source, data_type) override takes precedence over source-wide value.
+
+        soccer_football_info source-wide AND the SFI_PROGRESSIVE_STATS override
+        are BOTH 2020-06-06 post-ruling (2026-07-21 canonical sports floor) — the
+        old SFI-specific 2020-01-01 override no longer sits later than the
+        source-wide value, so the two coincide here. That means this case alone
+        can't distinguish "override wins" from "source-wide wins"; see
+        ``test_data_type_override_precedence_over_distinct_source_wide`` below
+        for the falsifying case that proves the override branch is genuinely
+        read.
+        """
         start, end = clip_dates_to_source_coverage(
             "soccer_football_info",
-            "2019-06-01",
-            "2020-06-01",
+            "2020-01-01",
+            "2020-12-31",
             data_type="SFI_PROGRESSIVE_STATS",
         )
-        assert start == "2020-01-01"
-        assert end == "2020-06-01"
+        assert start == "2020-06-06"
+        assert end == "2020-12-31"
+
+    @pytest.mark.unit
+    def test_data_type_override_precedence_over_distinct_source_wide(
+        self,
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        """Falsifier: inject a distinct, later override and confirm it — not source-wide — wins.
+
+        Since the 2026-07-21 ruling collapsed SFI_PROGRESSIVE_STATS onto the
+        same 2020-06-06 value as the source-wide floor, a same-value assertion
+        can't prove precedence. This monkeypatches a later override onto
+        ``DATA_TYPE_COVERAGE_START`` and proves the clip reads the override, not
+        ``SOURCE_COVERAGE_START["soccer_football_info"]``.
+        """
+        monkeypatch.setitem(
+            DATA_TYPE_COVERAGE_START,
+            ("soccer_football_info", "SFI_PROGRESSIVE_STATS"),
+            date(2020, 8, 1),
+        )
+        start, end = clip_dates_to_source_coverage(
+            "soccer_football_info",
+            "2020-06-06",
+            "2020-12-31",
+            data_type="SFI_PROGRESSIVE_STATS",
+        )
+        assert start == "2020-08-01"
+        assert end == "2020-12-31"
 
     @pytest.mark.unit
     def test_data_type_without_override_falls_back_to_source_wide(self) -> None:
         """data_type with no override uses the source-wide coverage start."""
-        # soccer_football_info: 2019-01-01 (no override for MATCHES)
+        # soccer_football_info: 2020-06-06 (canonical sports floor,
+        # 2026-07-21 — no override exists for MATCHES).
         start, end = clip_dates_to_source_coverage(
             "soccer_football_info",
-            "2018-01-01",
-            "2019-06-01",
+            "2020-01-01",
+            "2020-12-31",
             data_type="MATCHES",
         )
-        assert start == "2019-01-01"
-        assert end == "2019-06-01"
+        assert start == "2020-06-06"
+        assert end == "2020-12-31"
 
     @pytest.mark.unit
     @pytest.mark.parametrize(
         "data_type",
         ["FIXTURE_EVENTS", "FIXTURE_LINEUPS", "FIXTURE_STATS", "PLAYER_STATS"],
     )
-    def test_api_football_per_fixture_entities_use_source_wide_floor(self, data_type: str) -> None:
-        """api_football per-fixture entities carry NO override — they use 2018-01-01.
+    def test_api_football_per_fixture_entities_clip_to_2020_06_06_canonical_floor(self, data_type: str) -> None:
+        """api_football per-fixture entities carry NO override — they use the 2020-06-06 canonical floor.
 
-        Regression test for the operator ruling of 2026-07-15 ("amend floors to
-        reality"). These four were pinned at 2020-06-06 on the false premise that
-        "our backfill never captured 2018-2020 dates". An object probe found REAL,
-        historically-coherent data at 2018-01-01 for all four (e.g. fixture_events
-        ENG_CHAMPIONSHIP, 20 rows), so the overrides were deleted. A range opening
-        before the source-wide floor must now clip to 2018-01-01, NOT 2020-06-06.
+        RENAMED from ``test_api_football_per_fixture_entities_use_source_wide_floor``
+        (was pinned to the 2026-07-15 "amend floors to reality" value of
+        2018-01-01). The 2026-07-21 operator ruling — odds tick data starts
+        2020-06-06 and nothing downstream is legitimately computable without
+        it — SUPERSEDES that evidence-derived floor for ALL sports sources,
+        api_football included. A range opening before the source-wide floor
+        must now clip to 2020-06-06, NOT 2018-01-01.
         """
         start, end = clip_dates_to_source_coverage(
             "api_football",
@@ -102,7 +152,7 @@ class TestClipDatesToSourceCoverage:
             "2021-01-01",
             data_type=data_type,
         )
-        assert start == "2018-01-01"
+        assert start == "2020-06-06"
         assert end == "2021-01-01"
 
     @pytest.mark.unit
@@ -110,12 +160,17 @@ class TestClipDatesToSourceCoverage:
         "data_type",
         ["FIXTURE_EVENTS", "FIXTURE_LINEUPS", "FIXTURE_STATS", "PLAYER_STATS"],
     )
-    def test_api_football_per_fixture_2018_dates_are_not_clipped(self, data_type: str) -> None:
-        """2018-01-01 per-fixture data is REAL and must survive the clip.
+    def test_api_football_per_fixture_2018_dates_now_clip_to_empty(self, data_type: str) -> None:
+        """2018-01-01 per-fixture data is OUT-OF-SCOPE and clips to empty under the 2020-06-06 floor.
 
-        The 2,848 legacy-only pre-launch cells were unwritable precisely because
-        these dates were clipped away. Guards against re-pinning the floor above
-        the earliest date we hold real objects for.
+        RENAMED + INVERTED from ``test_api_football_per_fixture_2018_dates_are_not_clipped``
+        (which asserted "2018 per-fixture data is REAL and must survive the
+        clip" under the 2026-07-15 amendment). The 2026-07-21 operator ruling
+        SUPERSEDES that amendment: the sports floor is 2020-06-06 for every
+        source because odds tick data — the thing everything downstream needs —
+        measures ZERO before that date. Pre-floor sports data (including this
+        2018 per-fixture data) is being wiped; a window entirely inside 2018 is
+        now expected-empty, not "real data to protect".
         """
         start, end = clip_dates_to_source_coverage(
             "api_football",
@@ -123,46 +178,49 @@ class TestClipDatesToSourceCoverage:
             "2018-12-31",
             data_type=data_type,
         )
-        assert start == "2018-01-01"
-        assert end == "2018-12-31"
+        assert start == "2020-06-06"
+        assert end == ""
 
     @pytest.mark.unit
     def test_api_football_no_override_uses_source_wide(self) -> None:
-        """api_football without data_type override uses source-wide 2018-01-01."""
+        """api_football without data_type override uses source-wide 2020-06-06."""
         start, end = clip_dates_to_source_coverage(
             "api_football",
             "2014-01-01",
-            "2018-06-01",
+            "2021-01-01",
         )
-        assert start == "2018-01-01"
-        assert end == "2018-06-01"
+        assert start == "2020-06-06"
+        assert end == "2021-01-01"
 
     @pytest.mark.unit
     def test_range_starting_exactly_at_coverage_is_not_clipped(self) -> None:
         """Range starting exactly at coverage start → no clip needed."""
-        start, end = clip_dates_to_source_coverage("footystats", "2018-01-01", "2019-12-31")
-        assert start == "2018-01-01"
-        assert end == "2019-12-31"
+        start, end = clip_dates_to_source_coverage("footystats", "2020-06-06", "2021-12-31")
+        assert start == "2020-06-06"
+        assert end == "2021-12-31"
 
     @pytest.mark.unit
     @pytest.mark.parametrize(
         ("source", "expected"),
         [
-            ("api_football", "2018-01-01"),
-            ("footystats", "2018-01-01"),
-            ("transfermarkt", "2018-01-01"),
-            ("open_meteo", "2018-01-01"),
-            ("understat", "2014-01-01"),
-            ("soccer_football_info", "2019-01-01"),
+            ("api_football", "2020-06-06"),
+            ("footystats", "2020-06-06"),
+            ("transfermarkt", "2020-06-06"),
+            ("open_meteo", "2020-06-06"),
+            ("understat", "2020-06-06"),
+            ("soccer_football_info", "2020-06-06"),
         ],
     )
     def test_measured_floors_are_pinned(self, source: str, expected: str) -> None:
-        """Pin each sports floor to its evidence-derived value (probe of 2026-07-15).
+        """Pin every sports floor to the 2020-06-06 canonical value (operator ruling 2026-07-21).
 
-        Every value here is the earliest date at which a REAL object is held —
-        parquet that parses, has >= 1 row, and is historically coherent with its
-        date partition. Moving any of these requires a fresh object probe, not a
-        policy argument; see SOURCE_COVERAGE_START for the per-source witnesses.
+        Odds tick data starts 2020-06-06 (measured: ZERO odds before it), and
+        without odds nothing downstream is legitimately computable — so
+        2020-06-06 is the floor for ALL sports sources, superseding the old
+        per-source "evidence-derived" floors (each source's raw data may begin
+        earlier, but pre-floor sports data is out-of-scope and is being wiped).
+        Moving any of these back down requires a fresh operator ruling, not a
+        per-source object probe; see SOURCE_COVERAGE_START for the rationale.
         """
         start, _ = clip_dates_to_source_coverage(source, "2010-01-01", "2026-01-01")
         assert start == expected
@@ -222,13 +280,13 @@ class TestSourceCoverageStartCompleteness:
     def test_get_source_coverage_start_returns_override_when_data_type_given(self) -> None:
         """get_source_coverage_start returns override when data_type specified."""
         result = get_source_coverage_start("soccer_football_info", "SFI_PROGRESSIVE_STATS")
-        assert result == date(2020, 1, 1)
+        assert result == date(2020, 6, 6)
 
     @pytest.mark.unit
     def test_get_source_coverage_start_returns_source_wide_without_data_type(self) -> None:
         """get_source_coverage_start returns source-wide without data_type."""
         result = get_source_coverage_start("soccer_football_info")
-        assert result == date(2019, 1, 1)
+        assert result == date(2020, 6, 6)
 
     @pytest.mark.unit
     def test_get_source_coverage_start_returns_none_for_unknown(self) -> None:
@@ -251,7 +309,9 @@ class TestOddsApiFloorDerivesFromSportsSsot:
     would keep pre-skipping the very dates the oracle now expects, so the backfill
     no-ops while coverage reports the days as missing. That is the failure class
     UAC@c280e1ff exposed for the OTHER sports sources (floors asserted 2018-2020
-    uncapturable while ~22,327 real objects were held for those dates).
+    uncapturable while ~22,327 real objects were held for those dates). odds_api
+    itself is UNCHANGED by the 2026-07-21 ruling — it was already the 2020-06-06
+    canonical floor (odds tick data IS the evidence the ruling generalized from).
     """
 
     @pytest.mark.unit
