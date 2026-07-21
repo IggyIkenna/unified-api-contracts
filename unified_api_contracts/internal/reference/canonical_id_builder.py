@@ -830,6 +830,37 @@ def build_instrument_id(
         )
         raise ValueError(msg)
 
+    # FAIL LOUD instead of silently minting a double-wrapped id (operator ruling
+    # 2026-07-20, canonical_path_oracle_blind_to_filename_stem_2026_07_20.md §7 —
+    # "remove the silent build_instrument_id(venue, itype, symbol) catalogue-miss
+    # fallback that mints double-wrapped VENUE:ITYPE:<raw wire> ids"). ``:`` is
+    # this builder's OWN top-level ``VENUE:TYPE:SYMBOL`` field delimiter, so a
+    # ``symbol`` carrying one is never well-formed input for any asset group
+    # EXCEPT sports/prediction, whose ``symbol`` is itself a pre-built domain id
+    # that legitimately embeds colons (see :func:`_build_sports_or_prediction`,
+    # e.g. ``FOOTBALL:PINNACLE:MATCH_ODDS:...``). This is the exact shape a
+    # catalogue-miss fallback that passes a raw wire symbol straight through
+    # produces — e.g. Bitfinex's own colon-delimited funding-pair wire notation
+    # (``ADAF0:USTF0``) reaching this function unresolved mints
+    # ``BITFINEX-FUTURES:PERPETUAL:ADAF0:USTF0``, a double-wrapped id that
+    # silently polluted the CeFi corpus. A caller that cannot resolve a symbol
+    # against the catalogue/wire-map must not call this builder with the raw
+    # wire form — it should either fail the row (``record_failed``) or route the
+    # genuinely-unresolvable case through the UAC quarantine model
+    # (:mod:`unified_api_contracts.canonical.quarantine`) instead.
+    if instrument_type not in _SPORTS_AND_PREDICTION_TYPES and ":" in symbol:
+        msg = (
+            f"build_instrument_id: symbol {symbol!r} for instrument_type="
+            f"{instrument_type.value} carries an embedded ':' — the canonical id's "
+            "own VENUE:TYPE:SYMBOL delimiter. This is never well-formed input for a "
+            "non-sports/prediction asset group; resolve the symbol against the "
+            "catalogue/wire-map before calling this builder, or route a "
+            "genuinely-unresolvable instrument through the UAC quarantine model "
+            "(unified_api_contracts.canonical.quarantine) instead of building a "
+            "malformed double-wrapped id."
+        )
+        raise ValueError(msg)
+
     if margin_marker:
         if passthrough:
             msg = "margin_marker is not supported together with passthrough=True"
