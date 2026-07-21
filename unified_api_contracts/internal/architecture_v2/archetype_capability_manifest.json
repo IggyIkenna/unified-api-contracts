@@ -1,12 +1,13 @@
 {
   "schema_version": "1.0.0",
   "source": "unified_api_contracts.internal.architecture_v2.archetype_capability",
-  "archetype_count": 23,
+  "archetype_count": 53,
   "archetypes": [
     {
       "archetype_id": "ML_DIRECTIONAL_CONTINUOUS",
       "family": "ML_DIRECTIONAL",
       "uses_rolling_futures": true,
+      "bespoke_capable": true,
       "cells": [
         {
           "asset_group": "CEFI",
@@ -208,6 +209,7 @@
       "archetype_id": "ML_DIRECTIONAL_EVENT_SETTLED",
       "family": "ML_DIRECTIONAL",
       "uses_rolling_futures": false,
+      "bespoke_capable": true,
       "cells": [
         {
           "asset_group": "SPORTS",
@@ -271,6 +273,7 @@
       "archetype_id": "RULES_DIRECTIONAL_CONTINUOUS",
       "family": "RULES_DIRECTIONAL",
       "uses_rolling_futures": true,
+      "bespoke_capable": true,
       "cells": [
         {
           "asset_group": "CEFI",
@@ -432,6 +435,7 @@
       "archetype_id": "RULES_DIRECTIONAL_EVENT_SETTLED",
       "family": "RULES_DIRECTIONAL",
       "uses_rolling_futures": false,
+      "bespoke_capable": true,
       "cells": [
         {
           "asset_group": "SPORTS",
@@ -476,6 +480,7 @@
       "archetype_id": "TSMOM_BTC_CTA",
       "family": "RULES_DIRECTIONAL",
       "uses_rolling_futures": false,
+      "bespoke_capable": false,
       "cells": [
         {
           "asset_group": "CEFI",
@@ -525,6 +530,7 @@
       "archetype_id": "CARRY_BASIS_DATED",
       "family": "CARRY_AND_YIELD",
       "uses_rolling_futures": true,
+      "bespoke_capable": false,
       "cells": [
         {
           "asset_group": "CEFI",
@@ -604,6 +610,7 @@
       "archetype_id": "CARRY_BASIS_PERP",
       "family": "CARRY_AND_YIELD",
       "uses_rolling_futures": false,
+      "bespoke_capable": false,
       "cells": [
         {
           "asset_group": "CEFI",
@@ -655,6 +662,7 @@
       "archetype_id": "CARRY_STAKED_BASIS",
       "family": "CARRY_AND_YIELD",
       "uses_rolling_futures": false,
+      "bespoke_capable": false,
       "cells": [
         {
           "asset_group": "DEFI",
@@ -718,6 +726,7 @@
       "archetype_id": "CARRY_RECURSIVE_STAKED",
       "family": "CARRY_AND_YIELD",
       "uses_rolling_futures": false,
+      "bespoke_capable": false,
       "cells": [
         {
           "asset_group": "DEFI",
@@ -749,6 +758,7 @@
       "archetype_id": "YIELD_ROTATION_LENDING",
       "family": "CARRY_AND_YIELD",
       "uses_rolling_futures": false,
+      "bespoke_capable": false,
       "cells": [
         {
           "asset_group": "CEFI",
@@ -792,6 +802,7 @@
       "archetype_id": "YIELD_STAKING_SIMPLE",
       "family": "CARRY_AND_YIELD",
       "uses_rolling_futures": false,
+      "bespoke_capable": false,
       "cells": [
         {
           "asset_group": "DEFI",
@@ -821,6 +832,7 @@
       "archetype_id": "ARBITRAGE_PRICE_DISPERSION",
       "family": "ARBITRAGE_STRUCTURAL",
       "uses_rolling_futures": true,
+      "bespoke_capable": true,
       "cells": [
         {
           "asset_group": "CEFI",
@@ -1053,6 +1065,7 @@
       "archetype_id": "LIQUIDATION_CAPTURE",
       "family": "ARBITRAGE_STRUCTURAL",
       "uses_rolling_futures": false,
+      "bespoke_capable": false,
       "cells": [
         {
           "asset_group": "CEFI",
@@ -1114,6 +1127,7 @@
       "archetype_id": "MARKET_MAKING_CONTINUOUS",
       "family": "MARKET_MAKING",
       "uses_rolling_futures": true,
+      "bespoke_capable": false,
       "cells": [
         {
           "asset_group": "CEFI",
@@ -1281,6 +1295,7 @@
       "archetype_id": "MARKET_MAKING_EVENT_SETTLED",
       "family": "MARKET_MAKING",
       "uses_rolling_futures": false,
+      "bespoke_capable": false,
       "cells": [
         {
           "asset_group": "SPORTS",
@@ -1373,6 +1388,7 @@
       "archetype_id": "EVENT_DRIVEN",
       "family": "EVENT_DRIVEN",
       "uses_rolling_futures": true,
+      "bespoke_capable": true,
       "cells": [
         {
           "asset_group": "CEFI",
@@ -1589,6 +1605,7 @@
       "archetype_id": "VOL_TRADING_OPTIONS",
       "family": "VOL_TRADING",
       "uses_rolling_futures": false,
+      "bespoke_capable": false,
       "cells": [
         {
           "asset_group": "CEFI",
@@ -1647,6 +1664,7 @@
       "archetype_id": "STAT_ARB_PAIRS_FIXED",
       "family": "STAT_ARB_PAIRS",
       "uses_rolling_futures": true,
+      "bespoke_capable": true,
       "cells": [
         {
           "asset_group": "CEFI",
@@ -1768,6 +1786,7 @@
       "archetype_id": "STAT_ARB_CROSS_SECTIONAL",
       "family": "STAT_ARB_PAIRS",
       "uses_rolling_futures": true,
+      "bespoke_capable": true,
       "cells": [
         {
           "asset_group": "CEFI",
@@ -1872,6 +1891,7 @@
       "archetype_id": "CARRY_STAKED_BASIS_DATED",
       "family": "CARRY_AND_YIELD",
       "uses_rolling_futures": true,
+      "bespoke_capable": false,
       "cells": [
         {
           "asset_group": "DEFI",
@@ -1919,6 +1939,7 @@
       "archetype_id": "CARRY_BASIS_PERP_INV",
       "family": "CARRY_AND_YIELD",
       "uses_rolling_futures": false,
+      "bespoke_capable": false,
       "cells": [
         {
           "asset_group": "DEFI",
@@ -1969,6 +1990,7 @@
       "archetype_id": "CARRY_RECURSIVE_BORROW_LENDING_ONLY",
       "family": "CARRY_AND_YIELD",
       "uses_rolling_futures": false,
+      "bespoke_capable": false,
       "cells": [
         {
           "asset_group": "DEFI",
@@ -1999,6 +2021,7 @@
       "archetype_id": "CARRY_BASIS_DATED_INV",
       "family": "CARRY_AND_YIELD",
       "uses_rolling_futures": true,
+      "bespoke_capable": false,
       "cells": [
         {
           "asset_group": "CEFI",
@@ -2032,6 +2055,993 @@
           ],
           "representative_slot_labels": [],
           "notes": "No DeFi dated-future venue available \u2014 mirrors CARRY_BASIS_DATED DeFi BLOCKED cell."
+        }
+      ]
+    },
+    {
+      "archetype_id": "VOL_ARB_RV_IV",
+      "family": "VOL_TRADING",
+      "uses_rolling_futures": false,
+      "bespoke_capable": true,
+      "cells": [
+        {
+          "asset_group": "CEFI",
+          "instrument_type": "option",
+          "status": "PARTIAL",
+          "venue_ids": [
+            "deribit",
+            "okx",
+            "bybit"
+          ],
+          "signal_variants": [],
+          "roll_mode": "n/a",
+          "block_list_refs": [],
+          "representative_slot_labels": [],
+          "notes": "Cell added in the 2026-07-21 Phase-9 capability-manifest regeneration (19 VOL / 10 MM / 4 PORTFOLIO archetypes) \u2014 venue/instrument scope per scripts/enumerate_envelope.py's catalogue-envelope design; not yet confirmed by a live batch/paper instance, so PARTIAL rather than SUPPORTED (honest-absence)."
+        },
+        {
+          "asset_group": "TRADFI",
+          "instrument_type": "option",
+          "status": "PARTIAL",
+          "venue_ids": [
+            "cboe",
+            "cme"
+          ],
+          "signal_variants": [],
+          "roll_mode": "n/a",
+          "block_list_refs": [],
+          "representative_slot_labels": [],
+          "notes": "Cell added in the 2026-07-21 Phase-9 capability-manifest regeneration (19 VOL / 10 MM / 4 PORTFOLIO archetypes) \u2014 venue/instrument scope per scripts/enumerate_envelope.py's catalogue-envelope design; not yet confirmed by a live batch/paper instance, so PARTIAL rather than SUPPORTED (honest-absence)."
+        }
+      ]
+    },
+    {
+      "archetype_id": "VOL_SPREAD_STRUCTURES",
+      "family": "VOL_TRADING",
+      "uses_rolling_futures": false,
+      "bespoke_capable": true,
+      "cells": [
+        {
+          "asset_group": "CEFI",
+          "instrument_type": "option",
+          "status": "PARTIAL",
+          "venue_ids": [
+            "deribit",
+            "okx",
+            "bybit"
+          ],
+          "signal_variants": [],
+          "roll_mode": "n/a",
+          "block_list_refs": [],
+          "representative_slot_labels": [],
+          "notes": "Cell added in the 2026-07-21 Phase-9 capability-manifest regeneration (19 VOL / 10 MM / 4 PORTFOLIO archetypes) \u2014 venue/instrument scope per scripts/enumerate_envelope.py's catalogue-envelope design; not yet confirmed by a live batch/paper instance, so PARTIAL rather than SUPPORTED (honest-absence)."
+        },
+        {
+          "asset_group": "TRADFI",
+          "instrument_type": "option",
+          "status": "PARTIAL",
+          "venue_ids": [
+            "cboe",
+            "cme"
+          ],
+          "signal_variants": [],
+          "roll_mode": "n/a",
+          "block_list_refs": [],
+          "representative_slot_labels": [],
+          "notes": "Cell added in the 2026-07-21 Phase-9 capability-manifest regeneration (19 VOL / 10 MM / 4 PORTFOLIO archetypes) \u2014 venue/instrument scope per scripts/enumerate_envelope.py's catalogue-envelope design; not yet confirmed by a live batch/paper instance, so PARTIAL rather than SUPPORTED (honest-absence)."
+        }
+      ]
+    },
+    {
+      "archetype_id": "VOL_CARRY",
+      "family": "VOL_TRADING",
+      "uses_rolling_futures": false,
+      "bespoke_capable": true,
+      "cells": [
+        {
+          "asset_group": "CEFI",
+          "instrument_type": "option",
+          "status": "PARTIAL",
+          "venue_ids": [
+            "deribit",
+            "okx",
+            "bybit"
+          ],
+          "signal_variants": [],
+          "roll_mode": "n/a",
+          "block_list_refs": [],
+          "representative_slot_labels": [],
+          "notes": "Cell added in the 2026-07-21 Phase-9 capability-manifest regeneration (19 VOL / 10 MM / 4 PORTFOLIO archetypes) \u2014 venue/instrument scope per scripts/enumerate_envelope.py's catalogue-envelope design; not yet confirmed by a live batch/paper instance, so PARTIAL rather than SUPPORTED (honest-absence)."
+        }
+      ]
+    },
+    {
+      "archetype_id": "VOL_OVERLAY_COVERED_CALLS",
+      "family": "VOL_TRADING",
+      "uses_rolling_futures": false,
+      "bespoke_capable": true,
+      "cells": [
+        {
+          "asset_group": "CEFI",
+          "instrument_type": "option",
+          "status": "PARTIAL",
+          "venue_ids": [
+            "deribit",
+            "okx",
+            "bybit"
+          ],
+          "signal_variants": [],
+          "roll_mode": "n/a",
+          "block_list_refs": [],
+          "representative_slot_labels": [],
+          "notes": "Cell added in the 2026-07-21 Phase-9 capability-manifest regeneration (19 VOL / 10 MM / 4 PORTFOLIO archetypes) \u2014 venue/instrument scope per scripts/enumerate_envelope.py's catalogue-envelope design; not yet confirmed by a live batch/paper instance, so PARTIAL rather than SUPPORTED (honest-absence)."
+        },
+        {
+          "asset_group": "TRADFI",
+          "instrument_type": "option",
+          "status": "PARTIAL",
+          "venue_ids": [
+            "cboe",
+            "cme"
+          ],
+          "signal_variants": [],
+          "roll_mode": "n/a",
+          "block_list_refs": [],
+          "representative_slot_labels": [],
+          "notes": "Cell added in the 2026-07-21 Phase-9 capability-manifest regeneration (19 VOL / 10 MM / 4 PORTFOLIO archetypes) \u2014 venue/instrument scope per scripts/enumerate_envelope.py's catalogue-envelope design; not yet confirmed by a live batch/paper instance, so PARTIAL rather than SUPPORTED (honest-absence)."
+        }
+      ]
+    },
+    {
+      "archetype_id": "VOL_OVERLAY_PROTECTIVE_PUT",
+      "family": "VOL_TRADING",
+      "uses_rolling_futures": false,
+      "bespoke_capable": true,
+      "cells": [
+        {
+          "asset_group": "CEFI",
+          "instrument_type": "option",
+          "status": "PARTIAL",
+          "venue_ids": [
+            "deribit",
+            "okx",
+            "bybit"
+          ],
+          "signal_variants": [],
+          "roll_mode": "n/a",
+          "block_list_refs": [],
+          "representative_slot_labels": [],
+          "notes": "Cell added in the 2026-07-21 Phase-9 capability-manifest regeneration (19 VOL / 10 MM / 4 PORTFOLIO archetypes) \u2014 venue/instrument scope per scripts/enumerate_envelope.py's catalogue-envelope design; not yet confirmed by a live batch/paper instance, so PARTIAL rather than SUPPORTED (honest-absence)."
+        },
+        {
+          "asset_group": "TRADFI",
+          "instrument_type": "option",
+          "status": "PARTIAL",
+          "venue_ids": [
+            "cboe",
+            "cme"
+          ],
+          "signal_variants": [],
+          "roll_mode": "n/a",
+          "block_list_refs": [],
+          "representative_slot_labels": [],
+          "notes": "Cell added in the 2026-07-21 Phase-9 capability-manifest regeneration (19 VOL / 10 MM / 4 PORTFOLIO archetypes) \u2014 venue/instrument scope per scripts/enumerate_envelope.py's catalogue-envelope design; not yet confirmed by a live batch/paper instance, so PARTIAL rather than SUPPORTED (honest-absence)."
+        }
+      ]
+    },
+    {
+      "archetype_id": "VOL_STRADDLE",
+      "family": "VOL_TRADING",
+      "uses_rolling_futures": false,
+      "bespoke_capable": true,
+      "cells": [
+        {
+          "asset_group": "CEFI",
+          "instrument_type": "option",
+          "status": "PARTIAL",
+          "venue_ids": [
+            "deribit",
+            "okx",
+            "bybit"
+          ],
+          "signal_variants": [],
+          "roll_mode": "n/a",
+          "block_list_refs": [],
+          "representative_slot_labels": [],
+          "notes": "Cell added in the 2026-07-21 Phase-9 capability-manifest regeneration (19 VOL / 10 MM / 4 PORTFOLIO archetypes) \u2014 venue/instrument scope per scripts/enumerate_envelope.py's catalogue-envelope design; not yet confirmed by a live batch/paper instance, so PARTIAL rather than SUPPORTED (honest-absence)."
+        },
+        {
+          "asset_group": "TRADFI",
+          "instrument_type": "option",
+          "status": "PARTIAL",
+          "venue_ids": [
+            "cboe",
+            "cme"
+          ],
+          "signal_variants": [],
+          "roll_mode": "n/a",
+          "block_list_refs": [],
+          "representative_slot_labels": [],
+          "notes": "Cell added in the 2026-07-21 Phase-9 capability-manifest regeneration (19 VOL / 10 MM / 4 PORTFOLIO archetypes) \u2014 venue/instrument scope per scripts/enumerate_envelope.py's catalogue-envelope design; not yet confirmed by a live batch/paper instance, so PARTIAL rather than SUPPORTED (honest-absence)."
+        }
+      ]
+    },
+    {
+      "archetype_id": "VOL_SYNTHETIC_DELTA",
+      "family": "VOL_TRADING",
+      "uses_rolling_futures": false,
+      "bespoke_capable": true,
+      "cells": [
+        {
+          "asset_group": "CEFI",
+          "instrument_type": "option",
+          "status": "PARTIAL",
+          "venue_ids": [
+            "deribit",
+            "okx",
+            "bybit"
+          ],
+          "signal_variants": [],
+          "roll_mode": "n/a",
+          "block_list_refs": [],
+          "representative_slot_labels": [],
+          "notes": "Cell added in the 2026-07-21 Phase-9 capability-manifest regeneration (19 VOL / 10 MM / 4 PORTFOLIO archetypes) \u2014 venue/instrument scope per scripts/enumerate_envelope.py's catalogue-envelope design; not yet confirmed by a live batch/paper instance, so PARTIAL rather than SUPPORTED (honest-absence)."
+        }
+      ]
+    },
+    {
+      "archetype_id": "VOL_MARKET_MAKING",
+      "family": "VOL_TRADING",
+      "uses_rolling_futures": false,
+      "bespoke_capable": true,
+      "cells": [
+        {
+          "asset_group": "CEFI",
+          "instrument_type": "option",
+          "status": "PARTIAL",
+          "venue_ids": [
+            "deribit",
+            "okx",
+            "bybit"
+          ],
+          "signal_variants": [],
+          "roll_mode": "n/a",
+          "block_list_refs": [],
+          "representative_slot_labels": [],
+          "notes": "Cell added in the 2026-07-21 Phase-9 capability-manifest regeneration (19 VOL / 10 MM / 4 PORTFOLIO archetypes) \u2014 venue/instrument scope per scripts/enumerate_envelope.py's catalogue-envelope design; not yet confirmed by a live batch/paper instance, so PARTIAL rather than SUPPORTED (honest-absence)."
+        },
+        {
+          "asset_group": "TRADFI",
+          "instrument_type": "option",
+          "status": "PARTIAL",
+          "venue_ids": [
+            "cboe",
+            "cme"
+          ],
+          "signal_variants": [],
+          "roll_mode": "n/a",
+          "block_list_refs": [],
+          "representative_slot_labels": [],
+          "notes": "Cell added in the 2026-07-21 Phase-9 capability-manifest regeneration (19 VOL / 10 MM / 4 PORTFOLIO archetypes) \u2014 venue/instrument scope per scripts/enumerate_envelope.py's catalogue-envelope design; not yet confirmed by a live batch/paper instance, so PARTIAL rather than SUPPORTED (honest-absence)."
+        }
+      ]
+    },
+    {
+      "archetype_id": "VOL_ML_LEAN",
+      "family": "VOL_TRADING",
+      "uses_rolling_futures": false,
+      "bespoke_capable": true,
+      "cells": [
+        {
+          "asset_group": "CEFI",
+          "instrument_type": "option",
+          "status": "PARTIAL",
+          "venue_ids": [
+            "deribit",
+            "okx",
+            "bybit"
+          ],
+          "signal_variants": [],
+          "roll_mode": "n/a",
+          "block_list_refs": [],
+          "representative_slot_labels": [],
+          "notes": "Cell added in the 2026-07-21 Phase-9 capability-manifest regeneration (19 VOL / 10 MM / 4 PORTFOLIO archetypes) \u2014 venue/instrument scope per scripts/enumerate_envelope.py's catalogue-envelope design; not yet confirmed by a live batch/paper instance, so PARTIAL rather than SUPPORTED (honest-absence)."
+        }
+      ]
+    },
+    {
+      "archetype_id": "VOL_0DTE_GAMMA_SCALPING",
+      "family": "VOL_TRADING",
+      "uses_rolling_futures": false,
+      "bespoke_capable": true,
+      "cells": [
+        {
+          "asset_group": "CEFI",
+          "instrument_type": "option",
+          "status": "PARTIAL",
+          "venue_ids": [
+            "deribit",
+            "okx",
+            "bybit"
+          ],
+          "signal_variants": [],
+          "roll_mode": "n/a",
+          "block_list_refs": [],
+          "representative_slot_labels": [],
+          "notes": "Cell added in the 2026-07-21 Phase-9 capability-manifest regeneration (19 VOL / 10 MM / 4 PORTFOLIO archetypes) \u2014 venue/instrument scope per scripts/enumerate_envelope.py's catalogue-envelope design; not yet confirmed by a live batch/paper instance, so PARTIAL rather than SUPPORTED (honest-absence)."
+        },
+        {
+          "asset_group": "TRADFI",
+          "instrument_type": "option",
+          "status": "PARTIAL",
+          "venue_ids": [
+            "cboe",
+            "cme"
+          ],
+          "signal_variants": [],
+          "roll_mode": "n/a",
+          "block_list_refs": [],
+          "representative_slot_labels": [],
+          "notes": "Cell added in the 2026-07-21 Phase-9 capability-manifest regeneration (19 VOL / 10 MM / 4 PORTFOLIO archetypes) \u2014 venue/instrument scope per scripts/enumerate_envelope.py's catalogue-envelope design; not yet confirmed by a live batch/paper instance, so PARTIAL rather than SUPPORTED (honest-absence)."
+        }
+      ]
+    },
+    {
+      "archetype_id": "VOL_0DTE_PIN_RISK",
+      "family": "VOL_TRADING",
+      "uses_rolling_futures": false,
+      "bespoke_capable": true,
+      "cells": [
+        {
+          "asset_group": "CEFI",
+          "instrument_type": "option",
+          "status": "PARTIAL",
+          "venue_ids": [
+            "deribit",
+            "okx",
+            "bybit"
+          ],
+          "signal_variants": [],
+          "roll_mode": "n/a",
+          "block_list_refs": [],
+          "representative_slot_labels": [],
+          "notes": "Cell added in the 2026-07-21 Phase-9 capability-manifest regeneration (19 VOL / 10 MM / 4 PORTFOLIO archetypes) \u2014 venue/instrument scope per scripts/enumerate_envelope.py's catalogue-envelope design; not yet confirmed by a live batch/paper instance, so PARTIAL rather than SUPPORTED (honest-absence)."
+        },
+        {
+          "asset_group": "TRADFI",
+          "instrument_type": "option",
+          "status": "PARTIAL",
+          "venue_ids": [
+            "cboe",
+            "cme"
+          ],
+          "signal_variants": [],
+          "roll_mode": "n/a",
+          "block_list_refs": [],
+          "representative_slot_labels": [],
+          "notes": "Cell added in the 2026-07-21 Phase-9 capability-manifest regeneration (19 VOL / 10 MM / 4 PORTFOLIO archetypes) \u2014 venue/instrument scope per scripts/enumerate_envelope.py's catalogue-envelope design; not yet confirmed by a live batch/paper instance, so PARTIAL rather than SUPPORTED (honest-absence)."
+        }
+      ]
+    },
+    {
+      "archetype_id": "VOL_TERM_STRUCTURE_ARB",
+      "family": "VOL_TRADING",
+      "uses_rolling_futures": false,
+      "bespoke_capable": true,
+      "cells": [
+        {
+          "asset_group": "CEFI",
+          "instrument_type": "option",
+          "status": "PARTIAL",
+          "venue_ids": [
+            "deribit",
+            "okx",
+            "bybit"
+          ],
+          "signal_variants": [],
+          "roll_mode": "n/a",
+          "block_list_refs": [],
+          "representative_slot_labels": [],
+          "notes": "Cell added in the 2026-07-21 Phase-9 capability-manifest regeneration (19 VOL / 10 MM / 4 PORTFOLIO archetypes) \u2014 venue/instrument scope per scripts/enumerate_envelope.py's catalogue-envelope design; not yet confirmed by a live batch/paper instance, so PARTIAL rather than SUPPORTED (honest-absence)."
+        },
+        {
+          "asset_group": "TRADFI",
+          "instrument_type": "option",
+          "status": "PARTIAL",
+          "venue_ids": [
+            "cboe",
+            "cme"
+          ],
+          "signal_variants": [],
+          "roll_mode": "n/a",
+          "block_list_refs": [],
+          "representative_slot_labels": [],
+          "notes": "Cell added in the 2026-07-21 Phase-9 capability-manifest regeneration (19 VOL / 10 MM / 4 PORTFOLIO archetypes) \u2014 venue/instrument scope per scripts/enumerate_envelope.py's catalogue-envelope design; not yet confirmed by a live batch/paper instance, so PARTIAL rather than SUPPORTED (honest-absence)."
+        }
+      ]
+    },
+    {
+      "archetype_id": "VOL_TERM_STRUCTURE_SLOPE",
+      "family": "VOL_TRADING",
+      "uses_rolling_futures": false,
+      "bespoke_capable": true,
+      "cells": [
+        {
+          "asset_group": "CEFI",
+          "instrument_type": "option",
+          "status": "PARTIAL",
+          "venue_ids": [
+            "deribit",
+            "okx",
+            "bybit"
+          ],
+          "signal_variants": [],
+          "roll_mode": "n/a",
+          "block_list_refs": [],
+          "representative_slot_labels": [],
+          "notes": "Cell added in the 2026-07-21 Phase-9 capability-manifest regeneration (19 VOL / 10 MM / 4 PORTFOLIO archetypes) \u2014 venue/instrument scope per scripts/enumerate_envelope.py's catalogue-envelope design; not yet confirmed by a live batch/paper instance, so PARTIAL rather than SUPPORTED (honest-absence)."
+        },
+        {
+          "asset_group": "TRADFI",
+          "instrument_type": "option",
+          "status": "PARTIAL",
+          "venue_ids": [
+            "cboe",
+            "cme"
+          ],
+          "signal_variants": [],
+          "roll_mode": "n/a",
+          "block_list_refs": [],
+          "representative_slot_labels": [],
+          "notes": "Cell added in the 2026-07-21 Phase-9 capability-manifest regeneration (19 VOL / 10 MM / 4 PORTFOLIO archetypes) \u2014 venue/instrument scope per scripts/enumerate_envelope.py's catalogue-envelope design; not yet confirmed by a live batch/paper instance, so PARTIAL rather than SUPPORTED (honest-absence)."
+        }
+      ]
+    },
+    {
+      "archetype_id": "VOL_DISPERSION",
+      "family": "VOL_TRADING",
+      "uses_rolling_futures": false,
+      "bespoke_capable": true,
+      "cells": [
+        {
+          "asset_group": "CEFI",
+          "instrument_type": "option",
+          "status": "PARTIAL",
+          "venue_ids": [
+            "deribit",
+            "okx",
+            "bybit"
+          ],
+          "signal_variants": [],
+          "roll_mode": "n/a",
+          "block_list_refs": [],
+          "representative_slot_labels": [],
+          "notes": "Cell added in the 2026-07-21 Phase-9 capability-manifest regeneration (19 VOL / 10 MM / 4 PORTFOLIO archetypes) \u2014 venue/instrument scope per scripts/enumerate_envelope.py's catalogue-envelope design; not yet confirmed by a live batch/paper instance, so PARTIAL rather than SUPPORTED (honest-absence)."
+        },
+        {
+          "asset_group": "TRADFI",
+          "instrument_type": "option",
+          "status": "PARTIAL",
+          "venue_ids": [
+            "cboe",
+            "cme"
+          ],
+          "signal_variants": [],
+          "roll_mode": "n/a",
+          "block_list_refs": [],
+          "representative_slot_labels": [],
+          "notes": "Cell added in the 2026-07-21 Phase-9 capability-manifest regeneration (19 VOL / 10 MM / 4 PORTFOLIO archetypes) \u2014 venue/instrument scope per scripts/enumerate_envelope.py's catalogue-envelope design; not yet confirmed by a live batch/paper instance, so PARTIAL rather than SUPPORTED (honest-absence)."
+        }
+      ]
+    },
+    {
+      "archetype_id": "VOL_VARIANCE_SWAP",
+      "family": "VOL_TRADING",
+      "uses_rolling_futures": false,
+      "bespoke_capable": true,
+      "cells": [
+        {
+          "asset_group": "CEFI",
+          "instrument_type": "option",
+          "status": "PARTIAL",
+          "venue_ids": [
+            "deribit",
+            "okx",
+            "bybit"
+          ],
+          "signal_variants": [],
+          "roll_mode": "n/a",
+          "block_list_refs": [],
+          "representative_slot_labels": [],
+          "notes": "Cell added in the 2026-07-21 Phase-9 capability-manifest regeneration (19 VOL / 10 MM / 4 PORTFOLIO archetypes) \u2014 venue/instrument scope per scripts/enumerate_envelope.py's catalogue-envelope design; not yet confirmed by a live batch/paper instance, so PARTIAL rather than SUPPORTED (honest-absence)."
+        },
+        {
+          "asset_group": "TRADFI",
+          "instrument_type": "option",
+          "status": "PARTIAL",
+          "venue_ids": [
+            "cboe",
+            "cme"
+          ],
+          "signal_variants": [],
+          "roll_mode": "n/a",
+          "block_list_refs": [],
+          "representative_slot_labels": [],
+          "notes": "Cell added in the 2026-07-21 Phase-9 capability-manifest regeneration (19 VOL / 10 MM / 4 PORTFOLIO archetypes) \u2014 venue/instrument scope per scripts/enumerate_envelope.py's catalogue-envelope design; not yet confirmed by a live batch/paper instance, so PARTIAL rather than SUPPORTED (honest-absence)."
+        }
+      ]
+    },
+    {
+      "archetype_id": "VOL_LEAPS_CONVEXITY",
+      "family": "VOL_TRADING",
+      "uses_rolling_futures": false,
+      "bespoke_capable": true,
+      "cells": [
+        {
+          "asset_group": "CEFI",
+          "instrument_type": "option",
+          "status": "PARTIAL",
+          "venue_ids": [
+            "deribit",
+            "okx",
+            "bybit"
+          ],
+          "signal_variants": [],
+          "roll_mode": "n/a",
+          "block_list_refs": [],
+          "representative_slot_labels": [],
+          "notes": "Cell added in the 2026-07-21 Phase-9 capability-manifest regeneration (19 VOL / 10 MM / 4 PORTFOLIO archetypes) \u2014 venue/instrument scope per scripts/enumerate_envelope.py's catalogue-envelope design; not yet confirmed by a live batch/paper instance, so PARTIAL rather than SUPPORTED (honest-absence)."
+        },
+        {
+          "asset_group": "TRADFI",
+          "instrument_type": "option",
+          "status": "PARTIAL",
+          "venue_ids": [
+            "cboe",
+            "cme"
+          ],
+          "signal_variants": [],
+          "roll_mode": "n/a",
+          "block_list_refs": [],
+          "representative_slot_labels": [],
+          "notes": "Cell added in the 2026-07-21 Phase-9 capability-manifest regeneration (19 VOL / 10 MM / 4 PORTFOLIO archetypes) \u2014 venue/instrument scope per scripts/enumerate_envelope.py's catalogue-envelope design; not yet confirmed by a live batch/paper instance, so PARTIAL rather than SUPPORTED (honest-absence)."
+        }
+      ]
+    },
+    {
+      "archetype_id": "VOL_CROSS_ASSET_SPREAD",
+      "family": "VOL_TRADING",
+      "uses_rolling_futures": false,
+      "bespoke_capable": true,
+      "cells": [
+        {
+          "asset_group": "CEFI",
+          "instrument_type": "option",
+          "status": "PARTIAL",
+          "venue_ids": [
+            "deribit",
+            "okx",
+            "bybit"
+          ],
+          "signal_variants": [],
+          "roll_mode": "n/a",
+          "block_list_refs": [],
+          "representative_slot_labels": [],
+          "notes": "Cell added in the 2026-07-21 Phase-9 capability-manifest regeneration (19 VOL / 10 MM / 4 PORTFOLIO archetypes) \u2014 venue/instrument scope per scripts/enumerate_envelope.py's catalogue-envelope design; not yet confirmed by a live batch/paper instance, so PARTIAL rather than SUPPORTED (honest-absence)."
+        },
+        {
+          "asset_group": "TRADFI",
+          "instrument_type": "option",
+          "status": "PARTIAL",
+          "venue_ids": [
+            "cboe",
+            "cme"
+          ],
+          "signal_variants": [],
+          "roll_mode": "n/a",
+          "block_list_refs": [],
+          "representative_slot_labels": [],
+          "notes": "Cell added in the 2026-07-21 Phase-9 capability-manifest regeneration (19 VOL / 10 MM / 4 PORTFOLIO archetypes) \u2014 venue/instrument scope per scripts/enumerate_envelope.py's catalogue-envelope design; not yet confirmed by a live batch/paper instance, so PARTIAL rather than SUPPORTED (honest-absence)."
+        }
+      ]
+    },
+    {
+      "archetype_id": "VOL_RATIO_SPREAD",
+      "family": "VOL_TRADING",
+      "uses_rolling_futures": false,
+      "bespoke_capable": true,
+      "cells": [
+        {
+          "asset_group": "CEFI",
+          "instrument_type": "option",
+          "status": "PARTIAL",
+          "venue_ids": [
+            "deribit",
+            "okx",
+            "bybit"
+          ],
+          "signal_variants": [],
+          "roll_mode": "n/a",
+          "block_list_refs": [],
+          "representative_slot_labels": [],
+          "notes": "Cell added in the 2026-07-21 Phase-9 capability-manifest regeneration (19 VOL / 10 MM / 4 PORTFOLIO archetypes) \u2014 venue/instrument scope per scripts/enumerate_envelope.py's catalogue-envelope design; not yet confirmed by a live batch/paper instance, so PARTIAL rather than SUPPORTED (honest-absence)."
+        },
+        {
+          "asset_group": "TRADFI",
+          "instrument_type": "option",
+          "status": "PARTIAL",
+          "venue_ids": [
+            "cboe",
+            "cme"
+          ],
+          "signal_variants": [],
+          "roll_mode": "n/a",
+          "block_list_refs": [],
+          "representative_slot_labels": [],
+          "notes": "Cell added in the 2026-07-21 Phase-9 capability-manifest regeneration (19 VOL / 10 MM / 4 PORTFOLIO archetypes) \u2014 venue/instrument scope per scripts/enumerate_envelope.py's catalogue-envelope design; not yet confirmed by a live batch/paper instance, so PARTIAL rather than SUPPORTED (honest-absence)."
+        }
+      ]
+    },
+    {
+      "archetype_id": "MARKET_MAKING_PASSIVE_SPREAD",
+      "family": "MARKET_MAKING",
+      "uses_rolling_futures": false,
+      "bespoke_capable": true,
+      "cells": [
+        {
+          "asset_group": "CEFI",
+          "instrument_type": "spot",
+          "status": "PARTIAL",
+          "venue_ids": [
+            "binance",
+            "okx",
+            "bybit",
+            "hyperliquid",
+            "deribit",
+            "coinbase",
+            "kraken"
+          ],
+          "signal_variants": [],
+          "roll_mode": "n/a",
+          "block_list_refs": [],
+          "representative_slot_labels": [],
+          "notes": "Cell added in the 2026-07-21 Phase-9 capability-manifest regeneration (19 VOL / 10 MM / 4 PORTFOLIO archetypes) \u2014 venue/instrument scope per scripts/enumerate_envelope.py's catalogue-envelope design; not yet confirmed by a live batch/paper instance, so PARTIAL rather than SUPPORTED (honest-absence)."
+        },
+        {
+          "asset_group": "CEFI",
+          "instrument_type": "perp",
+          "status": "PARTIAL",
+          "venue_ids": [
+            "binance",
+            "okx",
+            "bybit",
+            "hyperliquid",
+            "deribit",
+            "coinbase",
+            "kraken"
+          ],
+          "signal_variants": [],
+          "roll_mode": "n/a",
+          "block_list_refs": [],
+          "representative_slot_labels": [],
+          "notes": "Cell added in the 2026-07-21 Phase-9 capability-manifest regeneration (19 VOL / 10 MM / 4 PORTFOLIO archetypes) \u2014 venue/instrument scope per scripts/enumerate_envelope.py's catalogue-envelope design; not yet confirmed by a live batch/paper instance, so PARTIAL rather than SUPPORTED (honest-absence)."
+        }
+      ]
+    },
+    {
+      "archetype_id": "MARKET_MAKING_INVENTORY_SKEW",
+      "family": "MARKET_MAKING",
+      "uses_rolling_futures": false,
+      "bespoke_capable": true,
+      "cells": [
+        {
+          "asset_group": "CEFI",
+          "instrument_type": "spot",
+          "status": "PARTIAL",
+          "venue_ids": [
+            "binance",
+            "okx",
+            "bybit",
+            "hyperliquid",
+            "deribit",
+            "coinbase",
+            "kraken"
+          ],
+          "signal_variants": [],
+          "roll_mode": "n/a",
+          "block_list_refs": [],
+          "representative_slot_labels": [],
+          "notes": "Cell added in the 2026-07-21 Phase-9 capability-manifest regeneration (19 VOL / 10 MM / 4 PORTFOLIO archetypes) \u2014 venue/instrument scope per scripts/enumerate_envelope.py's catalogue-envelope design; not yet confirmed by a live batch/paper instance, so PARTIAL rather than SUPPORTED (honest-absence)."
+        },
+        {
+          "asset_group": "CEFI",
+          "instrument_type": "perp",
+          "status": "PARTIAL",
+          "venue_ids": [
+            "binance",
+            "okx",
+            "bybit",
+            "hyperliquid",
+            "deribit",
+            "coinbase",
+            "kraken"
+          ],
+          "signal_variants": [],
+          "roll_mode": "n/a",
+          "block_list_refs": [],
+          "representative_slot_labels": [],
+          "notes": "Cell added in the 2026-07-21 Phase-9 capability-manifest regeneration (19 VOL / 10 MM / 4 PORTFOLIO archetypes) \u2014 venue/instrument scope per scripts/enumerate_envelope.py's catalogue-envelope design; not yet confirmed by a live batch/paper instance, so PARTIAL rather than SUPPORTED (honest-absence)."
+        }
+      ]
+    },
+    {
+      "archetype_id": "MARKET_MAKING_ML_LEAN",
+      "family": "MARKET_MAKING",
+      "uses_rolling_futures": false,
+      "bespoke_capable": true,
+      "cells": [
+        {
+          "asset_group": "CEFI",
+          "instrument_type": "spot",
+          "status": "PARTIAL",
+          "venue_ids": [
+            "binance",
+            "okx",
+            "bybit",
+            "hyperliquid",
+            "deribit",
+            "coinbase",
+            "kraken"
+          ],
+          "signal_variants": [],
+          "roll_mode": "n/a",
+          "block_list_refs": [],
+          "representative_slot_labels": [],
+          "notes": "Cell added in the 2026-07-21 Phase-9 capability-manifest regeneration (19 VOL / 10 MM / 4 PORTFOLIO archetypes) \u2014 venue/instrument scope per scripts/enumerate_envelope.py's catalogue-envelope design; not yet confirmed by a live batch/paper instance, so PARTIAL rather than SUPPORTED (honest-absence)."
+        },
+        {
+          "asset_group": "CEFI",
+          "instrument_type": "perp",
+          "status": "PARTIAL",
+          "venue_ids": [
+            "binance",
+            "okx",
+            "bybit",
+            "hyperliquid",
+            "deribit",
+            "coinbase",
+            "kraken"
+          ],
+          "signal_variants": [],
+          "roll_mode": "n/a",
+          "block_list_refs": [],
+          "representative_slot_labels": [],
+          "notes": "Cell added in the 2026-07-21 Phase-9 capability-manifest regeneration (19 VOL / 10 MM / 4 PORTFOLIO archetypes) \u2014 venue/instrument scope per scripts/enumerate_envelope.py's catalogue-envelope design; not yet confirmed by a live batch/paper instance, so PARTIAL rather than SUPPORTED (honest-absence)."
+        }
+      ]
+    },
+    {
+      "archetype_id": "MARKET_MAKING_QUEUE_MICROSTRUCTURE",
+      "family": "MARKET_MAKING",
+      "uses_rolling_futures": false,
+      "bespoke_capable": true,
+      "cells": [
+        {
+          "asset_group": "CEFI",
+          "instrument_type": "spot",
+          "status": "PARTIAL",
+          "venue_ids": [
+            "binance",
+            "okx",
+            "bybit",
+            "hyperliquid",
+            "deribit",
+            "coinbase",
+            "kraken"
+          ],
+          "signal_variants": [],
+          "roll_mode": "n/a",
+          "block_list_refs": [],
+          "representative_slot_labels": [],
+          "notes": "Cell added in the 2026-07-21 Phase-9 capability-manifest regeneration (19 VOL / 10 MM / 4 PORTFOLIO archetypes) \u2014 venue/instrument scope per scripts/enumerate_envelope.py's catalogue-envelope design; not yet confirmed by a live batch/paper instance, so PARTIAL rather than SUPPORTED (honest-absence)."
+        },
+        {
+          "asset_group": "CEFI",
+          "instrument_type": "perp",
+          "status": "PARTIAL",
+          "venue_ids": [
+            "binance",
+            "okx",
+            "bybit",
+            "hyperliquid",
+            "deribit",
+            "coinbase",
+            "kraken"
+          ],
+          "signal_variants": [],
+          "roll_mode": "n/a",
+          "block_list_refs": [],
+          "representative_slot_labels": [],
+          "notes": "Cell added in the 2026-07-21 Phase-9 capability-manifest regeneration (19 VOL / 10 MM / 4 PORTFOLIO archetypes) \u2014 venue/instrument scope per scripts/enumerate_envelope.py's catalogue-envelope design; not yet confirmed by a live batch/paper instance, so PARTIAL rather than SUPPORTED (honest-absence)."
+        }
+      ]
+    },
+    {
+      "archetype_id": "MARKET_MAKING_PREDICTION",
+      "family": "MARKET_MAKING",
+      "uses_rolling_futures": false,
+      "bespoke_capable": true,
+      "cells": [
+        {
+          "asset_group": "PREDICTION",
+          "instrument_type": "event_settled",
+          "status": "PARTIAL",
+          "venue_ids": [
+            "polymarket",
+            "unity"
+          ],
+          "signal_variants": [],
+          "roll_mode": "n/a",
+          "block_list_refs": [],
+          "representative_slot_labels": [],
+          "notes": "Cell added in the 2026-07-21 Phase-9 capability-manifest regeneration (19 VOL / 10 MM / 4 PORTFOLIO archetypes) \u2014 venue/instrument scope per scripts/enumerate_envelope.py's catalogue-envelope design; not yet confirmed by a live batch/paper instance, so PARTIAL rather than SUPPORTED (honest-absence). Kalshi excluded from venue_ids (execution adapter pending, per the existing ML_DIRECTIONAL_EVENT_SETTLED/MARKET_MAKING_EVENT_SETTLED PREDICTION cells)."
+        }
+      ]
+    },
+    {
+      "archetype_id": "DEFI_LP_CONCENTRATED",
+      "family": "MARKET_MAKING",
+      "uses_rolling_futures": false,
+      "bespoke_capable": true,
+      "cells": [
+        {
+          "asset_group": "DEFI",
+          "instrument_type": "lp",
+          "status": "PARTIAL",
+          "venue_ids": [
+            "uniswap_v3",
+            "pancakeswap_v3"
+          ],
+          "signal_variants": [],
+          "roll_mode": "n/a",
+          "block_list_refs": [],
+          "representative_slot_labels": [],
+          "notes": "Cell added in the 2026-07-21 Phase-9 capability-manifest regeneration (19 VOL / 10 MM / 4 PORTFOLIO archetypes) \u2014 venue/instrument scope per scripts/enumerate_envelope.py's catalogue-envelope design; not yet confirmed by a live batch/paper instance, so PARTIAL rather than SUPPORTED (honest-absence)."
+        }
+      ]
+    },
+    {
+      "archetype_id": "DEFI_LP_POOL",
+      "family": "MARKET_MAKING",
+      "uses_rolling_futures": false,
+      "bespoke_capable": true,
+      "cells": [
+        {
+          "asset_group": "DEFI",
+          "instrument_type": "lp",
+          "status": "PARTIAL",
+          "venue_ids": [
+            "balancer",
+            "curve",
+            "maverick"
+          ],
+          "signal_variants": [],
+          "roll_mode": "n/a",
+          "block_list_refs": [],
+          "representative_slot_labels": [],
+          "notes": "Cell added in the 2026-07-21 Phase-9 capability-manifest regeneration (19 VOL / 10 MM / 4 PORTFOLIO archetypes) \u2014 venue/instrument scope per scripts/enumerate_envelope.py's catalogue-envelope design; not yet confirmed by a live batch/paper instance, so PARTIAL rather than SUPPORTED (honest-absence)."
+        }
+      ]
+    },
+    {
+      "archetype_id": "DEFI_LP_VAULT",
+      "family": "MARKET_MAKING",
+      "uses_rolling_futures": false,
+      "bespoke_capable": true,
+      "cells": [
+        {
+          "asset_group": "DEFI",
+          "instrument_type": "lp",
+          "status": "PARTIAL",
+          "venue_ids": [
+            "gamma",
+            "arrakis",
+            "steer"
+          ],
+          "signal_variants": [],
+          "roll_mode": "n/a",
+          "block_list_refs": [],
+          "representative_slot_labels": [],
+          "notes": "Cell added in the 2026-07-21 Phase-9 capability-manifest regeneration (19 VOL / 10 MM / 4 PORTFOLIO archetypes) \u2014 venue/instrument scope per scripts/enumerate_envelope.py's catalogue-envelope design; not yet confirmed by a live batch/paper instance, so PARTIAL rather than SUPPORTED (honest-absence)."
+        }
+      ]
+    },
+    {
+      "archetype_id": "PORTFOLIO_MULTI_STRATEGY",
+      "family": "PORTFOLIO",
+      "uses_rolling_futures": false,
+      "bespoke_capable": true,
+      "cells": [
+        {
+          "asset_group": "CROSS_CATEGORY",
+          "instrument_type": "sleeve_mix",
+          "status": "PARTIAL",
+          "venue_ids": [
+            "canonical-1",
+            "canonical-2",
+            "canonical-3"
+          ],
+          "signal_variants": [],
+          "roll_mode": "n/a",
+          "block_list_refs": [],
+          "representative_slot_labels": [],
+          "notes": "Conservative / Balanced / Aggressive sleeve mixes. Cell added in the 2026-07-21 Phase-9 capability-manifest regeneration (19 VOL / 10 MM / 4 PORTFOLIO archetypes) \u2014 venue/instrument scope per scripts/enumerate_envelope.py's catalogue-envelope design; not yet confirmed by a live batch/paper instance, so PARTIAL rather than SUPPORTED (honest-absence)."
+        }
+      ]
+    },
+    {
+      "archetype_id": "PORTFOLIO_RISK_PARITY",
+      "family": "PORTFOLIO",
+      "uses_rolling_futures": false,
+      "bespoke_capable": true,
+      "cells": [
+        {
+          "asset_group": "CROSS_CATEGORY",
+          "instrument_type": "sleeve_mix",
+          "status": "PARTIAL",
+          "venue_ids": [
+            "canonical-1",
+            "canonical-2"
+          ],
+          "signal_variants": [],
+          "roll_mode": "n/a",
+          "block_list_refs": [],
+          "representative_slot_labels": [],
+          "notes": "Crypto-only / Multi-asset parity. Cell added in the 2026-07-21 Phase-9 capability-manifest regeneration (19 VOL / 10 MM / 4 PORTFOLIO archetypes) \u2014 venue/instrument scope per scripts/enumerate_envelope.py's catalogue-envelope design; not yet confirmed by a live batch/paper instance, so PARTIAL rather than SUPPORTED (honest-absence)."
+        }
+      ]
+    },
+    {
+      "archetype_id": "PORTFOLIO_FACTOR_ALLOCATION",
+      "family": "PORTFOLIO",
+      "uses_rolling_futures": false,
+      "bespoke_capable": true,
+      "cells": [
+        {
+          "asset_group": "CROSS_CATEGORY",
+          "instrument_type": "sleeve_mix",
+          "status": "PARTIAL",
+          "venue_ids": [
+            "canonical-1",
+            "canonical-2"
+          ],
+          "signal_variants": [],
+          "roll_mode": "n/a",
+          "block_list_refs": [],
+          "representative_slot_labels": [],
+          "notes": "Momentum+Carry / Momentum+Value+Carry. Cell added in the 2026-07-21 Phase-9 capability-manifest regeneration (19 VOL / 10 MM / 4 PORTFOLIO archetypes) \u2014 venue/instrument scope per scripts/enumerate_envelope.py's catalogue-envelope design; not yet confirmed by a live batch/paper instance, so PARTIAL rather than SUPPORTED (honest-absence)."
+        }
+      ]
+    },
+    {
+      "archetype_id": "PORTFOLIO_TACTICAL_OVERLAY",
+      "family": "PORTFOLIO",
+      "uses_rolling_futures": false,
+      "bespoke_capable": true,
+      "cells": [
+        {
+          "asset_group": "CROSS_CATEGORY",
+          "instrument_type": "sleeve_mix",
+          "status": "PARTIAL",
+          "venue_ids": [
+            "canonical-1",
+            "canonical-2"
+          ],
+          "signal_variants": [],
+          "roll_mode": "n/a",
+          "block_list_refs": [],
+          "representative_slot_labels": [],
+          "notes": "Regime-switch / Signal-weighted allocation. Cell added in the 2026-07-21 Phase-9 capability-manifest regeneration (19 VOL / 10 MM / 4 PORTFOLIO archetypes) \u2014 venue/instrument scope per scripts/enumerate_envelope.py's catalogue-envelope design; not yet confirmed by a live batch/paper instance, so PARTIAL rather than SUPPORTED (honest-absence)."
         }
       ]
     }

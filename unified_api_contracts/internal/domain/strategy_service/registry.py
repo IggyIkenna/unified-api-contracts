@@ -64,6 +64,7 @@ class Category(StrEnum):
     TRADFI = "TRADFI"
     SPORTS = "SPORTS"
     PREDICTION = "PREDICTION"
+    CROSS_CATEGORY = "CROSS_CATEGORY"  # PORTFOLIO family — cross-category sleeve allocation, no single venue category
 
 
 class ExecutionMode(StrEnum):

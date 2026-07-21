@@ -317,11 +317,14 @@ def test_carry_staked_basis_declares_lst_and_lending_legs(required_venue: str) -
 
 
 def test_capability_registry_loaded_with_22_archetypes() -> None:
-    """Manifest declares 23 archetypes — adding to MAY_23 must not regress.
+    """Manifest declares 53 archetypes — adding to MAY_23 must not regress.
 
     Updated 2026-06-22: 22 → 23 with TSMOM_BTC_CTA (RULES_DIRECTIONAL CeFi BTC trend CTA).
+    Updated 2026-07-21: 23 → 53 — Phase-9 capability-manifest regeneration adds the 18 new
+    VOL_TRADING archetypes, 8 new MARKET_MAKING archetypes, and the 4-archetype PORTFOLIO
+    family (enum-level since 2026-04, never had manifest cells until now).
     """
-    assert len(ARCHETYPE_CAPABILITY_REGISTRY) == 23
+    assert len(ARCHETYPE_CAPABILITY_REGISTRY) == 53
 
 
 def test_strategy_registry_non_empty() -> None:
