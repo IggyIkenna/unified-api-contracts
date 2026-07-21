@@ -61,6 +61,16 @@ UNDERLYING_NORMALIZATION: Final[dict[str, str]] = {
     "XAU": "XAU",
     "XAV": "XAV",
     "XAY": "XAY",
+    # --- CME Crypto Futures ---
+    # BTC/ETH full-size + MBT/MET micro roots (operator 2026-07-21). Identity-
+    # mapped: the underlying stays its own raw root so the canonical id is
+    # ``CME:FUTURE:BTC-USD@LIN-…`` (BTC/ETH/MBT/MET each a distinct bundle root;
+    # MBT/MET are NOT folded into BTC/ETH). Present here so ``normalize_underlying``
+    # resolves them and the canonical-path guard recognises the future chains.
+    "BTC": "BTC",
+    "ETH": "ETH",
+    "MBT": "MBT",
+    "MET": "MET",
     # --- CME Energy ---
     "CL": "WTI",
     "NG": "NAT-GAS",

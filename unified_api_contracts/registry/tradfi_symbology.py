@@ -221,6 +221,19 @@ EXCHANGE_CODE_TO_NAME: dict[str, str] = {
     "XAU": "XAU",
     "XAV": "XAV",
     "XAY": "XAY",
+    # CME crypto FUTURES roots (operator 2026-07-21) — BTC/ETH full-size +
+    # MBT/MET micro. Added to the MVP tradfi FUTURE download scope
+    # (``_mvp_scope_rules.py`` ``underliers``) but were missing from this
+    # recognised-root registry, so the write-time canonical-path guard
+    # quarantined every ``venue=CME/instrument_type=futures_chain/underlying=BTC``
+    # shard as an opaque code. Identity-mapped (root == human name) so the
+    # canonical id stays ``CME:FUTURE:BTC-USD@LIN-…`` — matching the catalogue
+    # rows (BTC/ETH/MBT/MET). Distinct roots: MBT/MET are their own bundle keys,
+    # never folded into BTC/ETH (the catalogue counts them separately).
+    "BTC": "BTC",
+    "ETH": "ETH",
+    "MBT": "MBT",
+    "MET": "MET",
     "CT": "COTTON",
     "CC": "COCOA",
     "KC": "COFFEE",
@@ -277,15 +290,20 @@ def is_recognized_tradfi_underlying(underlying: str) -> bool:
 
     Returns ``True`` for:
       * a real product root or human name (``ES``, ``SP500``, ``MES``,
-        ``MICRO-SP500``, ``XAB``, ``UST-10Y``, ``NAT-GAS`` …) — incl. the hyphenated
+        ``MICRO-SP500``, ``XAB``, ``UST-10Y``, ``NAT-GAS``, and the CME crypto
+        futures roots ``BTC``/``ETH``/``MBT``/``MET`` …) — incl. the hyphenated
         human names, which are matched whole before the leg split; and
       * a resolved named-spread combo (``WTI-BZ``, ``NAT-GAS-HH``) — a ``-``-joined
         underlying carrying at least one recognised product token.
 
     Returns ``False`` for:
-      * a numeric CBOE globex GROUP code (``12``/``13``/``23``); and
+      * a numeric CBOE globex GROUP code (``12``/``13``/``23``);
       * an opaque CBOE user-defined leg code (``GN``/``VT``/``IC``/``3W``) — a short
-        code that is neither a known root nor a ``-``-joined named spread.
+        code that is neither a known root nor a ``-``-joined named spread; and
+      * an opaque calendar-spread leg bundle (``BTCF3-BTCG3``) — a ``-``-joined
+        pair of dated leg symbols with no resolvable single root (the substring
+        fallback is restricted to hyphenated human names precisely so a short
+        crypto root does not spuriously match inside a leg token).
 
     The false cases are the garbage-underlying corpus that must be quarantined
     (honest absence), never written as a canonical bundle.
@@ -300,12 +318,19 @@ def is_recognized_tradfi_underlying(underlying: str) -> bool:
         return True
     if "-" in u:
         # Named-spread combo. A resolved leg (``WTI`` in ``WTI-BZ``) matches by
-        # token; a hyphenated human name (``NAT-GAS`` in ``NAT-GAS-HH``) matches
-        # by substring. Opaque UD codes never carry a ``-``, so this never
-        # accepts opaque garbage.
+        # token; a multi-word hyphenated human name (``NAT-GAS`` in ``NAT-GAS-HH``)
+        # matches by substring.
         if any(tok in known for tok in u.split("-")):
             return True
-        return any(len(name) >= 3 and name in u for name in known)
+        # Substring fallback is deliberately restricted to hyphenated human names
+        # (``"-" in name``). A short single root (e.g. a 3-char crypto root
+        # ``BTC``) must NOT match here: it would spuriously accept an opaque
+        # calendar-spread leg bundle like ``BTCF3-BTCG3`` (``BTC`` is a substring
+        # of the ``BTCF3`` leg token), which has no resolvable single root and
+        # MUST stay quarantined. Genuine named spreads carry the hyphenated human
+        # name whole (``NAT-GAS`` in ``NAT-GAS-HH``), so this keeps every real
+        # combo while rejecting opaque leg-symbol garbage.
+        return any(len(name) >= 3 and "-" in name and name in u for name in known)
     return False
 
 

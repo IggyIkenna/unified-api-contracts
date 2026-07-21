@@ -22,6 +22,7 @@ from unified_api_contracts.internal.reference.ticker_registry import (
 from unified_api_contracts.registry import EXCHANGE_CODE_TO_NAME
 
 _XA_ROOTS = ("XAB", "XAF", "XAI", "XAK", "XAP", "XAU", "XAV", "XAY")
+_CME_CRYPTO_FUTURES_ROOTS = ("BTC", "ETH", "MBT", "MET")
 
 
 class TestResolverAddsMesAndXaRoots:
@@ -39,11 +40,38 @@ class TestResolverAddsMesAndXaRoots:
         assert root in UNDERLYING_NORMALIZATION
         assert normalize_underlying(root)  # strict resolver no longer raises
 
+    @pytest.mark.parametrize("root", _CME_CRYPTO_FUTURES_ROOTS)
+    def test_cme_crypto_futures_roots_present_in_both_registries(self, root: str) -> None:
+        # BTC/ETH/MBT/MET (operator 2026-07-21) — added to the MVP tradfi FUTURE
+        # download scope; must also be recognised roots so the write-time
+        # canonical-path guard accepts their futures_chain shards.
+        assert root in EXCHANGE_CODE_TO_NAME
+        assert root in UNDERLYING_NORMALIZATION
+
+    @pytest.mark.parametrize("root", _CME_CRYPTO_FUTURES_ROOTS)
+    def test_cme_crypto_futures_roots_identity_mapped(self, root: str) -> None:
+        # Identity map keeps the canonical id ``CME:FUTURE:BTC-USD@LIN-…`` — the
+        # root is NOT remapped to a different human name (catalogue uses the raw
+        # root), and MBT/MET are never folded into BTC/ETH.
+        assert EXCHANGE_CODE_TO_NAME[root] == root
+        assert normalize_underlying(root) == root
+
 
 class TestIsRecognizedTradfiUnderlying:
     @pytest.mark.parametrize(
         "underlying",
-        ["ES", "SP500", "MES", "MICRO-SP500", "GOLD", "UST-10Y", "NAT-GAS", "VIX", *_XA_ROOTS],
+        [
+            "ES",
+            "SP500",
+            "MES",
+            "MICRO-SP500",
+            "GOLD",
+            "UST-10Y",
+            "NAT-GAS",
+            "VIX",
+            *_XA_ROOTS,
+            *_CME_CRYPTO_FUTURES_ROOTS,
+        ],
     )
     def test_real_roots_recognized(self, underlying: str) -> None:
         assert is_recognized_tradfi_underlying(underlying) is True
@@ -58,6 +86,15 @@ class TestIsRecognizedTradfiUnderlying:
 
     @pytest.mark.parametrize("underlying", ["GN", "VT", "IC", "3W", "CFO"])
     def test_opaque_cboe_leg_codes_rejected(self, underlying: str) -> None:
+        assert is_recognized_tradfi_underlying(underlying) is False
+
+    @pytest.mark.parametrize("underlying", ["BTCF3-BTCG3", "ETHF3-ETHG3", "MBTF3-MBTG3"])
+    def test_opaque_crypto_calendar_spread_legs_rejected(self, underlying: str) -> None:
+        # A ``-``-joined pair of dated leg symbols has no resolvable single root
+        # and MUST stay quarantined even though the crypto root (``BTC``) is a
+        # substring of the leg token (``BTCF3``). Regression for the substring
+        # fallback that would otherwise spuriously whitelist the combo. SSOT:
+        # tradfi_canonical_path_migration_design_2026_07_19.md.
         assert is_recognized_tradfi_underlying(underlying) is False
 
     def test_empty_rejected(self) -> None:
