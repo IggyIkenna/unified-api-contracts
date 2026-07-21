@@ -161,6 +161,7 @@ def test_root_import_surface() -> None:
         ("tradfi-vix-ohlcv-15m", "tradfi"),
         ("prediction-market-discovery-15m", "prediction"),
         ("sports-fixtures-poll", "sports"),
+        ("sports-coverage-drift", "sports"),
         ("manifest-consolidator-60s", "infra"),
         ("data-status-rollup", "infra"),
         ("manifest-aggregation-cron", "infra"),
@@ -171,3 +172,12 @@ def test_asset_groups(name: str, expected_asset_group: str) -> None:
     entry = next((s for s in SCHEDULER_REGISTRY if s.name == name), None)
     assert entry is not None, f"Entry {name!r} not found in registry"
     assert entry.asset_group == expected_asset_group
+
+
+def test_sports_coverage_drift_targets_deployment_api_cloud_run() -> None:
+    """Phase 8.B cron entrypoint — see deployment_api/scripts/coverage_drift_worker.py."""
+    entry = next((s for s in SCHEDULER_REGISTRY if s.name == "sports-coverage-drift"), None)
+    assert entry is not None
+    assert entry.target_kind == SchedulerTargetKind.CLOUD_RUN
+    assert entry.target_ref == "deployment-api"
+    assert entry.schedule_cron == "0 2 * * *"
