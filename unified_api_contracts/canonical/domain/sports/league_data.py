@@ -76,6 +76,13 @@ _API_FOOTBALL_ID_TO_LEAGUE: dict[int, str] = {
 # `day=2014-01-01/.../entity=standings` carrying `season=2026`, `update=2026-06-12`),
 # which is why each floor cites a probed row count + a coherence witness.
 # Re-probe with the entity/day walk before moving any floor.
+# SPORTS DATA FLOOR = 2020-06-06 (operator ruling 2026-07-21, CANONICAL). Odds tick data
+# starts 2020-06-06 (measured: ZERO odds before it); without odds nothing downstream is
+# legitimately computable, so 2020-06-06 is the floor for ALL sports sources/coverage/
+# expectations. This SUPERSEDES the per-source evidence floors (understat 2014, the
+# 2026-07-15 footystats/transfermarkt/open_meteo->2018 amendment, api_football 2018,
+# sfi 2019) — those describe where a source's raw data begins, but pre-floor sports data
+# is out-of-scope and is being wiped. Do NOT lower any sports floor below 2020-06-06.
 SOURCE_COVERAGE_START: dict[str, date] = {
     # Measured 2026-07-15 (legacy + prd object probe, all trees, years 2014-2021):
     # no api_football object of ANY entity exists before 2018-01-01, and the
@@ -86,7 +93,7 @@ SOURCE_COVERAGE_START: dict[str, date] = {
     # subscription returns empty for seasons 2015-2017 (35,889 all-empty_confirmed
     # across 76 MVP leagues — subscription floor, not a backfill bug). CONFIRMED
     # CORRECT — unchanged.
-    "api_football": date(2018, 1, 1),
+    "api_football": date(2020, 6, 6),
     # LOWERED 2019-01-01 → 2018-01-01 (2026-07-15). Real+coherent at 2018-01-01:
     # footystats_matches ENG_LEAGUE_ONE 12 rows (genuine New Year's Day League One
     # card: AFC Wimbledon v Southend, Bristol Rovers v Portsmouth, …); footystats_odds
@@ -94,26 +101,26 @@ SOURCE_COVERAGE_START: dict[str, date] = {
     # 2018-01-01T15:00 and available_at=2017-12-29T15:00 — exactly the documented
     # kickoff-minus-72h pre-match snapshot semantics. No footystats object exists
     # before 2018-01-01.
-    "footystats": date(2018, 1, 1),
+    "footystats": date(2020, 6, 6),
     # Earliest real understat object is 2014-08-08 (prd, LIGUE_1 understat_xg,
     # season=2014, Reims v PSG, home_xg=1.36787 — the real 2014/15 Ligue 1 opener),
     # i.e. the archive starts mid-2014 with the season. This floor already sits
     # BELOW the earliest real object, so it clips nothing real — left as-is
     # (no evidence would justify lowering it further).
-    "understat": date(2014, 1, 1),
+    "understat": date(2020, 6, 6),
     # LOWERED 2019-01-01 → 2018-01-01 (2026-07-15). Real+coherent at 2018-01-01:
     # entity=player_values/season=2017/player_values.parquet, 456 rows, season=2017
     # (historically coherent for a 2018-01-01 partition). NOTE: transfermarkt's real
     # payload is the `season=YYYY`-partitioned shape; the bare `player_values.parquet`
     # is the artifact class (the 2019-01-01 one carries season=2026), so the floor is
     # evidenced by the season-partitioned objects only.
-    "transfermarkt": date(2018, 1, 1),
+    "transfermarkt": date(2020, 6, 6),
     # Earliest real SFI object is 2020-01-01 (progressive_stats, 8,125 rows,
     # available_at spread across 2020-01-01T15:00+ in 30s steps). No SFI object
     # exists in 2018 or 2019 at all. This source-wide floor already sits BELOW the
     # earliest real object — left as-is; the operative floor is the
     # SFI_PROGRESSIVE_STATS override below, which measures EXACTLY correct.
-    "soccer_football_info": date(2019, 1, 1),
+    "soccer_football_info": date(2020, 6, 6),
     # LOWERED 2019-03-02 → 2018-01-01 (2026-07-15). Real+coherent at 2018-01-01:
     # entity=weather/weather.parquet, 26 rows, date=2018-01-01, every `actual_*`
     # observation column populated 26/26 (actual_ko_temp, actual_1h_*, actual_2h_*,
@@ -121,7 +128,7 @@ SOURCE_COVERAGE_START: dict[str, date] = {
     # The null `forecast_t24h_*` columns are EXPECTED for a historical backfill
     # (actuals are retrievable; archived forecasts are not) and do not make the
     # object a placeholder.
-    "open_meteo": date(2018, 1, 1),
+    "open_meteo": date(2020, 6, 6),
     # odds-api raw ticks → MDPS bucketed odds (consumed by FSS odds_features).
     # odds-api itself provides historical from 2020-06; our MTDS+MDPS hooked
     # in at 2020-06-06 per market-data-tick-sports/processed/by_date probe.
@@ -158,7 +165,7 @@ SOURCE_COVERAGE_START: dict[str, date] = {
 # honest number. (The old floor also conflated "no odds downstream" with "no data
 # upstream" — a downstream trading constraint is not an upstream coverage fact.)
 DATA_TYPE_COVERAGE_START: dict[tuple[str, str], date] = {
-    ("soccer_football_info", "SFI_PROGRESSIVE_STATS"): date(2020, 1, 1),
+    ("soccer_football_info", "SFI_PROGRESSIVE_STATS"): date(2020, 6, 6),
     # SFI_LEAGUES retired 2026-05-05 — was a static provider-catalog mapping,
     # now lives in UAC SOCCER_FOOTBALL_INFO_IDS rather than as captured GCS data.
 }

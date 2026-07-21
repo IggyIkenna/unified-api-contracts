@@ -91,7 +91,8 @@ class TestFeatureUpstreamRequirements:
 
 class TestInCoverage:
     def test_pre_launch_date_returns_false(self) -> None:
-        # api_football coverage starts 2015-01-01
+        # api_football coverage starts 2020-06-06 (canonical sports floor,
+        # operator ruling 2026-07-21 — supersedes any earlier per-source value).
         assert in_coverage("api_football", "FIXTURES", "EPL", "2014-01-01") is False
 
     def test_post_launch_date_in_coverage_league_returns_true(self) -> None:
@@ -123,11 +124,14 @@ class TestInCoverage:
         # Even pre-launch dates: derived bypasses date-floor.
         assert in_coverage("derived", "team_form", "EPL", "1999-01-01") is True
 
-    def test_sfi_progressive_stats_pre_2020_clipped(self) -> None:
-        # Per DATA_TYPE_COVERAGE_START override:
-        # ("soccer_football_info", "SFI_PROGRESSIVE_STATS") = 2020-01-01
-        assert in_coverage("soccer_football_info", "SFI_PROGRESSIVE_STATS", "EPL", "2019-12-31") is False
-        assert in_coverage("soccer_football_info", "SFI_PROGRESSIVE_STATS", "EPL", "2020-01-01") is True
+    def test_sfi_progressive_stats_pre_2020_06_06_clipped(self) -> None:
+        # Per DATA_TYPE_COVERAGE_START override (2020-06-06 canonical sports
+        # floor, operator ruling 2026-07-21 — supersedes the old SFI-specific
+        # 2020-01-01 value; SFI_PROGRESSIVE_STATS now coincides with the
+        # source-wide floor):
+        # ("soccer_football_info", "SFI_PROGRESSIVE_STATS") = 2020-06-06
+        assert in_coverage("soccer_football_info", "SFI_PROGRESSIVE_STATS", "EPL", "2020-06-05") is False
+        assert in_coverage("soccer_football_info", "SFI_PROGRESSIVE_STATS", "EPL", "2020-06-06") is True
 
 
 class TestInCoverageDt:
