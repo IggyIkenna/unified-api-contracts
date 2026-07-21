@@ -1,5 +1,9 @@
 """Alerting facade — workspace-public surface for AlertCode taxonomy + thresholds + rules.
 
+Also carries ``NormalizedAlertRow`` / ``AlertSourcePlane`` / ``FIELD_COVERAGE`` — the union
+ledger-row schema every mirrored alert source (GHA CI events, deployment-api, alerting-service,
+the zombie-watchdog, kill-switch audit) normalizes into. See ``canonical.crosscutting.alerting.ledger``.
+
 Consumers MUST import from this facade, not from the deep
 ``unified_api_contracts.canonical.crosscutting.alerting.*`` paths
 (per UAC import-surface rules).
@@ -22,17 +26,21 @@ from .canonical.crosscutting.alerting import (
     ALERT_THRESHOLDS,
     DATA_PIPELINE_ALERT_RULES,
     DATA_PIPELINE_SLACK_CHANNEL,
+    FIELD_COVERAGE,
     LIVE_ALERT_RULES,
     RECON_GREEN_THRESHOLDS,
     AlertChannel,
     AlertCode,
     AlertRule,
     AlertSeverity,
+    AlertSourcePlane,
     AlertThreshold,
     DataPipelineAlertCategory,
     DataPipelineAlertRule,
     DataPipelineEscalation,
+    FieldCoverage,
     KillSwitchScope,
+    NormalizedAlertRow,
     ThresholdUnit,
     UnknownAlertCodeError,
     UnknownThresholdKeyError,
@@ -43,17 +51,21 @@ __all__ = [
     "ALERT_THRESHOLDS",
     "DATA_PIPELINE_ALERT_RULES",
     "DATA_PIPELINE_SLACK_CHANNEL",
+    "FIELD_COVERAGE",
     "LIVE_ALERT_RULES",
     "RECON_GREEN_THRESHOLDS",
     "AlertChannel",
     "AlertCode",
     "AlertRule",
     "AlertSeverity",
+    "AlertSourcePlane",
     "AlertThreshold",
     "DataPipelineAlertCategory",
     "DataPipelineAlertRule",
     "DataPipelineEscalation",
+    "FieldCoverage",
     "KillSwitchScope",
+    "NormalizedAlertRow",
     "ThresholdUnit",
     "UnknownAlertCodeError",
     "UnknownThresholdKeyError",
