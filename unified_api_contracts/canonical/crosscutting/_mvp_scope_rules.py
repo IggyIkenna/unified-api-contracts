@@ -179,6 +179,13 @@ class TradFiMvpRule:
     underliers: frozenset[str] = field(default_factory=frozenset)
     option_underliers: frozenset[str] = field(default_factory=frozenset)
     sources: frozenset[str] = field(default_factory=frozenset)
+    # Operator-designated extra MVP cells beyond the CME futures complex + the
+    # equity-basis carve-out (2026-07-21). Each is an EXACT UPPERCASE
+    # ``(venue_root, instrument_type, base)`` triple; the predicate tags a tradfi
+    # row MVP on an exact match. Keeps one-off additions DECLARATIVE instead of
+    # widening the flat venue/type/underlier sets (which would over-tag — e.g.
+    # "CBOE" in ``venues`` would sweep in ~33k CBOE OPTION rows). Members below.
+    extra_mvp_cells: frozenset[tuple[str, str, str]] = field(default_factory=frozenset)
 
 
 @dataclass(frozen=True)
@@ -731,11 +738,39 @@ MVP_SCOPE: Final[dict[str, object]] = {
                 "NG",  # natural gas (NATGAS)
                 "CL",  # WTI crude (CL)
                 "HG",  # copper (COPPER)
+                # CME crypto FUTURES (operator 2026-07-21): BTC/ETH full-size +
+                # MBT/MET micro roots. FUTURE cells ONLY — CME BTC/ETH OPTIONS stay
+                # OUT because ``option_underliers``={"ES"} (OPTION ignores
+                # ``underliers``), per "no CME option for BTC and ETH". MBT/MET are
+                # OWN underliers (not ES-style sub-codes) since the catalogue tags
+                # micro-future rows base_asset=MBT/MET; they flow into
+                # ``MVP_CME_EXCHANGE_CODES`` so the CME download universe includes
+                # BTC.FUT/ETH.FUT/MBT.FUT/MET.FUT.
+                "BTC",  # CME Bitcoin futures (BTC.FUT)
+                "ETH",  # CME Ether futures (ETH.FUT)
+                "MBT",  # CME Micro Bitcoin futures (MBT.FUT)
+                "MET",  # CME Micro Ether futures (MET.FUT)
             }
         ),
         # OPTION-only narrowing (operator 2026-07-14): the S&P 500 / ES complex
-        # ONLY. See TRADFI_MVP_OPTION_UNDERLYING_ROOTS above for full rationale.
+        # ONLY. See TRADFI_MVP_OPTION_UNDERLYING_ROOTS above. The 2026-07-21
+        # BTC/ETH/MBT/MET ``underliers`` additions above do NOT reach OPTION cells.
         option_underliers=TRADFI_MVP_OPTION_UNDERLYING_ROOTS,
+        # Extra MVP cells (operator 2026-07-21) — CBOE VIX(VX) futures (CFE
+        # launcher; "CBOE" kept out of ``venues`` to avoid the ~33k CBOE SPX/VIX
+        # OPTION rows), the 5 daily US Treasury-yield INDEX tenors (Yahoo
+        # ohlcv_24h; VIX cash INDEX excluded), and the FX KRW-USD spot pair.
+        extra_mvp_cells=frozenset(
+            {
+                ("CBOE", "FUTURE", "VX"),
+                ("CBOE", "INDEX", "US2Y"),
+                ("CBOE", "INDEX", "US5Y"),
+                ("CBOE", "INDEX", "US10Y"),
+                ("CBOE", "INDEX", "US30Y"),
+                ("CBOE", "INDEX", "US3M"),
+                ("FX", "SPOT_PAIR", "KRW"),
+            }
+        ),
         # sources: empty → all sources in scope (databento primary + massive secondary)
         # TODO(mvp-scope): narrow to {"databento", "massive"} once live-source tagging confirmed.
         sources=frozenset(),
