@@ -520,7 +520,7 @@ class TestSportsMvp:
 
         football = [lg for lg in LEAGUE_REGISTRY.values() if lg.sport == "FOOTBALL"]
         non_football = [lg for lg in LEAGUE_REGISTRY.values() if lg.sport != "FOOTBALL"]
-        assert len(football) == 94
+        assert len(football) == 96  # China+Russia added 2026-07-21 (operator ruling: in-universe)
         assert len(non_football) == 7
         for lg in football:
             assert is_mvp("sports", "ODDS_API", "FIXED_ODDS", "odds", league=lg.league_id)
