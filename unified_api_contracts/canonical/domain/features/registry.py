@@ -36,28 +36,68 @@ from typing import Final
 # cross_instrument, ...) had its own repo and service name; all are now
 # ``features-service``.
 #
-# Feature groups are listed in the same string form they appear as in the
-# service's ``feature_builder_registry.py`` ``BuilderEntry.group_name`` —
-# this is the same string the manifest writer uses for the ``feature_group``
-# column. Drift here = data-status double-counts or under-counts.
+# Feature groups are listed in the same string form the manifest WRITER
+# actually emits as the ``feature_group`` column value. Drift here =
+# data-status double-counts or under-counts.
+#
+# For onchain, this is NOT the same string as the calculator-level
+# ``feature_builder_registry.py`` ``BuilderEntry.group_name`` — that claim
+# (previously made by this docstring) is REFUTED. onchain's writer
+# (``features_service.onchain.engine.orchestrator.OnChainOrchestrationService
+# .process_feature_group`` dispatch table) emits a distinct, protocol-agnostic
+# vocabulary — e.g. the writer's ``lending_rates`` is a genuine multi-protocol
+# merge (AAVE_V3 / COMPOUND_V3 / SPARK / KAMINO via ``_load_merged_lending_
+# data``), so the old registry name ``aave_lending_rates`` would mislabel the
+# non-Aave rows. Operator ruling 2026-07-21 (adopt writer/GCS names as
+# canonical, protocol-agnostic): the 11 onchain entries below were rewritten
+# 1:1 to the writer's ``_dispatch_feature_group`` literal names / CLI
+# ``FEATURE_GROUPS`` choices (verified against
+# ``features_service/onchain/engine/orchestrator.py`` and
+# ``features_service/onchain/cli/parser.py`` — NOT re-derived from the
+# calculator-level ``feature_builder_registry.py``, which remains a distinct,
+# unrelated DAG-metadata vocabulary for that module's own purposes). SSOT:
+# ``plans/active/issues/features_onchain_featureless_shards_and_vocabulary_split_2026_07_20.md``.
 
 EXPECTED_FEATURE_GROUPS_BY_SERVICE: Final[dict[str, list[str]]] = {
     "features-service": [
         # ---- Onchain --------------------------------------------------------
-        # Phase 0 — base calculators (no inter-calculator deps)
-        "aave_lending_rates",
-        "aave_utilization",
-        "aave_risk_params",
-        "defillama_tvl",
-        "lst_staking_yields",
-        "macro_sentiment",
-        "eigen_rewards",
-        "protocol_rewards",
+        # Writer-name reconciliation 2026-07-21 — every entry below is a
+        # literal branch of ``process_feature_group``'s dispatch table
+        # (``_dispatch_feature_group`` in orchestrator.py) / a CLI
+        # ``FEATURE_GROUPS`` choice. Two calculator-level names dropped
+        # entirely (no independent writer dispatch branch — see below).
+        #
+        # Produced today (captured rows exist; 5 of these 7 are currently
+        # feature-less placeholders — a separate, already-being-fixed P0,
+        # not a naming issue):
+        "lending_rates",
+        "risk_params",
+        "lst_yields",
+        "rewards",
+        "health_factor",
+        "liquidation_events",
         "flash_loan_availability",
-        # Phase 1 — depends on base
-        "aave_rate_impact",
-        # Phase 2 — regime aggregator
-        "onchain_regime",
+        # Batch-incompatible / never-produced in batch mode — the service
+        # still dispatches on these (CLI choices + writer elif branches);
+        # the producer now records ``attempted_failed``/``empty_confirmed``
+        # instead of a false ``captured`` row (2026-07-20 P0 fix, applied
+        # separately from this naming reconciliation):
+        "rate_impact",
+        "utilization",
+        "onchain_perps",
+        "perp_funding_rates",
+        "macro_sentiment",
+        "lst_native_rates",
+        # DROPPED (2026-07-21): "onchain_regime" — no calculator dispatch
+        # branch and no data (confirmed absent from
+        # ``_dispatch_feature_group``); "defillama_tvl" — a calculator
+        # registered in ``feature_builder_registry.py`` but never
+        # independently instantiated by the writer (it feeds macro_sentiment
+        # as an upstream data source only); "protocol_rewards" /
+        # "eigen_rewards" collapsed into the single protocol-agnostic
+        # "rewards" writer group (``_calculate_rewards_features`` reads
+        # merged ``rate_data`` directly — neither calculator class is
+        # instantiated by the writer path).
         # ---- Delta-one -------------------------------------------------------
         # Phase 0 — Price-based (no inter-calculator deps)
         "technical_indicators",
@@ -191,15 +231,21 @@ FEATURE_COVERAGE_START: Final[dict[tuple[str, str], date]] = {
     #
     # Aave V3 mainnet launch (March 2022). All Aave-derived feature
     # groups can't have data before this.
-    ("features-service", "aave_lending_rates"): date(2022, 3, 16),
-    ("features-service", "aave_utilization"): date(2022, 3, 16),
-    ("features-service", "aave_risk_params"): date(2022, 3, 16),
-    ("features-service", "aave_rate_impact"): date(2022, 3, 16),
+    # Writer-name reconciliation 2026-07-21 — keys renamed to match the
+    # ``EXPECTED_FEATURE_GROUPS_BY_SERVICE`` writer-name rewrite above
+    # (``lending_rates`` is now the protocol-agnostic multi-protocol merge,
+    # not an Aave-only name, but its floor date is unchanged — Aave V3 is
+    # still the earliest of the merged protocols per
+    # ``_load_merged_lending_data``).
+    ("features-service", "lending_rates"): date(2022, 3, 16),
+    ("features-service", "utilization"): date(2022, 3, 16),
+    ("features-service", "risk_params"): date(2022, 3, 16),
+    ("features-service", "rate_impact"): date(2022, 3, 16),
     # Lido stETH launched Dec 2020; Etherfi mid-2023. The MIN of upstream
     # source starts wins for the multi-source aggregate.
-    ("features-service", "lst_staking_yields"): date(2020, 12, 18),
+    ("features-service", "lst_yields"): date(2020, 12, 18),
     # EigenLayer mainnet launch (June 2023).
-    ("features-service", "eigen_rewards"): date(2023, 6, 14),
+    ("features-service", "rewards"): date(2023, 6, 14),
     # Morpho v1 launch (June 2022).
     ("features-service", "flash_loan_availability"): date(2022, 6, 1),
     # Add deltas / sports / volatility entries as upstream coverage
@@ -298,17 +344,21 @@ class FeatureGroupFamilyCollisionError(ValueError):
 
 _GROUP_FAMILY_MAP: Final[dict[str, FeatureFamily]] = {
     # --- Onchain (features-onchain-service origin) ---
-    "aave_lending_rates": FeatureFamily.ONCHAIN,
-    "aave_utilization": FeatureFamily.ONCHAIN,
-    "aave_risk_params": FeatureFamily.ONCHAIN,
-    "defillama_tvl": FeatureFamily.ONCHAIN,
-    "lst_staking_yields": FeatureFamily.ONCHAIN,
+    # Writer-name reconciliation 2026-07-21 — see EXPECTED_FEATURE_GROUPS_BY_SERVICE
+    # onchain block above for the full old->new map + evidence.
+    "lending_rates": FeatureFamily.ONCHAIN,
+    "utilization": FeatureFamily.ONCHAIN,
+    "risk_params": FeatureFamily.ONCHAIN,
+    "lst_yields": FeatureFamily.ONCHAIN,
     "macro_sentiment": FeatureFamily.ONCHAIN,
-    "eigen_rewards": FeatureFamily.ONCHAIN,
-    "protocol_rewards": FeatureFamily.ONCHAIN,
+    "rewards": FeatureFamily.ONCHAIN,
     "flash_loan_availability": FeatureFamily.ONCHAIN,
-    "aave_rate_impact": FeatureFamily.ONCHAIN,
-    "onchain_regime": FeatureFamily.ONCHAIN,
+    "rate_impact": FeatureFamily.ONCHAIN,
+    "health_factor": FeatureFamily.ONCHAIN,
+    "liquidation_events": FeatureFamily.ONCHAIN,
+    "onchain_perps": FeatureFamily.ONCHAIN,
+    "perp_funding_rates": FeatureFamily.ONCHAIN,
+    "lst_native_rates": FeatureFamily.ONCHAIN,
     # --- Delta-one (features-delta-one-service origin) ---
     "technical_indicators": FeatureFamily.DELTA_ONE,
     "moving_averages": FeatureFamily.DELTA_ONE,

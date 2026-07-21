@@ -235,10 +235,15 @@ def test_list_services_returns_sorted_known() -> None:
 
 
 def test_is_known_feature_group_round_trip() -> None:
-    """is_known_feature_group(service, fg) is True iff fg is registered."""
-    assert is_known_feature_group("features-service", "lst_staking_yields") is True
+    """is_known_feature_group(service, fg) is True iff fg is registered.
+
+    ``lst_yields`` is the writer/GCS-partition name (operator ruling
+    2026-07-21) — EXPECTED_FEATURE_GROUPS_BY_SERVICE no longer carries the
+    old registry-canonical ``lst_staking_yields`` (no writer ever emitted it).
+    """
+    assert is_known_feature_group("features-service", "lst_yields") is True
     assert is_known_feature_group("features-service", "definitely-not-real") is False
-    assert is_known_feature_group("definitely-not-a-service", "lst_staking_yields") is False
+    assert is_known_feature_group("definitely-not-a-service", "lst_yields") is False
 
 
 # ---------------------------------------------------------------------------

@@ -149,12 +149,18 @@ def test_feature_family_json_round_trip_single_value() -> None:
 
 def test_feature_family_json_round_trip_manifest_row_shape() -> None:
     """A manifest row carrying ``feature_family`` + ``feature_group`` round-trips
-    through JSON cleanly (the on-the-wire shape between writer + reader)."""
+    through JSON cleanly (the on-the-wire shape between writer + reader).
+
+    ``lst_yields`` is the writer/GCS-partition name (operator ruling
+    2026-07-21, ``features_onchain_featureless_shards_and_vocabulary_split_
+    2026_07_20.md``) — the old registry-canonical ``lst_staking_yields`` no
+    writer ever emitted.
+    """
     row: dict[str, str | None] = {
-        "feature_group": "lst_staking_yields",
+        "feature_group": "lst_yields",
         "feature_family": FeatureFamily.ONCHAIN.value,
     }
     decoded = json.loads(json.dumps(row))
-    assert decoded["feature_group"] == "lst_staking_yields"
+    assert decoded["feature_group"] == "lst_yields"
     assert decoded["feature_family"] == "onchain"
     assert get_feature_family(decoded["feature_group"]) == FeatureFamily.ONCHAIN
