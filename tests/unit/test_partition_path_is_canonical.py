@@ -336,10 +336,23 @@ def test_cefi_canonical_stem_is_clean(file_name: str) -> None:
 
 
 @pytest.mark.parametrize("itype", ["options_chain", "futures_chain"])
-def test_cefi_chain_ticks_parquet_is_never_flagged(itype: str) -> None:
-    """Chain shards legitimately have NO per-instrument stem — must not be flagged."""
-    path = _cefi_path("underlying=BTC/ticks.parquet", itype=itype)
+def test_cefi_chain_v6_tail_is_never_flagged(itype: str) -> None:
+    """v6 chain shards (quote/margin tail) legitimately have NO per-instrument stem —
+    must not be flagged. Operator ruling 2026-07-21: v6 is canonical EVERYWHERE."""
+    path = _cefi_path("underlying=BTC/quote=USDT/margin=linear/ticks.parquet", itype=itype)
     assert is_canonical(path), canonical_path_violations(path)
+
+
+@pytest.mark.parametrize("itype", ["options_chain", "futures_chain"])
+def test_cefi_chain_bare_v5_tail_is_flagged(itype: str) -> None:
+    """Bare v5 chain tail (no quote/margin) is now a STRUCTURAL violation — operator
+    ruling 2026-07-21: v5 is lossy (USD-vs-USDT / linear-vs-inverse chains on the same
+    underlying collide and overwrite) and must not remain anywhere.
+    SSOT: cefi_chain_tail_v6_canonicalisation_2026_07_21.md."""
+    path = _cefi_path("underlying=BTC/ticks.parquet", itype=itype)
+    violations = canonical_path_violations(path)
+    assert any("must end" in v and "quote=" in v for v in violations), violations
+    assert not is_canonical(path)
 
 
 def test_symbol_less_ticks_parquet_fan_in_is_never_flagged() -> None:

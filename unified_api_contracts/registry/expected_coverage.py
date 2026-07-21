@@ -415,8 +415,18 @@ _DEFI: dict[str, list[str]] = {
     # Note: governance_proposals uses same protocols but data_type "governance_proposals"
     # is not yet in the defi capability set — deferred to handler/capability alignment plan.
     "COMPOUND": ["governance_events"],
-    "AAVE": ["governance_events"],
+    # AAVE also emits oracle_prices (AaveOracle.getAssetPrice per LST reserve,
+    # write venue "AAVE" — see the AAVE-ETHEREUM IS-venue entry below for the
+    # per-chain form). Added 2026-07-21 per lst_rate_honest_coverage plan
+    # Phase 1 (codex: lst-exchange-rate-surfaces.md surface #3).
+    "AAVE": ["governance_events", "oracle_prices"],
     "UNISWAP": ["governance_events"],
+    # --- AAVE on-chain oracle price (getAssetPrice) — IS venue AAVE-ETHEREUM ---
+    # Extends the already-existing AAVE-ETHEREUM venue (see defi_venues.py,
+    # phase flipped pipeline->live alongside this entry). instrument_type=
+    # spot_asset, 6 verified LST reserves (wstETH/weETH/rETH/cbETH/rsETH/ezETH).
+    # Added 2026-07-21 per lst_rate_honest_coverage plan Phase 1.
+    "AAVE-ETHEREUM": ["oracle_prices"],
     # --- EigenLayer restaking rewards (separate from ETHERFI LST restaking) ---
     # eigenlayer_rewards_handler venue="EIGENLAYER"
     "EIGENLAYER": ["eigenlayer_rewards"],

@@ -72,6 +72,11 @@ class PipelineMode(StrEnum):
     (M1/M2), ratifying ``source_mode_capability_matrix_2026_06_07.md``.
     """
 
+    # AAVE on-chain oracle (AaveOracle.getAssetPrice per LST reserve) — added
+    # 2026-07-21 per lst_rate_honest_coverage plan Phase 1 (codex:
+    # lst-exchange-rate-surfaces.md surface #3). Write venue "AAVE"/IS venue
+    # "AAVE-ETHEREUM", source="aave", data_type=oracle_prices.
+    BATCH_AAVE = "batch_aave"
     BATCH_API_FOOTBALL = "batch_api_football"
     # BATCH_BARCHART RETIRED 2026-06-24 — Barchart removed (VIX 15m now aggregates
     # from VX futures via databento → BATCH_DATABENTO / batch_yahoo). No shim.

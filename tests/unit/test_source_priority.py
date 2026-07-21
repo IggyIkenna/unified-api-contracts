@@ -221,7 +221,10 @@ def test_external_sources_for_external_vendors() -> None:
     ]  # HL/ASTER cefi onchain perps + kalshi_perp/polymarket_perp CFTC perp venues + EXTENDED-STARKNET
     # ("pacifica" removed 2026-07-16 — operator ruling: all Solana perp DEXes
     # dropped except Jupiter, not integrated.)
-    assert external_sources_for("defi", "oracle_prices") == ["pyth_hermes", "chainlink"]
+    # "aave" added 2026-07-21 (lst_rate_honest_coverage plan Phase 1) — a third,
+    # disjoint oracle_prices venue (AaveOracle.getAssetPrice); see
+    # codex/02-data/lst-exchange-rate-surfaces.md surface #3.
+    assert external_sources_for("defi", "oracle_prices") == ["pyth_hermes", "chainlink", "aave"]
     assert external_sources_for("prediction", "trades") == ["polymarket_clob", "kalshi"]
 
 

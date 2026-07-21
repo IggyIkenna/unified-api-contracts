@@ -65,6 +65,10 @@ EXPECTED_SOURCE_MODE_CAPABILITY: dict[str, frozenset[Mode]] = {
     "onchain_subgraph": _BLR,
     "chainlink": _BLR,
     "pyth_hermes": _BLR,
+    # AAVE on-chain oracle (AaveOracle.getAssetPrice) — added 2026-07-21
+    # (lst_rate_honest_coverage plan Phase 1). BATCH-only: only BATCH_AAVE
+    # exists in PipelineMode today.
+    "aave": _B,
     # Prediction
     "polymarket_clob": _BLR,
     "polymarket_gamma_api": _B,

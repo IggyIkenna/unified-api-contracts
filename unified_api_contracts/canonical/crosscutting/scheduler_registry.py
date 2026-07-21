@@ -25,6 +25,10 @@ infra schedulers declared in deployment_ui_lifecycle_tabs_2026_05_08 Phase D.1):
     manifest-consolidator-60s, data-status-rollup,
     manifest-aggregation-cron, t1-audit
 
+Later additions:
+  sports-coverage-drift (features_sports_deployment_ui_coverage_tab_and_registry_playbook_2026_07_21
+  Phase 8.B — see deployment_api/scripts/coverage_drift_worker.py)
+
 SSOT: ``deployment_ui_lifecycle_tabs_2026_05_08.md`` Phase D.1.
 """
 
@@ -105,6 +109,7 @@ _BOTH_CLOUDS: frozenset[CloudTarget] = frozenset({CloudTarget.GCP, CloudTarget.A
 
 _INSTRUMENTS_PLAN = "instruments_master"
 _DEPLOYMENT_UI_PLAN = "deployment_ui_lifecycle_tabs_2026_05_08"
+_FEATURES_SPORTS_COVERAGE_PLAN = "features_sports_deployment_ui_coverage_tab_and_registry_playbook_2026_07_21"
 
 SCHEDULER_REGISTRY: tuple[SchedulerSpec, ...] = (
     # ── CeFi 15-min OHLCV (CCXT; Phase D.1-2) ─────────────────────────────
@@ -305,6 +310,24 @@ SCHEDULER_REGISTRY: tuple[SchedulerSpec, ...] = (
         expected_max_runtime_seconds=3600,
         max_consecutive_failures_before_page=1,
         env_tiers=_ALL_TIERS,
+        cloud_targets=_BOTH_CLOUDS,
+    ),
+    # ── Sports: features-sports coverage-drift snapshot + comparator (Phase 8.B) ──
+    # Daily snapshot of the features-sports-service manifest's per-(calc, league) coverage
+    # + a comparison against the snapshot taken 7 days back; drops >= 5pt persist an alert
+    # via deployment-api's own /api/alerts ledger. See
+    # deployment_api/scripts/coverage_drift_worker.py.
+    SchedulerSpec(
+        name="sports-coverage-drift",
+        lifecycle_class=LifecycleClass.SCHEDULED_RECURRING,
+        schedule_cron="0 2 * * *",
+        target_kind=SchedulerTargetKind.CLOUD_RUN,
+        target_ref="deployment-api",
+        asset_group="sports",
+        owning_plan=_FEATURES_SPORTS_COVERAGE_PLAN,
+        expected_max_runtime_seconds=300,
+        max_consecutive_failures_before_page=3,
+        env_tiers=_STAGING_PROD,
         cloud_targets=_BOTH_CLOUDS,
     ),
 )

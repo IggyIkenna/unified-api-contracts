@@ -242,7 +242,14 @@ DEFI_VENUE_DATA_TYPE_CAPABILITIES: dict[str, dict[str, str]] = {
     "STARGATE-ETHEREUM": {"bridge_events": "2022-03-17"},
     # ── DeFi — Governance events (Compound, Aave, Uniswap DAO) ──
     "COMPOUND-ETHEREUM": {"governance_events": "2020-02-26"},
-    "AAVE-ETHEREUM": {"governance_events": "2020-07-27"},
+    # oracle_prices added 2026-07-21 (lst_rate_honest_coverage plan Phase 1) —
+    # AaveOracle.getAssetPrice, a NEW collection surface (RPC call was
+    # dormant/unwired until now), so the floor is conservatively set to the
+    # registration date rather than the reserves' own on-chain genesis. Mirrors
+    # ORACLE_COVERAGE_START["aave_oracle"] in capability_declarations/
+    # _defi_oracle_coverage.py. See codex/02-data/lst-exchange-rate-surfaces.md
+    # surface #3.
+    "AAVE-ETHEREUM": {"governance_events": "2020-07-27", "oracle_prices": "2026-07-21"},
     "UNISWAP-ETHEREUM": {"governance_events": "2020-09-17"},
     # ── DeFi — MEV events (MEV-Boost relay stats) ──
     "FLASHBOTS-ETHEREUM": {"mev_events": "2021-01-01"},
@@ -333,6 +340,10 @@ DEFI_VENUE_DATA_TYPE_CAPABILITIES: dict[str, dict[str, str]] = {
     "CHAINLINK-OPTIMISM": {"oracle_prices": "2021-12-16"},
     "CHAINLINK-POLYGON": {"oracle_prices": "2020-05-30"},
     "PYTH-SOLANA": {"oracle_prices": "2021-08-01"},
+    # AAVE-ETHEREUM oracle_prices (AaveOracle.getAssetPrice) is declared on the
+    # EXISTING "AAVE-ETHEREUM" key above (§ Governance events) — see that entry
+    # for the merged {"governance_events": ..., "oracle_prices": "2026-07-21"}
+    # dict (a duplicate key here would silently shadow it / fail F601 lint).
 }
 
 

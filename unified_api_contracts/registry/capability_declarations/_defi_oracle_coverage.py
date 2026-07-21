@@ -42,6 +42,14 @@ ORACLE_COVERAGE_START: dict[str, str] = {
     # forward through their per-chain launch floors. Added 2026-07-20 (DeFi
     # catalogue canonicalization) alongside the CHAINLINK-<chain> oracle venues.
     "chainlink": "2020-01-01",
+    # AAVE on-chain oracle (AaveOracle.getAssetPrice, read ON-CHAIN via RPC, no
+    # archive-API floor). This is a NEW collection surface (2026-07-21, the
+    # RPC call was dormant/unwired until lst_rate_honest_coverage plan Phase 1)
+    # with no historical data captured yet, so the coverage-start floor is set
+    # conservative to the registration date rather than to the reserves' own
+    # on-chain genesis — a real backfill-start audit can pull it earlier once
+    # Phase 5 runs. See codex/02-data/lst-exchange-rate-surfaces.md surface #3.
+    "aave_oracle": "2026-07-21",
 }
 
 

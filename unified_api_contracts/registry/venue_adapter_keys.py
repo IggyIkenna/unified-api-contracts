@@ -257,6 +257,11 @@ VENUE_TO_ADAPTER_KEY: dict[str, str] = {
     "CHAINLINK-OPTIMISM": "chainlink",
     "CHAINLINK-POLYGON": "chainlink",
     "PYTH-SOLANA": "pyth",
+    # AAVE on-chain oracle price (AaveOracle.getAssetPrice per LST reserve) —
+    # added 2026-07-21 per lst_rate_honest_coverage plan Phase 1. Extends the
+    # already-existing AAVE-ETHEREUM venue (governance_events remains
+    # pipeline/NOT IS-producible; oracle_prices is the new IS-producible leg).
+    "AAVE-ETHEREUM": "aave_oracle",
     # RADIANT-BSC (2026-07-10): the auto-gen loop below only covers chains with
     # a registered subgraph_id (SUBGRAPH_IDS["radiant"] = ARBITRUM+ETHEREUM
     # only — Radiant's BSC deployment has no verified subgraph). The IS
