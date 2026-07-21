@@ -60,8 +60,11 @@ def _find_codex_markdown() -> Path | None:
 def test_registry_has_eighteen_archetypes() -> None:
     # Updated 2026-05-22: registry grew from 18 → 22 as new archetypes were added.
     # Updated 2026-06-22: 22 → 23 with TSMOM_BTC_CTA (BTC-level trend CTA, RULES_DIRECTIONAL).
-    assert len(ARCHETYPE_CAPABILITY_REGISTRY) == 23
-    assert len(all_capabilities()) == 23
+    # Updated 2026-07-21: 23 → 53 — Phase 9 capability-manifest regeneration adds the 18 new
+    # VOL_TRADING archetypes, 8 new MARKET_MAKING archetypes, and the 4-archetype PORTFOLIO
+    # family (enum-level since 2026-04, never had manifest cells until now).
+    assert len(ARCHETYPE_CAPABILITY_REGISTRY) == 53
+    assert len(all_capabilities()) == 53
 
 
 def test_manifest_archetype_ids_are_valid_strategy_archetype_values() -> None:
@@ -218,7 +221,7 @@ def test_every_supported_cell_has_at_least_one_venue() -> None:
 # ---------------------------------------------------------------------------
 
 
-_ARCHETYPE_HEADER_RE = re.compile(r"^###\s+\d+\.\s+`([A-Z_]+)`", re.MULTILINE)
+_ARCHETYPE_HEADER_RE = re.compile(r"^###\s+\d+\.\s+`([A-Z0-9_]+)`", re.MULTILINE)
 _FAMILY_HEADER_RE = re.compile(r"^##\s+Family\s+\d+:\s+(.+?)\s*$", re.MULTILINE)
 _FAMILY_NAME_TO_ENUM = {
     "ML Directional": StrategyFamily.ML_DIRECTIONAL,
@@ -229,6 +232,7 @@ _FAMILY_NAME_TO_ENUM = {
     "Event-Driven": StrategyFamily.EVENT_DRIVEN,
     "Vol Trading": StrategyFamily.VOL_TRADING,
     "Stat Arb / Pairs": StrategyFamily.STAT_ARB_PAIRS,
+    "Portfolio": StrategyFamily.PORTFOLIO,
 }
 
 
@@ -346,7 +350,7 @@ def test_codex_markdown_archetype_appears_under_correct_family_section() -> None
 
     # Walk headers in document order; track current family context.
     family_pattern = re.compile(
-        r"^##\s+Family\s+\d+:\s+(.+?)\s*$|^###\s+\d+\.\s+`([A-Z_]+)`",
+        r"^##\s+Family\s+\d+:\s+(.+?)\s*$|^###\s+\d+\.\s+`([A-Z0-9_]+)`",
         re.MULTILINE,
     )
 

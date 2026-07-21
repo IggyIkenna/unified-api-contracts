@@ -52,6 +52,7 @@ class ArchetypeInstrumentType(StrEnum):
     STAKING = "staking"
     LP = "lp"
     EVENT_SETTLED = "event_settled"
+    SLEEVE_MIX = "sleeve_mix"  # PORTFOLIO family — a canonical sleeve-config sample, not a single instrument
 
 
 class CoverageStatus(StrEnum):
@@ -107,6 +108,7 @@ class ArchetypeCapability(BaseModel):
     archetype_id: StrategyArchetype
     family: StrategyFamily
     uses_rolling_futures: bool
+    bespoke_capable: bool
     cells: tuple[ArchetypeCapabilityCell, ...]
 
     @property
