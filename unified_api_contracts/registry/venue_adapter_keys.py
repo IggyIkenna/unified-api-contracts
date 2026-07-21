@@ -92,15 +92,11 @@ VENUE_TO_ADAPTER_KEY: dict[str, str] = {
     "OKX-SWAP": "tardis",
     "OKX-FUTURES": "tardis",
     "DERIBIT": "tardis",
-    # DERIBIT-COMBO: batch (historical) combo instruments come via the Tardis
-    # adapter — confirmed live 2026-07-14, api.tardis.dev/v1/exchanges/deribit
-    # carries 68,847 type=='combo' symbols back to 2022-08-23. IS factory's
-    # mode seam routes mode="live" to the Deribit public REST adapter instead
-    # (deribit_combo) — Deribit's get_combos endpoint only exposes currently-
-    # active combos, no historical retention, so it is live-only; Tardis's
-    # archived feed covers historical. See
-    # cefi_layer1_denominator_gaps_2026_07_03.md (NEW FINDING 2026-07-14).
-    "DERIBIT-COMBO": "tardis",
+    # DERIBIT-COMBO entry removed 2026-07-21 (operator decision: legacy venue
+    # deregistered, migrated to split venue+instrument_type; instruments-service's
+    # own VENUE_TO_ADAPTER["DERIBIT-COMBO"]="deribit_combo" internal factory entry
+    # is a separate, out-of-scope follow-up for that repo). See
+    # market_data_categories.py's VENUES_BY_ASSET_GROUP["cefi"] comment.
     # DERIBIT-OPTIONS: live option-chain enumeration + mark IV via Deribit public REST.
     "DERIBIT-OPTIONS": "deribit_options",
     "COINBASE-SPOT": "tardis",

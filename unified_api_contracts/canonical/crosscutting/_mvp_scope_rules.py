@@ -435,20 +435,15 @@ MVP_SCOPE: Final[dict[str, object]] = {
                 # set — the operator accepts COIN-M delivery is NOT MVP. Other
                 # venues' dated/quarterly fixed-delivery futures STAY MVP (the
                 # FUTURE instrument_type below + the dated-future capture path).
-                # DERIBIT-COMBO (operator 2026-07-10, decision #6 on
-                # cefi_layer1_denominator_gaps_2026_07_03.md's
-                # BLOCKED-OPERATOR-DECISION): a declared cefi venue
-                # (VENUES_BY_ASSET_GROUP["cefi"]) with real captured data but
-                # previously ABSENT from this rule's ``venues`` set, so
-                # ``get_mvp_data_types_for_cefi_venue()`` silently returned
-                # frozenset() and its Layer-1 EXPECTED was always 0 — the exact
-                # "entire venue absent from the denominator" dishonesty class
-                # honest-coverage v2 exists to kill. Operator decision: keep it
-                # declared (add it), not confirm out-of-MVP. See the
-                # ``venue_data_types`` override below for its per-venue
-                # data_type scoping.
+                # DERIBIT-COMBO removed from this venues set 2026-07-21 (operator
+                # decision: legacy venue deregistered, migrated to split
+                # venue+instrument_type). See market_data_categories.py's
+                # VENUES_BY_ASSET_GROUP["cefi"] comment. The matching
+                # ``venue_data_types`` override + the "COMBO" instrument_type entry
+                # below were removed in the same commit — DERIBIT-COMBO was their
+                # only cefi consumer.
                 #
-                # NOTE: the same decision #6 also named bare "COINBASE" for this
+                # NOTE: the same 2026-07-10 decision #6 also named bare "COINBASE" for this
                 # treatment. NOT added here — `coinbase_bare_name_migration_
                 # 2026_07_06.md` (operator decision #3, same 12-decision batch)
                 # is an ACTIVE, dispatched 7-step plan whose explicit goal is to
@@ -459,7 +454,6 @@ MVP_SCOPE: Final[dict[str, object]] = {
                 # COINBASE-SPOT already satisfies decision #6's real intent
                 # (denominator correctness + trades-only cost control for the
                 # Coinbase spot product).
-                "DERIBIT-COMBO",
                 # Coinbase Derivatives Exchange (CDE) — 2026-07-10,
                 # COINBASE-FUTURES/#3-vs-#8 resolution (instruments_remaining_work_audit_
                 # 2026_07_10.md Progress Log). FUTURE-only venue (real dated futures +
@@ -492,27 +486,11 @@ MVP_SCOPE: Final[dict[str, object]] = {
                 # already unioned into ``base_ccys`` below, so they stay MVP. The
                 # equity identity is carried by the catalogue ``is_equity_perp`` /
                 # ``tracks_equity`` tags (IS rollup), NOT by a scoped instrument_type.
-                # InstrumentType.COMBO — Deribit multi-leg combo/spread instruments
-                # (operator decision, cefi_deribit_combo_and_okx_bare_venue_gaps_
-                # 2026_07_12.md, 2026-07-16): the instruments-service catalogue tags
-                # DERIBIT-COMBO rows with instrument_type "COMBO" (a distinct
-                # InstrumentType from "OPTION" — see _instrument_enums.py), so
-                # without this entry is_mvp() unconditionally returned False for
-                # every one of the 68,847 now-fully-backfilled DERIBIT-COMBO
-                # catalogue rows regardless of base_ccy/available_from — the exact
-                # "entire venue silently excluded from the denominator" dishonesty
-                # class honest-coverage v2 exists to kill (same precedent as the
-                # DERIBIT-COMBO venues-set addition above, operator decision #6,
-                # 2026-07-10). The DERIBIT-COMBO ``venue_data_types`` override below
-                # already scopes its effective data_type set to {trades,
-                # book_snapshot_5} (NOT options_chain) independent of
-                # instrument_type, so adding "COMBO" here does not risk minting a
-                # phantom options_chain cell. "COMBO" is ALSO used by TradFi
-                # Databento spread/bag instruments (external/databento/
-                # databento_classifier.py) — but those route through the SEPARATE
-                # ``TradFiMvpRule`` instance, so this CeFi-scoped addition cannot
-                # leak into TradFi's MVP predicate.
-                "COMBO",  # InstrumentType.COMBO (Deribit multi-leg combo/spread)
+                # InstrumentType.COMBO ("DERIBIT-COMBO"-only CeFi entry) removed
+                # 2026-07-21 (operator decision: legacy venue deregistered). TradFi's
+                # SEPARATE ``TradFiMvpRule`` instance owns its own independent
+                # "COMBO" declaration for Databento spread/bag instruments —
+                # unaffected by this CeFi-scoped removal.
             }
         ),
         # FLAT data_types — apply to SPOT_PAIR / PERPETUAL / FUTURE (everything
@@ -575,28 +553,9 @@ MVP_SCOPE: Final[dict[str, object]] = {
             # COINBASE sub-venues: trades-only (no book5).
             "COINBASE-SPOT": frozenset({"trades"}),
             "COINBASE-FUTURES": frozenset({"trades"}),
-            # DERIBIT-COMBO (operator 2026-07-10, decision #6): a DISTINCT venue
-            # from bare DERIBIT (multi-leg combo/spread instruments — see
-            # VENUES_BY_ASSET_GROUP["cefi"] comment). Its real declared capture
-            # capability (data_type_capability.py DataTypeCapability entries,
-            # VENUE_DATA_TYPE_CAPABILITIES["DERIBIT-COMBO"]) is trades +
-            # book_snapshot_5 — NOT options_chain. An explicit override is
-            # REQUIRED here: without one, DERIBIT-COMBO would inherit the
-            # instrument_type_data_types["OPTION"] -> {options_chain} override
-            # from the flat DERIBIT-shaped rule above (DERIBIT-COMBO's only
-            # valid instrument_type is OPTION per INSTRUMENT_TYPES_BY_VENUE),
-            # minting a phantom options_chain EXPECTED cell DERIBIT-COMBO can
-            # never actually produce. Verified dynamically: DERIBIT-COMBO's
-            # base venue token "DERIBIT" IS a FUTURE_BUNDLE_VENUES member, so
-            # its leaf OPTION itype rolls up to the options_chain bundle grain
-            # at the itype-gate stage (same as bare DERIBIT); with this
-            # override + the matching VENUE_DATA_TYPE_CAPABILITIES entry,
-            # build_expected("cefi") yields (DERIBIT-COMBO, options_chain,
-            # trades) — no longer silently zero. book_snapshot_5 is declared
-            # here too (matches its real DataTypeCapability entries) but never
-            # surfaces as an EXPECTED cell at this bundle grain (the bundle's
-            # only valid data_type is trades) — harmless, honest superset.
-            "DERIBIT-COMBO": frozenset({"trades", "book_snapshot_5"}),
+            # DERIBIT-COMBO override removed 2026-07-21 (operator decision: legacy
+            # venue deregistered, migrated to split venue+instrument_type). See
+            # market_data_categories.py's VENUES_BY_ASSET_GROUP["cefi"] comment.
             # COINBASE-CDE (2026-07-10) — trades-only: the only real capture surface
             # today is the re-keyed live connector (Advanced Trade WS market_trades
             # channel); no book-depth channel is wired and there is no Tardis/batch

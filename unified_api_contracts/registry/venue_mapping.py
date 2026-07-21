@@ -904,19 +904,9 @@ class VenueMapping:
             ("DERIBIT", "PERPETUAL"): "deribit",
             ("DERIBIT", "FUTURE"): "deribit",
             ("DERIBIT", "OPTION"): "deribit",
-            # DERIBIT-COMBO: multi-leg combo/spread instruments (Tardis ``deribit``
-            # exchange has a distinct ``type=='combo'`` alongside option/future/
-            # perpetual/spot, confirmed live 2026-07-12, 68,720 symbols). Routes
-            # through the SAME Tardis exchange slug as bare DERIBIT — the caller
-            # MUST pass canonical_venue="DERIBIT-COMBO" explicitly downstream
-            # (never re-derive it from the exchange slug via ``tardis_to_venue``,
-            # which is a 1:1 map already claimed by "DERIBIT" — see
-            # ``_resolve_canonical_venue`` in tardis_adapter.py). The combo-type-only
-            # filter is now applied inside TardisReferenceDataAdapter.get_instruments()
-            # itself, keyed off canonical_venue_override=="DERIBIT-COMBO" (2026-07-14,
-            # cefi_layer1_denominator_gaps_2026_07_03.md) — the venue's catalogue no
-            # longer mixes in bare DERIBIT's option/future/perpetual/spot universe.
-            ("DERIBIT-COMBO", "OPTION"): "deribit",
+            # DERIBIT-COMBO routing entry removed 2026-07-21 (operator decision:
+            # legacy venue deregistered, migrated to split venue+instrument_type).
+            # See market_data_categories.py's VENUES_BY_ASSET_GROUP["cefi"] comment.
             # Upbit (spot only - Korean exchange for kimchi premium)
             ("UPBIT", "SPOT_PAIR"): "upbit",
             # Coinbase (spot only - for coinbase premium)

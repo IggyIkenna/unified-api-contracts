@@ -115,8 +115,20 @@ _canonical_repr = canonical_config_repr
 # ---------------------------------------------------------------------------
 
 
-MVP_SCOPE_CONFIG_VERSION: Final[int] = 19
+MVP_SCOPE_CONFIG_VERSION: Final[int] = 20
 """Monotonic version of :data:`MVP_SCOPE`. Bump on any content change.
+
+v20 (2026-07-21): DERIBIT-COMBO fully deregistered from ``CeFiMvpRule`` (operator
+decision, verbatim: "delete everything to do with deribit combo since it is [a]
+once venue in practice — manifest/GCS path wise etc. all migrated to split
+venue+instrument_type"). Re-verified data-safe before removal: 0 captured rows
+(196 total manifest rows, none ``captured``) and 0 GCS objects. Reverts v12's
+``venues`` membership + ``venue_data_types`` override ({trades, book_snapshot_5})
+and v16's ``COMBO`` instrument_type addition (DERIBIT-COMBO was the ONLY CeFi
+consumer of "COMBO"; TradFi's separate ``TradFiMvpRule`` instance keeps its own
+independent "COMBO" declaration for Databento spread/bag instruments,
+unaffected). See market_data_categories.py's VENUES_BY_ASSET_GROUP["cefi"]
+comment for the full deregistration rationale across all UAC registries.
 
 v19 (2026-07-21): TradFi MVP-set expansion (operator directive) — four new
 instrument groups flipped into tradfi MVP. (1) CME crypto FUTURES: BTC/ETH

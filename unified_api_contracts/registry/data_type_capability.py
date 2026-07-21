@@ -643,7 +643,7 @@ DATA_TYPE_CAPABILITY_REGISTRY: Final[tuple[DataTypeCapability, ...]] = (
     # (NOT Tardis except LIGHTER post-2026-04-17): trades + book_snapshot_5 +
     # derivative_ticker (perp funding). Minimum perp surface so the data_type
     # axis is non-empty (operator 2026-06-23: all venues incl small DEX-perps
-    # are in scope). DERIBIT-COMBO rides Deribit's multi-leg combo feed.
+    # are in scope).
     # EXTENDED-STARKNET + LIGHTER-ZKSYNC (like HYPERLIQUID + ASTER above): the
     # standalone ``perp_funding`` data_type was RETIRED for these venues
     # (2026-07-08, operator-approved) in favor of this derivative_ticker row's
@@ -677,25 +677,10 @@ DATA_TYPE_CAPABILITY_REGISTRY: Final[tuple[DataTypeCapability, ...]] = (
             ("derivative_ticker", "perpetual"),
         )
     ),
-    DataTypeCapability(
-        asset_group=AssetGroup.CEFI,
-        data_type="trades",
-        venue="DERIBIT-COMBO",
-        instrument_type="",
-        live_capable=True,
-        batch_capable=True,
-        streaming_protocol="ws",
-        notes="Deribit multi-leg combo/spread instruments (distinct venue from DERIBIT).",
-    ),
-    DataTypeCapability(
-        asset_group=AssetGroup.CEFI,
-        data_type="book_snapshot_5",
-        venue="DERIBIT-COMBO",
-        instrument_type="",
-        live_capable=True,
-        batch_capable=True,
-        streaming_protocol="ws",
-    ),
+    # DERIBIT-COMBO DataTypeCapability entries (trades/book_snapshot_5) removed
+    # 2026-07-21 (operator decision: legacy venue deregistered, migrated to split
+    # venue+instrument_type). See market_data_categories.py's
+    # VENUES_BY_ASSET_GROUP["cefi"] comment.
     # =====================================================================
     # DeFi
     # =====================================================================
