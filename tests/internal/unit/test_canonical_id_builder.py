@@ -341,6 +341,71 @@ class TestMissingKwargs:
 
 
 # ---------------------------------------------------------------------------
+# Symbol colon-guard — removes the silent catalogue-miss double-wrapped-id
+# fallback (canonical_path_oracle_blind_to_filename_stem_2026_07_20.md §7,
+# "Remove the silent build_instrument_id catalogue-miss fallback"). ``:`` is
+# this builder's own top-level VENUE:TYPE:SYMBOL delimiter, so a ``symbol``
+# carrying one is never well-formed input outside sports/prediction.
+# ---------------------------------------------------------------------------
+
+
+class TestSymbolColonGuard:
+    def test_cefi_perpetual_wire_symbol_with_embedded_colon_raises(self) -> None:
+        """The exact real defect: a raw Bitfinex funding-pair wire symbol
+        (``ADAF0:USTF0``) reaching the builder unresolved used to silently
+        mint the double-wrapped ``BITFINEX-FUTURES:PERPETUAL:ADAF0:USTF0``."""
+        with pytest.raises(ValueError, match="embedded ':'"):
+            build_instrument_id("BITFINEX-FUTURES", InstrumentType.PERPETUAL, "ADAF0:USTF0")
+
+    def test_cefi_perpetual_margin_marker_fallback_with_colon_raises(self) -> None:
+        """The ``_MARGIN_MARKER_VENUES`` degrade path (tardis_shared.py's own
+        ``build_instrument_id(venue, instrument_type, symbol)`` bare fallback
+        when the margin-symbol shape doesn't parse) must also fail loud."""
+        with pytest.raises(ValueError, match="embedded ':'"):
+            build_instrument_id("HYPERLIQUID", InstrumentType.PERPETUAL, "BTC:USD")
+
+    def test_defi_symbol_with_embedded_colon_raises(self) -> None:
+        with pytest.raises(ValueError, match="embedded ':'"):
+            build_instrument_id("aave_v3", InstrumentType.A_TOKEN, "a:USDC", chain="ethereum")
+
+    def test_tradfi_symbol_with_embedded_colon_raises(self) -> None:
+        with pytest.raises(ValueError, match="embedded ':'"):
+            build_instrument_id("cme", InstrumentType.FUTURE, "ES:H26", expiry_date=_dt.date(2026, 3, 20))
+
+    def test_combo_symbol_with_embedded_colon_raises(self) -> None:
+        with pytest.raises(ValueError, match="embedded ':'"):
+            build_instrument_id("deribit", InstrumentType.COMBO, "BTC:CAL:20260328")
+
+    def test_passthrough_symbol_with_embedded_colon_raises(self) -> None:
+        """The guard applies even under ``passthrough=True`` — colon is never a
+        legitimate character in a raw exchange-native symbol for this builder."""
+        with pytest.raises(ValueError, match="embedded ':'"):
+            build_instrument_id("deribit", InstrumentType.OPTION, "BTC:9JUL26:56000:C", passthrough=True)
+
+    def test_margin_marker_symbol_with_embedded_colon_raises(self) -> None:
+        with pytest.raises(ValueError, match="embedded ':'"):
+            build_instrument_id("binance_futures", InstrumentType.PERPETUAL, "BTC:USDT", margin_marker="LIN")
+
+    def test_sports_and_prediction_symbols_with_colons_still_allowed(self) -> None:
+        """Sports/prediction wrap an already-built domain id, which legitimately
+        embeds colons — the guard must NOT apply to those instrument types."""
+        inner = "FOOTBALL:PINNACLE:MATCH_ODDS:ENG_PREMIER_LEAGUE:2025-26:ARSENAL-CHELSEA::HOME"
+        assert build_instrument_id("betfair", InstrumentType.EXCHANGE_ODDS, inner) == f"BETFAIR:EXCHANGE_ODDS:{inner}"
+        assert (
+            build_instrument_id("polymarket", InstrumentType.PREDICTION_MARKET, "PRED:SPORTS:abc123")
+            == "POLYMARKET:PREDICTION_MARKET:PRED:SPORTS:abc123"
+        )
+
+    def test_well_formed_symbols_without_colon_are_unaffected(self) -> None:
+        """No regression: every well-formed (no embedded ':') caller is untouched."""
+        assert build_instrument_id("binance", InstrumentType.SPOT_PAIR, "BTCUSDT") == "BINANCE:SPOT_PAIR:BTCUSDT"
+        assert (
+            build_instrument_id("aave_v3", InstrumentType.A_TOKEN, "aUSDC", chain="ethereum")
+            == "AAVE_V3-ETHEREUM:A_TOKEN:aUSDC"
+        )
+
+
+# ---------------------------------------------------------------------------
 # Venue / chain normalisation
 # ---------------------------------------------------------------------------
 

@@ -37,6 +37,10 @@ _DAY = date(2026, 4, 17)
 
 
 def test_defi_builder_output_is_canonical() -> None:
+    # ``file_name`` is the FULL canonical instrument_id (``VENUE-CHAIN:TYPE:SYMBOL``)
+    # now that ``defi`` is ID-FORM-checked (2026-07-21) — a bare stem like
+    # ``aUSDC.parquet`` would (correctly) fail this round-trip; see
+    # ``test_defi_bare_symbol_stem_is_non_canonical_by_id_form`` below for that case.
     for pipeline_mode in (None, "batch_eigenlayer", "live_hyperliquid"):
         path = build_defi_partition_path(
             venue="AAVE_V3",
@@ -44,7 +48,7 @@ def test_defi_builder_output_is_canonical() -> None:
             instrument_type=InstrumentType.A_TOKEN,
             data_type="lending_indices",
             day=_DAY,
-            file_name="aUSDC.parquet",
+            file_name="AAVE_V3-ETHEREUM:A_TOKEN:aUSDC.parquet",
             pipeline_mode=pipeline_mode,
         )
         assert is_canonical(path), canonical_path_violations(path)
@@ -109,7 +113,10 @@ def test_prediction_builder_output_is_canonical() -> None:
 _GOOD = (
     "raw_tick_data/by_date/day=2026-04-17/asset_group=defi/"
     "venue=AAVE_V3/chain=ETHEREUM/instrument_type=a_token/"
-    "data_type=lending_indices/aUSDC.parquet"
+    # ``defi`` is ID-FORM-checked (2026-07-21) — the filename stem is now part of
+    # the default (both-class) canonicality answer, so this must be the FULL
+    # canonical instrument_id, not the bare ``aUSDC.parquet`` symbol stem.
+    "data_type=lending_indices/AAVE_V3-ETHEREUM:A_TOKEN:aUSDC.parquet"
 )
 
 
@@ -341,19 +348,84 @@ def test_symbol_less_ticks_parquet_fan_in_is_never_flagged() -> None:
     assert is_canonical(path), canonical_path_violations(path)
 
 
-@pytest.mark.parametrize(
-    "path",
-    [
-        # DeFi ids route through the passthrough builder (pool addresses / aTokens) —
-        # the VENUE:ITYPE:BASE-QUOTE grammar does not apply, so no false violations.
-        "raw_tick_data/by_date/day=2026-05-01/pipeline_mode=batch_thegraph/asset_group=defi/"
-        "venue=AAVE_V3/chain=ETHEREUM/instrument_type=a_token/data_type=lending_indices/aUSDC.parquet",
-        # Prediction shards are named for the venue condition_id.
+def test_id_form_check_does_not_apply_to_prediction() -> None:
+    # Prediction shards are named for the venue condition_id — prediction's id
+    # grammar is explicitly OUT OF SCOPE (its own future closeout per
+    # defi_consolidated_closeout_2026_07_18.md), so no false violations.
+    path = (
         "raw_tick_data/by_date/day=2026-05-01/asset_group=prediction/venue=POLYMARKET/"
-        "instrument_type=binary_option/data_type=trades/0xabc123.parquet",
+        "instrument_type=binary_option/data_type=trades/0xabc123.parquet"
+    )
+    assert is_canonical(path), canonical_path_violations(path)
+
+
+# ---------------------------------------------------------------------------
+# DeFi ID-FORM widening (2026-07-21) — ``_ID_FORM_CHECKED_ASSET_GROUPS`` now
+# includes ``defi``, wiring the already-ratified per-type grammar
+# (defi_consolidated_closeout_2026_07_18.md "Instrument-uid grammar per DeFi
+# type") into the oracle. SSOT:
+# canonical_path_oracle_blind_to_filename_stem_2026_07_20.md §7.
+# ---------------------------------------------------------------------------
+
+_DEFI_TPL = (
+    "raw_tick_data/by_date/day=2026-05-01/pipeline_mode=batch_thegraph/asset_group=defi/"
+    "venue={venue}/chain={chain}/instrument_type={itype}/data_type={dtype}/{file_name}"
+)
+
+
+def _defi_path(
+    file_name: str,
+    *,
+    itype: str = "a_token",
+    venue: str = "AAVE_V3",
+    chain: str = "ETHEREUM",
+    dtype: str = "lending_indices",
+) -> str:
+    return _DEFI_TPL.format(venue=venue, chain=chain, itype=itype, dtype=dtype, file_name=file_name)
+
+
+@pytest.mark.parametrize(
+    "file_name",
+    [
+        "aUSDC.parquet",  # bare symbol stem — TODAY'S real writer convention (_resolve_file_symbol)
+        "0xabc123def4567890.parquet",  # raw pool/token address, unwrapped
     ],
 )
-def test_id_form_check_does_not_apply_to_defi_or_prediction(path: str) -> None:
+def test_defi_bare_symbol_stem_is_non_canonical_by_id_form(file_name: str) -> None:
+    """The exact real defect this widening surfaces: a bare/unwrapped defi stem.
+
+    Honest-disclosure outcome, matching the CeFi widening precedent — most of
+    today's defi corpus is expected to report NON_CANONICAL by id-form until
+    the writer emits the full ``VENUE-CHAIN:TYPE:SYMBOL`` id as the filename
+    (tracked separately, service-side).
+    """
+    path = _defi_path(file_name)
+    violations = canonical_path_violations(path)
+    assert any("is not a canonical instrument_id" in v for v in violations), violations
+    assert not is_canonical(path)
+
+
+@pytest.mark.parametrize(
+    ("file_name", "itype", "venue", "chain"),
+    [
+        ("AAVE_V3-ETHEREUM:A_TOKEN:aUSDC.parquet", "a_token", "AAVE_V3", "ETHEREUM"),
+        ("MORPHO-BASE:A_TOKEN:AUSDC-EURC-a1b2c3d4.parquet", "a_token", "MORPHO", "BASE"),
+        ("LIDO-ETHEREUM:LST:stETH.parquet", "lst", "LIDO", "ETHEREUM"),
+        ("ETHENA-ETHEREUM:YIELD_BEARING:sUSDe.parquet", "yield_bearing", "ETHENA", "ETHEREUM"),
+        ("UNISWAP_V3-ETHEREUM:POOL:USDC-WETH-500.parquet", "pool", "UNISWAP_V3", "ETHEREUM"),
+        ("ORCA-SOLANA:SOLANA_AMM_POOL:SOL-USDC.parquet", "solana_amm_pool", "ORCA", "SOLANA"),
+    ],
+)
+def test_defi_canonical_stem_per_type_is_clean(file_name: str, itype: str, venue: str, chain: str) -> None:
+    path = _defi_path(file_name, itype=itype, venue=venue, chain=chain)
+    assert is_canonical(path), canonical_path_violations(path)
+
+
+def test_defi_gmx_chainless_perpetual_is_canonical() -> None:
+    """GMX's on-chain PERPETUAL lane has NO ``-CHAIN`` suffix (routes cefi-simple)."""
+    path = _defi_path("GMX:PERPETUAL:BTC-USD.parquet", itype="perpetual", venue="GMX", chain="")
+    # No ``chain=`` hive segment for the chain-less GMX lane.
+    path = path.replace("/chain=/", "/")
     assert is_canonical(path), canonical_path_violations(path)
 
 
@@ -397,6 +469,16 @@ def test_classified_view_reports_every_class() -> None:
         ("BITFINEX-FUTURES:PERPETUAL:ADAF0:USTF0", False),
         ("BTCUSD", False),
         ("", False),
+        # DeFi grammar (widened 2026-07-21) — VENUE-CHAIN:TYPE:SYMBOL.
+        ("AAVE_V3-ETHEREUM:A_TOKEN:aUSDC", True),
+        ("MORPHO-BASE:A_TOKEN:AUSDC-EURC-a1b2c3d4", True),
+        ("LIDO-ETHEREUM:LST:stETH", True),
+        ("ETHENA-ETHEREUM:YIELD_BEARING:sUSDe", True),
+        ("UNISWAP_V3-ETHEREUM:POOL:USDC-WETH-500", True),
+        ("ORCA-SOLANA:SOLANA_AMM_POOL:SOL-USDC", True),
+        ("GMX:PERPETUAL:BTC-USD", True),  # chain-less DeFi perp lane, cefi-simple shape
+        ("aUSDC", False),  # bare defi symbol, no venue-chain/type wrapper
+        ("0xabc123def456", False),  # raw pool/token address, unwrapped
     ],
 )
 def test_is_canonical_instrument_id(candidate: str, expected: bool) -> None:

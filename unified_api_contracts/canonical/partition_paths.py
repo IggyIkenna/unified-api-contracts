@@ -692,12 +692,42 @@ class CanonicalViolationClass(StrEnum):
 
 # Canonical instrument_id shape (the ID-FORM oracle). Mirrors the resolver SSOT
 # ``VENUE:ITYPE:BASE-QUOTE[@LIN|@INV][-YYYYMMDD][-STRIKE-C|P]`` plus the COMBO
-# arm (COMBO ids are canonical but carry a free-form tail).
+# arm (COMBO ids are canonical but carry a free-form tail). Also covers the
+# chain-less DeFi ``PERPETUAL`` lane (GMX) — ``VENUE:PERPETUAL:BASE-QUOTE`` —
+# which deliberately has NO ``-CHAIN`` suffix (routes the cefi-simple builder
+# branch, see ``canonical_id_builder.py``'s dispatch table).
 _CANONICAL_INSTRUMENT_ID_RE: Final[re.Pattern[str]] = re.compile(
     r"^[A-Z0-9._-]+:(PERPETUAL|FUTURE|OPTION|SPOT_PAIR):[A-Z0-9]+-[A-Z0-9]+"
     r"(@(LIN|INV))?(-\d{8})?(-\d+(\.\d+)?-[CP])?$"
 )
 _COMBO_INSTRUMENT_ID_RE: Final[re.Pattern[str]] = re.compile(r"^[A-Z0-9._-]+:COMBO:.+$")
+
+# Canonical DeFi instrument_id shape (ID-FORM oracle widening, 2026-07-21) — the
+# ratified grammar per DeFi type (``defi_consolidated_closeout_2026_07_18.md``
+# "Instrument-uid grammar per DeFi type"): base = ``VENUE-CHAIN:TYPE:SYMBOL``,
+# DeFi being the only asset group whose venue segment carries a ``-CHAIN``
+# suffix (the venue itself may be compound, e.g. ``ETHERFI-GOV-ETHEREUM``, so
+# the venue-chain segment requires only >=1 hyphen, not exactly one). The
+# per-type SYMBOL variants (POOL glues its fee tier INTO the symbol with a
+# hyphen — ``TOKEN0-TOKEN1[-FEE_BPS]``, operator ruling 2026-07-18; A_TOKEN /
+# DEBT_TOKEN append an isolated-market id the same way; a Curve/Balancer
+# multi-token pool symbol is an arbitrary-length hyphen chain; a bare
+# LST/YIELD_BEARING/STAKING/SPOT_ASSET/RESTAKING token has zero extra
+# segments) all reduce to the SAME hyphen-joined-segment shape, so one
+# permissive symbol class covers every DeFi type without per-type
+# sub-patterns. Symbol case is PRESERVED (not upper-cased, unlike CeFi/TradFi)
+# because on-chain token symbols are case-sensitive (``aUSDC``, ``stETH``,
+# ``variableDebtUSDC``). GMX's chain-less ``PERPETUAL`` DeFi lane is
+# deliberately ABSENT from the type alternation here — it already matches
+# :data:`_CANONICAL_INSTRUMENT_ID_RE` above. ``LENDING`` (the legacy flat
+# lending type) stays in the alternation for the migration interim — see
+# ``defi_consolidated_closeout_2026_07_18.md`` "Lending — ONE SSOT".
+_DEFI_INSTRUMENT_ID_RE: Final[re.Pattern[str]] = re.compile(
+    r"^[A-Z0-9_]+(?:-[A-Z0-9_]+)+:"
+    r"(?:SPOT_ASSET|POOL|DEX_POOL|A_TOKEN|DEBT_TOKEN|LST|YIELD_BEARING|STAKING|RESTAKING|"
+    r"SOLANA_AMM_POOL|SOLANA_LENDING|SOLANA_VAULT|LENDING):"
+    r"[A-Za-z0-9_.]+(?:-[A-Za-z0-9_.]+)*$"
+)
 
 # Fan-in shard filenames that legitimately carry NO per-instrument stem: chain
 # bundles (``underlying=…/ticks.parquet``) and the symbol-less prediction
@@ -706,13 +736,21 @@ _COMBO_INSTRUMENT_ID_RE: Final[re.Pattern[str]] = re.compile(r"^[A-Z0-9._-]+:COM
 _STEMLESS_FAN_IN_FILE_NAMES: Final[frozenset[str]] = frozenset({"ticks.parquet"})
 
 # Asset groups whose per-instrument shard filename is contractually the FULL
-# canonical instrument_id. ``defi`` / ``sports`` / ``prediction`` are DELIBERATELY
-# absent: their ids route through the passthrough / domain-specific builders
-# (pool addresses, fixture ids, condition ids) whose grammar is not the
-# ``VENUE:ITYPE:BASE-QUOTE`` shape, so applying this regex there would
-# manufacture false violations. Widening this set requires an id grammar for
-# that asset group first.
-_ID_FORM_CHECKED_ASSET_GROUPS: Final[frozenset[str]] = frozenset({"cefi"})
+# canonical instrument_id. ``sports`` / ``prediction`` are DELIBERATELY absent:
+# their ids route through domain-specific builders (fixture ids, condition
+# ids) whose grammar is not the ``VENUE:ITYPE:BASE-QUOTE``/``VENUE-CHAIN:TYPE:
+# SYMBOL`` shape, so applying this regex there would manufacture false
+# violations. ``prediction``'s id grammar is explicitly OUT OF SCOPE here — it
+# is its own future closeout (``defi_consolidated_closeout_2026_07_18.md``
+# Track 1). ``defi`` widened 2026-07-21 — the grammar is ratified (see
+# :data:`_DEFI_INSTRUMENT_ID_RE`); this is expected to surface a large
+# NON_CANONICAL population on the current corpus (today's DeFi single-instrument
+# filenames are the bare ``symbol`` column, not yet the wrapped id — see
+# ``market-tick-data-service/.../partitioned_writer.py::_resolve_file_symbol``,
+# "defi/sports are untouched"), the same honest-disclosure outcome the CeFi
+# widening produced (20.82% canonical, not 100%) — NOT a bug in this checker.
+# Widening ``prediction`` requires an id grammar for that asset group first.
+_ID_FORM_CHECKED_ASSET_GROUPS: Final[frozenset[str]] = frozenset({"cefi", "defi"})
 
 
 def is_canonical_instrument_id(candidate: str) -> bool:
@@ -722,9 +760,18 @@ def is_canonical_instrument_id(candidate: str) -> bool:
     :func:`canonical_path_violations`'s path-STRUCTURE checks. A raw venue wire
     symbol (``ADAF0:USTF0``), a double-wrapped catalogue-miss id
     (``BITFINEX-FUTURES:PERPETUAL:ADAF0:USTF0``) and a bare symbol (``BTCUSD``)
-    all return False.
+    all return False. Recognises the CeFi/TradFi ``VENUE:ITYPE:BASE-QUOTE``
+    shape, the COMBO arm, and the DeFi ``VENUE-CHAIN:TYPE:SYMBOL`` shape
+    (:data:`_DEFI_INSTRUMENT_ID_RE`) — the three alternatives never overlap
+    (disjoint TYPE-token alternations), so widening acceptance here is
+    additive and cannot turn a previously-rejected CeFi/TradFi stem into a
+    false positive.
     """
-    return bool(_CANONICAL_INSTRUMENT_ID_RE.match(candidate) or _COMBO_INSTRUMENT_ID_RE.match(candidate))
+    return bool(
+        _CANONICAL_INSTRUMENT_ID_RE.match(candidate)
+        or _COMBO_INSTRUMENT_ID_RE.match(candidate)
+        or _DEFI_INSTRUMENT_ID_RE.match(candidate)
+    )
 
 
 def _stem_id_form_violations(*, asset_group: str, instrument_type: str | None, file_name: str) -> list[str]:
@@ -743,10 +790,15 @@ def _stem_id_form_violations(*, asset_group: str, instrument_type: str | None, f
     stem = file_name.removesuffix(".parquet")
     if is_canonical_instrument_id(stem):
         return []
+    expected_grammar = (
+        "'VENUE-CHAIN:TYPE:SYMBOL'"
+        if asset_group == "defi"
+        else "'VENUE:ITYPE:BASE-QUOTE[@LIN|@INV][-YYYYMMDD][-STRIKE-C|P]'"
+    )
     return [
         f"{asset_group} single-instrument shard filename {file_name!r} is not a canonical "
-        "instrument_id ('VENUE:ITYPE:BASE-QUOTE[@LIN|@INV][-YYYYMMDD][-STRIKE-C|P]') — "
-        "raw venue wire symbol or double-wrapped catalogue-miss id"
+        f"instrument_id ({expected_grammar}) — raw venue wire symbol / bare symbol or a "
+        "double-wrapped catalogue-miss id"
     ]
 
 
