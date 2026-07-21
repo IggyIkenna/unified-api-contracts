@@ -447,14 +447,10 @@ INSTRUMENT_TYPES_BY_VENUE: dict[str, set[str]] = {
     # 04-architecture/solana-defi-coverage.md.
     "EXTENDED-STARKNET": {"PERPETUAL"},  # Starknet perp DEX — native extended_api, not Tardis
     "LIGHTER-ZKSYNC": {"PERPETUAL"},  # zkSync perp DEX — Tardis post-2026-04-17, native lighter_api before
-    # DERIBIT-COMBO: multi-leg combo/spread instruments from Deribit's
-    # get_instruments (future_combo + option_combo kinds). Ikenna 2026-07-06:
-    # future_combo is NOT in MVP — only the option_combo kind counts, so this
-    # venue is OPTION-ONLY (it rolls up to the options_chain bundle via
-    # bundle_instrument_type_for_leaf, same universal cefi option roll-up
-    # DERIBIT's own OPTION leaf uses). Do NOT add FUTURE without a new,
-    # explicit operator decision superseding this one.
-    "DERIBIT-COMBO": {"OPTION"},
+    # DERIBIT-COMBO — DEREGISTERED 2026-07-21 (operator decision: legacy venue, 0
+    # captured rows, fully migrated to split venue+instrument_type). See
+    # market_data_categories.py's VENUES_BY_ASSET_GROUP["cefi"] comment for the full
+    # deregistration rationale + data-safety verification.
     NASDAQ: {"EQUITY", "ETF", "INDEX"},
     NYSE: {"EQUITY", "ETF", "INDEX"},
     CME: {"FUTURE", "OPTION", "INDEX", "BOND", "EVENT_CONTRACT"},

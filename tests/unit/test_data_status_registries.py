@@ -246,40 +246,23 @@ class TestRegistryConsistencyWithCapabilities:
                     )
 
 
-class TestOkxAndDeribitComboOptionsChainCapability:
-    """Regression for cefi_deribit_combo_and_okx_bare_venue_gaps_2026_07_12.md Bugs C/D.
+class TestOkxOptionsChainCapability:
+    """Regression for cefi_deribit_combo_and_okx_bare_venue_gaps_2026_07_12.md Bug C.
 
     Before this fix, ``VENUE_DATA_TYPE_CAPABILITIES`` had no ``options_chain``
-    key for ``OKX`` and no entry at all for ``DERIBIT-COMBO`` — the MTDS
-    preflight silently dropped the (only) requested data_type on every date,
-    with zero rows captured for either venue despite the underlying Tardis
-    routing being wired correctly.
+    key for ``OKX`` — the MTDS preflight silently dropped the (only) requested
+    data_type on every date, with zero rows captured despite the underlying
+    Tardis routing being wired correctly.
+
+    (Bug D's DERIBIT-COMBO coverage was removed from this class 2026-07-21 —
+    operator decision: legacy venue deregistered, migrated to split
+    venue+instrument_type. See market_data_categories.py's
+    VENUES_BY_ASSET_GROUP["cefi"] comment.)
     """
 
     def test_okx_declares_options_chain(self) -> None:
         assert "options_chain" in VENUE_DATA_TYPE_CAPABILITIES["OKX"]
         assert VENUE_DATA_TYPE_CAPABILITIES["OKX"]["options_chain"] == "2020-02-01"
-
-    def test_deribit_combo_declares_options_chain(self) -> None:
-        assert "DERIBIT-COMBO" in VENUE_DATA_TYPE_CAPABILITIES
-        assert VENUE_DATA_TYPE_CAPABILITIES["DERIBIT-COMBO"]["options_chain"] == "2022-08-23"
-
-    def test_deribit_combo_start_date_not_copied_from_bare_deribit(self) -> None:
-        """The two venues' real Tardis coverage genuinely differs — combo/spread
-        products launched years after bare Deribit options did (verified live
-        via api.tardis.dev/v1/exchanges/deribit this session, not assumed).
-        """
-        assert (
-            VENUE_DATA_TYPE_CAPABILITIES["DERIBIT-COMBO"]["options_chain"]
-            != VENUE_DATA_TYPE_CAPABILITIES["DERIBIT"]["options_chain"]
-        )
-
-    def test_get_expected_data_types_for_venue_includes_options_chain(self) -> None:
-        from unified_api_contracts.registry.market_data_categories import (
-            get_expected_data_types_for_venue,
-        )
-
-        assert "options_chain" in get_expected_data_types_for_venue("DERIBIT-COMBO")
 
 
 class TestKrxVenueDataTypeCapabilitiesRegistryGap:

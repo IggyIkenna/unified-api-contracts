@@ -291,14 +291,25 @@ VENUES_BY_ASSET_GROUP: dict[str, list[str]] = {
         # instruments_service_cefi_qg_red_on_ldr_head_2026_07_08.md,
         # cefi_layer1_denominator_gaps_2026_07_03.md.
         "OKX-SPOT",
+        # OKX-FUTURES / OKX-SWAP declared their own distinct cefi venues (2026-07-21,
+        # mirrors the OKX-SPOT precedent above): both are real, actively-captured
+        # venues in production (119,706 and 423,313 captured manifest rows
+        # respectively) but were wholly absent from this list — only bare "OKX" and
+        # "OKX-SPOT" were declared. canonical_mappings.py already carries the
+        # wire-alias mappings for both ("okex-swap": "OKX-SWAP",
+        # "okex-futures": "OKX-FUTURES") plus their own VENUE_TO_DATA_SOURCE entries, so
+        # these were already real, recognized canonical vocabulary elsewhere — this
+        # list alone was out of sync. Omitting them here previously left
+        # expected_universe._expected_generic("cefi") (which iterates THIS list, not
+        # canonical_mappings.py's keys) blind to their entire expected-capture set,
+        # AND left deployment-api's data-status Axis Value Census
+        # (_distinct_values.py::_canonical_set() reads VENUES_BY_ASSET_GROUP.get(ag,
+        # []) directly, no separate hardcoded venue set) badging real captured OKX
+        # futures/swap rows as "non-canonical" — a false-positive drift alarm (the
+        # exact D2a-class regression the COINBASE-SPOT comment below documents).
+        "OKX-FUTURES",
+        "OKX-SWAP",
         "DERIBIT",
-        # DERIBIT-COMBO: multi-leg combo/spread instruments fetched from Deribit's
-        # public get_instruments (future_combo + option_combo kinds). Registered as a
-        # DISTINCT venue (instruments-service VENUE_TO_ADAPTER["DERIBIT-COMBO"]="deribit_combo",
-        # its own manifest shard) — the validation registry MUST know it or every fetched
-        # combo is rejected "unknown venue" (the venue had 0 captured days 2026-05-23→06-18
-        # until the kind-split + venue-tag fixes 2026-06-18). instrument_key stays DERIBIT:COMBO:*.
-        "DERIBIT-COMBO",
         "UPBIT",
         # RE-KEYED from bare "COINBASE" (coinbase_bare_name_migration_2026_07_06.md
         # S3, 2026-07-10). Real bug found during execution: this list had NO
@@ -1423,44 +1434,20 @@ VENUE_DATA_TYPE_CAPABILITIES: dict[str, dict[str, str]] = {
         "derivative_ticker": "2020-01-01",
         "liquidations": "2020-01-01",
     },
-    # DERIBIT-COMBO (operator 2026-07-10, decision #6 on
-    # cefi_layer1_denominator_gaps_2026_07_03.md) — a DISTINCT venue from bare
-    # DERIBIT (multi-leg combo/spread instruments, see VENUES_BY_ASSET_GROUP
-    # comment). Was wholly absent from this dict — Carve-out 1 zeroed every
-    # data_type regardless of the itype-gate fix (INSTRUMENT_TYPES_BY_VENUE
-    # already admits it -> {"OPTION"}). Its base venue token "DERIBIT" IS a
-    # FUTURE_BUNDLE_VENUES member, so DERIBIT-COMBO's leaf OPTION itype rolls
-    # up to the options_chain bundle grain at the itype-gate stage
-    # (_get_cefi_venue_itypes) same as bare DERIBIT — the bundle grain's only
-    # valid data_type is ``trades`` (VALID_DATA_TYPES_BY_AG_AND_INSTRUMENT_TYPE
-    # [("cefi","options_chain")]). book_snapshot_5 is declared here too (matches
-    # its real DataTypeCapability entries, data_type_capability.py) but never
-    # actually surfaces as an EXPECTED cell at this bundle grain — harmless,
-    # honest superset. Verified dynamically: build_expected("cefi") yields
-    # (DERIBIT-COMBO, options_chain, trades) — no longer silently zero.
-    #
-    # "options_chain" key added 2026-07-12 (cefi_deribit_combo_and_okx_bare_
-    # venue_gaps_2026_07_12.md Bug D) — DISTINCT concern from the Layer-1
-    # bundle-grain EXPECTED-denominator role of "trades" above. MTDS's own
-    # `--data-types options_chain` preflight (deployment-service's
-    # launch-targeted-options-chain-backfill.sh always requests literal
-    # VM_DATA_TYPES=options_chain, mirroring bare DERIBIT's working G1
-    # backfill) does a direct key lookup against this same dict and silently
-    # dropped the request with no "options_chain" key present ("dropping
-    # data_types not supported per UAC" — confirmed live via a real VM this
-    # session, zero rows captured on every date). Start date verified via
-    # api.tardis.dev/v1/exchanges/deribit this session — Deribit's
-    # `type=='combo'` symbols only go back to 2022-08-23 (NOT bare DERIBIT's
-    # 2019-03-30 — combo/spread products launched years after bare options).
-    # trades/book_snapshot_5 corrected from the prior 2019-01-01 placeholder
-    # (never verified against real combo-type availability) to the same
-    # verified 2022-08-23 date for consistency — independently confirmed by
-    # two slots this session via the same live Tardis lookup.
-    "DERIBIT-COMBO": {
-        "trades": "2022-08-23",
-        "book_snapshot_5": "2022-08-23",
-        "options_chain": "2022-08-23",
-    },
+    # DERIBIT-COMBO — DEREGISTERED 2026-07-21 (operator decision, verbatim: "delete
+    # everything to do with deribit combo since it is [a] once venue in practice —
+    # manifest/GCS path wise etc. all migrated to split venue+instrument_type").
+    # Manifest-verified data-safe before deletion: 0 captured rows (196 total rows,
+    # all expected_unattempted/empty_confirmed/attempted_failed — re-confirmed via a
+    # direct availability_index read this session) and 0 GCS objects (manifest-oracle
+    # corpus-wide + bounded delimiter-descent). The venue's own manifest rows were
+    # purged by instruments-service/scripts/complete_cefi_manifest_canonical_dedup_v2_
+    # 2026_07_20.py (--deribit-combo purge). Removing the entry here (rather than
+    # leaving it registered) closes the gap that would otherwise make
+    # expected_universe show DERIBIT-COMBO as "expected but 0% captured" FOREVER — a
+    # permanent false gap in the honest-coverage denominator, defeating the point of
+    # the purge. See VENUES_BY_ASSET_GROUP["cefi"] (DERIBIT-COMBO removed from there
+    # too, same commit).
     # ── DEX-perp on-chain CLOBs (D2b, honest_coverage cefi gate-authority fix,
     # 2026-07-06) — EXTENDED-STARKNET / LIGHTER-ZKSYNC are declared cefi
     # venues (VENUES_BY_ASSET_GROUP["cefi"]) whose itype-gate the D2a fix now
