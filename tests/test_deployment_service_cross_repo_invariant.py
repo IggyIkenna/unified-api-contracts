@@ -158,7 +158,7 @@ EXPECTED_REGISTRY_NAMES: frozenset[str] = frozenset(
         "ARCHIVE_PREFIX",
         "DEFAULT_BUCKET",
         "DeploymentRegistryEntry",
-        "vm_run_log_rolling_uri",
+        "vm_run_log_final_uri",
     ]
 )
 
@@ -247,11 +247,15 @@ def test_deployment_service_registry_surface_stable() -> None:
     ``unified_trading_library.deployment_registry`` (Phase 9 of
     utl_uac_reuse_consolidation_remediation_2026_06_10 — deployment-service@b665123e /
     unified-trading-library@5926c6f0) — it depended only on UTL primitives, no
-    service-specific logic. deployment-api's deployments_inventory.py now imports:
+    service-specific logic. deployment-api's deployments_inventory.py and
+    vm_deployments.py now import:
         from unified_trading_library import (
             ACTIVE_PREFIX, ARCHIVE_PREFIX, DEFAULT_BUCKET,
-            DeploymentRegistryEntry, vm_run_log_rolling_uri,
+            DeploymentRegistryEntry, vm_run_log_final_uri,
         )
+    (``vm_run_log_final_uri`` replaced the broken ``vm_run_log_rolling_uri``
+    date-guess read path — deployment_ui_vm_log_viewer plan, 2026-07-21 — which
+    had zero remaining callers and was deleted from UTL.)
     Removing any of these breaks the deployment registry read path.
     """
     utl_sibling = _workspace_root() / "unified-trading-library"
@@ -269,8 +273,8 @@ def test_deployment_service_registry_surface_stable() -> None:
     assert not missing, (
         f"deployment_registry.py is MISSING names that deployment-api imports:\n"
         f"  {missing}\n\n"
-        "deployment-api deployments_inventory.py reads ACTIVE_PREFIX, ARCHIVE_PREFIX, "
-        "DEFAULT_BUCKET, DeploymentRegistryEntry, vm_run_log_rolling_uri by name — "
+        "deployment-api reads ACTIVE_PREFIX, ARCHIVE_PREFIX, "
+        "DEFAULT_BUCKET, DeploymentRegistryEntry, vm_run_log_final_uri by name — "
         "removing any breaks the registry/GCS path derivation."
     )
 
