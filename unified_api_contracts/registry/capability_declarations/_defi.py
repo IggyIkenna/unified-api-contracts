@@ -311,6 +311,14 @@ class _ProtocolCapability:
 # Instrument type shorthands
 _LENDING = [_IT.LENDING.value]
 _POOL = [_IT.POOL.value]
+# Solana-specific pool/vault instrument_types. The IS reference adapters
+# (raydium/orca → SOLANA_AMM_POOL, kamino → SOLANA_VAULT) stamp these, and the
+# MTDS per-pool capture writes instrument_type=solana_amm_pool / solana_vault.
+# Declaring them here keeps valid_data_types_for_venue_instrument_type's protocol
+# narrowing matched so dex_pool_state resolves (F6 vocab-desync fix, direction A;
+# SSOT codex/02-data/defi-canonical-naming-ssot.md:108).
+_SOLANA_AMM_POOL = [_IT.SOLANA_AMM_POOL.value]
+_SOLANA_VAULT = [_IT.SOLANA_VAULT.value]
 _YIELD = [_IT.YIELD_BEARING.value]
 _STAKING = [_IT.STAKING.value]
 _PERPS = [_IT.PERPETUAL.value, _IT.SPOT_PAIR.value]
@@ -662,7 +670,7 @@ PROTOCOL_CAPABILITIES: dict[str, _ProtocolCapability] = {
     "kamino": _ProtocolCapability(
         venue_prefix="KAMINO",
         protocol_class=ProtocolClass.DEX,
-        instrument_types=_POOL,
+        instrument_types=_SOLANA_VAULT,
         data_types=["dex_pool_state", "lending_indices"],
         mtds_operations=["collect-dex-pools", "collect-lending-indices"],
         required_tokens=frozenset({"KMNO"}),
@@ -670,7 +678,7 @@ PROTOCOL_CAPABILITIES: dict[str, _ProtocolCapability] = {
     "raydium": _ProtocolCapability(
         venue_prefix="RAYDIUM",
         protocol_class=ProtocolClass.DEX,
-        instrument_types=_POOL,
+        instrument_types=_SOLANA_AMM_POOL,
         data_types=["dex_pool_state", "dex_pool_swaps"],
         mtds_operations=["collect-dex-pools"],
         required_tokens=frozenset({"RAY"}),
@@ -678,7 +686,7 @@ PROTOCOL_CAPABILITIES: dict[str, _ProtocolCapability] = {
     "orca": _ProtocolCapability(
         venue_prefix="ORCA",
         protocol_class=ProtocolClass.DEX,
-        instrument_types=_POOL,
+        instrument_types=_SOLANA_AMM_POOL,
         data_types=["dex_pool_state", "dex_pool_swaps"],
         mtds_operations=["collect-dex-pools"],
         required_tokens=frozenset({"ORCA"}),
