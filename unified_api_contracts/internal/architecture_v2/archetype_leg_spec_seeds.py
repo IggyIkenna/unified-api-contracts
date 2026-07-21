@@ -629,6 +629,51 @@ def _price_dispersion_structure() -> ArchetypeLegStructure:
     )
 
 
+def _sports_dutching_structure() -> ArchetypeLegStructure:
+    """ARBITRAGE_SPORTS_DUTCHING: N-venue dutched arb on a complete odds outcome set."""
+
+    src = (
+        "strategy-service SportsArbDutchingEngine (arbitrage_structural/sports_arb_dutching.py, "
+        "dutched stake per outcome proportional to 1/best_odds, gated on "
+        "min_overround_savings_pct); manifest cell ARBITRAGE_SPORTS_DUTCHING"
+    )
+    venues = ("betfair", "matchbook", "unity", "smarkets_direct", "betfair_direct")
+    groups = (VenueCategoryV2.SPORTS,)
+    instr = (ArchetypeInstrumentType.EVENT_SETTLED,)
+    return ArchetypeLegStructure(
+        archetype_id=StrategyArchetype.ARBITRAGE_SPORTS_DUTCHING,
+        legs=(
+            ArchetypeLegSpec(
+                leg_id="outcome_a",
+                role=ArchetypeLegRole.SPOT_LONG,
+                required=True,
+                instrument_types=instr,
+                asset_groups=groups,
+                eligible_venue_ids=venues,
+                signal_variants=("decimal_odds",),
+                source_of_truth=f"{src} (back leg for outcome A of a >=2-way complete set)",
+            ),
+            ArchetypeLegSpec(
+                leg_id="outcome_b",
+                role=ArchetypeLegRole.SPOT_LONG,
+                required=True,
+                instrument_types=instr,
+                asset_groups=groups,
+                eligible_venue_ids=venues,
+                signal_variants=("decimal_odds",),
+                source_of_truth=f"{src} (back leg for outcome B; a 3-way set e.g. HOME/DRAW/AWAY adds a 3rd "
+                "identically-shaped leg — the engine loops `outcome_set`, this spec models the 2-way minimum)",
+            ),
+        ),
+        execution_coupling=AtomicExecutionMode.SEQUENCED_WITH_PACING,
+        notes=(
+            "N-leg dutched back-every-outcome arb (no offsetting short — every outcome is BACKED, unlike the "
+            "buy/sell pair in ARBITRAGE_PRICE_DISPERSION); legs execute within hedge_deadline_ms of each other, "
+            "abort-on-adverse-move if a later leg's price moves before it fills."
+        ),
+    )
+
+
 # ---------------------------------------------------------------------------
 # Arbitrage-structural + MEV + liquidation family (engined, Phase 6A backfill)
 # ---------------------------------------------------------------------------
@@ -1146,6 +1191,7 @@ def _carry_yield_seeds() -> tuple[ArchetypeLegStructure, ...]:
 def _arbitrage_seeds() -> tuple[ArchetypeLegStructure, ...]:
     return (
         _price_dispersion_structure(),
+        _sports_dutching_structure(),
         _cross_domain_event_structure(),
         _mev_single_swap_structure(
             StrategyArchetype.ARBITRAGE_MEV_BACKRUN,
