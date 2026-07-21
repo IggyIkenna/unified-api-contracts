@@ -130,6 +130,13 @@ from unified_api_contracts.internal.architecture_v2 import (
 )
 
 # ── canonical re-export surface — added 2026-06-02 to fix SIT test_uic_completeness ──
+from unified_api_contracts.internal.architecture_v2.admin_assignment import (
+    AdminStrategyAssignment,
+    AdminStrategyAssignmentWriter,
+    AssignmentRoute,
+    AssignmentScope,
+    OrgConflictOnStrategyError,
+)
 from unified_api_contracts.internal.architecture_v2.archetype_capability import (
     ArchetypeCapability,
     ArchetypeCapabilityCell,
@@ -1584,6 +1591,8 @@ __all__ = [
     "AccountRegistry",
     "AccountState",
     "AccountType",
+    "AdminStrategyAssignment",
+    "AdminStrategyAssignmentWriter",
     "AgentEventDetails",
     "AgentInferenceCacheRecord",
     "AggregatedPositionMessage",
@@ -1603,6 +1612,8 @@ __all__ = [
     "ArtifactRef",
     "AssetBalanceSummary",
     "AssetClass",
+    "AssignmentRoute",
+    "AssignmentScope",
     "AtomicExecutionMode",
     "AtomicInstruction",
     "AtomicLeg",
@@ -2012,6 +2023,7 @@ __all__ = [
     "OrderSide",
     "OrderSubmitted",
     "OrderType",
+    "OrgConflictOnStrategyError",
     "OrgType",
     "PAPER_EXECUTION_TARGETS",
     "PairSpreadFeatureRecord",

@@ -9,6 +9,14 @@ Split across enums.py + schemas.py to stay under the 900-line QG limit.
 
 from __future__ import annotations
 
+from unified_api_contracts.internal.architecture_v2.admin_assignment import (
+    AdminStrategyAssignment,
+    AdminStrategyAssignmentWriter,
+    AssignmentRoute,
+    AssignmentScope,
+    OrgConflictOnStrategyError,
+)
+
 # ---------------------------------------------------------------------------
 # Archetype leg-spec registry — structural per-leg restriction model (F22,
 # capability_wizard_and_manifest_2026_06_11.md). The NEW SSOT for leg truth;
@@ -468,6 +476,8 @@ __all__ = [
     "AccessDecision",
     "AccountActionV2",
     "AccountInstruction",
+    "AdminStrategyAssignment",
+    "AdminStrategyAssignmentWriter",
     "AgentAnnotation",
     "AlgoVerdict",
     "AllocationDirective",
@@ -484,6 +494,8 @@ __all__ = [
     "ArtifactPublishedPayload",
     "ArtifactRef",
     "AssetHaircut",
+    "AssignmentRoute",
+    "AssignmentScope",
     "AtomicExecutionMode",
     "AtomicInstruction",
     "AtomicLeg",
@@ -586,6 +598,7 @@ __all__ = [
     "MultiLegOrderCapability",
     "MultiLegVenueNotRegisteredError",
     "NettingRule",
+    "OrgConflictOnStrategyError",
     "PairedDispersionCatalogRow",
     "Persona",
     "Phase",
