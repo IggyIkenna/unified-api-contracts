@@ -305,7 +305,10 @@ from .possible_manifest import (
     is_valid_shard_key,
 )
 from .processed_data_dependencies import (
+    MDPS_CANONICAL_TIMEFRAMES,
+    MDPS_DERIVABLE_DATA_TYPES,
     PROCESSED_REQUIRES_RAW,
+    get_expected_timeframes_for_venue_dt,
     get_raw_source_data_types,
     is_processed_data_type,
 )
@@ -816,6 +819,8 @@ __all__ = [
     "MARATHONBET",
     "MATCHBOOK",
     "MAX_UNDERLYING_MOVES",
+    "MDPS_CANONICAL_TIMEFRAMES",
+    "MDPS_DERIVABLE_DATA_TYPES",
     "METABET",
     "MORPHO_ETHEREUM",
     "MRGREEN",
@@ -1081,6 +1086,7 @@ __all__ = [
     "get_expected_data_types_for_venue",
     "get_expected_instruments_for_venue",
     "get_expected_pairs",
+    "get_expected_timeframes_for_venue_dt",
     "get_lst_base_asset",
     "get_lst_token_genesis",
     "get_lst_venue_genesis",

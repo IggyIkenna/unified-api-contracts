@@ -18,6 +18,8 @@ must declare its raw source(s) here. The mapping mirrors
 
 from __future__ import annotations
 
+from typing import Final
+
 # Source data_type → MDPS-key prefix.
 # Mirrors ``_DATA_TYPE_TO_MDPS_PREFIX`` in MDPS ``canonical_writer.py``;
 # both must move together.
@@ -88,6 +90,65 @@ def _expand_processed_keys() -> dict[str, list[str]]:
 
 PROCESSED_REQUIRES_RAW: dict[str, list[str]] = _expand_processed_keys()
 
+# ---------------------------------------------------------------------------
+# MDPS timeframe-aware honest-coverage — SSOT for "what does MDPS derive
+# candles from, and at which timeframes" (mtds_data_status_page_parity_2026_07_21).
+# ---------------------------------------------------------------------------
+#
+# ``MDPS_DERIVABLE_DATA_TYPES`` is the set of SOURCE data_type tokens MDPS
+# candle-derives FROM. Per the MDPS canonical_writer operator ruling
+# (2026-07-21, "manifest data_type AXIS = SOURCE data_type; path==manifest on
+# data_type"), an MDPS manifest row's ``data_type`` column carries the RAW
+# source token (``trades``, ``book_snapshot_5``, ...) — the SAME vocabulary
+# MTDS's raw-tick manifest rows use — with the candle timeframe living in a
+# SEPARATE ``timeframe`` column. This is why ``get_expected_data_types_for_venue``
+# must NARROW (not reuse) the venue's full raw-capability list for MDPS: most
+# raw data_types a venue can produce (``gas_fees``, ``perp_funding``,
+# ``eigenlayer_rewards``, event-typed handlers, ...) have no candle/aggregate
+# form and MDPS never writes them — only the keys below do.
+#
+# Two sources compose the set:
+#   1. ``_RAW_TO_PROCESSED_PREFIX`` keys — the raw dts with a direct MDPS
+#      ``{prefix}_{tf}`` candle form (trades -> ohlcv_*, book_snapshot_5 ->
+#      book5_ohlcv_*, liquidations -> liq_agg_*, the DEFI per-pool/index
+#      types, ...).
+#   2. ``_PASSTHROUGH_RAW_FOR_OHLCV`` (``["trades", "ohlcv_1m"]``) — TradFi
+#      venues (CME/NASDAQ/NYSE/CBOE) declare their raw capability as
+#      ``ohlcv_1m`` (Databento 1m passthrough), NOT ``trades``; MDPS derives
+#      5m/15m/1h/4h/1d candles FROM that ``ohlcv_1m`` raw source exactly the
+#      same way it derives them from CeFi ``trades``. Omitting ``ohlcv_1m``
+#      here would make ``get_expected_data_types_for_venue(<tradfi venue>,
+#      service="market-data-processing-service")`` return an empty set for
+#      EVERY TradFi venue (they never declare raw ``trades``) — a silent
+#      "MDPS produces nothing for TradFi" false negative.
+MDPS_DERIVABLE_DATA_TYPES: frozenset[str] = frozenset(_RAW_TO_PROCESSED_PREFIX) | frozenset(_PASSTHROUGH_RAW_FOR_OHLCV)
+
+# The canonical, forward-write timeframe set MDPS emits as its manifest
+# ``timeframe`` column value (distinct from ``_TIMEFRAMES`` above, which
+# additionally carries the legacy ``"24h"`` token so historical, already
+# -written manifest data_type suffixes still resolve — this constant
+# is the going-forward canonical form only, ``"1d"`` not ``"24h"``, per the
+# ``_normalise_timeframe`` writer-side normalisation in MDPS
+# ``canonical_writer_shaping.py``). Single-sourced by deployment-api's
+# ``path_combinatorics.PROCESSING_TIMEFRAMES`` (2026-07-21 fix: that constant
+# previously hardcoded ``"24h"``, which no real manifest row ever carries).
+MDPS_CANONICAL_TIMEFRAMES: Final[tuple[str, ...]] = ("15s", "1m", "5m", "15m", "1h", "4h", "1d")
+
+
+def get_expected_timeframes_for_venue_dt(venue: str, data_type: str) -> list[str]:
+    """Return the expected MDPS candle timeframes for a ``(venue, data_type)`` pair.
+
+    Today this ALWAYS returns the flat :data:`MDPS_CANONICAL_TIMEFRAMES` list,
+    uniformly for every venue/data_type (open design question, DEFAULT
+    resolution per mtds_data_status_page_parity_2026_07_21: no known
+    (venue, data_type) pair has per-timeframe start-date divergence yet). The
+    ``venue``/``data_type`` parameters are intentionally accepted-but-ignored
+    so a future per-venue/per-dt override (e.g. a venue onboarded only at
+    coarser timeframes) is a body-only change — no call-site signature churn.
+    """
+    _ = (venue, data_type)  # reserved for a future per-(venue, dt) override
+    return list(MDPS_CANONICAL_TIMEFRAMES)
+
 
 def is_processed_data_type(data_type: str) -> bool:
     """Return ``True`` iff ``data_type`` is an MDPS-derived processed type.
@@ -110,7 +171,10 @@ def get_raw_source_data_types(processed_data_type: str) -> list[str]:
 
 
 __all__ = [
+    "MDPS_CANONICAL_TIMEFRAMES",
+    "MDPS_DERIVABLE_DATA_TYPES",
     "PROCESSED_REQUIRES_RAW",
+    "get_expected_timeframes_for_venue_dt",
     "get_raw_source_data_types",
     "is_processed_data_type",
 ]
