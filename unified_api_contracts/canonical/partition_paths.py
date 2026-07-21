@@ -774,6 +774,37 @@ def is_canonical_instrument_id(candidate: str) -> bool:
     )
 
 
+def _cefi_chain_tail_violations(
+    asset_group: str | None, kv: dict[str, str], partition_segments: list[str], file_name: str
+) -> list[str]:
+    """STRUCTURAL violations for a cefi ``options_chain``/``futures_chain`` shard's tail.
+
+    Operator ruling 2026-07-21: the cefi chain-tail v6 shape
+    (``underlying=<BASE>/quote=<Q>/margin=<M>/ticks.parquet``) is canonical
+    EVERYWHERE — the bare v5 tail (no quote/margin) is LOSSY (USD-vs-USDT /
+    linear-vs-inverse chains on the same underlying collide and overwrite) and
+    must not remain anywhere. Enforced write-time by the MTDS
+    ``PartitionedTickWriter`` (asset_group=cefi) so a regressing backfill fails
+    loud instead of silently reintroducing the collision. SSOT:
+    cefi_chain_tail_v6_canonicalisation_2026_07_21.md.
+    """
+    if asset_group != "cefi":
+        return []
+    it_value = kv.get("instrument_type")
+    if it_value not in CEFI_CHAIN_INSTRUMENT_TYPES:
+        return []
+    tail_keys = [seg.partition("=")[0] for seg in partition_segments[-3:]]
+    if tail_keys == ["underlying", "quote", "margin"] and file_name == "ticks.parquet":
+        return []
+    return [
+        f"cefi {it_value} shard must end "
+        "'.../underlying=<BASE>/quote=<Q>/margin=<M>/ticks.parquet' "
+        f"(got tail {[*partition_segments[-3:], file_name]!r}) — v5 bare chain "
+        "tail is a lossy USD-vs-USDT / linear-vs-inverse collision, RULED v6-only "
+        "everywhere (operator 2026-07-21)"
+    ]
+
+
 def _stem_id_form_violations(*, asset_group: str, instrument_type: str | None, file_name: str) -> list[str]:
     """ID-FORM violations for a single-instrument shard's filename stem.
 
@@ -996,6 +1027,8 @@ def canonical_path_violations(
                     f"tradfi single-instrument shard filename {file_name!r} must be the full "
                     "canonical instrument_id ('VENUE:TYPE:SYMBOL...'), got a bare symbol"
                 )
+
+    structural.extend(_cefi_chain_tail_violations(asset_group_value, kv, partition_segments, segments[-1]))
 
     # ── ID-FORM: the filename stem must BE a canonical instrument_id ─────────
     # The gap this closes: before 2026-07-20 the stem was dropped
