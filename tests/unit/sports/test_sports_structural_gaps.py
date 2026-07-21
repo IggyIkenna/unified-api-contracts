@@ -63,7 +63,7 @@ class TestUnderstatAllowList:
         big5 = {"EPL", "LA_LIGA", "BUNDESLIGA", "SERIE_A", "LIGUE_1"}
         football = [lg.league_id for lg in LEAGUE_REGISTRY.values() if lg.sport == "FOOTBALL"]
         others = [lid for lid in football if lid not in big5]
-        assert len(others) == 89  # 94 football − 5 big-5
+        assert len(others) == 91  # 96 football − 5 big-5 (China+Russia added 2026-07-21)
         for lid in others:
             assert is_sports_structural_gap("understat", lid)
 

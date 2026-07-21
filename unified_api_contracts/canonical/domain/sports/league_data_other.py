@@ -282,6 +282,35 @@ FEATURES_LEAGUES: dict[str, LeagueDefinition] = {
         tier=3,
         classification="Features",
     ),
+    # Added 2026-07-21 (operator ruling: in-universe) so the historical odds captured
+    # under sport_key soccer_china_superleague / soccer_russia_premier_league resolve to
+    # a canonical slug instead of reading as non-canonical. Resolution is by NUMERIC
+    # api_football_id, so the bare display names ("Super League"/"Premier League") that
+    # collide with other leagues are harmless here.
+    "CHINA_SUPER_LEAGUE": LeagueDefinition(
+        league_id="CHINA_SUPER_LEAGUE",
+        display_name="Chinese Super League",
+        sport="FOOTBALL",
+        country="CN",
+        season_months=(3, 11),
+        has_playoffs=False,
+        data_sources=FEAT_STANDARD,
+        api_football_id=169,
+        tier=1,
+        classification="Features",
+    ),
+    "RUSSIA_PREMIER_LEAGUE": LeagueDefinition(
+        league_id="RUSSIA_PREMIER_LEAGUE",
+        display_name="Russian Premier League",
+        sport="FOOTBALL",
+        country="RU",
+        season_months=(7, 5),
+        has_playoffs=False,
+        data_sources=FEAT_STANDARD,
+        api_football_id=235,
+        tier=1,
+        classification="Features",
+    ),
 }
 
 # ---------------------------------------------------------------------------

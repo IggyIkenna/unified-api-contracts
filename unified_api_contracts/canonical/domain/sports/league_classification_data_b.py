@@ -876,6 +876,44 @@ LEAGUE_CLASSIFICATION_DATA_B: dict[int, dict[str, str | int | bool | dict[str, b
             "open_meteo": False,
         },
     },
+    # Added 2026-07-21 (operator ruling: in-universe) — links the odds-api sport_key to
+    # the canonical slug so historical soccer_china_superleague / soccer_russia_premier_league
+    # captures resolve. Keyed by NUMERIC api_football_id, so the bare display names that
+    # collide with other leagues do not matter.
+    169: {
+        "country_region": "China",
+        "api_football_id": 169,
+        "api_football_league_name": "Super League",
+        "odds_api_league_name": "soccer_china_superleague",
+        "classification": "Features",
+        "tier": 1,
+        "data_sources": {
+            "api_football": True,
+            "soccer_football_info": False,
+            "footystats": False,
+            "transfermarkt": False,
+            "understat": False,
+            "odds_api": True,
+            "open_meteo": False,
+        },
+    },
+    235: {
+        "country_region": "Russia",
+        "api_football_id": 235,
+        "api_football_league_name": "Premier League",
+        "odds_api_league_name": "soccer_russia_premier_league",
+        "classification": "Features",
+        "tier": 1,
+        "data_sources": {
+            "api_football": True,
+            "soccer_football_info": False,
+            "footystats": False,
+            "transfermarkt": False,
+            "understat": False,
+            "odds_api": True,
+            "open_meteo": False,
+        },
+    },
 }
 
 __all__ = ["LEAGUE_CLASSIFICATION_DATA_B"]

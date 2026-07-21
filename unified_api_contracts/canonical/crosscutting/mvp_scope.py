@@ -115,8 +115,26 @@ _canonical_repr = canonical_config_repr
 # ---------------------------------------------------------------------------
 
 
-MVP_SCOPE_CONFIG_VERSION: Final[int] = 18
+MVP_SCOPE_CONFIG_VERSION: Final[int] = 19
 """Monotonic version of :data:`MVP_SCOPE`. Bump on any content change.
+
+v19 (2026-07-21): TradFi MVP-set expansion (operator directive) — four new
+instrument groups flipped into tradfi MVP. (1) CME crypto FUTURES: BTC/ETH
+full-size + MBT/MET micro roots added to ``TradFiMvpRule.underliers`` (FUTURE
+cells only; ``option_underliers``={"ES"} keeps CME BTC/ETH OPTIONS out, per the
+operator's "no CME option for BTC and ETH"). (2) CBOE VIX (VX) futures,
+(3) the daily US Treasury-yield INDEX tenors (US2Y/US5Y/US10Y/US30Y/US3M,
+Yahoo ohlcv_24h), and (4) the FX KRW-USD spot pair, all added as declarative
+``TradFiMvpRule.extra_mvp_cells`` (venue_root, instrument_type, base) triples so
+the predicate tags exactly those cells WITHOUT widening the flat
+venue/type/underlier sets (which would over-tag — e.g. the ~33k CBOE SPX/VIX
+OPTION rows). The prior tradfi MVP set (CME futures complex ES/NQ/VX + the 7
+commodity roots + CME ES options + the NASDAQ/NYSE/KRX equity-basis carve-out +
+IBIT/ETHA ETFs) is UNCHANGED. NOTE: ``mdps_mvp_universe("tradfi")`` and
+``expected_coverage`` enumerate ``venues x instrument_types`` (+ the equity-basis
+carve-out) and do NOT read ``underliers``/``extra_mvp_cells``, so the four new
+groups are catalogue-MVP-tagged + download-covered but not yet in those two
+enumerations — a tracked follow-up, not part of this scope.
 
 v18 (2026-07-18): ``book_snapshot_5`` added to ``PredictionMvpRule.data_types``
 (prediction_consolidated_closeout_2026_07_18.md P1 reconcile). It was already in

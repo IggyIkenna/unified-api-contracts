@@ -368,6 +368,10 @@ def is_mvp(
         # empty so source=yahoo passes (US equities are databento; both in scope).
         _itype = (instrument_type or "").strip().upper()
         _venue_root = (venue or "").strip().upper().split("-", 1)[0]
+        # Operator-designated extra MVP cells (2026-07-21): exact (venue_root,
+        # instrument_type, base) triple match — see ``TradFiMvpRule.extra_mvp_cells``.
+        if rule.extra_mvp_cells and (_venue_root, _itype, (base_ccy or "").strip().upper()) in rule.extra_mvp_cells:
+            return not (rule.sources and source not in rule.sources)
         if _itype in ("EQUITY", "ETF") and _venue_root in ("NASDAQ", "NYSE", "ARCA", "AMEX", "BATS", "KRX"):
             # KRX (2026-07-12, operator decision): Yahoo-sourced with no reliable
             # intraday backfill over long historical windows -- narrowed to

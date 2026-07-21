@@ -441,13 +441,116 @@ class TestTradFiOptionUnderlierNarrowingV14:
         assert frozenset({"ES"}) == TRADFI_MVP_OPTION_UNDERLYING_ROOTS
 
     def test_config_version_is_latest(self) -> None:
-        """MVP_SCOPE_CONFIG_VERSION == 18 exactly (v18 = book_snapshot_5 added to
-        PredictionMvpRule.data_types — prediction MVP-scope reconcile; v17 = 26
-        LST/restaking/vault DeFi venues onboarded to P → live → MVP; v16 = COMBO
-        instrument_type addition for DERIBIT-COMBO)."""
+        """MVP_SCOPE_CONFIG_VERSION == 19 exactly (v19 = tradfi MVP-set expansion:
+        CME BTC/ETH/MBT/MET futures + CBOE VIX futures + CBOE Treasury-yield INDEX
+        tenors + FX KRW-USD; v18 = book_snapshot_5 added to
+        PredictionMvpRule.data_types; v17 = 26 LST/restaking/vault DeFi venues
+        onboarded to P → live → MVP; v16 = COMBO instrument_type for
+        DERIBIT-COMBO)."""
         from unified_api_contracts.canonical.crosscutting.mvp_scope import MVP_SCOPE_CONFIG_VERSION
 
-        assert MVP_SCOPE_CONFIG_VERSION == 18
+        assert MVP_SCOPE_CONFIG_VERSION == 19
+
+
+# ---------------------------------------------------------------------------
+# v19 — TradFi MVP-set expansion (operator directive 2026-07-21): four new
+# instrument groups flipped into tradfi MVP. (1) CME BTC/ETH/MBT/MET FUTURES
+# (via ``underliers``), (2) CBOE VIX (VX) futures, (3) the daily US
+# Treasury-yield INDEX tenors, and (4) the FX KRW-USD spot pair (the latter
+# three via the declarative ``extra_mvp_cells`` triples). The prior tradfi MVP
+# set is UNCHANGED, and CME BTC/ETH OPTIONS stay OUT (``option_underliers``).
+# ---------------------------------------------------------------------------
+
+
+class TestTradFiMvpExpansionV19:
+    """v19: CME BTC/ETH futures, CBOE VIX futures, CBOE Treasury INDEX, FX KRW."""
+
+    def test_cme_future_btc_is_mvp(self) -> None:
+        """CME FUTURE on BTC (Bitcoin) → MVP."""
+        assert is_mvp("tradfi", "CME", "FUTURE", "ohlcv_1m", base_ccy="BTC")
+
+    def test_cme_future_eth_is_mvp(self) -> None:
+        """CME FUTURE on ETH (Ether) → MVP."""
+        assert is_mvp("tradfi", "CME", "FUTURE", "ohlcv_1m", base_ccy="ETH")
+
+    def test_cme_future_micro_btc_eth_is_mvp(self) -> None:
+        """CME FUTURE on MBT/MET (micro Bitcoin/Ether) → MVP — the IS catalogue
+        tags micro-future rows with base_asset=MBT/MET, so both micro roots must
+        themselves be MVP underliers (not ES-style sub-codes)."""
+        assert is_mvp("tradfi", "CME", "FUTURE", "ohlcv_1m", base_ccy="MBT")
+        assert is_mvp("tradfi", "CME", "FUTURE", "ohlcv_1m", base_ccy="MET")
+
+    def test_cme_option_btc_eth_not_mvp(self) -> None:
+        """CME OPTION on BTC/ETH → NOT MVP (operator: "no CME option for BTC and
+        ETH"). ``option_underliers``={"ES"} governs OPTION cells, so the new
+        BTC/ETH/MBT/MET ``underliers`` additions do not reach options."""
+        for root in ("BTC", "ETH", "MBT", "MET"):
+            assert not is_mvp("tradfi", "CME", "OPTION", "ohlcv_1m", base_ccy=root)
+
+    def test_cboe_vix_future_is_mvp(self) -> None:
+        """CBOE FUTURE on VX (VIX futures) → MVP via the extra-cell carve-out.
+
+        The IS catalogue writer emits venue=CBOE with base_asset=VX for these
+        rows; "CBOE" is NOT in the flat ``venues`` set (it also carries ~33k
+        SPX/VIX OPTION rows that must stay non-MVP), so this rides the exact
+        (CBOE, FUTURE, VX) ``extra_mvp_cells`` triple.
+        """
+        assert is_mvp("tradfi", "CBOE", "FUTURE", "ohlcv_1m", base_ccy="VX")
+
+    def test_cboe_option_not_swept_in(self) -> None:
+        """Regression: adding CBOE VIX futures did NOT sweep in CBOE OPTIONs — a
+        CBOE OPTION (e.g. an SPX option) is NOT MVP (would be if "CBOE" had been
+        added to the flat ``venues`` set instead of a scoped extra cell)."""
+        assert not is_mvp("tradfi", "CBOE", "OPTION", "ohlcv_1m", base_ccy="SPX")
+        assert not is_mvp("tradfi", "CBOE", "SPOT_PAIR", "ohlcv_24h", base_ccy="SPX")
+
+    def test_cboe_index_treasury_tenors_are_mvp(self) -> None:
+        """CBOE INDEX on the 5 daily Treasury-yield tenors → MVP (Yahoo ohlcv_24h)."""
+        for tenor in ("US2Y", "US5Y", "US10Y", "US30Y", "US3M"):
+            assert is_mvp("tradfi", "CBOE", "INDEX", "ohlcv_24h", base_ccy=tenor)
+
+    def test_cboe_index_vix_cash_not_mvp(self) -> None:
+        """CBOE INDEX on VIX (the cash index) → NOT MVP — only the treasury-yield
+        tenors are in scope, not the VIX cash INDEX rows."""
+        assert not is_mvp("tradfi", "CBOE", "INDEX", "ohlcv_24h", base_ccy="VIX")
+
+    def test_fx_krw_spot_is_mvp(self) -> None:
+        """FX SPOT_PAIR on KRW (KRW-USD, kimchi-premium basis leg) → MVP."""
+        assert is_mvp("tradfi", "FX", "SPOT_PAIR", "ohlcv_24h", base_ccy="KRW")
+
+    def test_fx_other_majors_not_mvp(self) -> None:
+        """Regression: the other FX majors stay non-MVP (only KRW is in scope)."""
+        for base in ("EUR", "GBP", "JPY", "AUD", "CAD"):
+            assert not is_mvp("tradfi", "FX", "SPOT_PAIR", "ohlcv_24h", base_ccy=base)
+
+    def test_extra_mvp_cells_exact_membership(self) -> None:
+        """``TradFiMvpRule.extra_mvp_cells`` == the exact 7-triple expansion set."""
+        rule = MVP_SCOPE["tradfi"]
+        assert isinstance(rule, TradFiMvpRule)
+        assert rule.extra_mvp_cells == frozenset(
+            {
+                ("CBOE", "FUTURE", "VX"),
+                ("CBOE", "INDEX", "US2Y"),
+                ("CBOE", "INDEX", "US5Y"),
+                ("CBOE", "INDEX", "US10Y"),
+                ("CBOE", "INDEX", "US30Y"),
+                ("CBOE", "INDEX", "US3M"),
+                ("FX", "SPOT_PAIR", "KRW"),
+            }
+        )
+
+    def test_cme_crypto_underliers_present(self) -> None:
+        """The CME crypto futures roots are in ``TradFiMvpRule.underliers``."""
+        rule = MVP_SCOPE["tradfi"]
+        assert isinstance(rule, TradFiMvpRule)
+        assert {"BTC", "ETH", "MBT", "MET"} <= rule.underliers
+
+    def test_prior_tradfi_set_unchanged(self) -> None:
+        """Regression: the pre-v19 tradfi MVP set is UNCHANGED (ES/NQ/VX futures +
+        ES options + the equity-basis carve-out all still MVP)."""
+        assert is_mvp("tradfi", "CME", "FUTURE", "ohlcv_1m", base_ccy="ES")
+        assert is_mvp("tradfi", "CME", "OPTION", "ohlcv_1m", base_ccy="ES")
+        assert is_mvp("tradfi", "NASDAQ", "EQUITY", "ohlcv_1m", base_ccy="NVDA")
 
 
 # ---------------------------------------------------------------------------
@@ -520,7 +623,7 @@ class TestSportsMvp:
 
         football = [lg for lg in LEAGUE_REGISTRY.values() if lg.sport == "FOOTBALL"]
         non_football = [lg for lg in LEAGUE_REGISTRY.values() if lg.sport != "FOOTBALL"]
-        assert len(football) == 94
+        assert len(football) == 96  # China+Russia added 2026-07-21 (operator ruling: in-universe)
         assert len(non_football) == 7
         for lg in football:
             assert is_mvp("sports", "ODDS_API", "FIXED_ODDS", "odds", league=lg.league_id)

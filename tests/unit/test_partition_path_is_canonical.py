@@ -252,6 +252,28 @@ def test_tradfi_combo_named_spread_and_recovered_root_pass() -> None:
         )
 
 
+@pytest.mark.parametrize("underlying", ["BTC", "ETH", "MBT", "MET"])
+def test_tradfi_chain_cme_crypto_futures_root_is_canonical(underlying: str) -> None:
+    # CME crypto FUTURES roots (operator 2026-07-21) — BTC/ETH full-size + MBT/MET
+    # micro. Added to the MVP tradfi FUTURE download scope but were quarantined
+    # write-time because the recognised-root registry did not list them. The
+    # write-guard now accepts ``venue=CME/instrument_type=futures_chain/
+    # underlying=BTC`` as canonical (canonical id ``CME:FUTURE:BTC-USD@LIN-…``).
+    path = _tradfi_chain_path(underlying)
+    assert is_canonical(path, require_pipeline_mode=True), canonical_path_violations(path, require_pipeline_mode=True)
+
+
+@pytest.mark.parametrize("underlying", ["BTCF3-BTCG3", "ETHF3-ETHG3", "MBTF3-MBTG3"])
+def test_tradfi_opaque_crypto_calendar_spread_leg_bundle_rejected(underlying: str) -> None:
+    # Precision guard: recognising the single crypto roots must NOT whitelist an
+    # opaque ``-``-joined dated-leg bundle (``BTCF3-BTCG3``) — those have no
+    # resolvable single root and MUST stay quarantined (the crypto root is only a
+    # substring of the leg token). Covers both the chain and combo bundle shapes.
+    for path in (_tradfi_chain_path(underlying), _tradfi_combo_path(underlying)):
+        violations = canonical_path_violations(path, require_pipeline_mode=True)
+        assert any("is not a real product root" in v for v in violations), violations
+
+
 # ---------------------------------------------------------------------------
 # ID-FORM oracle — the filename stem (regression: the oracle was BLIND to it).
 #

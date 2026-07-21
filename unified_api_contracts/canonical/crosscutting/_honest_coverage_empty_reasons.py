@@ -332,6 +332,35 @@ class EmptyConfirmedReason(StrEnum):
     provider can EVER cover it) — here a provider CAN cover it, the acquisition is
     merely not yet built."""
 
+    EXPECTED_REFERENCE_ONLY_NO_CAPTURE_PATH = "EXPECTED_REFERENCE_ONLY_NO_CAPTURE_PATH"
+    """Instrument is a REFERENCE-ONLY holdings row — instruments-service mints it as a
+    DERIVED sibling of a parent POOL/SPOT_PAIR/LST/A_TOKEN/DEBT_TOKEN row's on-chain
+    token leg (``instrument_type in {SPOT_ASSET, A_TOKEN, DEBT_TOKEN}``) — with NO
+    per-day MARKET-DATA capture path under its protocol venue, by construction, not by
+    a pipeline gap. Unlike ``EXPECTED_ACQUISITION_PENDING`` (a provider CAN cover it,
+    the wiring just hasn't landed yet), for these rows NO adapter will EVER fetch
+    per-day data keyed on ``(protocol_venue, token_contract_address)`` — the cell can
+    never resolve to ``captured``. WITHIN-window (deliberately NOT a member of
+    ``OUT_OF_COVERAGE_WINDOW_REASONS``): unlike ``EXPECTED_NO_PROVIDER_COVERAGE`` /
+    ``EXPECTED_NOT_ENOUGH_TVL`` / ``EXPECTED_INSTRUMENT_DELISTED``, this reason must
+    stay IN the honest-coverage denominator — the instrument is genuinely alive and
+    catalogued; the absence is a structural non-event, not a gap OR a delisting.
+    Re-stamping these cells with an ``OUT_OF_COVERAGE_WINDOW_REASONS`` member (e.g.
+    ``EXPECTED_NOT_ENOUGH_TVL``) is WRONG — it would silently re-exclude live
+    instruments from the denominator, the exact honest-coverage distortion this
+    reason exists to prevent (see
+    ``plans/active/issues/defi_nonpool_per_instrument_eu_has_no_reconciliation_path_2026_07_20.md``
+    "THE TRAP").
+
+    Emitted by the v2 expected-universe enumerator
+    (``instruments-service/scripts/enumerate_expected_universe.py`` ``_enumerate_v2_defi``)
+    at SEED time (not after a failed capture attempt) for any in-window
+    SPOT_ASSET/A_TOKEN/DEBT_TOKEN cell, since the uncapturability is known ahead of
+    fetch. Also stamped retroactively for the historical backlog by
+    ``instruments-service/scripts/reclassify_defi_reference_only_eu_2026_07_21.py``
+    (the 215,864-cell backlog created by the ``available_to`` false-delisting fix,
+    ``defi_catalogue_available_to_false_delisting_2026_07_20.md``)."""
+
     EXPECTED_OUTSIDE_PROCESSING_SCOPE = "EXPECTED_OUTSIDE_PROCESSING_SCOPE"
     """Instrument exists in the instruments-service catalog but is not included in the downstream
     service's subscription_list / MVP-scope configuration. The service explicitly skips it rather
