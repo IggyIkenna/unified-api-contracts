@@ -120,6 +120,12 @@ class StrategyArchetype(StrEnum):
     YIELD_ROTATION_LENDING = "YIELD_ROTATION_LENDING"
     YIELD_STAKING_SIMPLE = "YIELD_STAKING_SIMPLE"
     ARBITRAGE_PRICE_DISPERSION = "ARBITRAGE_PRICE_DISPERSION"
+    # N-venue dutched arb on a complete sports-odds outcome set (SportsArbDutchingEngine,
+    # sports_arb_dutching.py). Distinct from ARBITRAGE_PRICE_DISPERSION (2-leg BUY/SELL
+    # cross-venue pair, decimal-odds-free) — added 2026-07-21 per
+    # sports_arb_dutching_engine_not_wired_to_factory_2026_07_21.md Option A (the two
+    # engines were colliding on one archetype value with no asset-group-aware routing).
+    ARBITRAGE_SPORTS_DUTCHING = "ARBITRAGE_SPORTS_DUTCHING"
     LIQUIDATION_CAPTURE = "LIQUIDATION_CAPTURE"
     # MEV (DeFi-only structural arb under ARBITRAGE_STRUCTURAL family)
     ARBITRAGE_MEV_SANDWICH = "ARBITRAGE_MEV_SANDWICH"
@@ -192,6 +198,7 @@ ARCHETYPE_TO_FAMILY: dict[StrategyArchetype, StrategyFamily] = {
     StrategyArchetype.YIELD_ROTATION_LENDING: StrategyFamily.CARRY_AND_YIELD,
     StrategyArchetype.YIELD_STAKING_SIMPLE: StrategyFamily.CARRY_AND_YIELD,
     StrategyArchetype.ARBITRAGE_PRICE_DISPERSION: StrategyFamily.ARBITRAGE_STRUCTURAL,
+    StrategyArchetype.ARBITRAGE_SPORTS_DUTCHING: StrategyFamily.ARBITRAGE_STRUCTURAL,
     StrategyArchetype.LIQUIDATION_CAPTURE: StrategyFamily.ARBITRAGE_STRUCTURAL,
     StrategyArchetype.ARBITRAGE_MEV_SANDWICH: StrategyFamily.ARBITRAGE_STRUCTURAL,
     StrategyArchetype.ARBITRAGE_MEV_JIT_LIQUIDITY: StrategyFamily.ARBITRAGE_STRUCTURAL,

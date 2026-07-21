@@ -627,6 +627,22 @@ DEFI_LST_LST_RATES = SchemaContract(
 # lending is an APY-snapshot shape (NOT the EVM rate/index shape); Solana AMM
 # pools (Orca/Raydium) and Kamino vaults each carry venue-specific fields the
 # EVM pool contracts don't. Same data_type, distinct instrument_type partition.
+#
+# ``symbol_column`` corrected 2026-07-21 ("eliminate the address/UUID fallback"
+# P0, defi_consolidated_closeout_2026_07_18.md sub-item 3/5): was ``market_id``
+# (the DeFiLlama pool UUID) -- meaning ``write_defi_rows`` built the canonical
+# ``instrument_id`` AND the per-instrument GCS leaf from the UUID for EVERY
+# Solana-lending row, regardless of what the ``symbol`` column carried. The
+# handler-side resolver fix (market-tick-data-service's
+# ``lending_indices_handler._resolve_blank_solana_lending_symbols``) populates
+# a REAL resolved token symbol into the ``symbol`` column before this contract
+# is consulted -- it had NO effect on the written object until this column
+# pointer also moved from ``market_id`` to ``symbol``. Verified no other caller
+# relies on the ``market_id`` default: the two migration/fold one-off scripts
+# (``migrate_legacy_solana_defi_to_canonical.py`` /
+# ``fold_legacy_solana_defi_to_consolidated_canonical_2026_07_21.py``) and
+# ``risk_params_handler.py`` all pass an explicit ``symbol_column=`` to
+# ``write_defi_rows`` and never consult this contract's default.
 DEFI_SOLANA_LENDING_LENDING_INDICES = SchemaContract(
     asset_group="defi",
     instrument_type="solana_lending",
@@ -641,7 +657,7 @@ DEFI_SOLANA_LENDING_LENDING_INDICES = SchemaContract(
         ColumnSpec(name="apy", dtype="float64", nullable=True),
         ColumnSpec(name="tvl_usd", dtype="float64", nullable=True),
     ],
-    symbol_column="market_id",
+    symbol_column="symbol",
     required_row_count_min=1,
 )
 
