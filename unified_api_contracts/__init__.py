@@ -597,6 +597,13 @@ from .canonical.partition_paths import (
     is_canonical,
     is_canonical_instrument_id,
 )
+from .canonical.quarantine import (
+    QUARANTINE_REGISTRY,
+    IdFormVerdict,
+    ResolutionEvidence,
+    classify_id_form,
+    is_quarantined_instrument_id,
+)
 from .config.trading_validation import (
     CONFIG_REQUIRED_FIELDS,
     CONFIG_SCHEMA,
@@ -1849,6 +1856,9 @@ __all__ = [
     "CanonicalUnknownVenueError",
     "CanonicalVenue",
     "CanonicalViolationClass",
+    "QUARANTINE_REGISTRY",
+    "IdFormVerdict",
+    "ResolutionEvidence",
     "CanonicalWebSocketLifecycle",
     "CanonicalWorkflowRun",
     "CanonicalYieldCurvePoint",
@@ -2361,6 +2371,8 @@ __all__ = [
     "is_batch",
     "is_canonical",
     "is_canonical_instrument_id",
+    "classify_id_form",
+    "is_quarantined_instrument_id",
     "is_emission_policy_declared",
     "live_pipeline_mode_for_venue",
     "live_source_for_venue",
