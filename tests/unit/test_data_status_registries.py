@@ -20,7 +20,10 @@ from unified_api_contracts.registry.market_data_categories import (
     VENUE_DATA_TYPE_CAPABILITIES,
 )
 from unified_api_contracts.registry.processed_data_dependencies import (
+    MDPS_CANONICAL_TIMEFRAMES,
+    MDPS_DERIVABLE_DATA_TYPES,
     PROCESSED_REQUIRES_RAW,
+    get_expected_timeframes_for_venue_dt,
     get_raw_source_data_types,
     is_processed_data_type,
 )
@@ -407,3 +410,93 @@ class TestYahooFinancePhantomVenueRemoved:
         )
 
         assert get_us_treasury_yield_daily_source(date(2024, 6, 1)) == "YAHOO_FINANCE"
+
+
+class TestMdpsServiceScopedExpectedDataTypes:
+    """MDPS timeframe-aware honest-coverage extension
+    (mtds_data_status_page_parity_2026_07_21).
+
+    ``get_expected_data_types_for_venue(venue, service="market-data-processing-service")``
+    must NARROW the venue's raw-capable dt list to :data:`MDPS_DERIVABLE_DATA_TYPES`
+    — the critical, all-3-reviews-converged fix. Without the narrowing, MDPS
+    inherits the FULL MTDS raw vocabulary (options_chain/futures_chain/gas_fees/...)
+    as "expected", producing permanent false ``missing_data_types``.
+    """
+
+    def test_mtds_default_service_unaffected(self) -> None:
+        """service="" (the pre-existing MTDS call convention) is BYTE-FOR-BYTE
+        unchanged — the MDPS narrowing only applies when service is explicitly
+        the MDPS service string."""
+        from unified_api_contracts.registry.market_data_categories import (
+            get_expected_data_types_for_venue,
+        )
+
+        assert get_expected_data_types_for_venue("DERIBIT") == sorted(
+            ["trades", "book_snapshot_5", "derivative_ticker", "options_chain", "futures_chain"]
+        )
+        assert get_expected_data_types_for_venue("DERIBIT", service="market-tick-data-service") == sorted(
+            ["trades", "book_snapshot_5", "derivative_ticker", "options_chain", "futures_chain"]
+        )
+
+    def test_mdps_narrows_deribit_to_derivable_only(self) -> None:
+        """DERIBIT declares 5 raw dts; MDPS only candle-derives 3 of them
+        (options_chain/futures_chain have no MDPS ohlcv/candle form)."""
+        from unified_api_contracts.registry.market_data_categories import (
+            get_expected_data_types_for_venue,
+        )
+
+        mdps_dts = get_expected_data_types_for_venue("DERIBIT", service="market-data-processing-service")
+        assert set(mdps_dts) == {"trades", "book_snapshot_5", "derivative_ticker"}
+        assert "options_chain" not in mdps_dts
+        assert "futures_chain" not in mdps_dts
+
+    def test_mdps_includes_tradfi_ohlcv_1m_passthrough_source(self) -> None:
+        """TradFi venues (CME) declare raw capability as ``ohlcv_1m``/``ohlcv_1s``
+        (Databento passthrough), NOT ``trades``. MDPS derives 5m/15m/1h/4h/1d
+        candles FROM ``ohlcv_1m`` — this must NOT narrow to empty for TradFi."""
+        from unified_api_contracts.registry.market_data_categories import (
+            get_expected_data_types_for_venue,
+        )
+
+        mdps_dts = get_expected_data_types_for_venue("CME", service="market-data-processing-service")
+        assert "ohlcv_1m" in mdps_dts
+        # ohlcv_1s has no MDPS passthrough-raw declaration today (only trades /
+        # ohlcv_1m do) — narrowed out.
+        assert "ohlcv_1s" not in mdps_dts
+
+    def test_mdps_krx_yahoo_daily_only_venue_is_empty(self) -> None:
+        """KRX's only raw capability is ``ohlcv_24h`` (Yahoo daily) — not a
+        candle-derivable source — so MDPS has NOTHING expected for KRX."""
+        from unified_api_contracts.registry.market_data_categories import (
+            get_expected_data_types_for_venue,
+        )
+
+        assert get_expected_data_types_for_venue("KRX", service="market-data-processing-service") == []
+
+    def test_mdps_derivable_data_types_matches_processed_prefix_plus_passthrough(self) -> None:
+        assert "trades" in MDPS_DERIVABLE_DATA_TYPES
+        assert "ohlcv_1m" in MDPS_DERIVABLE_DATA_TYPES
+        assert "liquidations" in MDPS_DERIVABLE_DATA_TYPES
+        assert "gas_fees" not in MDPS_DERIVABLE_DATA_TYPES
+        assert "perp_funding" not in MDPS_DERIVABLE_DATA_TYPES
+
+
+class TestMdpsCanonicalTimeframes:
+    """MDPS_CANONICAL_TIMEFRAMES + get_expected_timeframes_for_venue_dt."""
+
+    def test_canonical_timeframes_uses_1d_not_24h(self) -> None:
+        """The forward-write canonical form is "1d" (matching the MDPS writer's
+        real ``_normalise_timeframe`` output) -- NOT the legacy "24h" token."""
+        assert "1d" in MDPS_CANONICAL_TIMEFRAMES
+        assert "24h" not in MDPS_CANONICAL_TIMEFRAMES
+
+    def test_canonical_timeframes_content(self) -> None:
+        assert MDPS_CANONICAL_TIMEFRAMES == ("15s", "1m", "5m", "15m", "1h", "4h", "1d")
+
+    def test_get_expected_timeframes_for_venue_dt_is_flat_default(self) -> None:
+        """DEFAULT resolution of the per-(venue, dt) timeframe-divergence open
+        question: uniformly the flat canonical list regardless of venue/dt,
+        today -- the args are accepted so a future override doesn't need a
+        signature change."""
+        assert get_expected_timeframes_for_venue_dt("BINANCE-FUTURES", "trades") == list(MDPS_CANONICAL_TIMEFRAMES)
+        assert get_expected_timeframes_for_venue_dt("CME", "ohlcv_1m") == list(MDPS_CANONICAL_TIMEFRAMES)

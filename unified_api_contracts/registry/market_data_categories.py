@@ -2085,14 +2085,29 @@ def get_expected_data_types_for_venue(
     here (it would break the legit empty-caps venues above) — the invariant is
     enforced by simply not enumerating non-venues. (YAHOO_FINANCE was removed as a
     venue on 2026-07-15 for exactly this reason.)
+
+    ``service="market-data-processing-service"`` (MDPS, added
+    mtds_data_status_page_parity_2026_07_21) NARROWS the venue's raw-capable
+    dt list to :data:`~unified_api_contracts.registry.processed_data_dependencies.MDPS_DERIVABLE_DATA_TYPES`
+    — the manifest ``data_type`` axis for MDPS rows is the SOURCE token
+    (operator ruling 2026-07-21: "path==manifest on data_type"), the SAME
+    vocabulary as MTDS raw-tick rows, so without this narrowing MDPS would
+    inherit the full MTDS raw vocabulary (``gas_fees``, ``perp_funding``, ...)
+    as "expected", most of which MDPS never candle-derives — producing
+    permanent false ``missing_data_types`` and tanking ``completion_pct``.
     """
     if service == "instruments-service":
         ref_caps = VENUE_REFERENCE_DATA_CAPABILITIES.get(venue, {})
         return sorted(ref_caps.keys()) if ref_caps else []
     caps = VENUE_DATA_TYPE_CAPABILITIES.get(venue, {})
-    if caps:
-        return sorted(caps.keys())
-    return get_valid_data_types_for_venue(venue)
+    dts = sorted(caps.keys()) if caps else get_valid_data_types_for_venue(venue)
+    if service == "market-data-processing-service":
+        from unified_api_contracts.registry.processed_data_dependencies import (
+            MDPS_DERIVABLE_DATA_TYPES,
+        )
+
+        return sorted(set(dts) & MDPS_DERIVABLE_DATA_TYPES)
+    return dts
 
 
 # ---------------------------------------------------------------------------
