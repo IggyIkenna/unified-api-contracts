@@ -261,7 +261,14 @@ SOURCE_PRIORITY: Final[dict[tuple[str, str], list[str]]] = {
     # oracle_prices dispatches Pyth Hermes (Solana feeds) as primary and
     # Chainlink (EVM aggregator rounds) as secondary; per-row pipeline_mode
     # is resolved at callsite by the MTDS oracle_prices_handler resolver.
-    ("defi", "oracle_prices"): ["pyth_hermes", "chainlink"],
+    # "aave" added 2026-07-21 (lst_rate_honest_coverage plan Phase 1): a THIRD,
+    # distinct oracle_prices venue (write venue AAVE / IS venue AAVE-ETHEREUM,
+    # AaveOracle.getAssetPrice per LST reserve) — never competes for the same
+    # row as pyth_hermes/chainlink (disjoint venues), listed here purely to
+    # satisfy the PipelineMode<->SOURCE_PRIORITY closed-set round-trip
+    # (BATCH_AAVE requires a matching entry). See
+    # codex/02-data/lst-exchange-rate-surfaces.md surface #3.
+    ("defi", "oracle_prices"): ["pyth_hermes", "chainlink", "aave"],
     # perp_funding + solana_defi are Hyperliquid REST legs; Hyperliquid (the vendor,
     # via its REST transport) is the primary (and currently only) source for both
     # data_types. source=hyperliquid, transport=rest (a column, not the name).
@@ -486,6 +493,12 @@ SOURCE_MODE_CAPABILITY: Final[dict[str, frozenset[Mode]]] = {
     "onchain_subgraph": frozenset({Mode.BATCH, Mode.LIVE, Mode.REPLAY}),  # live = poll
     "chainlink": frozenset({Mode.BATCH, Mode.LIVE, Mode.REPLAY}),
     "pyth_hermes": frozenset({Mode.BATCH, Mode.LIVE, Mode.REPLAY}),
+    # AAVE on-chain oracle (AaveOracle.getAssetPrice) — added 2026-07-21
+    # (lst_rate_honest_coverage plan Phase 1). BATCH-only for now: the
+    # collection branch (Phase 2) is a batch RPC backfill; only BATCH_AAVE
+    # exists in PipelineMode (no LIVE_AAVE/REPLAY_AAVE member) — widen this
+    # + add the matching enum members together if/when a live leg lands.
+    "aave": frozenset({Mode.BATCH}),
     # ---- Prediction ----
     "polymarket_clob": frozenset({Mode.BATCH, Mode.LIVE, Mode.REPLAY}),
     "polymarket_gamma_api": frozenset({Mode.BATCH}),  # market metadata; not a tick series
@@ -675,6 +688,10 @@ EMISSION_LATENCY_MS_BY_SOURCE: Final[dict[str, int]] = {
     "deribit": 3_600_000,  # 1h: Deribit public DVOL-history REST cadence (source=deribit, transport=rest)
     "pyth_hermes": 1_000,  # 1s: Pyth Hermes batch endpoint
     "chainlink": 200,  # 200ms: on-chain EVM oracle aggregator round (RPC-style)
+    # AAVE on-chain oracle (AaveOracle.getAssetPrice, RPC eth_call) — added
+    # 2026-07-21 (lst_rate_honest_coverage plan Phase 1). Same RPC-style class
+    # as chainlink (both are on-chain reads via Alchemy RPC).
+    "aave": 200,  # 200ms: on-chain getAssetPrice eth_call (RPC-style, mirrors chainlink)
     # Solana native-staking sources — epoch-granularity (~2.5 day cadence).
     "solana_rpc": 60_000,  # 1 min: Solana RPC getInflationRate/getEpochInfo polling
     "helius_rpc": 60_000,  # 1 min: Helius APY aggregation endpoint polling

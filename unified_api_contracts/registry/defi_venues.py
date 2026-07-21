@@ -561,8 +561,12 @@ DEFI_VENUE_PHASE: dict[str, str] = {
     #    2026-07-18) ──
     "BEEFY-BSC": "live",
     "BINANCE-BSC": "live",
+    # AAVE-ETHEREUM flipped pipeline→live 2026-07-21 per lst_rate_honest_coverage
+    # plan Phase 1 — the AaveOracle.getAssetPrice() oracle_prices collection
+    # branch is IS-producible (aave_oracle adapter); governance_events on this
+    # venue remains pipeline (NOT IS-producible), tracked separately.
+    "AAVE-ETHEREUM": "live",
     # ── Pipeline (Ethereum analytics / governance / MEV — NOT IS-producible) ──
-    "AAVE-ETHEREUM": "pipeline",
     "COMPOUND-ETHEREUM": "pipeline",
     "UNISWAP-ETHEREUM": "pipeline",
     "FLASHBOTS-ETHEREUM": "pipeline",
