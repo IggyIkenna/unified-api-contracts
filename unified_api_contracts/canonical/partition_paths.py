@@ -66,6 +66,13 @@ ASSET_GROUP_HIVE_KEY = "asset_group"
 # in writer code or readers; import it from here.
 RAW_TICK_DATA_PREFIX = "raw_tick_data/by_date/"
 
+# Derived-candle root prefix (MDPS). Same buckets as RAW_TICK_DATA_PREFIX, a
+# sibling top-level tree — candle_feature_canonical_path_divergence_2026_07_20.md
+# todo 10 / data_pipeline_reconciliation_skill_2026_07_20.md todo 39. Sports
+# candles live under a DIFFERENT root (``processed/``, not ``processed_candles/``)
+# and stay out of scope — they fall through to the unrecognized-prefix branch.
+PROCESSED_CANDLES_PREFIX = "processed_candles/by_date/"
+
 
 # ---------------------------------------------------------------------------
 # DeFi
@@ -774,6 +781,74 @@ def is_canonical_instrument_id(candidate: str) -> bool:
     )
 
 
+def _tradfi_path_violations(
+    kv: dict[str, str], partition_segments: list[str], file_name: str
+) -> tuple[list[str], list[str]]:
+    """(structural, id_form) violations for a tradfi shard — extracted from
+    :func:`canonical_path_violations` to keep its cyclomatic complexity in
+    budget (ruff C901). Caller has already confirmed ``asset_group == "tradfi"``.
+    """
+    structural: list[str] = []
+    id_form: list[str] = []
+    it_value = kv.get("instrument_type")
+    if kv.get("pipeline_mode") == "batch_massive":
+        structural.append(
+            "tradfi pipeline_mode=batch_massive is forbidden — Massive is purged; "
+            "Databento is the batch source of truth"
+        )
+    # ── garbage-underlying guard (chain + combo bundles) ─────────────────────
+    # A tradfi CHAIN/COMBO bundle carries ``underlying=<ROOT>``. The forensic
+    # sweep found 189,830 objects whose ``underlying=`` was a numeric CBOE
+    # globex GROUP code (``12``/``13``) or an opaque CBOE user-defined leg
+    # code (``GN``/``VT``/``3W``) — the product root is UNRECOVERABLE from the
+    # path, so a fresh write MUST fail loud (shard-level isolation → honest
+    # ``attempted_failed``) rather than fake-canonicalise a garbage bundle.
+    # Real roots (``SP500``/``MES``/``XAB``) and resolved named-spread combos
+    # (``WTI-BZ``/``NAT-GAS-HH``) PASS. Covers combo too (not in
+    # TRADFI_CHAIN_INSTRUMENT_TYPES): the opaque ``UD:1V: GN`` combos land
+    # here. SSOT: tradfi_canonical_path_migration_design_2026_07_19.md.
+    underlying_value = kv.get("underlying")
+    if underlying_value is not None:
+        # Call-time import (canonical→registry) — avoids the load-time cycle
+        # (registry/__init__ imports canonical); at call time both are loaded.
+        from unified_api_contracts.registry.tradfi_symbology import (
+            is_recognized_tradfi_underlying,
+        )
+
+        if not is_recognized_tradfi_underlying(underlying_value):
+            structural.append(
+                f"tradfi underlying={underlying_value!r} is not a real product root / "
+                "named-spread combo (numeric globex group code or opaque CBOE "
+                "user-defined leg code) — quarantine, never fake-canonicalize"
+            )
+    if it_value in TRADFI_CHAIN_INSTRUMENT_TYPES:
+        # chain shard tail MUST be underlying=.../quote=.../margin=.../ticks.parquet
+        tail_keys = [seg.partition("=")[0] for seg in partition_segments[-3:]]
+        if tail_keys != ["underlying", "quote", "margin"] or file_name != "ticks.parquet":
+            structural.append(
+                f"tradfi {it_value} shard must end "
+                "'.../underlying=<BASE>/quote=<Q>/margin=<M>/ticks.parquet' "
+                f"(got tail {[*partition_segments[-3:], file_name]!r})"
+            )
+    elif it_value in TRADFI_SINGLE_INSTRUMENT_TYPES:
+        # single-instrument shard: filename MUST be the full canonical
+        # instrument_id (VENUE:TYPE:SYMBOL...), never a bare symbol or a
+        # symbol-less ticks.parquet fan-in. Scoped to the canonical single
+        # itypes only — ``combo`` (bare-symbol, leg-id unsettled) and special
+        # bundle types like ``event_contract`` are deliberately NOT enforced.
+        if file_name == "ticks.parquet":
+            id_form.append(
+                "tradfi single-instrument shard filename must be the full canonical "
+                "instrument_id, got a symbol-less 'ticks.parquet' fan-in"
+            )
+        elif ":" not in file_name:
+            id_form.append(
+                f"tradfi single-instrument shard filename {file_name!r} must be the full "
+                "canonical instrument_id ('VENUE:TYPE:SYMBOL...'), got a bare symbol"
+            )
+    return structural, id_form
+
+
 def _cefi_chain_tail_violations(
     asset_group: str | None, kv: dict[str, str], partition_segments: list[str], file_name: str
 ) -> list[str]:
@@ -849,10 +924,86 @@ def _select_violation_classes(
     return selected
 
 
+def _candle_path_violations(
+    remainder: str,
+    *,
+    require_candle_migration_complete: bool,
+) -> list[str]:
+    """Violations for a ``processed_candles/by_date/...`` path (the LOCKED shape,
+    CORRECTED RULING 2026-07-21): ``day=/pipeline_mode=/timeframe=/data_type=/
+    instrument_type=/venue=/{canonical_id}.parquet`` for cefi/tradfi/defi;
+    prediction candles use ``instrument_type=`` as the terminal axis in place of
+    ``venue=`` and never carry ``pipeline_mode=``.
+
+    Migration-window suppression (mirrors taxonomy exception AE-6): the whole
+    existing corpus predates this ruling, so a missing ``instrument_type=`` (all
+    shapes) or a missing ``pipeline_mode=`` (venue-shaped only — prediction never
+    had it) is SUPPRESSED by default (``require_candle_migration_complete=False``)
+    and only flagged once the caller asserts the migration has completed. Genuine
+    defects (empty stem, malformed values, missing ``day=``/``timeframe=``/
+    ``data_type=``) are NEVER suppressed.
+    """
+    violations: list[str] = []
+    segments = remainder.split("/")
+    partition_segments = segments[:-1]
+    file_name = segments[-1]
+
+    if not partition_segments:
+        violations.append("no partition segments after the prefix")
+        return violations
+
+    day_seg = partition_segments[0]
+    if day_seg.startswith("day-"):
+        violations.append(f"legacy hyphen day segment {day_seg!r} — must be 'day=YYYY-MM-DD'")
+    elif not day_seg.startswith("day="):
+        violations.append(f"first partition is {day_seg!r}, expected 'day=YYYY-MM-DD'")
+    elif not _DAY_VALUE_RE.match(day_seg[len("day=") :]):
+        violations.append(f"day value {day_seg[len('day=') :]!r} is not ISO YYYY-MM-DD")
+
+    kv: dict[str, str] = {}
+    for seg in partition_segments[1:]:
+        if "=" not in seg:
+            violations.append(f"non-canonical partition segment {seg!r} (expected 'key=value')")
+            continue
+        key, _, value = seg.partition("=")
+        if key == "pipeline_mode" and not _PIPELINE_MODE_VALUE_RE.match(value):
+            violations.append(
+                f"pipeline_mode value {value!r} is not canonical '{{mode}}_{{source}}' "
+                "(mode ∈ batch/live/replay, source = vendor token)"
+            )
+        kv[key] = value
+
+    if "timeframe" not in kv:
+        violations.append("missing 'timeframe=' partition segment")
+    if "data_type" not in kv:
+        violations.append("missing 'data_type=' partition segment")
+
+    if require_candle_migration_complete:
+        if "instrument_type" not in kv:
+            violations.append(
+                "missing 'instrument_type=' partition segment (required once the candle "
+                "migration is complete — LOCKED shape, 2026-07-21)"
+            )
+        if "venue" in kv and "pipeline_mode" not in kv:
+            violations.append(
+                "missing 'pipeline_mode={mode}_{source}/' segment (required once the "
+                "candle migration is complete — venue-shaped candles only, prediction exempt)"
+            )
+
+    # Empty instrument stem: a chain-bundle write that never got renamed to the
+    # bundled leaf (measured defect, e.g. '.../underlying=BTC/.parquet').
+    stem = file_name.rsplit(".", 1)[0] if "." in file_name else file_name
+    if not stem:
+        violations.append(f"empty instrument stem in filename {file_name!r} — unattributable to a shard")
+
+    return violations
+
+
 def canonical_path_violations(
     path: str,
     *,
     require_pipeline_mode: bool = False,
+    require_candle_migration_complete: bool = False,
     violation_classes: frozenset[CanonicalViolationClass] | None = None,
 ) -> list[str]:
     """Return the list of canonical-form violations for ``path`` (empty == canonical).
@@ -869,12 +1020,21 @@ def canonical_path_violations(
             ``pipeline_mode={mode}_{source}/`` segment left of ``asset_group=``
             is a violation. Default False accepts the back-compat bare paths
             the builders still emit (the segment is canonical-but-optional for
-            CeFi/Prediction and back-compat for DeFi/TradFi).
+            CeFi/Prediction and back-compat for DeFi/TradFi). Applies to
+            ``raw_tick_data/`` paths only.
+        require_candle_migration_complete: When True, a ``processed_candles/``
+            path is checked against the fully-migrated LOCKED shape (missing
+            ``instrument_type=``/``pipeline_mode=`` is a violation). Default
+            False suppresses those two during the migration_pending window
+            (mirrors taxonomy exception AE-6) — see
+            ``codex/02-data/mdps-candle-canonical-reconciliation.md``. No
+            effect on ``raw_tick_data/`` paths.
         violation_classes: Restrict the answer to these
             :class:`CanonicalViolationClass` members. Default ``None`` reports
             BOTH classes — path STRUCTURE *and* filename instrument-id FORM.
             Pass ``frozenset({CanonicalViolationClass.STRUCTURAL})`` for the
-            skeleton-only question (the pre-2026-07-20 behaviour).
+            skeleton-only question (the pre-2026-07-20 behaviour). Every
+            ``processed_candles/`` violation is classified STRUCTURAL.
 
     Note:
         Structure and id-form are ORTHOGONAL questions — an empty list means
@@ -884,8 +1044,20 @@ def canonical_path_violations(
     id_form: list[str] = []
     cleaned = path.lstrip("/")
 
+    if cleaned.startswith(PROCESSED_CANDLES_PREFIX):
+        structural.extend(
+            _candle_path_violations(
+                cleaned[len(PROCESSED_CANDLES_PREFIX) :],
+                require_candle_migration_complete=require_candle_migration_complete,
+            )
+        )
+        return _select_violation_classes(structural, id_form, violation_classes)
+
     if not cleaned.startswith(RAW_TICK_DATA_PREFIX):
-        structural.append(f"path does not start with the canonical prefix {RAW_TICK_DATA_PREFIX!r}")
+        structural.append(
+            f"path does not start with a recognized canonical prefix "
+            f"({RAW_TICK_DATA_PREFIX!r} or {PROCESSED_CANDLES_PREFIX!r})"
+        )
         return _select_violation_classes(structural, id_form, violation_classes)
 
     remainder = cleaned[len(RAW_TICK_DATA_PREFIX) :]
@@ -970,63 +1142,9 @@ def canonical_path_violations(
     # atom / new write that dropped the tail). SSOT:
     # plans/active/issues/tradfi_canonical_path_migration_design_2026_07_19.md.
     if asset_group_value == "tradfi":
-        file_name = segments[-1]
-        it_value = kv.get("instrument_type")
-        if kv.get("pipeline_mode") == "batch_massive":
-            structural.append(
-                "tradfi pipeline_mode=batch_massive is forbidden — Massive is purged; "
-                "Databento is the batch source of truth"
-            )
-        # ── garbage-underlying guard (chain + combo bundles) ─────────────────
-        # A tradfi CHAIN/COMBO bundle carries ``underlying=<ROOT>``. The forensic
-        # sweep found 189,830 objects whose ``underlying=`` was a numeric CBOE
-        # globex GROUP code (``12``/``13``) or an opaque CBOE user-defined leg
-        # code (``GN``/``VT``/``3W``) — the product root is UNRECOVERABLE from the
-        # path, so a fresh write MUST fail loud (shard-level isolation → honest
-        # ``attempted_failed``) rather than fake-canonicalise a garbage bundle.
-        # Real roots (``SP500``/``MES``/``XAB``) and resolved named-spread combos
-        # (``WTI-BZ``/``NAT-GAS-HH``) PASS. Covers combo too (not in
-        # TRADFI_CHAIN_INSTRUMENT_TYPES): the opaque ``UD:1V: GN`` combos land
-        # here. SSOT: tradfi_canonical_path_migration_design_2026_07_19.md.
-        underlying_value = kv.get("underlying")
-        if underlying_value is not None:
-            # Call-time import (canonical→registry) — avoids the load-time cycle
-            # (registry/__init__ imports canonical); at call time both are loaded.
-            from unified_api_contracts.registry.tradfi_symbology import (
-                is_recognized_tradfi_underlying,
-            )
-
-            if not is_recognized_tradfi_underlying(underlying_value):
-                structural.append(
-                    f"tradfi underlying={underlying_value!r} is not a real product root / "
-                    "named-spread combo (numeric globex group code or opaque CBOE "
-                    "user-defined leg code) — quarantine, never fake-canonicalize"
-                )
-        if it_value in TRADFI_CHAIN_INSTRUMENT_TYPES:
-            # chain shard tail MUST be underlying=.../quote=.../margin=.../ticks.parquet
-            tail_keys = [seg.partition("=")[0] for seg in partition_segments[-3:]]
-            if tail_keys != ["underlying", "quote", "margin"] or file_name != "ticks.parquet":
-                structural.append(
-                    f"tradfi {it_value} shard must end "
-                    "'.../underlying=<BASE>/quote=<Q>/margin=<M>/ticks.parquet' "
-                    f"(got tail {[*partition_segments[-3:], file_name]!r})"
-                )
-        elif it_value in TRADFI_SINGLE_INSTRUMENT_TYPES:
-            # single-instrument shard: filename MUST be the full canonical
-            # instrument_id (VENUE:TYPE:SYMBOL...), never a bare symbol or a
-            # symbol-less ticks.parquet fan-in. Scoped to the canonical single
-            # itypes only — ``combo`` (bare-symbol, leg-id unsettled) and special
-            # bundle types like ``event_contract`` are deliberately NOT enforced.
-            if file_name == "ticks.parquet":
-                id_form.append(
-                    "tradfi single-instrument shard filename must be the full canonical "
-                    "instrument_id, got a symbol-less 'ticks.parquet' fan-in"
-                )
-            elif ":" not in file_name:
-                id_form.append(
-                    f"tradfi single-instrument shard filename {file_name!r} must be the full "
-                    "canonical instrument_id ('VENUE:TYPE:SYMBOL...'), got a bare symbol"
-                )
+        _tradfi_structural, _tradfi_id_form = _tradfi_path_violations(kv, partition_segments, segments[-1])
+        structural.extend(_tradfi_structural)
+        id_form.extend(_tradfi_id_form)
 
     structural.extend(_cefi_chain_tail_violations(asset_group_value, kv, partition_segments, segments[-1]))
 
@@ -1052,6 +1170,7 @@ def canonical_path_violations_classified(
     path: str,
     *,
     require_pipeline_mode: bool = False,
+    require_candle_migration_complete: bool = False,
 ) -> dict[CanonicalViolationClass, list[str]]:
     """Canonical-form violations for ``path`` split by :class:`CanonicalViolationClass`.
 
@@ -1065,6 +1184,7 @@ def canonical_path_violations_classified(
         member: canonical_path_violations(
             path,
             require_pipeline_mode=require_pipeline_mode,
+            require_candle_migration_complete=require_candle_migration_complete,
             violation_classes=frozenset({member}),
         )
         for member in CanonicalViolationClass
@@ -1075,6 +1195,7 @@ def is_canonical(
     path: str,
     *,
     require_pipeline_mode: bool = False,
+    require_candle_migration_complete: bool = False,
     violation_classes: frozenset[CanonicalViolationClass] | None = None,
 ) -> bool:
     """True iff ``path`` is a canonical GCS partition path (no drift violations).
@@ -1084,7 +1205,8 @@ def is_canonical(
     documented non-canonical drift shapes (hyphen ``day-``, glued
     ``VENUE-CHAIN`` / ``V{N}``, out-of-set ``asset_group=``, a non-canonical
     filename instrument-id stem, and — when ``require_pipeline_mode=True`` — a
-    missing ``pipeline_mode=`` segment).
+    missing ``pipeline_mode=`` segment). Also validates ``processed_candles/``
+    paths (see ``require_candle_migration_complete``).
 
     Like :func:`canonical_path_violations` this answers BOTH the STRUCTURAL and
     the ID_FORM question by default; narrow with ``violation_classes``.
@@ -1092,6 +1214,7 @@ def is_canonical(
     return not canonical_path_violations(
         path,
         require_pipeline_mode=require_pipeline_mode,
+        require_candle_migration_complete=require_candle_migration_complete,
         violation_classes=violation_classes,
     )
 
@@ -1099,6 +1222,7 @@ def is_canonical(
 __all__ = [
     "ASSET_GROUP_HIVE_KEY",
     "CEFI_CHAIN_INSTRUMENT_TYPES",
+    "PROCESSED_CANDLES_PREFIX",
     "RAW_TICK_DATA_PREFIX",
     "TRADFI_CHAIN_INSTRUMENT_TYPES",
     "TRADFI_SINGLE_INSTRUMENT_TYPES",
