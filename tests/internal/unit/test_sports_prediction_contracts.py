@@ -313,3 +313,69 @@ def test_all_three_new_prediction_contracts_use_condition_id() -> None:
         assert contract.symbol_column == "condition_id", (
             f"{key} must pivot on condition_id (got {contract.symbol_column!r})"
         )
+
+
+# ---------------------------------------------------------------------------
+# G1-ENUM validity-matrix reachability (sports_shard_enumeration_cartesian_
+# blowup_2026_07_20.md Part 2 item 2.3): CONTRACT_REGISTRY's sports "odds"
+# family must be reachable from VALID_DATA_TYPES_BY_AG_AND_INSTRUMENT_TYPE.
+# The matrix had NO ("sports","odds") entry at all despite
+# CONTRACT_REGISTRY[("sports","odds","trades")] backing 1,806,527 real prod
+# rows (instrument_type=odds/data_type=trades).
+# ---------------------------------------------------------------------------
+
+
+def test_sports_odds_instrument_type_has_a_validity_matrix_entry() -> None:
+    """Regression lock for the ("sports","odds") matrix hole.
+
+    Before this fix, ``VALID_DATA_TYPES_BY_AG_AND_INSTRUMENT_TYPE`` had no
+    ``("sports","odds")`` key at all, so every real
+    (instrument_type=odds, data_type=trades) manifest row -- 1,806,527 of them
+    in prod -- silently fell through the "unmapped instrument_type" path
+    instead of an audited, confirmed matrix entry.
+    """
+    from unified_api_contracts.registry.market_data_categories import (
+        VALID_DATA_TYPES_BY_AG_AND_INSTRUMENT_TYPE,
+    )
+
+    assert ("sports", "odds") in VALID_DATA_TYPES_BY_AG_AND_INSTRUMENT_TYPE
+    assert "trades" in VALID_DATA_TYPES_BY_AG_AND_INSTRUMENT_TYPE[("sports", "odds")]
+
+
+def test_every_sports_odds_family_contract_registry_entry_is_matrix_reachable() -> None:
+    """Every CONTRACT_REGISTRY key sharing a sports market-data "odds" family
+    instrument_type -- and whose data_type is a genuine
+    ``DATA_TYPES_BY_ASSET_GROUP["sports"]`` member (not a schema-internal name
+    like ``SPORTS_ODDS_SNAPSHOT``'s ``sports_odds_snapshot``, a separate,
+    out-of-scope naming mismatch between CONTRACT_REGISTRY's schema keys and
+    the wire data_type vocabulary) -- must have its data_type present in the
+    ``VALID_DATA_TYPES_BY_AG_AND_INSTRUMENT_TYPE`` entry for that
+    instrument_type.
+
+    Scoped to the odds-shape family the matrix already declares
+    (fixture/exchange_odds/fixed_odds/prop/odds) rather than the whole
+    CONTRACT_REGISTRY -- most of the registry (ml_training manifests, sports
+    reference/derived/feature contracts, MDPS candle-feature families, ...)
+    is outside what this market-data validity matrix models at all.
+    """
+    from unified_api_contracts.registry.market_data_categories import (
+        DATA_TYPES_BY_ASSET_GROUP,
+        VALID_DATA_TYPES_BY_AG_AND_INSTRUMENT_TYPE,
+    )
+
+    odds_family_instrument_types = {"fixture", "exchange_odds", "fixed_odds", "prop", "odds"}
+    sports_data_types = set(DATA_TYPES_BY_ASSET_GROUP["sports"])
+
+    violations: list[tuple[str, str, str]] = []
+    for asset_group, instrument_type, data_type in CONTRACT_REGISTRY:
+        if asset_group != "sports" or instrument_type not in odds_family_instrument_types:
+            continue
+        if data_type not in sports_data_types:
+            continue  # out of scope: schema-internal name, not a wire data_type
+        matrix_entry = VALID_DATA_TYPES_BY_AG_AND_INSTRUMENT_TYPE.get((asset_group, instrument_type))
+        if matrix_entry is None or data_type not in matrix_entry:
+            violations.append((asset_group, instrument_type, data_type))
+
+    assert not violations, (
+        f"sports odds-family CONTRACT_REGISTRY entries with no validity-matrix coverage: {violations}"
+    )

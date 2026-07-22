@@ -338,6 +338,7 @@ from .sports_bookmaker_league_coverage import (
     COVERED_BOOKMAKERS,
     PREDICTION_MARKET_VENUES,
     is_bookmaker_league_covered,
+    is_bookmaker_league_covered_exact,
     is_bookmaker_observed,
     is_prediction_market_venue,
 )
@@ -1135,6 +1136,7 @@ __all__ = [
     "grain_for_instrument_type",
     "is_block_finalized",
     "is_bookmaker_league_covered",
+    "is_bookmaker_league_covered_exact",
     "is_bookmaker_observed",
     "is_defi_force_include",
     "is_defi_force_include_pool",

@@ -852,6 +852,17 @@ VALID_DATA_TYPES_BY_AG_AND_INSTRUMENT_TYPE: dict[tuple[str, str], frozenset[str]
     ("sports", "prop"): frozenset(  # UNCERTAIN — sports-owner verify
         {"odds", "odds_snapshot", "odds_movement"}
     ),
+    # ("sports", "odds") — closes the matrix hole found by
+    # sports_shard_enumeration_cartesian_blowup_2026_07_20.md Part 2 item 2.3
+    # (2026-07-22). Unlike its four neighbours above, this entry is CONFIRMED,
+    # not UNCERTAIN: CONTRACT_REGISTRY[("sports","odds","trades")] =
+    # SPORTS_ODDS_TRADES is a real, registered SchemaContract
+    # (_sports_prediction_contracts.py), and prod carries 1,806,527 rows under
+    # exactly this (instrument_type=odds, data_type=trades) pair. Before this
+    # entry existed the pair had NO matrix row at all, so every one of those
+    # rows silently rode the "unmapped instrument_type" fallback path instead
+    # of an audited entry.
+    ("sports", "odds"): frozenset({"trades"}),
     # ── Prediction ────────────────────────────────────────────────────────────
     # Prediction uses per-row data_type GRAIN BINDING (instr.data_type field): the
     # enumerator's _row_data_types step-1 returns [instr.data_type] and NEVER
