@@ -479,6 +479,38 @@ SPORTS_ODDS_API_ACCEPTED_NONCANONICAL_BOOKMAKERS: frozenset[str] = frozenset(
     }
 )
 
+# TradFi "chain snapshot" bundle data_types (options_chain/futures_chain) — the
+# per-underlying options/futures chain snapshot rows the DERIBIT/CME writers
+# genuinely emit (mark_iv/greeks + the futures-chain analogue), operator
+# PRESERVE-ruled (T-OLD-2b, 2026-06-08). They are deliberately NOT members of
+# DATA_TYPES_BY_ASSET_GROUP["tradfi"] — that list stays the per-contract-leaf
+# market-data vocabulary (trades/ohlcv_*/tbbo/mbp_10/...), and
+# options_chain/futures_chain are conceptually INSTRUMENT_TYPES (one bundle per
+# underlying), not data_types (see the "Bundle grain (ERA-B...)" comment above
+# VALID_DATA_TYPES_BY_AG_AND_INSTRUMENT_TYPE). But real captured rows DO carry
+# data_type=options_chain (242,210 rows, 100% captured — the Era-A mark_iv/
+# greeks chain snapshot the CEFI_OPTIONS_CHAIN_TRADES/*_SNAPSHOT schema
+# protects) and data_type=futures_chain (8 rows, 100% captured — the small
+# genuine legacy futures-chain-snapshot cohort, same shape). Neither is junk
+# and neither should be relabelled/purged (options_chain: REFUTED-relabel
+# verdict; futures_chain: the same precedent, carved out 2026-07-22) — see
+# `plans/active/distinct_values_noncanonical_audit_2026_07_20.md` "LIVE
+# row-count evidence" + "Refined worklist". Until this export, the
+# distinct-values detector had no way to know that: both still badged
+# non-canonical every run despite the audit's own "is canonical"/"carve-out"
+# verdicts never actually being wired to silence them. Mirrors
+# SPORTS_ODDS_API_ACCEPTED_NONCANONICAL_BOOKMAKERS exactly: consumed by
+# deployment-api's `_distinct_values.py` `_ACCEPTED_EXCEPTIONS` to drop these
+# two values from the tradfi `data_types` axis finding count — "known and
+# accepted", not "drift needing a fix". NOT a canonical set — never merge into
+# DATA_TYPES_BY_ASSET_GROUP/ALL_DATA_TYPES or any canonicality check.
+TRADFI_CHAIN_SNAPSHOT_ACCEPTED_NONCANONICAL_DATA_TYPES: frozenset[str] = frozenset(
+    {
+        "options_chain",
+        "futures_chain",
+    }
+)
+
 
 # --- Candle processing classification ---
 # True = MDPS should process this data type through a candle adapter.

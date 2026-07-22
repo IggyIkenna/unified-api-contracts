@@ -8,6 +8,7 @@ from unified_api_contracts.registry.market_data_categories import (
     DATA_TYPES_BY_ASSET_GROUP,
     NEEDS_CANDLE_PROCESSING,
     TIMEFRAMES,
+    TRADFI_CHAIN_SNAPSHOT_ACCEPTED_NONCANONICAL_DATA_TYPES,
     VENUES_BY_ASSET_GROUP,
     get_valid_timeframes_for_data_type,
     needs_candle_processing,
@@ -126,3 +127,31 @@ def test_defi_data_type_has_explicit_candle_classification(data_type: str) -> No
         f"NEEDS_CANDLE_PROCESSING. It will default to True and route to an MDPS candle "
         f"adapter that may not exist. Add an explicit True/False entry."
     )
+
+
+# ---------------------------------------------------------------------------
+# TRADFI_CHAIN_SNAPSHOT_ACCEPTED_NONCANONICAL_DATA_TYPES (audit 2026-07-22,
+# distinct_values_noncanonical_audit_2026_07_20.md "futures_chain tradfi
+# remedy decision") — mirrors SPORTS_ODDS_API_ACCEPTED_NONCANONICAL_BOOKMAKERS:
+# genuinely non-canonical, permanently-accepted tradfi data_type values (real
+# captured chain-snapshot rows, operator PRESERVE-ruled), consumed by
+# deployment-api's `_distinct_values.py` to stop badging them as drift without
+# ever making them canonical.
+# ---------------------------------------------------------------------------
+
+
+def test_tradfi_chain_snapshot_accepted_exceptions_are_exactly_options_and_futures_chain() -> None:
+    assert frozenset({"options_chain", "futures_chain"}) == TRADFI_CHAIN_SNAPSHOT_ACCEPTED_NONCANONICAL_DATA_TYPES
+
+
+def test_tradfi_chain_snapshot_accepted_exceptions_are_not_canonical_tradfi_data_types() -> None:
+    """The whole point: these stay OUT of DATA_TYPES_BY_ASSET_GROUP['tradfi'] — an
+    accepted-exception, never a canonical-set addition (options_chain/futures_chain
+    are instrument_types, not data_types; the data_type for those rows is 'trades')."""
+    tradfi_data_types = DATA_TYPES_BY_ASSET_GROUP.get("tradfi", [])
+    for value in TRADFI_CHAIN_SNAPSHOT_ACCEPTED_NONCANONICAL_DATA_TYPES:
+        assert value not in tradfi_data_types, (
+            f"'{value}' leaked into DATA_TYPES_BY_ASSET_GROUP['tradfi'] — it must stay an "
+            f"accepted-exception (TRADFI_CHAIN_SNAPSHOT_ACCEPTED_NONCANONICAL_DATA_TYPES), "
+            f"never a canonical data_type."
+        )
