@@ -4,7 +4,9 @@ from __future__ import annotations
 
 import pytest
 
+from unified_api_contracts import InstrumentType
 from unified_api_contracts.registry.market_data_categories import (
+    CHAIN_BUNDLE_ACCEPTED_NONCANONICAL_INSTRUMENT_TYPES,
     DATA_TYPES_BY_ASSET_GROUP,
     NEEDS_CANDLE_PROCESSING,
     TIMEFRAMES,
@@ -154,4 +156,42 @@ def test_tradfi_chain_snapshot_accepted_exceptions_are_not_canonical_tradfi_data
             f"'{value}' leaked into DATA_TYPES_BY_ASSET_GROUP['tradfi'] — it must stay an "
             f"accepted-exception (TRADFI_CHAIN_SNAPSHOT_ACCEPTED_NONCANONICAL_DATA_TYPES), "
             f"never a canonical data_type."
+        )
+
+
+# ---------------------------------------------------------------------------
+# CHAIN_BUNDLE_ACCEPTED_NONCANONICAL_INSTRUMENT_TYPES (audit follow-up
+# 2026-07-22, distinct_values_noncanonical_audit_2026_07_20.md "D5 —
+# bundle-grain recognition") — mirrors
+# TRADFI_CHAIN_SNAPSHOT_ACCEPTED_NONCANONICAL_DATA_TYPES / the sports
+# bookmakers pattern exactly, but on the tradfi+cefi ``instrument_types`` axis:
+# ``options_chain``/``futures_chain`` are the real MTDS Tardis-writer bundle
+# tokens, genuinely non-canonical (not ``InstrumentType`` members) and
+# permanently accepted, never purged/relabelled. ``combo`` is deliberately
+# excluded (mirrors ``TRADFI_CHAIN_INSTRUMENT_TYPES``'s own exclusion in
+# ``canonical/partition_paths.py`` — its leg-aware id format is unsettled).
+# ---------------------------------------------------------------------------
+
+
+def test_chain_bundle_accepted_exceptions_are_exactly_options_and_futures_chain() -> None:
+    assert frozenset({"options_chain", "futures_chain"}) == CHAIN_BUNDLE_ACCEPTED_NONCANONICAL_INSTRUMENT_TYPES
+
+
+def test_chain_bundle_accepted_exceptions_exclude_combo() -> None:
+    """``combo``'s leg-aware id format is unsettled (see
+    ``TRADFI_CHAIN_INSTRUMENT_TYPES``'s own exclusion) — it must NOT be folded
+    into this bundle-grain accepted-exception set."""
+    assert "combo" not in CHAIN_BUNDLE_ACCEPTED_NONCANONICAL_INSTRUMENT_TYPES
+
+
+def test_chain_bundle_accepted_exceptions_are_not_instrument_type_enum_members() -> None:
+    """The whole point: these stay OUT of the ``InstrumentType`` enum — an
+    accepted-exception, never a canonical-set addition (a per-bundle token
+    would misrepresent itself as an individually-tradable per-contract
+    instrument, the same grain error D1b already fixed for defi venues)."""
+    canonical_instrument_types = frozenset(member.value for member in InstrumentType)
+    for value in CHAIN_BUNDLE_ACCEPTED_NONCANONICAL_INSTRUMENT_TYPES:
+        assert value not in canonical_instrument_types, (
+            f"'{value}' leaked into the InstrumentType enum — it must stay an accepted-exception "
+            f"(CHAIN_BUNDLE_ACCEPTED_NONCANONICAL_INSTRUMENT_TYPES), never a canonical instrument_type."
         )

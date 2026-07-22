@@ -572,6 +572,49 @@ CEFI_VENUE_ACCEPTED_NONCANONICAL_ALIASES: frozenset[str] = frozenset(CEFI_VENUE_
     VENUES_BY_ASSET_GROUP["cefi"]
 )
 
+# Bundle-grain "chain snapshot" instrument_type tokens (audit follow-up 2026-07-22,
+# distinct_values_noncanonical_audit_2026_07_20.md § "D5 — bundle-grain
+# recognition"): ``options_chain``/``futures_chain`` are the REAL, deliberate
+# shard-grain ``instrument_type`` stamp MTDS's Tardis writers use for TradFi +
+# CeFi options/futures chain-snapshot bundles — one manifest atom per underlying
+# per day, bundling every strike/expiry leg into a single file (see MTDS
+# ``tardis_bulk_download.py::shard_it_str = "options_chain" if ... else
+# "futures_chain"``; mirrored by this registry's OWN
+# ``canonical.partition_paths.TRADFI_CHAIN_INSTRUMENT_TYPES`` /
+# ``CEFI_CHAIN_INSTRUMENT_TYPES``, which already recognise the identical pair as
+# legitimate path-building bundle tokens — this export gives the distinct-values
+# detector the same recognition for a DIFFERENT axis: MTDS's raw
+# ``instrument_type`` manifest COLUMN, not the GCS path). Real production rows:
+# tradfi ``futures_chain`` (154,147 captured) + ``options_chain`` (121,031
+# captured) at this axis-grain, 2026-07-21 live rollup.
+#
+# Neither is a member of the ``InstrumentType`` enum (that enum is per-CONTRACT
+# grain — ``FUTURE``/``OPTION`` — the individual legs the bundle contains), and
+# neither should be ADDED to it: ``InstrumentType`` feeds the
+# expected-universe/completeness_pct denominator at the per-instrument grain, so
+# admitting a per-BUNDLE token there would misrepresent the bundle as an
+# individually-tradable instrument (same category of error D1b already fixed for
+# defi venues — conflating a real value with the wrong grain's registry).
+#
+# ``combo`` is deliberately NOT included here — it mirrors
+# ``TRADFI_CHAIN_INSTRUMENT_TYPES``'s own exclusion (its leg-aware id format is
+# unsettled, per ``canonical/partition_paths.py``'s comment). Tradfi's lowercase
+# ``combo``/``equity``/``etf``/``future``/``index`` spellings are a SEPARATE,
+# already-classified finding (real case-drift owned by the in-flight tradfi
+# uppercase migration — see this audit's D3 note); this export does not touch
+# them. Mirrors SPORTS_ODDS_API_ACCEPTED_NONCANONICAL_BOOKMAKERS /
+# TRADFI_CHAIN_SNAPSHOT_ACCEPTED_NONCANONICAL_DATA_TYPES exactly: consumed by
+# deployment-api's `_distinct_values.py` `_ACCEPTED_EXCEPTIONS` to drop these two
+# values from the tradfi AND cefi `instrument_types` axis finding count — "known
+# and accepted", not "drift needing a fix". NOT a canonical set — never merge
+# into the `InstrumentType` enum or any canonicality check.
+CHAIN_BUNDLE_ACCEPTED_NONCANONICAL_INSTRUMENT_TYPES: frozenset[str] = frozenset(
+    {
+        "options_chain",
+        "futures_chain",
+    }
+)
+
 
 # --- Candle processing classification ---
 # True = MDPS should process this data type through a candle adapter.
