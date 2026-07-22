@@ -59,6 +59,12 @@ AvailabilitySemantic = Literal[
 AVAILABILITY_AT_SEMANTICS: Final[dict[tuple[str, str], AvailabilitySemantic]] = {
     # ---- Sports ----------------------------------------------------------
     ("sports", "FIXTURES"): "announced_at",
+    # FIXTURES_SCHEDULE/FIXTURES_OUTCOMES: schedule/outcome split of FIXTURES (writer
+    # cutover 2026-07-14, fixture_lifecycle.py). Semantics follow the split's own
+    # documented rationale — schedule is known at announcement, outcome only at
+    # match end (lookahead-bias avoidance is the reason the split exists at all).
+    ("sports", "FIXTURES_SCHEDULE"): "announced_at",
+    ("sports", "FIXTURES_OUTCOMES"): "match_end_time",
     ("sports", "FIXTURE_LINEUPS"): "kickoff_minus_60min",
     ("sports", "FIXTURE_EVENTS"): "event_time",
     ("sports", "INJURIES"): "report_time",

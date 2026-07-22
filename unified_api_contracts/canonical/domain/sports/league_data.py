@@ -232,6 +232,13 @@ SPORTS_DATA_TYPE_TO_SOURCE: dict[str, str] = {
     "XG_SHOTS": "understat",
     # API-Football — fixtures + per-fixture detail + reference (teams / standings)
     "FIXTURES": "api_football",
+    # FIXTURES_SCHEDULE/FIXTURES_OUTCOMES are the schedule/outcome split of the same
+    # api_football fixtures feed (writer cutover 2026-07-14, fixture_lifecycle.py) —
+    # missing here meant is_pre_launch_date() silently returned False for them,
+    # letting ~83,541 pre-2020-06-06 objects misclassify as real orphans instead of
+    # the pre-launch-floor violations they are (found 2026-07-22, orphan-sweep audit).
+    "FIXTURES_SCHEDULE": "api_football",
+    "FIXTURES_OUTCOMES": "api_football",
     "INJURIES": "api_football",
     "FIXTURE_STATS": "api_football",
     "FIXTURE_EVENTS": "api_football",

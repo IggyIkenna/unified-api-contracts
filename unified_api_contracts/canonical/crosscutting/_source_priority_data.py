@@ -30,6 +30,10 @@ SOURCE_PRIORITY: Final[dict[tuple[str, str], list[str]]] = {
         "api_football",
         "footystats",
     ],  # footystats is the deferred multi-source merge candidate (see module docstring Phase 1B)
+    # FIXTURES_SCHEDULE/FIXTURES_OUTCOMES are the schedule/outcome split of FIXTURES
+    # (writer cutover 2026-07-14, fixture_lifecycle.py) — same source as legacy FIXTURES.
+    ("sports", "FIXTURES_SCHEDULE"): ["api_football", "footystats"],
+    ("sports", "FIXTURES_OUTCOMES"): ["api_football", "footystats"],
     ("sports", "FIXTURE_LINEUPS"): ["api_football"],
     ("sports", "FIXTURE_EVENTS"): ["api_football"],
     ("sports", "FIXTURE_STATS"): ["api_football"],
