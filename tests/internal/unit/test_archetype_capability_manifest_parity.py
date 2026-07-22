@@ -35,23 +35,44 @@ from unified_api_contracts.internal.architecture_v2.enums import (
 
 
 def _find_codex_markdown() -> Path | None:
-    """Resolve ``category-instrument-coverage.md`` via workspace root or repo-sibling lookup.
+    """Resolve ``category-instrument-coverage.md`` via repo-sibling lookup, falling back to
+    ``UNIFIED_TRADING_WORKSPACE_ROOT``.
+
+    Repo-sibling FIRST (2026-07-22 fix): under the per-slot worktree model
+    (``codex/05-infrastructure/per-tab-worktrees.md``), each slot is an
+    independent ``git clone --reference`` under ``<workspace>/.tabs/<N>/`` with
+    its own ``unified-trading-pm`` checkout kept current via
+    ``git pull --ff-only``. ``UNIFIED_TRADING_WORKSPACE_ROOT`` is a
+    machine-wide env var (set once in the operator's shell profile for
+    unrelated purposes — the shared ``.venv-workspace`` on ``PATH``, the
+    ``sync-main`` helpers) that points at the WORKSPACE ROOT, one level above
+    every slot — walking up from *this test file's own location* always lands
+    inside the correct, currently-checked-out-and-synced slot instead. A bare
+    ``<root>/unified-trading-pm`` checkout can exist at the root (pre-Path-B
+    leftover, or simply absent) and go stale for weeks with nobody noticing,
+    because nothing else reads it — this test was the one consumer still
+    trusting it, and did so BEFORE the always-correct ancestor walk, so a
+    stale root checkout produced spurious "missing archetype section"
+    failures for content that was actually present and current in every
+    slot's own checkout. Root-caused 2026-07-22: the root checkout was 16
+    days stale (last commit 2026-07-06) while every slot already had the full
+    2026-07-21 Phase-9 archetype expansion (53/53 archetypes documented).
 
     Returns ``None`` when UAC is running in true isolation (e.g. an
-    ephemeral CI container without the PM checkout). Every other context
-    resolves to the real file and enforces parity.
+    ephemeral CI container without the PM checkout, where neither resolution
+    finds a file). Every other context resolves to the real file and
+    enforces parity.
     """
 
     rel = Path("unified-trading-pm/codex/09-strategy/architecture-v2/category-instrument-coverage.md")
-    env_root = os.environ.get("UNIFIED_TRADING_WORKSPACE_ROOT")
-    if env_root:
-        candidate = Path(env_root) / rel
-        if candidate.is_file():
-            return candidate
-    # Fall back to UAC repo's parent (standard multi-repo workspace layout).
     here = Path(__file__).resolve()
     for ancestor in here.parents:
         candidate = ancestor / rel
+        if candidate.is_file():
+            return candidate
+    env_root = os.environ.get("UNIFIED_TRADING_WORKSPACE_ROOT")
+    if env_root:
+        candidate = Path(env_root) / rel
         if candidate.is_file():
             return candidate
     return None

@@ -349,9 +349,10 @@ class TestTradFiMvp:
         """CME trades → NOT MVP (decision #7 — tradfi MVP is ohlcv_1m only)."""
         assert not is_mvp("tradfi", "CME", "FUTURE", "trades", base_ccy="ES")
 
-    def test_cme_ohlcv_1s_excluded(self) -> None:
-        """CME ohlcv_1s → NOT MVP (decision #7 — tradfi MVP is ohlcv_1m only, no 1s)."""
-        assert not is_mvp("tradfi", "CME", "FUTURE", "ohlcv_1s", base_ccy="ES")
+    def test_cme_ohlcv_1s_included(self) -> None:
+        """CME ohlcv_1s → MVP (decision #7 revised 2026-07-22 — the backfill captured both
+        ohlcv_1m and ohlcv_1s, so the predicate now matches what was actually captured)."""
+        assert is_mvp("tradfi", "CME", "FUTURE", "ohlcv_1s", base_ccy="ES")
 
     def test_non_mvp_tradfi_venue_returns_false(self) -> None:
         """NASDAQ is in tradfi venues but NOT in the MVP set → False."""
@@ -779,10 +780,10 @@ class TestPredictionReconcileCrossAgUnchanged:
         assert rule.data_types == frozenset({"trades", "book_snapshot_5", "derivative_ticker", "funding_rate"})
 
     def test_tradfi_data_types_unchanged(self) -> None:
-        """TradFi MVP data_types is exactly {ohlcv_1m} — no book_snapshot_5 leak."""
+        """TradFi MVP data_types is exactly {ohlcv_1m, ohlcv_1s} — no book_snapshot_5 leak."""
         rule = MVP_SCOPE["tradfi"]
         assert isinstance(rule, TradFiMvpRule)
-        assert rule.data_types == frozenset({"ohlcv_1m"})
+        assert rule.data_types == frozenset({"ohlcv_1m", "ohlcv_1s"})
         assert not is_mvp("tradfi", "CME", "FUTURE", "book_snapshot_5", base_ccy="ES")
 
     def test_sports_data_types_unchanged(self) -> None:

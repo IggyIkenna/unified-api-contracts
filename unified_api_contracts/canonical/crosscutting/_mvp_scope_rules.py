@@ -674,11 +674,15 @@ MVP_SCOPE: Final[dict[str, object]] = {
                 "OPTION",  # InstrumentType.OPTION — CME options, MVP at ohlcv_1m
             }
         ),
-        # ohlcv_1m ONLY (operator 2026-06-27 decision #7): tradfi MVP is 1-minute
-        # bars — NO ohlcv_1s, NO trades. CME options ride the same ohlcv_1m grain.
+        # ohlcv_1m + ohlcv_1s (operator 2026-06-27 decision #7 revised 2026-07-22): the
+        # 2026-07-21/22 backfill fleet captured both grains ("whatever fills fastest as
+        # MVP" — operator), so the predicate now matches what was actually captured.
+        # Still NO trades/tbbo (billing-gated L1/L2 microstructure — documented
+        # nice-to-have in tradfi_consolidated_closeout_2026_07_18.md, not MVP).
         data_types=frozenset(
             {
                 "ohlcv_1m",
+                "ohlcv_1s",
             }
         ),
         underliers=frozenset(
