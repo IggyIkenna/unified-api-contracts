@@ -36,7 +36,71 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
-from typing import cast
+from typing import Final, cast
+
+# ---------------------------------------------------------------------------
+# Part 0 — the REQUEST scope (Phase 6d prerequisite for MTDS venue-injection)
+# ---------------------------------------------------------------------------
+# UAC-side mirror of ``market-tick-data-service``'s
+# ``market_interface/adapters/sports/odds_api_adapter.py::REQUESTED_ODDS_API_BOOKMAKERS``
+# — the exact books sent as the Odds-API ``bookmakers=`` request parameter, and
+# therefore the only defensible basis for a per-bookmaker EXPECTATION (see that
+# module's docstring for the 2026-07-20 finding this closes: deriving scope from
+# UAC venue CATEGORIES instead of the real request list manufactured 418,860
+# structurally-false honest-absence rows on 3 never-requested keys).
+#
+# This is a DELIBERATE duplication, not an import (MTDS depends on UAC, not the
+# reverse — "no service-to-service deps", tier-and-import-architecture). UAC is
+# the SSOT going forward: MTDS's copy should re-point to import this constant in
+# a follow-up change; until then keep both lists in sync by hand when the
+# Odds-API request scope changes (rare — audited additions only).
+#
+# Consumed by :func:`expected_odds_api_bookmaker_keys` for the deployment-api
+# MTDS SPORTS venue-injection (Phase 6d, ``mtds.py::MTDS_CATEGORY_META["SPORTS"]``
+# — the axis is bookmaker x league x fixture-date, NOT the generic venue x
+# data_type x calendar-date axis the other MTDS categories use; the injection
+# loop for this axis is separate follow-up work, see
+# ``plans/active/issues/sports_shard_enumeration_cartesian_blowup_2026_07_20.md`` §4.4).
+REQUESTED_ODDS_API_BOOKMAKERS: Final[tuple[str, ...]] = (
+    "pinnacle",
+    "betfair_ex_uk",
+    "betfair_ex_eu",
+    "betonlineag",
+    "coral",
+    "paddypower",
+    "casumo",
+    "virginbet",
+    "betsson",
+    "unibet",
+    "fanduel",
+    "draftkings",
+    "betrivers",
+    "matchbook",
+    "smarkets",
+    "williamhill",
+    "ladbrokes_uk",
+    "betvictor",
+    "unibet_uk",
+    "skybet",
+    "betfair_sb_uk",
+    "sport888",
+    "livescorebet",
+)
+
+
+def expected_odds_api_bookmaker_keys() -> list[str]:
+    """Canonical UPPERCASE bookmaker keys an Odds-API response can contain.
+
+    Mirrors MTDS's ``expected_odds_api_venue_keys()`` exactly (same request
+    list, same uppercasing — the capture writer groups on ``bookmaker_key``
+    upper-cased). A bookmaker not in this list can never legitimately appear
+    in a captured row and must never be treated as an expected venue; a
+    bookmaker IN this list that never captures must be injected as a
+    zero-row entry (Phase 6d) so it renders as an honest 0%, not silently
+    absent from the data-status UI.
+    """
+    return sorted(k.upper() for k in REQUESTED_ODDS_API_BOOKMAKERS)
+
 
 # ---------------------------------------------------------------------------
 # Part 1 — prediction-market venues (NOT Odds-API bookmakers)

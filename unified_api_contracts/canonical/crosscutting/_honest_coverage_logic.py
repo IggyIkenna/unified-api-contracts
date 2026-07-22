@@ -42,13 +42,19 @@ class CaptureStatusCounts(NamedTuple):
 
     * ``expected_unattempted_known_empty`` — Tier-3 sentinel pre-resolved this
       slot to an ``EXPECTED_*`` reason (calendar pre-skip, pre-genesis, pre-listing).
-      No fetch will ever land data here, so the slot IS honestly answered.
-      Counts toward NUMERATOR.
+      No fetch will ever land data here. DENOMINATOR only (as of the
+      2026-07-22 Part 4.1 formula consolidation — see
+      :func:`compute_honest_coverage`'s docstring; pre-4.1 this counted
+      toward the numerator, a distinction the new formula deliberately drops
+      to match ``instruments-service``'s production formula exactly).
 
     * ``expected_unattempted_pending_fetch`` — Tier-3 sentinel says "we expect
       data exists here but no adapter has run yet". This is a GAP. Counts in
       DENOMINATOR only — backfills must run to convert these into ``captured``,
       ``empty_confirmed`` (with ``SOURCE_RETURNED_ZERO``), or ``attempted_failed``.
+      Also the ONE sub-bucket :data:`HONEST_COVERAGE_GAP_FIELDS` lists as
+      backfill-actionable (``known_empty`` never converts — there's nothing
+      to retry, the calendar has already spoken).
 
     Producers (manifest reconcilers, data-status service, deployment-api):
     materialise these counts by grouping manifest rows on
@@ -75,65 +81,77 @@ class CaptureStatusCounts(NamedTuple):
     window/scope (a SUBSET of :attr:`empty_confirmed`; reason ∈
     :data:`OUT_OF_COVERAGE_WINDOW_REASONS` — instrument-not-listed / delisted /
     pre-venue-launch / no-fixture / …, OR a schedule-defining ``FIXTURES``
-    no-match-day). These cells "could never have data" so they are CLIPPED from
-    BOTH the numerator and the denominator by :func:`compute_honest_coverage`
-    (operator direction 2026-06-23 — "better to have blanks where we expected
-    data" than out-of-life empties credited as coverage). Defaults to 0 so
-    callers that don't populate it get the legacy numerator-credit behaviour
-    unchanged; producers that classify reasons (UTL ``read_capture_status_counts``,
-    deployment-api coverage rollup) populate it so out-of-life cells stop
-    inflating the %. MUST satisfy ``0 <= out_of_window <= empty_confirmed``."""
+    no-match-day). Since 2026-07-22 (Part 4.1 global formula consolidation)
+    :func:`compute_honest_coverage` excludes ALL of ``empty_confirmed`` from
+    both numerator and denominator regardless of this sub-classification, so
+    this field no longer changes the computed ratio — it is retained purely
+    as a reporting breakdown (the deployment-ui drilldown shows how much of
+    the excluded ``empty_confirmed`` total was out-of-life vs in-window).
+    MUST satisfy ``0 <= out_of_window <= empty_confirmed``."""
 
 
 def compute_honest_coverage(counts: CaptureStatusCounts) -> float:
     """Canonical honest-coverage ratio. Every caller in the workspace uses this.
 
-    Formula (post-2026-05-19 consolidation; out-of-window clip 2026-06-23):
+    Formula (2026-07-22 Part 4.1 global consolidation — the ONE formula for
+    every asset_group; supersedes the 2026-05-19/2026-06-23 numerator-credit
+    formula below):
 
-        within_window_empty = empty_confirmed - out_of_window
-        numerator   = captured + within_window_empty + expected_unattempted_known_empty
-        denominator = numerator + attempted_failed + expected_unattempted_pending_fetch
+        numerator   = captured
+        denominator = captured + attempted_failed
+                      + expected_unattempted_known_empty
+                      + expected_unattempted_pending_fetch
         coverage    = numerator / denominator     (returns 1.0 if denominator==0)
 
-    ``out_of_window`` (default 0) is the subset of ``empty_confirmed`` whose
-    cells could never have data (instrument not listed / delisted / pre-venue-
-    launch / no-fixture / schedule-defining FIXTURES no-match-day — the
-    :data:`OUT_OF_COVERAGE_WINDOW_REASONS`). These are CLIPPED from both
-    numerator and denominator so an out-of-life cell reads as a BLANK, not a
-    coverage success (operator direction 2026-06-23). Producers that classify
-    reasons populate ``out_of_window`` (UTL ``read_capture_status_counts``,
-    deployment-api coverage rollup); callers that leave it 0 get the legacy
-    numerator-credit behaviour, so this is a back-compatible change. NOTE:
-    clip ≠ numerator-credit whenever ``attempted_failed`` /
-    ``expected_unattempted_pending_fetch`` > 0 — crediting out-of-life empties
-    in BOTH num+denom inflates the % over the true in-window coverage (this is
-    the prediction-POLYMARKET 49.6k-empties inflation the operator flagged).
+    ``empty_confirmed`` (legitimate absence — source attempted, returned
+    zero rows, whether or not it also happens to be ``out_of_window``) is
+    now EXCLUDED from both numerator and denominator, matching
+    ``instruments-service/scripts/measure_honest_coverage.py::_count_statuses``
+    (the ``coverage.json`` / ``HonestCoverageCard.tsx`` formula) and
+    ``codex/02-data/honest-coverage-model.md``'s ``reachable_coverage``
+    (`captured / (captured + attempted_failed + expected_unattempted)`).
+    ``out_of_window`` is now a pure reporting subset of the excluded
+    ``empty_confirmed`` total — it no longer changes the ratio (see its
+    field docstring).
 
-    Semantics in plain English: a slot is **honestly answered** if we have any
-    truthful answer for it — data landed, or we confirmed it's empty, or the
-    Tier-3 sentinel resolved it as known-empty-no-fetch-needed
-    (``EXPECTED_HOLIDAY`` / ``EXPECTED_PRE_VENUE_LAUNCH`` / etc.). A slot is a
-    **gap** if we tried and failed (``attempted_failed``) or if the sentinel
-    says "expected to exist but we never tried" (non-``EXPECTED_*``
-    ``expected_unattempted`` rows).
-
-    Why ``known_empty`` is in the numerator: the writegate Phase 6.x plan
-    states "production-grade >99% means real >99% — denominator clipped to
-    legitimately-coverable shards". Equivalent rewording: rows that CAN'T
-    have data (pre-genesis dates, holidays, delisted instruments) are not a
-    gap, they're an honest answer. Excluding them from the numerator AND
-    denominator (clipping) and including them in both (numerator-credit)
-    produce the same ratio — we choose numerator-credit so the breakdown
-    in the deployment-ui drilldown shows the count.
+    Semantics in plain English: a slot is **honestly answered** ONLY if data
+    actually landed (``captured``) — this is a narrower bar than the
+    pre-2026-07-22 formula. A slot is a **gap** for every other state:
+    ``attempted_failed``, ``expected_unattempted_pending_fetch`` ("expected
+    to exist but we never tried"), ``expected_unattempted_known_empty``
+    ("the calendar/lifecycle sentinel pre-resolved this before any fetch —
+    a holiday, a pre-genesis date"), and ``empty_confirmed`` ("the source
+    was attempted and affirmatively returned zero rows"). Matching
+    ``instruments-service``'s ``_count_statuses`` exactly: that function
+    never splits ``expected_unattempted`` by reason at all, so a
+    known-empty-shaped row and a pending-fetch-shaped row are equally
+    denominator-only there — Part 4.1 preserves that equivalence rather
+    than inventing a numerator credit ``_count_statuses`` doesn't have.
+    This is a REVERSAL of the pre-2026-07-22 formula's "known_empty is an
+    honest answer, credit it" stance for that one field, made in the same
+    global decision that stops crediting ``empty_confirmed`` (measured
+    2026-07-22: every asset_group drops when ``empty_confirmed`` stops
+    being credited — CEFI -11.50pp, TRADFI -8.96pp, SPORTS -10.19pp,
+    PREDICTION -5.19pp, DEFI -0.05pp; see
+    ``unified-trading-pm/plans/active/issues/sports_shard_enumeration_cartesian_blowup_2026_07_20.md``
+    §4.1 for the full measured table and decision record). The
+    ``known_empty``/``pending_fetch`` split (:class:`CaptureStatusCounts`'s
+    docstring) remains useful for OTHER purposes — reporting, and
+    :data:`HONEST_COVERAGE_GAP_FIELDS` deliberately still lists only
+    ``pending_fetch`` (not ``known_empty``) as "actionable, retry this on
+    backfill" — but neither sub-bucket earns numerator credit here.
 
     SSOTs this function consolidates:
 
+    * ``sports_shard_enumeration_cartesian_blowup_2026_07_20.md`` §4.1 — the
+      2026-07-22 decision to adopt the EXCLUDE-``empty_confirmed`` formula
+      globally (all asset groups, not sports-scoped)
+    * ``codex/02-data/honest-coverage-model.md`` — ``reachable_coverage``
     * ``writegate_honest_coverage_endtoend_2026_05_06.md`` Phase 1B + 6.x
+      (superseded numerator-credit formula, kept for history)
     * ``expected_unattempted_propagation_chain_2026_05_12.md`` Phase 2.A
-      (the EXPECTED_/non-EXPECTED_ split for ``expected_unattempted`` rows)
-    * ``data_status_drilldown_shard_atom_alignment_2026_05_07.md`` Phase 1
-      endpoint (line 170-171: "numerator = manifest rows with
-      ``capture_status=captured``" — superseded by this function)
+      (the EXPECTED_/non-EXPECTED_ split for ``expected_unattempted`` rows —
+      still load-bearing under the new formula)
 
     Callers:
 
@@ -153,9 +171,13 @@ def compute_honest_coverage(counts: CaptureStatusCounts) -> float:
     rows before computing coverage; otherwise a brand-new asset_group reports
     a misleading 100%.
     """
-    within_window_empty = counts.empty_confirmed - counts.out_of_window
-    numerator = counts.captured + within_window_empty + counts.expected_unattempted_known_empty
-    denominator = numerator + counts.attempted_failed + counts.expected_unattempted_pending_fetch
+    numerator = counts.captured
+    denominator = (
+        numerator
+        + counts.attempted_failed
+        + counts.expected_unattempted_known_empty
+        + counts.expected_unattempted_pending_fetch
+    )
     if denominator == 0:
         return 1.0
     return numerator / denominator
