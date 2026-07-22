@@ -265,13 +265,17 @@ _DEFI: dict[str, list[str]] = {
     "SUSHISWAP_V3-ETHEREUM": list(_DEFI_DEX_PAIRS),
     "ORCA-SOLANA": list(_DEFI_DEX_PAIRS),
     "RAYDIUM-SOLANA": list(_DEFI_DEX_PAIRS),
-    # Solana DEX pools (2026-07-20 catalogue canonicalization) — dex_pool_state
-    # ONLY (matches the meteora.py/lifinity.py/phoenix.py adapter capture surface
-    # + DEFI_VENUE_DATA_TYPE_CAPABILITIES; declaring dex_pool_swaps would mint a
-    # false MISSING for a shard the adapters never write).
-    "METEORA-SOLANA": ["dex_pool_state"],
-    "LIFINITY-SOLANA": ["dex_pool_state"],
-    "PHOENIX-SOLANA": ["dex_pool_state"],
+    # METEORA-SOLANA / LIFINITY-SOLANA / PHOENIX-SOLANA removed from this dict
+    # 2026-07-22 (not just narrowed elsewhere): get_expected_venues_in_scope()
+    # returns every venue with a non-empty list here WITHOUT consulting
+    # DEFI_VENUE_PHASE, so a phase="pipeline" flip alone (defi_venues.py) does
+    # NOT drop a venue from this honest-coverage denominator — it stayed a leak
+    # after the CHAINLINK precedent (uac@83f17c46) flipped phase without
+    # deleting the row here too. All 3 upstreams are measurably dead
+    # (404/522/NXDOMAIN, re-verified 2026-07-22); re-add
+    # {"dex_pool_state": [...]} here in the SAME commit that re-promotes the
+    # venue to phase="live". SSOT:
+    # issues/uac_is_defi_oracle_dex_adapter_drift_2026_07_20.md.
     # --- Lending protocols — evm_defi_handler uses "aave_v3".upper() = "AAVE_V3" ---
     # ALSO: flash_loan_events_handler + position_data_handler hardcode "AAVE_V3"
     # (no underscore) — both names needed until those handlers are normalised (Bug 2).

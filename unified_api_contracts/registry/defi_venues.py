@@ -224,7 +224,14 @@ ALL_DEFI_VENUES: list[str] = [
     # ── Solana DEX / CLOB pools (2026-07-20 DeFi catalogue canonicalization —
     #    IS-wired via meteora.py / lifinity.py / phoenix.py adapters; dex_pool_state).
     #    METEORA = DLMM + dynamic pools; LIFINITY = proactive-MM; PHOENIX = on-chain
-    #    order-book DEX (Ellipsis Labs). Flipped to phase="live" below. ──
+    #    order-book DEX (Ellipsis Labs). Narrowed back to phase="pipeline" below
+    #    2026-07-22 (measured-dead-upstream finding, re-verified live: METEORA
+    #    app.meteora.ag/api/pools -> 404, LIFINITY api.lifinity.io/pools -> no
+    #    response/522, PHOENIX api.phoenix.trade -> NXDOMAIN — same result as the
+    #    original 2026-07-20 measurement). Adapter classes stay registered in IS
+    #    factory._ADAPTERS for when an upstream recovers/migrates. SSOT:
+    #    issues/uac_is_defi_oracle_dex_adapter_drift_2026_07_20.md
+    #    (Recommendation A). ──
     "METEORA-SOLANA",
     "LIFINITY-SOLANA",
     "PHOENIX-SOLANA",
@@ -613,12 +620,18 @@ DEFI_VENUE_PHASE: dict[str, str] = {
     "SOLANA-NATIVE-SOLANA": "live",
     # ── Pipeline (Solana — JUPITER is execution-only aggregator, no IS adapter) ──
     "JUPITER-SOLANA": "pipeline",
-    # ── Live (Solana DEX pools — 2026-07-20 DeFi catalogue canonicalization;
-    #    meteora.py / lifinity.py / phoenix.py adapters produce dex_pool_state
-    #    via _build_defi_venues(), IS-producible per the phase=="live" invariant) ──
-    "METEORA-SOLANA": "live",
-    "LIFINITY-SOLANA": "live",
-    "PHOENIX-SOLANA": "live",
+    # ── Pipeline (Solana DEX pools — 2026-07-20 DeFi catalogue canonicalization,
+    #    narrowed back from "live" 2026-07-22: meteora.py/lifinity.py/phoenix.py
+    #    adapters are correctly wired + registered in IS factory._ADAPTERS, but
+    #    all 3 upstreams are measurably dead (404/522/NXDOMAIN, re-verified
+    #    2026-07-22 — same as the original 2026-07-20 finding), so phase="live"
+    #    manufactured a permanently-unattainable numerator in the honest-coverage
+    #    denominator. Re-promote to "live" in the SAME commit an upstream
+    #    migration/replacement lands. SSOT:
+    #    issues/uac_is_defi_oracle_dex_adapter_drift_2026_07_20.md) ──
+    "METEORA-SOLANA": "pipeline",
+    "LIFINITY-SOLANA": "pipeline",
+    "PHOENIX-SOLANA": "pipeline",
     # ── Live (Oracle price feeds — 2026-07-20 DeFi catalogue canonicalization;
     #    pyth.py / chainlink.py adapters produce oracle_prices; CHAINLINK-*
     #    flipped live once instruments-service@6506b505 landed the real
@@ -788,10 +801,8 @@ MTDS_DEFI_VENUES: list[str] = [
     # DRIFT (Solana) removed 2026-07-16 (operator ruling): all Solana perp DEXes
     # dropped except Jupiter (not integrated). SSOT: unified-trading-pm/codex/
     # 04-architecture/solana-defi-coverage.md.
-    # --- Solana DEX pools (2026-07-20 DeFi catalogue canonicalization) ---
-    "METEORA-SOLANA",
-    "LIFINITY-SOLANA",
-    "PHOENIX-SOLANA",
+    # METEORA-SOLANA / LIFINITY-SOLANA / PHOENIX-SOLANA excluded 2026-07-22:
+    # phase="pipeline" (measured-dead upstreams), see DEFI_VENUE_PHASE above.
     # --- Oracle price feeds (2026-07-20 DeFi catalogue canonicalization) ---
     "CHAINLINK-ETHEREUM",
     "CHAINLINK-ARBITRUM",

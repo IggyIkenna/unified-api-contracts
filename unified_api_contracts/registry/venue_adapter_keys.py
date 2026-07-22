@@ -217,11 +217,16 @@ VENUE_TO_ADAPTER_KEY: dict[str, str] = {
     "KAMINO-SOLANA": "kamino",
     "RAYDIUM-SOLANA": "raydium",
     "ORCA-SOLANA": "orca",
-    # Solana DEX pools (2026-07-20 DeFi catalogue canonicalization) — existing IS
-    # adapters (meteora.py / lifinity.py / phoenix.py) that were never registered.
-    "METEORA-SOLANA": "meteora",
-    "LIFINITY-SOLANA": "lifinity",
-    "PHOENIX-SOLANA": "phoenix",
+    # Solana DEX pools (2026-07-20 DeFi catalogue canonicalization) — IS adapters
+    # (meteora.py / lifinity.py / phoenix.py) are wired + registered in IS
+    # factory._ADAPTERS, but NO key here: all 3 upstreams are measurably dead
+    # (404/522/NXDOMAIN, re-verified 2026-07-22) and DEFI_VENUE_PHASE for these
+    # 3 venues is "pipeline" (see defi_venues.py) — no entry + pipeline phase is
+    # the correct interim state (matches the YEARN_V3-OPTIMISM/BEEFY-POLYGON/
+    # IDLE-POLYGON precedent). Re-add "meteora"/"lifinity"/"phoenix" here in the
+    # SAME commit an upstream migration/replacement makes the adapter produce
+    # >=1 real instrument again. SSOT:
+    # issues/uac_is_defi_oracle_dex_adapter_drift_2026_07_20.md.
     "MARINADE-SOLANA": "marinade",
     "JITO-SOLANA": "jito",
     "SANCTUM-SOLANA": "sanctum",
