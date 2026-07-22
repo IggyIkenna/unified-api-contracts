@@ -51,10 +51,25 @@ LST_TOKEN_GENESIS: dict[str, str] = {
     # inflate the missing-shards denominator (the worse direction).
     # Filed by Tab 14 audit as missing from UAC SSOT 2026-05-08.
     "bSOL": "2022-11-24",
-    # Sanctum Infinity (INF) — Solana LST aggregator pool launched ~2024-01-25.
+    # Sanctum Infinity (INF) — Solana LST aggregator pool "launched" ~2024-01-25.
     # Uses standard SPL stake-pool layout (same Tier-1 decoder as jitoSOL/bSOL).
     # Exact stake-pool account address requires on-chain verification against
     # INF mint 5oVNBeEEQvYi1cX3ir8Dx5n1P7pdxydbGF2X4TxVusJm before enabling.
+    #
+    # IMPORTANT CAVEAT (found 2026-07-22, market-tick-data-service@6ab0359a):
+    # this mint is NOT a 2024-genesis token — it is the SAME mint as the
+    # pre-existing Socean stake-pool token (CoinGecko id "socean-staked-sol",
+    # symbol "inf"); "2024-01-25" was Sanctum's REBRAND of Socean into
+    # "Sanctum Infinity", not a new mint. DefiLlama price history for this
+    # exact mint is real back to 2021-10-15 (binary-searched). Whether the
+    # STAKE POOL ACCOUNT this entry gates existed that far back (vs. only
+    # since the 2024 rebrand) is a SEPARATE, still-open question — the
+    # account address itself is an unverified placeholder (see
+    # SANCTUM_INF_POOL_ACCOUNT in market-tick-data-service's
+    # _solana_lst_archival_tier1.py) — so this "2024-01-25" value is left
+    # UNCHANGED here pending that verification; do not assume it is safe to
+    # backdate to 2021-10-15 without confirming the ACCOUNT (not just the
+    # mint) existed then.
     "sanctumSOL": "2024-01-25",
 }
 
