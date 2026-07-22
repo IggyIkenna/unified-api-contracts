@@ -551,16 +551,26 @@ CEFI_VENUE_FOLD: dict[str, str] = {
 }
 
 # The dialect spellings above are real manifest values (writers genuinely
-# stamp them), not junk — but they are also not members of
+# stamp them), not junk. Most are also not members of
 # VENUES_BY_ASSET_GROUP["cefi"] (the bare-canonical grain), so the
 # distinct-values panel badges them non-canonical every run despite them
-# being fully understood, folded, honest data. Mirrors
+# being fully understood, folded, honest data. TWO entries (OKX-SWAP,
+# OKX-FUTURES) were SEPARATELY promoted to direct VENUES_BY_ASSET_GROUP
+# membership 2026-07-21 (real, actively-captured cefi venues in their own
+# right) — excluded here via the set difference so they keep badging
+# canonical=True (visibly correct) rather than being silently dropped from
+# the panel's enumeration entirely, which is what accepted-exception
+# treatment does (see `enumerate_distinct_values` — a value here is REMOVED
+# from output, not just marked canonical). Mirrors
 # SPORTS_ODDS_API_ACCEPTED_NONCANONICAL_BOOKMAKERS /
-# TRADFI_CHAIN_SNAPSHOT_ACCEPTED_NONCANONICAL_DATA_TYPES exactly: consumed by
-# deployment-api's `_distinct_values.py` `_ACCEPTED_EXCEPTIONS` to drop these
-# from the cefi `venues` axis finding count. NOT a canonical set — never
-# merge into VENUES_BY_ASSET_GROUP/ALL_VENUES or any canonicality check.
-CEFI_VENUE_ACCEPTED_NONCANONICAL_ALIASES: frozenset[str] = frozenset(CEFI_VENUE_FOLD)
+# TRADFI_CHAIN_SNAPSHOT_ACCEPTED_NONCANONICAL_DATA_TYPES exactly for the
+# genuinely-still-non-canonical remainder: consumed by deployment-api's
+# `_distinct_values.py` `_ACCEPTED_EXCEPTIONS` to drop those from the cefi
+# `venues` axis finding count. NOT a canonical set — never merge into
+# VENUES_BY_ASSET_GROUP/ALL_VENUES or any canonicality check.
+CEFI_VENUE_ACCEPTED_NONCANONICAL_ALIASES: frozenset[str] = frozenset(CEFI_VENUE_FOLD) - frozenset(
+    VENUES_BY_ASSET_GROUP["cefi"]
+)
 
 
 # --- Candle processing classification ---
