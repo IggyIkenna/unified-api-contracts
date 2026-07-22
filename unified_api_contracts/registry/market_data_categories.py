@@ -511,6 +511,57 @@ TRADFI_CHAIN_SNAPSHOT_ACCEPTED_NONCANONICAL_DATA_TYPES: frozenset[str] = frozens
     }
 )
 
+# CeFi venue-dialect fold (honest_coverage_uac_writer_matrix_reconciliation
+# Decision 6): the writer captures under Tardis-grain suffixed venues
+# (OKX-SWAP/-FUTURES from expand_cefi_tardis_endpoints; legacy raw Tardis
+# exchange ids on older rows) while this registry keys those venues at the
+# bare canonical grain (OKX). Maps each known dialect spelling to its
+# canonical venue. Venues that are themselves canonical suffixed forms
+# (OKX-SPOT, BYBIT-SPOT, KRAKEN-FUTURES, BITFINEX-*, ...) are deliberately
+# NOT present here — OKX-SPOT was REMOVED 2026-07-10 (Option A follow-
+# through: OKX-SPOT is its own declared cefi venue with its own EXPECTED
+# entry now; folding it to bare OKX would make real captured OKX-SPOT rows
+# compare against the wrong EXPECTED tuple). COINBASE is the exception: the
+# canonical EXPECTED token for spot Coinbase is COINBASE-SPOT (not bare
+# COINBASE), so that entry folds legacy bare-COINBASE tokens UP instead of
+# down. Moved here from instruments-service's `check_enumeration_completeness.py`
+# (audit follow-up 2026-07-22, distinct-values D2) so instruments-service's
+# canonicalisation AND deployment-api's distinct-values detector share ONE
+# source of truth instead of instruments-service hardcoding its own copy that
+# deployment-api could never see — see
+# `plans/active/distinct_values_noncanonical_audit_2026_07_20.md` "D2".
+CEFI_VENUE_FOLD: dict[str, str] = {
+    # Tardis-grain splits emitted by expand_cefi_tardis_endpoints()
+    "OKX-SWAP": "OKX",
+    "OKX-FUTURES": "OKX",
+    # INVERTED (coinbase_bare_name_migration_2026_07_06 S1): COINBASE-SPOT is
+    # now the canonical EXPECTED token; legacy manifest rows that stamped bare
+    # COINBASE fold UP to COINBASE-SPOT so they still match EXPECTED instead
+    # of landing in the stray bucket.
+    "COINBASE": "COINBASE-SPOT",
+    # Writer-side names for venues UAC keys differently
+    "BYBIT-FUTURES": "BYBIT",
+    "COINBASE-INTERNATIONAL": "COINBASE-FUTURES",
+    # Legacy raw Tardis exchange ids (pre-canonicalisation manifest rows)
+    "OKEX": "OKX",
+    "OKEX-SWAP": "OKX",
+    "OKEX-FUTURES": "OKX",
+    "CRYPTOFACILITIES": "KRAKEN-FUTURES",
+    "BITFINEX-DERIVATIVES": "BITFINEX-FUTURES",
+}
+
+# The dialect spellings above are real manifest values (writers genuinely
+# stamp them), not junk — but they are also not members of
+# VENUES_BY_ASSET_GROUP["cefi"] (the bare-canonical grain), so the
+# distinct-values panel badges them non-canonical every run despite them
+# being fully understood, folded, honest data. Mirrors
+# SPORTS_ODDS_API_ACCEPTED_NONCANONICAL_BOOKMAKERS /
+# TRADFI_CHAIN_SNAPSHOT_ACCEPTED_NONCANONICAL_DATA_TYPES exactly: consumed by
+# deployment-api's `_distinct_values.py` `_ACCEPTED_EXCEPTIONS` to drop these
+# from the cefi `venues` axis finding count. NOT a canonical set — never
+# merge into VENUES_BY_ASSET_GROUP/ALL_VENUES or any canonicality check.
+CEFI_VENUE_ACCEPTED_NONCANONICAL_ALIASES: frozenset[str] = frozenset(CEFI_VENUE_FOLD)
+
 
 # --- Candle processing classification ---
 # True = MDPS should process this data type through a candle adapter.
