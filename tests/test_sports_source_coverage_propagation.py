@@ -26,8 +26,10 @@ import pytest
 from unified_api_contracts.canonical.domain.sports.league_data import (
     DATA_TYPE_COVERAGE_START,
     SOURCE_COVERAGE_START,
+    SPORTS_DATA_TYPE_TO_SOURCE,
     clip_dates_to_source_coverage,
     get_source_coverage_start,
+    is_pre_launch_date,
 )
 from unified_api_contracts.registry.venue_mapping import VenueMapping
 
@@ -293,6 +295,25 @@ class TestSourceCoverageStartCompleteness:
         """get_source_coverage_start returns None for unknown sources."""
         result = get_source_coverage_start("nonexistent_source")
         assert result is None
+
+    @pytest.mark.unit
+    def test_fixtures_schedule_and_outcomes_are_registered(self) -> None:
+        """Regression: FIXTURES_SCHEDULE/FIXTURES_OUTCOMES (the live post-2026-07-14
+        split of FIXTURES, fixture_lifecycle.py) must resolve a source so
+        is_pre_launch_date() can classify them.
+
+        Found 2026-07-22: these two data_types were missing from
+        SPORTS_DATA_TYPE_TO_SOURCE, so is_pre_launch_date() silently returned False
+        for every row regardless of date — the orphan-sweep's C3 pre-launch-window
+        guard could never fire for them, and ~83,541 real pre-2020-06-06 objects
+        misclassified as legitimate E_orphan_real instead of floor violations.
+        """
+        assert SPORTS_DATA_TYPE_TO_SOURCE.get("FIXTURES_SCHEDULE") == "api_football"
+        assert SPORTS_DATA_TYPE_TO_SOURCE.get("FIXTURES_OUTCOMES") == "api_football"
+        assert is_pre_launch_date("FIXTURES_SCHEDULE", "2019-01-01") is True
+        assert is_pre_launch_date("FIXTURES_OUTCOMES", "2019-01-01") is True
+        assert is_pre_launch_date("FIXTURES_SCHEDULE", "2021-01-01") is False
+        assert is_pre_launch_date("FIXTURES_OUTCOMES", "2021-01-01") is False
 
 
 class TestOddsApiFloorDerivesFromSportsSsot:
