@@ -23,7 +23,9 @@ from unified_api_contracts.internal.schemas.contracts import (
     DEFI_LENDING_POSITION_LENDING_INDICES,
     DEFI_LST_LST_RATES,
     DEFI_POOL_DEX_POOL_SWAPS,
+    DEFI_SPOT_ASSET_BRIDGE_EVENTS,
     DEFI_SPOT_ASSET_GAS_FEES,
+    DEFI_SPOT_ASSET_MEV_EVENTS,
     TRADFI_EQUITY_TRADES,
     TRADFI_FUTURE_TRADES,
     TRADFI_OPTIONS_CHAIN_TRADES,
@@ -181,6 +183,57 @@ def _df_defi_lst_rates() -> pd.DataFrame:
     )
 
 
+def _df_defi_mev_events() -> pd.DataFrame:
+    """Shaped exactly like the post-``write_defi_rows``-enrichment row
+    ``mev_events_handler.py`` produces for a Flashbots relay payload: the raw
+    fetch row (``symbol``/``ts_event``/``venue``/``chain``/``relay``/
+    ``block_number``/``builder_pubkey``/``value_eth``) plus the
+    ``instrument_id``/``instrument_type``/``data_type`` columns
+    ``write_defi_rows`` adds before upload."""
+    return pd.DataFrame(
+        {
+            "instrument_id": pd.Series(["FLASHBOTS-ETHEREUM:SPOT_ASSET:FLASHBOTS"], dtype="string"),
+            "symbol": pd.Series(["FLASHBOTS"], dtype="string"),
+            "venue": pd.Series(["FLASHBOTS"], dtype="string"),
+            "chain": pd.Series(["ETHEREUM"], dtype="string"),
+            "ts_event": _ts_series(1),
+            "relay": pd.Series(["flashbots"], dtype="string"),
+            "block_number": pd.Series([19_876_543], dtype="int64"),
+            "builder_pubkey": pd.Series(["0x" + "ab" * 48], dtype="string"),
+            "value_eth": pd.Series([0.0521], dtype="float64"),
+            "instrument_type": pd.Series(["spot_asset"], dtype="string"),
+            "data_type": pd.Series(["mev_events"], dtype="string"),
+        }
+    )
+
+
+def _df_defi_bridge_events() -> pd.DataFrame:
+    """Shaped exactly like the post-``write_defi_rows``-enrichment row
+    ``bridge_events_handler.py`` produces for an Across ``FundsDeposited``
+    on-chain log: the raw fetch row (``symbol``/``ts_event``/``venue``/
+    ``chain``/``source_chain``/``dest_chain``/``token``/``amount``/
+    ``depositor``/``recipient``) plus the ``instrument_id``/
+    ``instrument_type``/``data_type`` columns ``write_defi_rows`` adds
+    before upload."""
+    return pd.DataFrame(
+        {
+            "instrument_id": pd.Series(["ACROSS-ETHEREUM:SPOT_ASSET:USDC"], dtype="string"),
+            "symbol": pd.Series(["USDC"], dtype="string"),
+            "venue": pd.Series(["ACROSS"], dtype="string"),
+            "chain": pd.Series(["ETHEREUM"], dtype="string"),
+            "ts_event": _ts_series(1),
+            "source_chain": pd.Series(["1"], dtype="string"),
+            "dest_chain": pd.Series(["42161"], dtype="string"),
+            "token": pd.Series(["0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"], dtype="string"),
+            "amount": pd.Series([1234.56], dtype="float64"),
+            "depositor": pd.Series(["0x" + "de" * 20], dtype="string"),
+            "recipient": pd.Series(["0x" + "be" * 20], dtype="string"),
+            "instrument_type": pd.Series(["spot_asset"], dtype="string"),
+            "data_type": pd.Series(["bridge_events"], dtype="string"),
+        }
+    )
+
+
 # ---------------------------------------------------------------------------
 # Contract/fixture pairs for parametric tests
 # ---------------------------------------------------------------------------
@@ -196,6 +249,8 @@ VALID_CASES: list[tuple[SchemaContract, pd.DataFrame]] = [
     (DEFI_LENDING_POSITION_LENDING_INDICES, _df_defi_lending_indices()),
     (DEFI_DEX_POOL_DEX_POOL_SWAPS, _df_defi_dex_pool_swaps()),
     (DEFI_LST_LST_RATES, _df_defi_lst_rates()),
+    (DEFI_SPOT_ASSET_MEV_EVENTS, _df_defi_mev_events()),
+    (DEFI_SPOT_ASSET_BRIDGE_EVENTS, _df_defi_bridge_events()),
 ]
 
 
@@ -457,8 +512,51 @@ def test_contract_registry_covers_expanded_defi_shards() -> None:
         ("defi", "perpetual", "perp_funding"),
         ("defi", "staking", "eigenlayer_rewards"),
         ("defi", "staking", "yield_snapshots"),
+        ("defi", "spot_asset", "mev_events"),
+        ("defi", "spot_asset", "bridge_events"),
     }
     assert required.issubset(set(CONTRACT_REGISTRY.keys()))
+
+
+def test_mev_events_and_bridge_events_resolve_via_write_defi_rows_call_shape() -> None:
+    """Regression: ``market-tick-data-service``'s ``mev_events_handler.py`` /
+    ``bridge_events_handler.py`` call ``write_defi_rows(..., symbol_column=None)``
+    (implicit default), which makes ``write_defi_rows`` STRICT — it resolves
+    ``lookup_contract(asset_group="defi", instrument_type=InstrumentType.SPOT_ASSET
+    .value.lower(), data_type=<data_type>, venue=<venue>)`` up front and turns any
+    ``SchemaContractNotFoundError`` into a hard ``ValueError`` before a single row
+    is written. Before either contract was registered, this exact call shape
+    raised; it must now resolve cleanly for every venue each handler writes."""
+    mev_contract = lookup_contract(
+        asset_group="defi",
+        instrument_type="spot_asset",
+        data_type="mev_events",
+        venue="FLASHBOTS",
+    )
+    assert mev_contract is DEFI_SPOT_ASSET_MEV_EVENTS
+    assert mev_contract.symbol_column == "symbol"
+
+    for bridge_venue in ("ACROSS", "STARGATE"):
+        bridge_contract = lookup_contract(
+            asset_group="defi",
+            instrument_type="spot_asset",
+            data_type="bridge_events",
+            venue=bridge_venue,
+        )
+        assert bridge_contract is DEFI_SPOT_ASSET_BRIDGE_EVENTS
+        assert bridge_contract.symbol_column == "symbol"
+
+
+def test_mev_events_and_bridge_events_sample_rows_validate_clean() -> None:
+    """A dataframe shaped exactly like the enriched row ``write_defi_rows``
+    produces from each handler's real fetch output (raw columns + the
+    ``instrument_id``/``instrument_type``/``data_type`` enrichment columns)
+    must validate with zero violations against the registered contract."""
+    mev_violations = validate_dataframe(_df_defi_mev_events(), DEFI_SPOT_ASSET_MEV_EVENTS)
+    assert mev_violations == [], f"expected no violations for mev_events sample row, got {mev_violations}"
+
+    bridge_violations = validate_dataframe(_df_defi_bridge_events(), DEFI_SPOT_ASSET_BRIDGE_EVENTS)
+    assert bridge_violations == [], f"expected no violations for bridge_events sample row, got {bridge_violations}"
 
 
 def test_contract_registry_covers_expanded_cefi_shards() -> None:
