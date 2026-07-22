@@ -389,44 +389,73 @@ def test_schedule_defining_fixtures_empty_is_resolved() -> None:
 
 
 # ---------------------------------------------------------------------------
-# compute_honest_coverage — out-of-window clip (43c, 2026-06-23)
+# compute_honest_coverage — EXCLUDE-empty_confirmed global formula (Part 4.1,
+# 2026-07-22). Supersedes the 2026-06-23 out-of-window numerator-credit tests
+# below: under the new formula ``empty_confirmed`` is ALWAYS excluded from
+# both numerator and denominator, so there is no more "credit" mode to
+# distinguish from "clip" — ``out_of_window`` is now a pure reporting subset
+# with zero effect on the ratio.
 # ---------------------------------------------------------------------------
 
 
-def test_compute_honest_coverage_default_out_of_window_is_zero() -> None:
-    """Unmigrated callers (no out_of_window) keep the legacy numerator-credit
-    behaviour — back-compatible."""
+def test_compute_honest_coverage_excludes_empty_confirmed_entirely() -> None:
+    """empty_confirmed never enters the ratio, in either numerator or
+    denominator — matches instruments-service's production
+    ``_count_statuses`` and codex's ``reachable_coverage``."""
     counts = CaptureStatusCounts(captured=10, empty_confirmed=50, attempted_failed=5)
-    assert counts.out_of_window == 0
-    assert compute_honest_coverage(counts) == pytest.approx(60 / 65)
+    # denominator = captured + attempted_failed = 10 + 5 = 15 (empty_confirmed excluded).
+    assert compute_honest_coverage(counts) == pytest.approx(10 / 15)
 
 
-def test_compute_honest_coverage_clips_out_of_window_from_both_num_and_denom() -> None:
-    """Out-of-life empties are clipped from BOTH numerator and denominator so an
-    out-of-window cell reads as a blank, not coverage credit (operator 2026-06-23)."""
-    # 49 of the 50 empties are out-of-life (e.g. EXPECTED_INSTRUMENT_NOT_LISTED).
-    counts = CaptureStatusCounts(captured=10, empty_confirmed=50, attempted_failed=5, out_of_window=49)
-    # within_window_empty = 1; numerator = 10 + 1 = 11; denominator = 11 + 5 = 16.
-    assert compute_honest_coverage(counts) == pytest.approx(11 / 16)
-
-
-def test_compute_honest_coverage_clip_differs_from_credit_when_failures_present() -> None:
-    """The clip is materially lower than numerator-credit precisely when there are
-    attempted_failed/pending cells — the prediction-POLYMARKET inflation case."""
-    credit = compute_honest_coverage(CaptureStatusCounts(captured=10, empty_confirmed=50, attempted_failed=5))
-    clip = compute_honest_coverage(
+def test_compute_honest_coverage_out_of_window_no_longer_affects_ratio() -> None:
+    """out_of_window (a subset of empty_confirmed) produces the IDENTICAL ratio
+    to leaving it at 0 — since empty_confirmed is excluded wholesale regardless
+    of its out-of-window sub-classification, out_of_window is now a no-op for
+    the ratio (retained only for the drilldown breakdown, see its docstring)."""
+    without_oow = compute_honest_coverage(CaptureStatusCounts(captured=10, empty_confirmed=50, attempted_failed=5))
+    with_oow = compute_honest_coverage(
         CaptureStatusCounts(captured=10, empty_confirmed=50, attempted_failed=5, out_of_window=49)
     )
-    assert clip < credit
+    assert with_oow == pytest.approx(without_oow)
+    assert with_oow == pytest.approx(10 / 15)
 
 
-def test_compute_honest_coverage_clip_no_effect_without_failures() -> None:
-    """With zero failed/pending cells, clip and credit agree (both 1.0) — the
-    docstring's original equivalence holds only in that case."""
-    credit = compute_honest_coverage(CaptureStatusCounts(captured=10, empty_confirmed=50))
-    clip = compute_honest_coverage(CaptureStatusCounts(captured=10, empty_confirmed=50, out_of_window=49))
-    assert credit == pytest.approx(1.0)
-    assert clip == pytest.approx(1.0)
+def test_compute_honest_coverage_empty_confirmed_magnitude_does_not_affect_ratio() -> None:
+    """Changing empty_confirmed's magnitude alone (0 vs 50) leaves the ratio
+    unchanged — the 2026-07-22 decision that a confirmed-empty cell is not a
+    coverage success, reversing the pre-2026-07-22 numerator-credit behaviour
+    that inflated coverage_pct fleet-wide (measured: every asset_group drops
+    when empty_confirmed stops being credited)."""
+    no_empties = compute_honest_coverage(CaptureStatusCounts(captured=10, attempted_failed=5))
+    many_empties = compute_honest_coverage(CaptureStatusCounts(captured=10, empty_confirmed=50, attempted_failed=5))
+    assert no_empties == pytest.approx(many_empties)
+    assert no_empties == pytest.approx(10 / 15)
+
+
+def test_compute_honest_coverage_known_empty_is_denominator_only() -> None:
+    """expected_unattempted_known_empty no longer gets numerator credit either
+    (Part 4.1) — it lands in the denominator alongside pending_fetch, exactly
+    like ``instruments-service``'s ``_count_statuses`` (which never splits
+    ``expected_unattempted`` by reason at all: both known_empty-shaped and
+    pending_fetch-shaped rows are just "expected_unattempted", denominator-only).
+    Only ``captured`` is a coverage success under the new formula."""
+    counts = CaptureStatusCounts(captured=10, attempted_failed=5, expected_unattempted_known_empty=15)
+    # numerator = 10; denominator = 10 + 5 + 15 = 30.
+    assert compute_honest_coverage(counts) == pytest.approx(10 / 30)
+
+
+def test_compute_honest_coverage_known_empty_and_pending_fetch_treated_identically() -> None:
+    """The known_empty/pending_fetch split (still useful elsewhere for
+    reporting/backfill-targeting, see HONEST_COVERAGE_GAP_FIELDS) no longer
+    changes the ratio at all post-4.1 — moving cells between the two buckets
+    is a no-op for compute_honest_coverage."""
+    all_known_empty = compute_honest_coverage(
+        CaptureStatusCounts(captured=10, attempted_failed=5, expected_unattempted_known_empty=15)
+    )
+    all_pending_fetch = compute_honest_coverage(
+        CaptureStatusCounts(captured=10, attempted_failed=5, expected_unattempted_pending_fetch=15)
+    )
+    assert all_known_empty == pytest.approx(all_pending_fetch)
 
 
 def test_out_of_coverage_window_reasons_carry_lifecycle_reasons() -> None:
