@@ -402,22 +402,23 @@ VENUES_BY_ASSET_GROUP: dict[str, list[str]] = {
         # `unified-trading-pm/plans/epics/sports_master.md` §
         # "Scrapers DEFERRED-INDEFINITELY 2026-05-12 per operator".
         #
-        # ── SUPERSEDED IN PART (operator 2026-07-20,
-        # `plans/active/distinct_values_noncanonical_audit_2026_07_20.md`) ──
-        # The 2026-05-12 deferral is about the SCRAPER acquisition path, not about
-        # the bookmaker identity. The ODDS_API fan-out already WRITES these
-        # bookmakers as manifest venues, so excluding them from this set made the
-        # canonical vocabulary disagree with what the writer actually emits — they
-        # accounted for the single largest non-canonical cluster on the
-        # data-status drift panel (29 sports venue badges). Every entry below is a
-        # canonical `ODDS_API_KEY_MAP` / `AUDITED_BOOKMAKERS` key (verified
-        # 2026-07-20), added on exactly the DRAFTKINGS/FANDUEL
-        # "via ODDS_API fan-out (manifest-confirmed)" precedent.
-        # NOTE: this EXPANDS the honest-coverage DENOMINATOR (
-        # `instruments-service/scripts/enumerate_expected_universe.py` builds the
-        # expected universe from this set), so measured sports coverage % drops —
-        # the data did not change, the denominator became honest. Operator
-        # explicitly accepted that trade-off.
+        # ── 2026-07-20 addition REVERTED 2026-07-22 (operator, same plan,
+        # "Operator decisions — RULED 2026-07-22" § "Sports ODDS_API bookmakers"):
+        # "do NOT add them, in fact remove them everywhere so they don't come up
+        # in audit" — a stronger reversal of the 2026-07-20 add-to-registry fix
+        # below. The 20 ODDS_API fan-out bookmakers (BETMGM/BETONLINEAG/
+        # BETOPENLY/BETRIVERS/BETSSON/BETVICTOR/BETWAY/BOVADA/CASUMO/CORAL/
+        # LIVESCOREBET/MATCHBOOK/NOVIG/ONEXBET/PADDYPOWER/PROPHETX/SKYBET/UNIBET/
+        # VIRGINBET/WILLIAMHILL) are REMOVED from this canonical set again — the
+        # 2026-05-12 scraper-deferral decision (above) is UNCHANGED, this is
+        # purely about whether the registry treats them as canonical/expected.
+        # They are STILL real manifest values (ODDS_API fan-out genuinely writes
+        # venue=BETMGM etc.), so simply removing them here would reopen the exact
+        # non-canonical-value audit finding the 2026-07-20 addition existed to
+        # silence — see `SPORTS_ODDS_API_ACCEPTED_NONCANONICAL_BOOKMAKERS` below,
+        # which the distinct-values detector (deployment-api::_distinct_values.py)
+        # reads to exclude these specific values from its findings WITHOUT
+        # badging them canonical.
         "ODDS_API",  # Multi-bookmaker odds aggregator (raw tick data source)
         "PINNACLE",  # Bookmaker API (ODDS_API fan-out + direct)
         "BETFAIR",  # Canonical exchange venue constant (execution/reference)
@@ -426,7 +427,35 @@ VENUES_BY_ASSET_GROUP: dict[str, list[str]] = {
         "BETFAIR_EX_EU",  # MTDS manifest sub-venue: Betfair Exchange EU
         "DRAFTKINGS",  # US bookmaker via ODDS_API fan-out (manifest-confirmed)
         "FANDUEL",  # US bookmaker via ODDS_API fan-out (manifest-confirmed)
-        # ── ODDS_API fan-out bookmakers (operator 2026-07-20; all registry-backed) ──
+    ],
+    "prediction": [
+        # Prediction markets (binary / multi-outcome)
+        "POLYMARKET",
+        "KALSHI",
+    ],
+}
+
+# All supported data types (union of all asset groups)
+ALL_DATA_TYPES: list[str] = sorted({dt for dts in DATA_TYPES_BY_ASSET_GROUP.values() for dt in dts})
+
+# All supported venues (union of all asset groups)
+ALL_VENUES: list[str] = sorted({v for vs in VENUES_BY_ASSET_GROUP.values() for v in vs})
+
+# The 20 ODDS_API fan-out bookmakers reverted out of VENUES_BY_ASSET_GROUP
+# ["sports"] above (operator ruling 2026-07-22,
+# `plans/active/distinct_values_noncanonical_audit_2026_07_20.md`). They are
+# deliberately NOT canonical (do NOT add to any canonical venue list — the
+# 2026-05-12 scraper-deferral decision stands, no per-bookmaker capture
+# adapter exists or is planned) but ARE real raw manifest values (the
+# ODDS_API fan-out genuinely writes venue=BETMGM etc.), so a plain removal
+# would reopen the exact non-canonical-value finding this set exists to
+# suppress. Consumed by deployment-api's distinct-values detector
+# (`_distinct_values.py`) to exclude these specific, permanently-accepted
+# values from its non-canonical findings count — "known and accepted", not
+# "drift needing a fix". NOT a canonical set — never merge into
+# VENUES_BY_ASSET_GROUP/ALL_VENUES or any canonicality check.
+SPORTS_ODDS_API_ACCEPTED_NONCANONICAL_BOOKMAKERS: frozenset[str] = frozenset(
+    {
         "BETMGM",
         "BETONLINEAG",
         "BETOPENLY",
@@ -447,19 +476,8 @@ VENUES_BY_ASSET_GROUP: dict[str, list[str]] = {
         "UNIBET",
         "VIRGINBET",
         "WILLIAMHILL",
-    ],
-    "prediction": [
-        # Prediction markets (binary / multi-outcome)
-        "POLYMARKET",
-        "KALSHI",
-    ],
-}
-
-# All supported data types (union of all asset groups)
-ALL_DATA_TYPES: list[str] = sorted({dt for dts in DATA_TYPES_BY_ASSET_GROUP.values() for dt in dts})
-
-# All supported venues (union of all asset groups)
-ALL_VENUES: list[str] = sorted({v for vs in VENUES_BY_ASSET_GROUP.values() for v in vs})
+    }
+)
 
 
 # --- Candle processing classification ---
