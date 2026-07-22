@@ -260,7 +260,18 @@ DEFI_VENUE_DATA_TYPE_CAPABILITIES: dict[str, dict[str, str]] = {
     # could-exist denominator (the universe builder reads this dict directly).
     # data_type = the one observed in projected_index_defi.parquet; floor =
     # earliest captured date there (best-effort; adapter gates per-row).
-    "MAKER-ETHEREUM": {"vault_share_price": "2023-01-18"},  # sDAI / DSR share price
+    # lst_rates added 2026-07-22 (distinct_values_noncanonical_audit_2026_07_20,
+    # MAKER unit): production capture MOVED from vault_share_price_handler.py to
+    # lst_rates_handler.py (same convertToAssets() call on the sDAI ERC-4626
+    # contract, 0x83F20F44975D03b1b09e64809B757c47f942BEeA) — verified via a real
+    # 2026-07-21 backfill (block 25580957, sDAI=1.178309 DAI) plus continuous prod
+    # lst_rates captures through 2026-07-19. vault_share_price is kept (genuine
+    # historical captures 2023-01-18 through ~2026-06-20) but is now an orphaned,
+    # non-producing duplicate of the same underlying rate — see the handler-wide
+    # vault_share_price capture-gap issue doc for the scheduling-side fix:
+    # unified-trading-pm/plans/active/issues/
+    # vault_share_price_handler_capture_gap_since_2026_06_22.md
+    "MAKER-ETHEREUM": {"vault_share_price": "2023-01-18", "lst_rates": "2023-01-18"},  # sDAI / DSR share price
     "FRAX-ETHEREUM": {"vault_share_price": "2023-10-19"},  # sfrxETH / Frax vault share price
     "MORPHOVAULTS-ETHEREUM": {"vault_share_price": "2024-01-04"},  # MetaMorpho ERC-4626 vaults
     # ── DeFi — Yield vaults (Phase 1A) ──
