@@ -632,6 +632,75 @@ DEFI_VENUE_PHASE: dict[str, str] = {
 }
 
 
+# ---------------------------------------------------------------------------
+# DEFI_VENUE_MTDS_ADAPTER_VERIFIED_NOT_YET_SCHEDULED — venues whose on-chain-
+# read ADAPTER has been independently verified accurate (cross-RPC, same
+# historical block, exact match to N decimal places), but which are NOT YET
+# captured by any healthy scheduled production job.
+#
+# Membership here means "if you backfill/schedule this venue, the read logic
+# is correct" -- it does NOT mean "the pipeline is capturing this venue," and
+# it is deliberately NOT named/shaped like a "captured data" constant: the
+# verification behind every entry is a SINGLE manual/ad-hoc invocation on one
+# historical day, not an ongoing or scheduled capture. Do not promote a venue
+# out of this dict until there is evidence of an actual scheduled/cron-driven
+# capture succeeding (see uts-prod-mtds-collect-lst-rates, which currently
+# fails both of its tracked runs -- OOM/timeout crash-loop -- and additionally
+# targets "yesterday" relative to run date rather than an explicit historical
+# day, so it could not have produced this data even if healthy).
+#
+# This is NOT wired into DEFI_VENUE_PHASE (phase stays "pipeline" for every
+# entry below -- none of these venues has an instruments-service reference-
+# data adapter), VENUES_BY_ASSET_GROUP["defi"], or MVP_SCOPE["defi"].venues.
+#
+# SSOT: unified-trading-pm design doc "Correction Design: 11 DeFi Venues →
+# Honest-Coverage Registry" (2026-07-22). Of the 11 venues investigated, only
+# these 6 qualified as ACCURATE-BUT-MANUAL-ONLY; FRAX (UNVERIFIED-CLAIM: real
+# data exists but stopped dead 2026-06-21, no scheduler) and ALCHEMY /
+# FLASHBOTS / ACROSS / STARGATE (STILL-BROKEN: crash-looping cron or never
+# scheduled at all, two with no SchemaContract registered) do NOT qualify and
+# are deliberately excluded -- see that design doc for the full per-venue
+# evidence and the deferred follow-up items for those five.
+# ---------------------------------------------------------------------------
+DEFI_VENUE_MTDS_ADAPTER_VERIFIED_NOT_YET_SCHEDULED: dict[str, str] = {
+    "ANKR-ETHEREUM": (
+        "single verified-accurate ratio() read for ankrETH, day=2026-07-20, "
+        "block 25573787, via manual/ad-hoc invocation -- NOT the scheduled "
+        "uts-prod-mtds-collect-lst-rates cron (currently crash-looping on "
+        "OOM/timeout; also targets 'yesterday' relative to run date, never "
+        "day=2026-07-20 as run on 2026-07-22)."
+    ),
+    "STADER-ETHEREUM": (
+        "single verified-accurate getExchangeRate() read for ETHx, "
+        "day=2026-07-20, block 25573787, manual/ad-hoc invocation only; "
+        "production cron not yet capturing this venue."
+    ),
+    "STAKEWISE-ETHEREUM": (
+        "single verified-accurate convertToAssets(1e18) read for osETH, "
+        "day=2026-07-20, block 25573787, manual/ad-hoc invocation only; "
+        "production cron not yet capturing this venue."
+    ),
+    "SWELL-ETHEREUM": (
+        "single verified-accurate swETHToETHRate() read for swETH, "
+        "day=2026-07-20, block 25573787, manual/ad-hoc invocation only; "
+        "production cron not yet capturing this venue."
+    ),
+    "MANTLE-ETHEREUM": (
+        "single verified-accurate mETHToETH(1e18) read for mETH, "
+        "day=2026-07-20, block 25573787, manual/ad-hoc invocation only; "
+        "production cron not yet capturing this venue."
+    ),
+    "MAKER-ETHEREUM": (
+        "single verified-accurate convertToAssets(1e18) read for sDAI, "
+        "day=2026-07-20, block 25573787, manual/ad-hoc invocation only; "
+        "GCS object present but manifest row MISSING for this day (artifact "
+        "of the manual run's execution order, not a MAKER-specific writer "
+        "bug -- see provenance note); production cron not yet capturing "
+        "this venue."
+    ),
+}
+
+
 # On-chain perpetual DEX venues that are DeFi by settlement (wallet-signed
 # transactions, on-chain custody) but eligible as hedge leg candidates for
 # cross-venue funding arbitrage and basis trades alongside CeFi perp venues.
@@ -736,6 +805,7 @@ MTDS_DEFI_VENUES: list[str] = [
 __all__ = [
     "ALL_DEFI_VENUES",
     "DEFI_VENUE_AXIS_OVERRIDES",
+    "DEFI_VENUE_MTDS_ADAPTER_VERIFIED_NOT_YET_SCHEDULED",
     "DEFI_VENUE_PHASE",
     "LEGACY_DEFI_VENUE_ALIASES",
     "MTDS_DEFI_VENUES",
