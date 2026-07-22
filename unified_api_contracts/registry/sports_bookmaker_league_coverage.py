@@ -145,11 +145,41 @@ def is_bookmaker_league_covered(bookmaker: str, league_id: str) -> bool:
     return base is not None and league in base
 
 
+def is_bookmaker_league_covered_exact(bookmaker: str, league_id: str) -> bool:
+    """Whether the EXACT ``bookmaker`` key has captured odds for ``league_id``.
+
+    Unlike :func:`is_bookmaker_league_covered`, this does **not** fall back to
+    the base-key union (``_COVERAGE_BY_BASE``): ``BETFAIR_EX_UK`` is resolved
+    only against its own captured league set, never against a sibling suffixed
+    variant's (``BETFAIR_EX_EU``, ``BETFAIR_SB_UK``) or bare ``BETFAIR``'s.
+
+    Use this on the sentinel-emission path
+    (``market-tick-data-service/.../engine/orchestrator/sentinels.py``), where
+    ``bookmakers_scope`` already carries the exact requested key
+    (``expected_odds_api_venue_keys()``) — folding to a shared base risks
+    marking one suffixed variant "covered" for leagues only a SIBLING variant
+    has actually priced, manufacturing false ``attempted_failed`` rows (the
+    2026-07-20 bare-BETFAIR grain-mismatch class,
+    ``plans/active/issues/sports_shard_enumeration_cartesian_blowup_2026_07_20.md``
+    step 1.3). Uppercase-insensitive on both args; still ``False`` for a
+    prediction-market venue or a blank league.
+    """
+    if is_prediction_market_venue(bookmaker):
+        return False
+    league = league_id.strip().upper()
+    if not league:
+        return False
+    book = bookmaker.strip().upper()
+    exact = BOOKMAKER_LEAGUE_COVERAGE.get(book)
+    return exact is not None and league in exact
+
+
 __all__ = [
     "BOOKMAKER_LEAGUE_COVERAGE",
     "COVERED_BOOKMAKERS",
     "PREDICTION_MARKET_VENUES",
     "is_bookmaker_league_covered",
+    "is_bookmaker_league_covered_exact",
     "is_bookmaker_observed",
     "is_prediction_market_venue",
 ]
