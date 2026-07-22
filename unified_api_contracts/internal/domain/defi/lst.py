@@ -39,24 +39,30 @@ LST_TOKEN_TO_PROTOCOL_ASSET: dict[str, tuple[str, str]] = {
     "wstETH": ("LIDO_WRAPPED", "ETH"),
     "rETH": ("ROCKET_POOL", "ETH"),
     "cbETH": ("COINBASE", "ETH"),
-    "weETH": ("ETHERFI", "ETH"),
     "ankrETH": ("ANKR", "ETH"),
     "mETH": ("MANTLE", "ETH"),
     "swETH": ("SWELL", "ETH"),
     "ETHx": ("STADER", "ETH"),
     "osETH": ("STAKEWISE", "ETH"),
-    "pufETH": ("PUFFER", "ETH"),
     "sUSDe": ("ETHENA", "USDE"),
     "sDAI": ("SPARK", "DAI"),
     "jitoSOL": ("JITO", "SOL"),
     "mSOL": ("MARINADE", "SOL"),
     "bSOL": ("BLAZESTAKE", "SOL"),
     # Restaking LRTs (added 2026-05-12 per defi_catalogue_chain_primitives_2026_05_10.md
-    # Phase 1G + 1A. Symbiotic/Karak vault tokens NOT in this mapping — those protocols
-    # issue per-vault shares rather than a single canonical LRT, so they live in the
-    # instruments-service LST_REFERENCE_DATA registry only.)
+    # Phase 1G + 1A; RESTAKING classification confirmed + weETH/pufETH moved into this
+    # block 2026-07-22 per distinct_values_noncanonical_audit_2026_07_20.md — all four
+    # carry EigenLayer AVS slashing risk stacked on base ETH staking slashing, distinct
+    # from a plain LST. weETH is ether.fi's non-rebasing wrapper of the rebasing eETH
+    # receipt token (only the wrapped form is captured/tracked as a discrete instrument
+    # in this workspace — see instruments-service etherfi.py). Symbiotic/Karak vault
+    # tokens NOT in this mapping — those protocols issue per-vault shares rather than a
+    # single canonical LRT, so they live in the instruments-service LST_REFERENCE_DATA
+    # registry only.)
     "ezETH": ("RENZO", "ETH"),
     "rsETH": ("KELPDAO", "ETH"),
+    "pufETH": ("PUFFER", "ETH"),
+    "weETH": ("ETHERFI", "ETH"),
 }
 
 

@@ -178,6 +178,9 @@ _SINGLE_ASSET_DEFI_TYPES = frozenset(
         InstrumentType.STAKING.value,  # "STAKING" — Marinade mSOL
         InstrumentType.A_TOKEN.value,  # "A_TOKEN" — Aave V3, Spark, Compound V3 supply side
         InstrumentType.DEBT_TOKEN.value,  # "DEBT_TOKEN" — Aave V3, Spark, Compound V3 borrow side
+        # "RESTAKING" — ezETH/rsETH/pufETH/weETH (2026-07-20/22 reclassification out of LST);
+        # same single-asset shape (quote_asset="") as the LST rows they used to be.
+        InstrumentType.RESTAKING.value,
     }
 )
 
