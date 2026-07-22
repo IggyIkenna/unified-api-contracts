@@ -51,10 +51,22 @@ _DERIVED_ONLY: dict[str, list[str]] = {
 # precondition for an `ohlcv_*` processed shard.
 _PASSTHROUGH_RAW_FOR_OHLCV: list[str] = ["trades", "ohlcv_1m"]
 
-# Standard candle timeframe suffixes. ``24h`` is the legacy MDPS token for
-# daily; ``1d`` is the UAC-canonical form. Both are kept so manifest rows
-# written under either token resolve consistently.
-_TIMEFRAMES: tuple[str, ...] = ("1m", "5m", "15m", "1h", "4h", "1d", "24h")
+# Standard candle timeframe suffixes, used only to materialise
+# ``PROCESSED_REQUIRES_RAW``'s legacy AGGREGATED keys (``{prefix}_{tf}``,
+# e.g. ``ohlcv_15s`` / ``deriv_ohlcv_1d``) for pre-752eaff manifest rows that
+# still carry that convention. ``24h`` is the legacy MDPS token for daily;
+# ``1d`` is the UAC-canonical form — both are kept so manifest rows written
+# under either token resolve consistently (intentional dual-key, not a bug:
+# a historical-suffix compat set, not a going-forward vocabulary). ``15s``
+# (2026-07-22) closes a real gap found during
+# mdps_datatype_axis_switch_breaks_generic_classifier_2026_07_21's B2 review:
+# MDPS_CANONICAL_TIMEFRAMES below includes ``15s`` as a genuine derived
+# candle grain (``mdps_data_type_key`` can and does emit ``book5_ohlcv_15s``
+# / ``ohlcv_15s`` etc.), so omitting it here left `is_processed_data_type`
+# blind to any pre-cutover 15s-aggregate row — verified against the writer's
+# real output (``canonical_writer_shaping.mdps_data_type_key``), not copied
+# from an existing constant.
+_TIMEFRAMES: tuple[str, ...] = ("15s", "1m", "5m", "15m", "1h", "4h", "1d", "24h")
 
 
 def _expand_processed_keys() -> dict[str, list[str]]:
@@ -150,24 +162,68 @@ def get_expected_timeframes_for_venue_dt(venue: str, data_type: str) -> list[str
     return list(MDPS_CANONICAL_TIMEFRAMES)
 
 
-def is_processed_data_type(data_type: str) -> bool:
+# Services whose manifest ``data_type`` axis is the SOURCE token, not the
+# legacy AGGREGATED token (operator ruling 2026-07-21, MDPS
+# ``canonical_writer.py`` "Manifest data_type AXIS = SOURCE data_type").
+# ``is_processed_data_type``/``get_raw_source_data_types`` need this to
+# disambiguate a bare SOURCE token like ``"trades"``/``"derivative_ticker"``,
+# which is genuinely RAW under any other service (e.g. MTDS's own
+# ``market-tick-data-service`` manifest rows) but is a PROCESSED candle row
+# when observed under one of these services' own manifest scope — the token
+# alone is ambiguous post-cutover; only the caller's ``service`` context
+# resolves it. See
+# mdps_datatype_axis_switch_breaks_generic_classifier_2026_07_21.md.
+_SOURCE_AXIS_SERVICES: frozenset[str] = frozenset({"market-data-processing-service"})
+
+
+def is_processed_data_type(data_type: str, *, service: str = "") -> bool:
     """Return ``True`` iff ``data_type`` is an MDPS-derived processed type.
 
     Used by deployment-api to decide whether to apply precondition logic
     (split missing-shards into ``missing`` vs ``blocked_on_raw``).
+
+    ``service`` (optional, default ``""`` — BYTE-FOR-BYTE the pre-2026-07-22
+    behaviour for every caller that doesn't pass it): when ``service`` is one
+    of :data:`_SOURCE_AXIS_SERVICES`, a bare SOURCE token in
+    :data:`MDPS_DERIVABLE_DATA_TYPES` (``"trades"``, ``"derivative_ticker"``,
+    ...) is ALSO recognised as processed — this is what a post-752eaff MDPS
+    manifest row's ``data_type`` actually carries. Without ``service``, the
+    SOURCE token stays correctly classified as raw (it IS raw under e.g.
+    MTDS's own manifest scope) — this is why the check is service-gated, not
+    a global re-key: re-keying ``PROCESSED_REQUIRES_RAW`` itself to SOURCE
+    tokens would make a genuine raw MTDS ``"trades"`` row misreport as
+    processed too, since the same token means different things under
+    different services post-cutover.
     """
-    return data_type in PROCESSED_REQUIRES_RAW
+    if data_type in PROCESSED_REQUIRES_RAW:
+        return True
+    return service in _SOURCE_AXIS_SERVICES and data_type in MDPS_DERIVABLE_DATA_TYPES
 
 
-def get_raw_source_data_types(processed_data_type: str) -> list[str]:
+def get_raw_source_data_types(processed_data_type: str, *, service: str = "") -> list[str]:
     """Return the list of acceptable raw source dts for a processed dt.
 
     Returns an empty list when the data_type is not declared as processed
-    — callers should branch on :func:`is_processed_data_type` first.
-    A processed shard is "blocked on raw" only when *none* of the listed
-    raw sources have a captured shard at the same coordinates.
+    — callers should branch on :func:`is_processed_data_type` first (pass the
+    SAME ``service`` to both calls). A processed shard is "blocked on raw"
+    only when *none* of the listed raw sources have a captured shard at the
+    same coordinates.
+
+    ``service``: see :func:`is_processed_data_type`. For a SOURCE-axis token
+    resolved via the ``service`` branch, the raw source is the OHLCV
+    passthrough set (:data:`_PASSTHROUGH_RAW_FOR_OHLCV`) when
+    ``processed_data_type`` is itself one of those passthrough tokens, else
+    the token IS its own raw source (mirrors the pre-cutover
+    ``_RAW_TO_PROCESSED_PREFIX`` mapping, where e.g. ``deriv_ohlcv_*``'s only
+    raw source was ``derivative_ticker`` itself).
     """
-    return list(PROCESSED_REQUIRES_RAW.get(processed_data_type, []))
+    if processed_data_type in PROCESSED_REQUIRES_RAW:
+        return list(PROCESSED_REQUIRES_RAW[processed_data_type])
+    if service in _SOURCE_AXIS_SERVICES and processed_data_type in MDPS_DERIVABLE_DATA_TYPES:
+        if processed_data_type in _PASSTHROUGH_RAW_FOR_OHLCV:
+            return list(_PASSTHROUGH_RAW_FOR_OHLCV)
+        return [processed_data_type]
+    return []
 
 
 __all__ = [
