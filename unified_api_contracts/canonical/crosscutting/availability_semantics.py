@@ -82,6 +82,11 @@ AVAILABILITY_AT_SEMANTICS: Final[dict[tuple[str, str], AvailabilitySemantic]] = 
     ("sports", "ODDS_SNAPSHOT"): "publication_time",
     ("sports", "ODDS_MOVEMENT"): "publication_time",
     ("sports", "ARBITRAGE"): "publication_time",
+    # TRADES: the raw MTDS per-(bookmaker,league,fixture) tick shard (odds_api) —
+    # same publication-time semantic as its ODDS_SNAPSHOT/ODDS_MOVEMENT siblings.
+    # Added alongside the SOURCE_PRIORITY entry (_source_priority_data.py) — see
+    # that file's comment for the full root-cause diagnosis.
+    ("sports", "TRADES"): "publication_time",
     ("sports", "WEATHER_FORECAST"): "forecast_issue_time",
     # Sports raw data types written by instruments-service (as recorded in
     # the manifest and used by features-sports-service as upstream inputs).
