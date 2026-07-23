@@ -81,9 +81,9 @@ def test_batch_mode_includes_read_scope_venue_keys() -> None:
     """Batch mode declares read-scope venue keys (not trade-scope)."""
     data = _load(PER_MODE_PATH)
     batch_creds = [c["id"] for c in data["modes"]["batch"]["required"]]
-    # bybit has a single unscoped key in Secret Manager (bybit_api_key), not a
+    # bybit has a single unscoped key in Secret Manager (bybit-api-key), not a
     # read/trade split like binance/deribit — match the real SM secret id.
-    assert "bybit_api_key" in batch_creds
+    assert "bybit-api-key" in batch_creds
     assert "binance-read-api-key" in batch_creds
     # No trade-scope keys in batch (binance has a real read/trade split in SM)
     assert "binance-trade-api-key" not in batch_creds
@@ -129,7 +129,7 @@ def test_carry_staked_basis_declares_perp_hedge_venues() -> None:
     # Real GCP Secret Manager ids (one representative key per perp venue). okx is
     # per-client (exec-<client>-okx-*) so it is declared as a pattern, not a flat id.
     perp_keys = {
-        "bybit_api_key",
+        "bybit-api-key",
         "binance-trade-api-key",
         "deribit-trade-api-key",
         "pattern:exec-<client>-okx-api-key",

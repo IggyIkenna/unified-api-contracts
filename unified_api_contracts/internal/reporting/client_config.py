@@ -16,7 +16,10 @@ class ClientConfig(TypedDict, total=False):
     tranche: str
     currency: str
     venue: str
-    secret_name: str
+    secret_name: str  # legacy/inaccurate singular field; kept so existing readers still work — prefer secret_names
+    # Real per-field secret names (api_key/api_secret/passphrase) per the exec-{client}-{venue}-{field}
+    # pattern documented in unified-trading-pm/codex/05-infrastructure/secret-manager-naming.md.
+    secret_names: dict[str, str]
     odum_fee_pct: Decimal
     trader_fee_pct: Decimal
     introducer_id: str
