@@ -849,6 +849,61 @@ def _tradfi_path_violations(
     return structural, id_form
 
 
+def _partition_key_index(partition_segments: list[str], key: str) -> int | None:
+    """Index of the first ``{key}=...`` segment in ``partition_segments``, or ``None``."""
+    prefix = f"{key}="
+    for idx, seg in enumerate(partition_segments):
+        if seg.startswith(prefix):
+            return idx
+    return None
+
+
+def _defi_partition_order_violations(partition_segments: list[str], kv: dict[str, str]) -> list[str]:
+    """STRUCTURAL pin for the DeFi flat canonical shape: venue-BEFORE-chain, lowercase
+    ``instrument_type``, ``pipeline_mode=`` (when present) left of ``asset_group=``.
+
+    ``build_defi_partition_path`` (the single DeFi writer SSOT) emits an UNCONDITIONAL
+    fixed template — ``day=/[pipeline_mode=]/asset_group=defi/venue=/chain=/
+    instrument_type=/data_type=/{file}`` — so any REAL output of that one function
+    always satisfies every check below; this can never produce a false positive
+    against a canonical write. Before this, ``canonical_path_violations`` only
+    checked segment PRESENCE/VALUES via a ``key -> value`` dict, never ORDER, so a
+    second writer that spliced ``chain=`` ahead of ``venue=``
+    (``market_tick_data_service.live.websocket_runner.live_tick_blob_path``,
+    mtds@3043f2dc1 2026-06-26 — fixed alongside this check) read as CANONICAL for
+    nearly a month. SSOT: codex/02-data/defi-canonical-naming-ssot.md,
+    plans/active/defi_consolidated_closeout_2026_07_18.md ("pin the flat canonical
+    path shape ... kill the second dexpool writer path").
+    """
+    violations: list[str] = []
+
+    venue_idx = _partition_key_index(partition_segments, "venue")
+    chain_idx = _partition_key_index(partition_segments, "chain")
+    if venue_idx is not None and chain_idx is not None and chain_idx < venue_idx:
+        violations.append(
+            "defi path has 'chain=' before 'venue=' — canonical order is venue-before-chain "
+            "('venue={V}/chain={C}/...', never the reverse)"
+        )
+
+    itype_value = kv.get("instrument_type")
+    if itype_value is not None and itype_value != itype_value.lower():
+        violations.append(
+            f"instrument_type={itype_value!r} is not lowercase — the defi hive partition "
+            "value must be lowercase (e.g. 'a_token', not 'A_TOKEN'; the canonical upper-case "
+            "form lives only inside the instrument_id column)"
+        )
+
+    pm_idx = _partition_key_index(partition_segments, "pipeline_mode")
+    ag_idx = _partition_key_index(partition_segments, ASSET_GROUP_HIVE_KEY)
+    if pm_idx is not None and ag_idx is not None and pm_idx > ag_idx:
+        violations.append(
+            "defi path has 'pipeline_mode=' AFTER 'asset_group=' — canonical position is "
+            "immediately after 'day=' and BEFORE 'asset_group='"
+        )
+
+    return violations
+
+
 def _cefi_chain_tail_violations(
     asset_group: str | None, kv: dict[str, str], partition_segments: list[str], file_name: str
 ) -> list[str]:
@@ -1134,6 +1189,12 @@ def canonical_path_violations(
                 f"venue={venue_value!r} carries a glued 'V{{N}}' version — canonical form separates "
                 "it with an underscore (e.g. 'AAVE_V3', 'UNISWAP_V3')"
             )
+
+    # ── defi flat canonical shape (venue-before-chain, lowercase itype, pipeline_mode=
+    # position) — see _defi_partition_order_violations for the second-writer regression
+    # this closes.
+    if asset_group_value == "defi":
+        structural.extend(_defi_partition_order_violations(partition_segments, kv))
 
     # ── tradfi canonical shape (chain quote/margin tail + single full-id filename) ──
     # Enforced write-time by the MTDS PartitionedTickWriter (asset_group=tradfi)
