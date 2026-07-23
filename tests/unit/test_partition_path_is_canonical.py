@@ -168,6 +168,75 @@ def test_underscore_version_is_canonical() -> None:
     assert canonical_path_violations(_GOOD) == []
 
 
+# ---------------------------------------------------------------------------
+# DeFi flat canonical shape PIN (venue-before-chain, lowercase itype,
+# pipeline_mode= position) — closes plans/active/defi_consolidated_closeout_
+# 2026_07_18.md's "pin the flat canonical path shape ... kill the second
+# dexpool writer path". Before this, canonical_path_violations only checked
+# segment PRESENCE/VALUES, never ORDER, so a live-only writer
+# (market_tick_data_service.live.websocket_runner.live_tick_blob_path) that
+# spliced chain= ahead of venue= for nearly a month (mtds@3043f2dc1
+# 2026-06-26) read as CANONICAL.
+# ---------------------------------------------------------------------------
+
+
+def test_reject_chain_before_venue() -> None:
+    bad = _GOOD.replace("venue=AAVE_V3/chain=ETHEREUM", "chain=ETHEREUM/venue=AAVE_V3")
+    assert not is_canonical(bad, violation_classes=frozenset({CanonicalViolationClass.STRUCTURAL}))
+    violations = canonical_path_violations(bad, violation_classes=frozenset({CanonicalViolationClass.STRUCTURAL}))
+    assert any("canonical order is venue-before-chain" in v for v in violations)
+
+
+def test_reject_uppercase_instrument_type_segment() -> None:
+    bad = _GOOD.replace("instrument_type=a_token", "instrument_type=A_TOKEN")
+    violations = canonical_path_violations(bad, violation_classes=frozenset({CanonicalViolationClass.STRUCTURAL}))
+    assert any("is not lowercase" in v for v in violations)
+
+
+def test_reject_pipeline_mode_after_asset_group() -> None:
+    good_with_pm = _GOOD.replace(
+        "day=2026-04-17/asset_group=defi/",
+        "day=2026-04-17/pipeline_mode=batch_onchain_subgraph/asset_group=defi/",
+    )
+    assert (
+        canonical_path_violations(good_with_pm, violation_classes=frozenset({CanonicalViolationClass.STRUCTURAL})) == []
+    )
+    bad = _GOOD.replace(
+        "day=2026-04-17/asset_group=defi/",
+        "day=2026-04-17/asset_group=defi/pipeline_mode=batch_onchain_subgraph/",
+    )
+    violations = canonical_path_violations(bad, violation_classes=frozenset({CanonicalViolationClass.STRUCTURAL}))
+    assert any("canonical position is immediately after 'day='" in v for v in violations)
+
+
+def test_defi_order_pin_does_not_false_positive_on_real_builder_output() -> None:
+    """Every real ``build_defi_partition_path`` output — with/without pipeline_mode,
+    across representative instrument_type/data_type combos — must stay STRUCTURAL-clean.
+    """
+    for pipeline_mode in (None, "batch_onchain_subgraph", "live_pyth_hermes"):
+        for instrument_type, data_type in (
+            (InstrumentType.POOL, "dex_pool_state"),
+            (InstrumentType.A_TOKEN, "lending_indices"),
+            (InstrumentType.SOLANA_AMM_POOL, "dex_pool_state"),
+            (InstrumentType.SPOT_ASSET, "oracle_prices"),
+        ):
+            path = build_defi_partition_path(
+                venue="AAVE_V3",
+                chain="ETHEREUM",
+                instrument_type=instrument_type,
+                data_type=data_type,
+                day=_DAY,
+                file_name="leaf.parquet",
+                pipeline_mode=pipeline_mode,
+            )
+            violations = canonical_path_violations(
+                path,
+                require_pipeline_mode=pipeline_mode is not None,
+                violation_classes=frozenset({CanonicalViolationClass.STRUCTURAL}),
+            )
+            assert violations == [], (path, violations)
+
+
 @pytest.mark.parametrize("bad_ag", ["crypto", "equities", "DeFi", "options"])
 def test_reject_out_of_set_asset_group(bad_ag: str) -> None:
     bad = _GOOD.replace("asset_group=defi", f"asset_group={bad_ag}")
