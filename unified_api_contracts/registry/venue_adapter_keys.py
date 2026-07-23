@@ -122,10 +122,12 @@ VENUE_TO_ADAPTER_KEY: dict[str, str] = {
     "ICE": "databento",
     # FX never touches Databento — execution is FXAdapter (IBKR IDEALPRO), market data is
     # Yahoo Finance fetched via a hardcoded venue_upper == "FX" branch in MTDS's
-    # umi_tick_provider.py, bypassing VENUE_TO_ADAPTER_KEY/URDI entirely. No URDI reference-data
-    # adapter class exists for Yahoo Finance (checked instruments-service's _ADAPTERS) — FX
-    # genuinely has no URDI adapter, so this is NO_ADAPTER_YET, not a phantom vendor key.
-    "FX": NO_ADAPTER_YET,
+    # umi_tick_provider.py, bypassing VENUE_TO_ADAPTER_KEY/URDI entirely for TICK data. The
+    # reference-data (instrument LIST) side is a separate, much simpler question: the FX spot
+    # pair universe is a small static list (FX_SPOT_PAIRS below) that barely changes — a "fx"
+    # URDI adapter just emits it, no vendor call needed. Added 2026-07-23
+    # (instruments-service/reference_data/adapters/tradfi/fx.py).
+    "FX": "fx",
     "KRX": "databento",
     # YAHOO_FINANCE removed 2026-07-15 — it was a source-as-venue modeling error, not
     # a real venue (no adapter, no fetch code stamps venue=YAHOO_FINANCE). Yahoo is a

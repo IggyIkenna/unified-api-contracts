@@ -31,12 +31,11 @@ EXPECTED_SENTINEL_VENUES: frozenset[str] = frozenset(
     {
         # (YAHOO_FINANCE removed 2026-07-15 — it was a source-as-venue modeling error,
         #  no longer enumerated as a venue, so it is no longer a sentinel here.)
-        # MTDS-owned market-data venue: execution is FXAdapter (IBKR IDEALPRO), market data
-        # is Yahoo Finance via a hardcoded venue_upper == "FX" branch in MTDS's
-        # umi_tick_provider.py — bypasses VENUE_TO_ADAPTER_KEY/URDI entirely. No URDI
-        # reference-data adapter class exists for it (2026-07-13, previously mis-tagged
-        # "databento", which FX never touches).
-        "FX",
+        # (FX removed 2026-07-23 — it now has a real URDI reference-data adapter, "fx"
+        #  (instruments-service/reference_data/adapters/tradfi/fx.py, static
+        #  FX_SPOT_PAIRS-derived, no vendor call). MTDS's own FX tick/OHLCV path is
+        #  unaffected — it still bypasses VENUE_TO_ADAPTER_KEY/URDI via its hardcoded
+        #  Yahoo branch; this sentinel was specifically about the reference-data side.)
         # MTDS-owned sports odds venues (Decision C, 2026-06-29).
         "ODDS_API",
         "PINNACLE",
