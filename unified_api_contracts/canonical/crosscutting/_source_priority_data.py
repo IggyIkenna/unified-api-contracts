@@ -59,6 +59,17 @@ SOURCE_PRIORITY: Final[dict[tuple[str, str], list[str]]] = {
     ("sports", "ODDS_SNAPSHOT"): ["odds_api"],
     ("sports", "ODDS_MOVEMENT"): ["odds_api"],
     ("sports", "ARBITRAGE"): ["odds_api"],
+    # TRADES = the raw MTDS per-(bookmaker,league,fixture) tick shard write shape
+    # (venue_fetch.py::_build_sports_shard_path) — odds-api is the ONLY sanctioned
+    # writer (api_football has no MTDS odds adapter, see
+    # market_tick_data_service/scripts/wipe_api_football_sports_odds_2026_06_24.py).
+    # Missing here meant read_with_source_priority("sports","TRADES"/"trades") raised
+    # KeyError, so derive_pipeline_mode_for_row() fell through to the
+    # _ASSET_GROUP_FALLBACKS["sports"]=BATCH_API_FOOTBALL default and mis-stamped every
+    # sports sentinel/expected-row for this shape as source=api_football — the root
+    # cause of a 1.26M-row wrong-source re-accumulation found 2026-07-22/23
+    # (issues/mtds_sports_api_football_wrong_source_reaccumulated_post_wipe_2026_07_22.md).
+    ("sports", "TRADES"): ["odds_api"],
     ("sports", "WEATHER_FORECAST"): ["open_meteo"],
     # Sports raw data types (instruments-service manifest data_type names).
     ("sports", "XG"): ["understat"],

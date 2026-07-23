@@ -221,6 +221,7 @@ DATA_TYPES_BY_ASSET_GROUP: dict[str, list[str]] = {
         "settlements",  # Settlement records (payout confirmation)
         # ── Bet/trade events (PINNACLE, BETFAIR_SB_UK/EX_UK/EX_EU, DRAFTKINGS, FANDUEL) ──
         "trades",  # Matched bets / trade-level acceptance events (aligned with CeFi/prediction)
+        "TRADES",  # Canonical uppercase form (K1, mtds@2536b91c, 2026-07-22) — mirrors "ODDS" above.
         # 2026-07-17 (operator ruling OR-5b(c), sports legacy-bucket cutover): POST-KICKOFF
         # ("in-play") bookmaker quotes recovered from the legacy MDT bucket, kept as a
         # population DISTINCT from pre-match ``trades`` so the observations survive the
@@ -1016,7 +1017,18 @@ VALID_DATA_TYPES_BY_AG_AND_INSTRUMENT_TYPE: dict[tuple[str, str], frozenset[str]
     # entry existed the pair had NO matrix row at all, so every one of those
     # rows silently rode the "unmapped instrument_type" fallback path instead
     # of an audited entry.
-    ("sports", "odds"): frozenset({"trades"}),
+    # "TRADES" (uppercase) added to the value set 2026-07-23: K1 (mtds@2536b91c,
+    # 2026-07-22) flipped the live writer to emit instrument_type=ODDS/
+    # data_type=TRADES; K2 (2026-07-22/23) migrated all 260,298 historical objects
+    # + the manifest-swap (373,296 rows) to match — verified 0 remaining lowercase
+    # rows in the batch_odds_api scope. The key stays lowercase "odds" — the
+    # instrument_type axis is case-normalized before lookup
+    # (valid_data_types_for_instrument_type() lowercases it), so a separate
+    # ("sports","ODDS") key would never actually be queried; only the VALUE set
+    # needs the uppercase data_type member. The lowercase "trades" member is kept
+    # as a harmless historical artifact (no live data reaches it post-migration).
+    # SSOT: sports_master_closeout_2026_07_21.md.
+    ("sports", "odds"): frozenset({"trades", "TRADES"}),
     # ── Prediction ────────────────────────────────────────────────────────────
     # Prediction uses per-row data_type GRAIN BINDING (instr.data_type field): the
     # enumerator's _row_data_types step-1 returns [instr.data_type] and NEVER
