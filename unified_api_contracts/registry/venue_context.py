@@ -317,7 +317,14 @@ def resolve_venue_context(
     captcha_risk = False
     supported_market_types_list: list[str] = []
 
-    if venue_category == "sports":
+    # "prediction" (KALSHI/POLYMARKET's correct asset_group, VENUE_CATEGORY_MAP override 2026-07-24)
+    # is included here alongside "sports": both venues are members of SPORTS_VENUE_TYPE_MAP /
+    # SPORTS_AUTH_MAP / SUPPORTED_MARKET_TYPES (via SPORTS_PREDICTION_MARKET_VENUES, which the
+    # asset_group fix did NOT change) because they DO offer sports contracts — gating this block on
+    # venue_category=="sports" only would silently drop KALSHI/POLYMARKET's sports_venue_type
+    # (PREDICTION_MARKET_API) and regress their derived execution_pattern from clob_api to
+    # data_only. See cross_ag_prediction_rows_bleed_into_sports_instruments_index_2026_07_20.md.
+    if venue_category in ("sports", "prediction"):
         sports_venue_type = SPORTS_VENUE_TYPE_MAP.get(venue)
         sports_auth_method = SPORTS_AUTH_MAP.get(venue)
         captcha_risk = venue in SPORTS_CAPTCHA_RISK
