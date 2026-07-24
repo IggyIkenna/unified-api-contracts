@@ -85,9 +85,9 @@ class TestBucketCaptureStatusCell:
             EmptyConfirmedReason.EXPECTED_FIXTURE_POSTPONED.value,
             EmptyConfirmedReason.SOURCE_RETURNED_ZERO.value,
         ):
-            assert (
-                bucket_capture_status_cell(capture_status="empty_confirmed", error_reason=reason) == "WE"
-            ), f"{reason} should bucket as within-window (WE)"
+            assert bucket_capture_status_cell(capture_status="empty_confirmed", error_reason=reason) == "WE", (
+                f"{reason} should bucket as within-window (WE)"
+            )
 
     def test_out_of_coverage_window_empty_bucket(self) -> None:
         # Out-of-coverage-window reasons (pre-launch / pre-genesis / not-listed / delisted /
@@ -101,17 +101,16 @@ class TestBucketCaptureStatusCell:
             EmptyConfirmedReason.EXPECTED_NO_FIXTURE.value,
             EmptyConfirmedReason.EXPECTED_NOT_ENOUGH_TVL.value,
         ):
-            assert (
-                bucket_capture_status_cell(capture_status="empty_confirmed", error_reason=reason) == "OOW"
-            ), f"{reason} should bucket as out-of-coverage-window (OOW)"
+            assert bucket_capture_status_cell(capture_status="empty_confirmed", error_reason=reason) == "OOW", (
+                f"{reason} should bucket as out-of-coverage-window (OOW)"
+            )
 
     def test_attempted_failed_bucket(self) -> None:
         # error_reason on attempted_failed carries the RecordFailedReason value;
         # for window classification the F bucket is taken regardless.
         assert bucket_capture_status_cell(capture_status="attempted_failed", error_reason=None) == "F"
         assert (
-            bucket_capture_status_cell(capture_status="attempted_failed", error_reason="CLASSIFIED_VENUE_ERROR")
-            == "F"
+            bucket_capture_status_cell(capture_status="attempted_failed", error_reason="CLASSIFIED_VENUE_ERROR") == "F"
         )
 
     def test_expected_unattempted_with_expected_prefix_bucket(self) -> None:
@@ -127,24 +126,24 @@ class TestBucketCaptureStatusCell:
     def test_expected_unattempted_without_expected_prefix_bucket(self) -> None:
         # Pending fetch — the gap a backfill is expected to close.
         for reason in (None, "", "PENDING_BACKFILL"):
-            assert (
-                bucket_capture_status_cell(capture_status="expected_unattempted", error_reason=reason) == "U"
-            ), f"reason={reason!r} should bucket as pending unattempted (U)"
+            assert bucket_capture_status_cell(capture_status="expected_unattempted", error_reason=reason) == "U", (
+                f"reason={reason!r} should bucket as pending unattempted (U)"
+            )
 
     def test_unknown_capture_status_rejected(self) -> None:
         with pytest.raises(ValueError, match="Unknown capture_status"):
             bucket_capture_status_cell(capture_status="not_a_state", error_reason=None)
 
     def test_schedule_defining_fixtures_zero_routes_to_oow(self) -> None:
-        # Operator direction 2026-06-23: a schedule-DEFINING FIXTURES no-match-day
-        # SOURCE_RETURNED_ZERO routes through is_out_of_coverage_window when
-        # data_type is supplied. This is the data-type-aware path that
-        # bucket_capture_status_cell MUST honour.
+        # Operator direction 2026-06-23: a schedule-DEFINING FIXTURES_SCHEDULE
+        # no-match-day SOURCE_RETURNED_ZERO routes through
+        # is_out_of_coverage_window when data_type is supplied. This is the
+        # data-type-aware path that bucket_capture_status_cell MUST honour.
         assert (
             bucket_capture_status_cell(
                 capture_status="empty_confirmed",
                 error_reason=EmptyConfirmedReason.SOURCE_RETURNED_ZERO.value,
-                data_type="FIXTURES",
+                data_type="FIXTURES_SCHEDULE",
             )
             == "OOW"
         )
@@ -231,12 +230,8 @@ class TestClassifyFromCaptureCounts:
         # insufficient — even though both produce zero captured rows.
         honest_empty_counts = WindowCaptureCounts(out_of_coverage_window_empty=91)
         insufficient_counts = WindowCaptureCounts(attempted_failed=91)
-        assert (
-            classify_from_capture_counts(honest_empty_counts) == ShardCoverageClass.HONEST_EMPTY
-        )
-        assert (
-            classify_from_capture_counts(insufficient_counts) == ShardCoverageClass.INSUFFICIENT_HISTORY
-        )
+        assert classify_from_capture_counts(honest_empty_counts) == ShardCoverageClass.HONEST_EMPTY
+        assert classify_from_capture_counts(insufficient_counts) == ShardCoverageClass.INSUFFICIENT_HISTORY
 
     def test_priority_insufficient_dominates_runnable(self) -> None:
         # Even when most of the window is captured, a single hole forces
