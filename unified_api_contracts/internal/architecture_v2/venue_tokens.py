@@ -91,6 +91,17 @@ _DEFI_DEX_TOKENS: frozenset[str] = frozenset(
         "pancakeswapv3",
         "traderjoe",
         "jupiter",
+        # 2026-07-24 containment-fix follow-up (defi_archetype_universe_no_curtailment_
+        # mechanism_2026_07_23.md Side-decision 2): archetype_leg_spec_seeds.py's
+        # ARBITRAGE_PRICE_DISPERSION venues now cite "aerodrome_v3"/"camelot_v3"/"phoenix"
+        # (the DEX cross-venue spot-dispersion sub-family, catalog_trading.py's
+        # _dex_dispersion_pairs) — same F47 unbuildable-slot gap this file's own Phase-V
+        # comment above describes; the family base "aerodrome" already exists (added here
+        # for the exact versioned fold), "camelot"/"phoenix" had no entry at all.
+        "aerodromev3",
+        "camelot",
+        "camelotv3",
+        "phoenix",
     }
 )
 
@@ -181,6 +192,15 @@ _PREDICTION_TOKENS: frozenset[str] = frozenset(
     {
         "polymarket",
         "kalshi",
+        # 2026-07-24 containment-fix follow-up (defi_archetype_universe_no_curtailment_
+        # mechanism_2026_07_23.md Side-decision 2): CARRY_BASIS_PERP / CARRY_FUNDING_
+        # DISPERSION's eligible_venue_ids now cite "kalshi_perp"/"polymarket_perp" — the
+        # CFTC-regulated crypto-perp CLOB product (distinct from the bare "kalshi"/
+        # "polymarket" event-market product; venue_adapter_keys.VENUE_TO_ADAPTER_KEY keys
+        # them separately too). Family bases exist above; the parser needs the exact
+        # folded token for the perp-product variant.
+        "kalshiperp",
+        "polymarketperp",
     }
 )
 
