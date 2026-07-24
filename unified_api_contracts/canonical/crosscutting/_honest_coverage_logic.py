@@ -21,6 +21,8 @@ import datetime as _dt
 import re
 from typing import Final, NamedTuple
 
+from unified_api_contracts.canonical.domain.sports.fixture_lifecycle import FIXTURES_SCHEDULE
+
 # ---------------------------------------------------------------------------
 # Honest-coverage formula — SSOT for "what fraction of expected slots have we
 # answered honestly?". Every numerator/denominator computation in the workspace
@@ -80,8 +82,9 @@ class CaptureStatusCounts(NamedTuple):
     """Count of ``empty_confirmed`` cells that are OUTSIDE the coverable
     window/scope (a SUBSET of :attr:`empty_confirmed`; reason ∈
     :data:`OUT_OF_COVERAGE_WINDOW_REASONS` — instrument-not-listed / delisted /
-    pre-venue-launch / no-fixture / …, OR a schedule-defining ``FIXTURES``
-    no-match-day). Since 2026-07-22 (Part 4.1 global formula consolidation)
+    pre-venue-launch / no-fixture / …, OR a schedule-defining
+    ``FIXTURES_SCHEDULE`` no-match-day). Since 2026-07-22 (Part 4.1 global
+    formula consolidation)
     :func:`compute_honest_coverage` excludes ALL of ``empty_confirmed`` from
     both numerator and denominator regardless of this sub-classification, so
     this field no longer changes the computed ratio — it is retained purely
@@ -266,8 +269,8 @@ def compute_layered_coverage(
 # direction 2026-06-23).
 #
 # A schedule-defining data_type IS the source-of-truth for whether anything
-# exists to capture on a (entity, day). API-Football ``FIXTURES`` is the sports
-# schedule: when its fixtures endpoint returns 200 + zero rows for a
+# exists to capture on a (entity, day). API-Football ``FIXTURES_SCHEDULE`` is
+# the sports schedule: when its fixtures endpoint returns 200 + zero rows for a
 # (league, day), there genuinely are NO matches that day — that cell is
 # CORRECTLY RESOLVED (complete), not a coverage gap. The 2026-06-23 audit found
 # 233 golden-window FIXTURES cells at ``empty_confirmed(SOURCE_RETURNED_ZERO)``
@@ -285,18 +288,24 @@ def compute_layered_coverage(
 # NOTE on MATCHES (FootyStats): NOT schedule-defining. FootyStats is
 # fixture-PINNED — it records ``EXPECTED_NO_FIXTURE`` (already out-of-window)
 # when no API-Football fixture exists, and a genuine zero from FootyStats when a
-# fixture DOES exist is a real enrichment gap. So only ``FIXTURES`` qualifies.
-# SSOT: ``codex/02-data/honest-absence-downstream-handling.md`` + the operator
-# directive 2026-06-23.
+# fixture DOES exist is a real enrichment gap. So only ``FIXTURES_SCHEDULE``
+# qualifies. SSOT: ``codex/02-data/honest-absence-downstream-handling.md`` + the
+# operator directive 2026-06-23.
+#
+# ``FIXTURES`` → ``FIXTURES_SCHEDULE`` atom migration (2026-07-24,
+# ``plans/active/sports_closeout_batch1_ao_ready_2026_07_24.md`` todo 1): the
+# manifest atom this constant matches was renamed at every writer/reader call
+# site in instruments-service — this constant must track the SAME atom or it
+# silently stops matching anything post-migration.
 # ---------------------------------------------------------------------------
 
-SCHEDULE_DEFINING_DATA_TYPES: Final[frozenset[str]] = frozenset({"FIXTURES"})
+SCHEDULE_DEFINING_DATA_TYPES: Final[frozenset[str]] = frozenset({FIXTURES_SCHEDULE})
 """Closed set of schedule-DEFINING data_types — the source-of-truth for whether
 anything exists to capture on a (entity, day). For these, a clean
 ``SOURCE_RETURNED_ZERO`` (200 + zero rows) means "no matches that day = complete"
 → RESOLVED, not a gap (see :func:`is_resolved_schedule_empty`). Today only
-sports ``FIXTURES`` (API-Football, the schedule). Enrichment data_types are NOT
-here — their zero-row responses may be real gaps."""
+sports ``FIXTURES_SCHEDULE`` (API-Football, the schedule). Enrichment
+data_types are NOT here — their zero-row responses may be real gaps."""
 
 _SCHEDULE_EMPTY_RESOLVED_REASON: Final[str] = "SOURCE_RETURNED_ZERO"
 """The ONLY ``empty_confirmed`` reason a schedule-defining data_type resolves
@@ -307,7 +316,7 @@ matches that day). ``EXPECTED_*`` calendar reasons are already out-of-window."""
 def is_resolved_schedule_empty(data_type: str | None, reason: str | None) -> bool:
     """True iff a schedule-DEFINING data_type's empty cell is RESOLVED (complete).
 
-    A schedule-defining data_type (today only sports ``FIXTURES``, the
+    A schedule-defining data_type (today only sports ``FIXTURES_SCHEDULE``, the
     API-Football schedule) that is ``empty_confirmed`` with reason
     ``SOURCE_RETURNED_ZERO`` means the fixtures endpoint returned 200 + zero
     rows → there genuinely were NO matches that (league, day) → the cell is
