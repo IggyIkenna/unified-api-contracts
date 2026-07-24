@@ -87,7 +87,15 @@ _STAKED_HEDGE_VENUES: Final[tuple[str, ...]] = (
     "deribit",
     "okx",
 )
-_STAKE_PROTOCOLS_ETH_SOL: Final[tuple[str, ...]] = ("lido", "rocketpool", "jito", "marinade")
+_STAKE_PROTOCOLS_ETH_SOL: Final[tuple[str, ...]] = (
+    "lido",
+    "rocketpool",
+    "etherfi",  # 2026-07-24 containment fix — catalog_staked_basis.py's _STAKED_BASIS_ETH_LSTS
+    # includes ("ETHERFI", "weETH"); confirmed missing via the Side-decision 2 containment check
+    # (defi_archetype_universe_no_curtailment_mechanism_2026_07_23.md).
+    "jito",
+    "marinade",
+)
 _LEND_VENUES_STAKED: Final[tuple[str, ...]] = ("aave_v3", "kamino")
 # Spot-leg (USDC→native SWAP) venues for CARRY_STAKED_BASIS — operator-
 # selectable, NOT hardcoded per-LST (operator directive 2026-06-17; plan
@@ -129,7 +137,17 @@ _CEFI_CLOB_VENUES: Final[tuple[str, ...]] = (
 )
 _OPTIONS_VENUES: Final[tuple[str, ...]] = ("deribit", "okx")
 _OPTIONS_VENUES_WITH_CBOE: Final[tuple[str, ...]] = ("deribit", "okx", "cboe")
-_DEX_SWAP_VENUES: Final[tuple[str, ...]] = ("uniswap_v3", "pancakeswap_v3", "sushiswap_v3")
+_DEX_SWAP_VENUES: Final[tuple[str, ...]] = (
+    "uniswap_v3",
+    "pancakeswap_v3",
+    "sushiswap_v3",
+    # 2026-07-24 containment fix — catalog_yield_defi.py's build_liquidation_capture() uses
+    # swap_venue="aerodrome" (Base-chain row) and swap_venue="raydium" (Solana row); confirmed
+    # missing via the Side-decision 2 containment check
+    # (defi_archetype_universe_no_curtailment_mechanism_2026_07_23.md).
+    "aerodrome",
+    "raydium",
+)
 _LENDING_PROTOCOLS: Final[tuple[str, ...]] = ("aave_v3", "compound_v3", "morpho", "euler", "fluid")
 _EVENT_SETTLED_VENUES: Final[tuple[str, ...]] = (
     "betfair_direct",
@@ -271,14 +289,30 @@ def _basis_perp_structure(archetype: StrategyArchetype, *, inverse: bool, notes:
                 instrument_types=(ArchetypeInstrumentType.SPOT,),
                 asset_groups=(VenueCategoryV2.CEFI, VenueCategoryV2.DEFI),
                 eligible_venue_ids=(
+                    "aster",  # 2026-07-24 containment fix: catalog_carry.py _CARRY_BASIS_PERP_VENUE_BUNDLES
+                    # sets spot_venue=full_venue for every single-venue-netted bundle (incl. aster/deribit/
+                    # gmx/kalshi-perp/polymarket-perp) — see defi_archetype_universe_no_curtailment_
+                    # mechanism_2026_07_23.md Finding 3 addendum + Side-decision 2 containment check.
                     "binance",
                     "bitfinex",  # bitfinex_native.py:167 (BITFINEX-SPOT adapter — spot only, no futures adapter exists)
                     "bitget",  # F39: bitget_native.py:125 (BITGET-SPOT adapter — spot leg)
                     "bybit",
                     "coinbase",  # F39: coinbase_ccxt.py:32 (COINBASE-SPOT adapter)
+                    "deribit",  # 2026-07-24 containment fix (see aster comment above)
+                    "gmx_v2",  # 2026-07-24 containment fix — catalog emits bare "gmx"; same real GMX-V2
+                    # perp DEX this module already calls "gmx_v2" everywhere else (see _STAKED_HEDGE_VENUES /
+                    # this function's own perp leg below) — NOT a naming bug, aliased in the containment check.
                     "hyperliquid",
+                    "kalshi_perp",  # 2026-07-24 containment fix (see aster comment above); distinct from
+                    # bare "kalshi" (the event-market product) — VENUE_TO_ADAPTER_KEY["KALSHI-PERP"]="kalshi_perp".
                     "kraken",  # F39: kraken_rest_adapter.py:159 (KRAKEN-SPOT adapter — spot leg)
                     "okx",
+                    "polymarket_perp",  # 2026-07-24 containment fix (see aster comment above); distinct from
+                    # bare "polymarket" — VENUE_TO_ADAPTER_KEY["POLYMARKET-PERP"]="polymarket_perp".
+                    "raydium",  # 2026-07-24 containment fix — catalog_carry.py's cross-venue row
+                    # ("raydium", "hyperliquid", "sol", ...) sets spot_venue="raydium" (SOL/USDC AMM,
+                    # DEX spot leg paired with a Hyperliquid perp hedge); confirmed missing via the
+                    # Side-decision 2 containment check.
                     "uniswap_v3",
                 ),
                 source_of_truth=(
@@ -293,14 +327,25 @@ def _basis_perp_structure(archetype: StrategyArchetype, *, inverse: bool, notes:
                 instrument_types=(ArchetypeInstrumentType.PERP,),
                 asset_groups=(VenueCategoryV2.CEFI, VenueCategoryV2.DEFI),
                 eligible_venue_ids=(
+                    "aster",  # 2026-07-24 containment fix — live in catalog_carry.py's
+                    # _CARRY_BASIS_PERP_VENUE_BUNDLES ("kalshi-perp live from 2026-05-29" per that
+                    # file's own comment) — confirmed missing by the Finding 3 reconciliation-direction
+                    # addendum (defi_archetype_universe_no_curtailment_mechanism_2026_07_23.md).
                     "binance",
+                    "bitfinex",  # 2026-07-24 containment fix — catalog's BITFINEX-FUTURES venue bundle sets
+                    # perp_venue=BITFINEX-FUTURES too; NOTE this may itself be a pre-existing catalog bug
+                    # (bitfinex_native.py only ships a SPOT adapter per this file's own comment above) —
+                    # flagged as a separate, out-of-scope finding, not fixed here (containment-check scope
+                    # is catalog-declares vs UAC-cites, not catalog-declaration correctness).
                     "bitget",  # F39: bitget_native.py:125 (BITGET-FUTURES adapter — perp leg)
                     "bybit",
                     "deribit",
                     "gmx_v2",
                     "hyperliquid",
+                    "kalshi_perp",  # 2026-07-24 containment fix (see aster comment above)
                     "kraken",  # F39: kraken_rest_adapter.py:159 (KRAKEN-FUTURES adapter — perp leg)
                     "okx",
+                    "polymarket_perp",  # 2026-07-24 containment fix (see aster comment above)
                 ),
                 signal_variants=("funding_rate_annualised_bps",),
                 constraints=(same_venue,),
@@ -324,7 +369,18 @@ def _funding_dispersion_structure() -> ArchetypeLegStructure:
     coupled or leader/hedge. The reversion edge is venue-dependent (Binance/Bybit/OKX/Aster); Hyperliquid is
     momentum and is excluded at the signal layer.
     """
-    arbitraged_perp_venues = ("binance", "bitget", "bybit", "kraken", "okx")
+    arbitraged_perp_venues = (
+        "aster",  # 2026-07-24 containment fix — catalog_carry.py's _FUNDING_DISPERSION_VENUES
+        # includes aster/kalshi-perp/polymarket-perp; confirmed missing via the Side-decision 2
+        # containment check (defi_archetype_universe_no_curtailment_mechanism_2026_07_23.md).
+        "binance",
+        "bitget",
+        "bybit",
+        "kalshi_perp",  # 2026-07-24 containment fix (see aster comment above)
+        "kraken",
+        "okx",
+        "polymarket_perp",  # 2026-07-24 containment fix (see aster comment above)
+    )
     return ArchetypeLegStructure(
         archetype_id=StrategyArchetype.CARRY_FUNDING_DISPERSION,
         legs=(
@@ -384,11 +440,17 @@ def _basis_dated_structure(archetype: StrategyArchetype, *, inverse: bool, notes
                     "bitfinex",  # bitfinex_native.py:167 (BITFINEX-SPOT adapter — spot only, no futures adapter exists)
                     "bitget",  # F39: bitget_native.py:125 (BITGET-SPOT adapter — spot leg)
                     "bybit",  # F39: bybit_native.py:138 (BYBIT-SPOT adapter — spot leg)
+                    "cboe",  # 2026-07-24 containment fix — catalog_carry.py's build_carry_basis_dated()
+                    # equity-index rows set spot_venue="cboe" (SPX/NDX cash legs); confirmed missing via
+                    # the Side-decision 2 containment check.
+                    "cme",  # 2026-07-24 containment fix — same function's commodity rows (gold: spot_venue="cme")
                     "coinbase",
                     "deribit",
                     "ibkr",
+                    "ice",  # 2026-07-24 containment fix — same function's crude-oil row (spot_venue="ice")
                     "kraken",  # F39: kraken_rest_adapter.py:159 (KRAKEN-SPOT adapter — spot leg)
                     "nasdaq",  # codex category-instrument-coverage.md §5 slot ibkr-cme-qqq-nq-dated-usd-prod (QQQ)
+                    "nymex",  # 2026-07-24 containment fix — same function's nat-gas row (spot_venue="nymex")
                     "nyse",  # codex category-instrument-coverage.md §5 slot ibkr-cme-spy-es-dated-usd-prod (SPY)
                     "okx",  # F39: okx_native.py:151 (OKX-SPOT adapter — spot leg)
                 ),
@@ -436,7 +498,10 @@ def _recursive_staked_structure() -> ArchetypeLegStructure:
                 required=True,
                 instrument_types=(ArchetypeInstrumentType.STAKING,),
                 asset_groups=(VenueCategoryV2.DEFI,),
-                eligible_venue_ids=("lido", "rocketpool", "jito", "marinade"),
+                # 2026-07-24 containment fix — catalog_carry.py's _RECURSIVE_STAKED_LST includes
+                # "etherfi" (staking_venue="etherfi" is a real emitted row); confirmed missing via
+                # the Side-decision 2 containment check.
+                eligible_venue_ids=("lido", "rocketpool", "etherfi", "jito", "marinade"),
                 constraints=(atomic,),
                 source_of_truth=src,
             ),
@@ -446,7 +511,11 @@ def _recursive_staked_structure() -> ArchetypeLegStructure:
                 required=True,
                 instrument_types=(ArchetypeInstrumentType.LENDING,),
                 asset_groups=(VenueCategoryV2.DEFI,),
-                eligible_venue_ids=("aave_v3", "kamino"),
+                # 2026-07-24 containment fix — catalog_carry.py's _RECURSIVE_STAKED_LEND includes
+                # "compound" (lending_venue="compound" is a real emitted row, aliased to
+                # "compound_v3" — same convention as "aave"/"aave_v3"); confirmed missing via the
+                # Side-decision 2 containment check.
+                eligible_venue_ids=("aave_v3", "compound_v3", "kamino"),
                 constraints=(atomic,),
                 source_of_truth=src,
             ),
@@ -456,7 +525,7 @@ def _recursive_staked_structure() -> ArchetypeLegStructure:
                 required=True,
                 instrument_types=(ArchetypeInstrumentType.LENDING,),
                 asset_groups=(VenueCategoryV2.DEFI,),
-                eligible_venue_ids=("aave_v3", "kamino"),
+                eligible_venue_ids=("aave_v3", "compound_v3", "kamino"),  # 2026-07-24: see loop_collateral above
                 signal_variants=("effective_ltv", "target_leverage"),
                 constraints=(atomic,),
                 source_of_truth=src,
@@ -518,7 +587,11 @@ def _staking_simple_structure() -> ArchetypeLegStructure:
                 required=True,
                 instrument_types=(ArchetypeInstrumentType.STAKING,),
                 asset_groups=(VenueCategoryV2.DEFI,),
-                eligible_venue_ids=("lido", "rocketpool", "etherfi", "jito", "marinade"),
+                # 2026-07-24 containment fix — catalog_yield_defi.py's build_yield_staking_simple()
+                # has a 6th ethena/USDE row (deliberately excluded from paper-replay tick-loader
+                # wiring per this issue doc's Phase 4a note, but still a REAL catalog row); confirmed
+                # missing via the Side-decision 2 containment check.
+                eligible_venue_ids=("lido", "rocketpool", "etherfi", "jito", "marinade", "ethena"),
                 source_of_truth=(
                     "strategy-service YieldStakingSimpleEngine (staking_simple.py, "
                     "single STAKE leg); manifest cell YIELD_STAKING_SIMPLE (DEFI, staking) "
@@ -543,7 +616,10 @@ def _rotation_lending_structure() -> ArchetypeLegStructure:
                 required=True,
                 instrument_types=(ArchetypeInstrumentType.LENDING,),
                 asset_groups=(VenueCategoryV2.DEFI,),
-                eligible_venue_ids=("aave_v3", "compound_v3", "euler", "morpho", "kamino"),
+                # 2026-07-24 containment fix — catalog_yield_defi.py's build_yield_rotation_lending()
+                # cross-chain meta-rotation row sets candidate_protocols="aave,compound,morpho,spark";
+                # "spark" confirmed missing via the Side-decision 2 containment check.
+                eligible_venue_ids=("aave_v3", "compound_v3", "euler", "morpho", "kamino", "spark"),
                 signal_variants=("apy_rotation",),
                 source_of_truth=(
                     "strategy-service YieldRotationLendingEngine (rotation_lending.py, "
@@ -566,20 +642,47 @@ def _price_dispersion_structure() -> ArchetypeLegStructure:
         "codex/09-strategy/architecture-v2/archetypes/arbitrage-price-dispersion.md"
     )
     venues = (
+        "aave_v3",  # 2026-07-24 containment fix — catalog_trading.py's build_arbitrage_price_dispersion()
+        # lending-protocol-arb + cross-chain-yield-arb sub-families set candidate_venues/protocol="aave"
+        # (aliased to "aave_v3" — same convention as elsewhere); confirmed missing via the Side-decision 2
+        # containment check (defi_archetype_universe_no_curtailment_mechanism_2026_07_23.md).
+        "aerodrome_v3",  # 2026-07-24 containment fix — same function's DEX cross-venue spot-dispersion
+        # sub-family (_dex_dispersion_pairs) sets candidate_venues csv including AERODROME_V3.
         "balancer",
+        "betfair",  # 2026-07-24 containment fix — same function's sports-cross-book row sets
+        # venues="unity,betfair,matchbook" (bare "betfair", distinct from "betfair_direct" already below —
+        # both are real, separately-registered ids per venue_tokens.py's own family-vs-routing-target split).
         "betfair_direct",
         "binance",
         "bitget",  # F39: bitget_native.py:125 (BITGET-FUTURES/SPOT adapter)
         "bybit",
+        "camelot_v3",  # 2026-07-24 containment fix — _dex_dispersion_pairs (see aerodrome_v3 above)
+        "cme",  # 2026-07-24 containment fix — same function's cross-venue dated-futures-arb sub-family
+        # sets candidate_venues="cme,deribit" (CME micro vs Deribit dated, same expiry).
         "coinbase",  # F39: coinbase_ccxt.py:32 (COINBASE-SPOT adapter)
+        "compound_v3",  # 2026-07-24 containment fix (see aave_v3 comment above; catalog "compound" aliased)
         "curve",
         "deribit",
         "gmx_v2",
         "hyperliquid",
+        "kalshi",  # 2026-07-24 containment fix — same function's Kalshi<->Polymarket cross-venue row sets
+        # arb_venues="polymarket,kalshi" (bare event-market id, distinct from the perp-product "kalshi_perp"
+        # used by CARRY_BASIS_PERP/CARRY_FUNDING_DISPERSION above).
         "kraken",  # F39: kraken_rest_adapter.py:159 (KRAKEN-FUTURES/SPOT adapter)
+        "matchbook",  # 2026-07-24 containment fix (see betfair comment above)
+        "morpho",  # 2026-07-24 containment fix (see aave_v3 comment above; catalog emits literal "morpho")
         "okx",
+        "orca",  # 2026-07-24 containment fix — _dex_dispersion_pairs (see aerodrome_v3 above)
+        "pancakeswap_v3",  # 2026-07-24 containment fix — _dex_dispersion_pairs (see aerodrome_v3 above)
+        "phoenix",  # 2026-07-24 containment fix — _dex_dispersion_pairs (see aerodrome_v3 above); NOTE
+        # instruments-service's phoenix.py adapter is registered but its upstream is measurably dead
+        # (venue_adapter_keys.py DEFI_VENUE_PHASE="pipeline") — cited here as a real catalog-declared
+        # candidate_venue regardless of current data-availability (a separate, orthogonal question from
+        # leg-eligibility citation).
         "polymarket",
+        "raydium",  # 2026-07-24 containment fix — _dex_dispersion_pairs (see aerodrome_v3 above)
         "smarkets_direct",
+        "sushiswap_v3",  # 2026-07-24 containment fix — _dex_dispersion_pairs (see aerodrome_v3 above)
         "uniswap_v3",
         "unity",
     )
@@ -1241,7 +1344,13 @@ def _defi_lp_seeds() -> tuple[ArchetypeLegStructure, ...]:
         _defi_lp_structure(
             StrategyArchetype.DEFI_LP_VAULT,
             operation="vault_deposit",
-            venues=("yearn_v3", "morpho", "sommelier"),
+            # 2026-07-24 containment fix — catalog_yield_defi.py's build_defi_lp_vault() has real
+            # ethena/sUSDe + maker/sDAI rows (venue="ETHENA"/"MAKER"); confirmed missing via the
+            # Side-decision 2 containment check (defi_archetype_universe_no_curtailment_mechanism_
+            # 2026_07_23.md). "morpho"/"sommelier" are kept even though the catalog doesn't emit them
+            # yet — a legitimately-broader UAC citation (codex-documented, not-yet-live venues; the
+            # containment direction is catalog ⊆ UAC, not equality).
+            venues=("yearn_v3", "morpho", "sommelier", "ethena", "maker"),
             engine_file="vault.py",
             notes="ERC-4626 vault deposit/redeem; exit on APY-below-floor or drawdown breach.",
         ),
