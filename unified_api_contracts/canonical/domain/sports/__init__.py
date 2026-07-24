@@ -148,6 +148,9 @@ from .refdata_cadence import (
     TRANSFERMARKT_PLAYER_VALUES_UPDATE_WEEKDAYS as TRANSFERMARKT_PLAYER_VALUES_UPDATE_WEEKDAYS,
 )
 from .refdata_cadence import is_player_values_update_day as is_player_values_update_day
+from .right_days import SPORTS_GOLDEN_WINDOW_END as SPORTS_GOLDEN_WINDOW_END
+from .right_days import SPORTS_GOLDEN_WINDOW_START as SPORTS_GOLDEN_WINDOW_START
+from .right_days import SPORTS_SMOKE_DATES as SPORTS_SMOKE_DATES
 from .round_names import ROUND_NAMES as ROUND_NAMES
 from .round_names import ROUND_PREFIXES as ROUND_PREFIXES
 from .round_names import RoundMatch as RoundMatch
