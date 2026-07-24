@@ -342,12 +342,18 @@ def test_out_of_coverage_window_partition() -> None:
 
 
 def test_schedule_defining_fixtures_empty_is_resolved() -> None:
-    """A schedule-defining FIXTURES_SCHEDULE SOURCE_RETURNED_ZERO is RESOLVED
-    (no-match-day), NOT a coverage gap — but an enrichment's SOURCE_RETURNED_ZERO
-    still IS a gap.
+    """A schedule-defining FIXTURES_SCHEDULE (or legacy FIXTURES) SOURCE_RETURNED_ZERO
+    is RESOLVED (no-match-day), NOT a coverage gap — but an enrichment's
+    SOURCE_RETURNED_ZERO still IS a gap.
 
     Operator direction 2026-06-23: FIXTURES_SCHEDULE (API-Football) IS the
     schedule source-of-truth, so zero matches = complete, not missing data.
+    The legacy ``FIXTURES`` atom is kept in the closed set ADDITIVELY
+    (2026-07-24, ``fixtures_schedule_atom_migration_partial_landing_regression_2026_07_24.md``)
+    because pre-cutover manifest rows PERMANENTLY carry ``data_type="FIXTURES"``
+    (no historical dual-write ever existed) and at least one writer call site
+    hasn't migrated to the new atom yet — dropping the legacy literal here
+    would silently stop resolving those rows as out-of-window.
     """
     from unified_api_contracts import (
         SCHEDULE_DEFINING_DATA_TYPES,
@@ -356,15 +362,22 @@ def test_schedule_defining_fixtures_empty_is_resolved() -> None:
         is_within_window_absence,
     )
 
-    # Only the schedule-defining FIXTURES_SCHEDULE data_type is in the closed set.
-    assert set(SCHEDULE_DEFINING_DATA_TYPES) == {"FIXTURES_SCHEDULE"}
+    # Both the legacy FIXTURES atom and the new FIXTURES_SCHEDULE atom are in the
+    # closed set — additive across the migration, not a replace.
+    assert set(SCHEDULE_DEFINING_DATA_TYPES) == {"FIXTURES", "FIXTURES_SCHEDULE"}
 
-    # FIXTURES_SCHEDULE + SOURCE_RETURNED_ZERO → resolved / out-of-window (no matches that day).
-    assert is_resolved_schedule_empty("FIXTURES_SCHEDULE", "SOURCE_RETURNED_ZERO") is True
-    assert is_out_of_coverage_window("SOURCE_RETURNED_ZERO", "FIXTURES_SCHEDULE") is True
-    assert is_within_window_absence("SOURCE_RETURNED_ZERO", "FIXTURES_SCHEDULE") is False
-    # Case-insensitive on the data_type token.
-    assert is_resolved_schedule_empty("fixtures_schedule", "SOURCE_RETURNED_ZERO") is True
+    for atom in ("FIXTURES", "FIXTURES_SCHEDULE"):
+        # atom + SOURCE_RETURNED_ZERO → resolved / out-of-window (no matches that day).
+        assert is_resolved_schedule_empty(atom, "SOURCE_RETURNED_ZERO") is True
+        assert is_out_of_coverage_window("SOURCE_RETURNED_ZERO", atom) is True
+        assert is_within_window_absence("SOURCE_RETURNED_ZERO", atom) is False
+        # Case-insensitive on the data_type token.
+        assert is_resolved_schedule_empty(atom.lower(), "SOURCE_RETURNED_ZERO") is True
+        # Only SOURCE_RETURNED_ZERO triggers the schedule-empty resolution — other
+        # reasons route through the normal reason-set / blank rules.
+        assert is_resolved_schedule_empty(atom, "EXPECTED_HOLIDAY") is False
+        # EXPECTED_NO_FIXTURE is already an out-of-window lifecycle reason regardless.
+        assert is_out_of_coverage_window("EXPECTED_NO_FIXTURE", atom) is True
 
     # Enrichment data_types: SOURCE_RETURNED_ZERO stays an in-window gap (its zero
     # may be a real miss when a fixture exists). NOT blanket-excluded.
@@ -375,12 +388,6 @@ def test_schedule_defining_fixtures_empty_is_resolved() -> None:
 
     # Legacy reason-only call (no data_type): SOURCE_RETURNED_ZERO is still a gap.
     assert is_out_of_coverage_window("SOURCE_RETURNED_ZERO") is False
-
-    # Only SOURCE_RETURNED_ZERO triggers the schedule-empty resolution — other
-    # reasons on FIXTURES_SCHEDULE route through the normal reason-set / blank rules.
-    assert is_resolved_schedule_empty("FIXTURES_SCHEDULE", "EXPECTED_HOLIDAY") is False
-    # EXPECTED_NO_FIXTURE is already an out-of-window lifecycle reason regardless.
-    assert is_out_of_coverage_window("EXPECTED_NO_FIXTURE", "FIXTURES_SCHEDULE") is True
     assert is_out_of_coverage_window("EXPECTED_NO_FIXTURE") is True
 
     # Blank / None guards.

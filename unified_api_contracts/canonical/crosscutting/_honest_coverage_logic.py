@@ -295,17 +295,36 @@ def compute_layered_coverage(
 # ``FIXTURES`` → ``FIXTURES_SCHEDULE`` atom migration (2026-07-24,
 # ``plans/active/sports_closeout_batch1_ao_ready_2026_07_24.md`` todo 1): the
 # manifest atom this constant matches was renamed at every writer/reader call
-# site in instruments-service — this constant must track the SAME atom or it
-# silently stops matching anything post-migration.
+# site in instruments-service THAT HAS MIGRATED SO FAR — but pre-cutover
+# manifest rows PERMANENTLY carry ``data_type="FIXTURES"`` (no historical
+# dual-write ever existed, see ``fixture_lifecycle.py``'s module docstring),
+# and at least one writer call site (``sports_fixture_status_refresh.py``)
+# still stamps the legacy literal as of 2026-07-24. A 2026-07-24 same-day
+# REPLACE of this set (``uac@6d9c7b59``, ``{"FIXTURES"}`` -> ``{FIXTURES_SCHEDULE}``)
+# silently stopped resolving every legacy-atom empty_confirmed row as
+# out-of-window — a real coverage-math regression, not just test drift (caught
+# by deployment-api's ``tests/unit/data_status/test_oow_denominator.py`` going
+# RED on ``live-defi-rollout``). Kept ADDITIVE here instead — same pattern as
+# ``gcs_paths.SPORTS_DATA_TYPE_TO_FOLDER``/``candidate_parquet_paths()``, which
+# keep resolving legacy ``"FIXTURES"`` callers across the cutover rather than
+# replacing them. Drop the legacy literal from this set only once todo 1's
+# corpus-wide migration is verified complete AND historical rows are confirmed
+# out of scope for this formula (unlikely, since coverage aggregates full
+# history).
 # ---------------------------------------------------------------------------
 
-SCHEDULE_DEFINING_DATA_TYPES: Final[frozenset[str]] = frozenset({FIXTURES_SCHEDULE})
+SCHEDULE_DEFINING_DATA_TYPES: Final[frozenset[str]] = frozenset({"FIXTURES", FIXTURES_SCHEDULE})
 """Closed set of schedule-DEFINING data_types — the source-of-truth for whether
 anything exists to capture on a (entity, day). For these, a clean
 ``SOURCE_RETURNED_ZERO`` (200 + zero rows) means "no matches that day = complete"
-→ RESOLVED, not a gap (see :func:`is_resolved_schedule_empty`). Today only
-sports ``FIXTURES_SCHEDULE`` (API-Football, the schedule). Enrichment
-data_types are NOT here — their zero-row responses may be real gaps."""
+→ RESOLVED, not a gap (see :func:`is_resolved_schedule_empty`). Today sports
+``FIXTURES_SCHEDULE`` (API-Football, the schedule, post-2026-07-14 cutover)
+PLUS the legacy ``FIXTURES`` literal (pre-cutover manifest rows + any writer
+call site not yet migrated by
+``plans/active/sports_closeout_batch1_ao_ready_2026_07_24.md`` todo 1) — both
+name the SAME schedule source, just at different points in the atom
+migration. Enrichment data_types are NOT here — their zero-row responses may
+be real gaps."""
 
 _SCHEDULE_EMPTY_RESOLVED_REASON: Final[str] = "SOURCE_RETURNED_ZERO"
 """The ONLY ``empty_confirmed`` reason a schedule-defining data_type resolves
@@ -316,8 +335,10 @@ matches that day). ``EXPECTED_*`` calendar reasons are already out-of-window."""
 def is_resolved_schedule_empty(data_type: str | None, reason: str | None) -> bool:
     """True iff a schedule-DEFINING data_type's empty cell is RESOLVED (complete).
 
-    A schedule-defining data_type (today only sports ``FIXTURES_SCHEDULE``, the
-    API-Football schedule) that is ``empty_confirmed`` with reason
+    A schedule-defining data_type (today sports ``FIXTURES_SCHEDULE`` post-cutover
+    plus the legacy ``FIXTURES`` literal pre-cutover — see
+    :data:`SCHEDULE_DEFINING_DATA_TYPES`, the API-Football schedule) that is
+    ``empty_confirmed`` with reason
     ``SOURCE_RETURNED_ZERO`` means the fixtures endpoint returned 200 + zero
     rows → there genuinely were NO matches that (league, day) → the cell is
     CORRECTLY RESOLVED, NOT a coverage gap. Such cells are OUT-of-coverage-window
