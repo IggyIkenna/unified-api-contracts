@@ -108,7 +108,13 @@ INSTRUCTION_CONSTRAINTS: dict[str, InstructionConstraint] = {
     "PREDICTION_BET": InstructionConstraint(
         order_types=frozenset({"MARKET", "LIMIT"}),
         instrument_types=frozenset({"PREDICTION_MARKET"}),
-        venue_categories=frozenset({"sports"}),
+        # "prediction" added 2026-07-24 alongside "sports": KALSHI/POLYMARKET (the actual
+        # PREDICTION_MARKET-instrument venues this instruction type targets) now correctly report
+        # venue_category="prediction" (VENUE_CATEGORY_MAP fix, they were never sports venues by
+        # asset_group, only by SPORTS_PREDICTION_MARKET_VENUES routing membership) — without this,
+        # PREDICTION_BET on KALSHI/POLYMARKET fails validation. "sports" kept for any genuine
+        # sports-exchange venue that also places PREDICTION_BET-shaped orders.
+        venue_categories=frozenset({"sports", "prediction"}),
         operation_types=frozenset({"BUY", "SELL"}),
         requires_price=True,
         allows_partial_fill=True,

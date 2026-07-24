@@ -35,9 +35,18 @@ def test_sports_venues_constant() -> None:
 
 
 def test_sports_venue_category_map() -> None:
-    """All SPORTS_VENUES must map to category 'sports'."""
+    """All SPORTS_VENUES map to category 'sports' EXCEPT the two deliberate prediction-market
+    exceptions (KALSHI/POLYMARKET) — members of SPORTS_VENUES via SPORTS_PREDICTION_MARKET_VENUES
+    (they DO offer sports contracts, a routing fact) but their asset_group is "prediction", not
+    "sports" (VENUE_CATEGORY_MAP override, root-caused 2026-07-24 as a live SSOT contradiction with
+    market_data_categories.VENUE_TO_ASSET_GROUP — this test previously encoded the wrong side of
+    that contradiction as the expected behavior). See
+    cross_ag_prediction_rows_bleed_into_sports_instruments_index_2026_07_20.md.
+    """
+    prediction_exceptions = {"KALSHI", "POLYMARKET"}
     for venue in SPORTS_VENUES:
-        assert VENUE_CATEGORY_MAP.get(venue) == "sports"
+        expected = "prediction" if venue in prediction_exceptions else "sports"
+        assert VENUE_CATEGORY_MAP.get(venue) == expected
 
 
 def test_api_football_fixture_minimal() -> None:

@@ -332,7 +332,8 @@ class TestResolveVenueContextParametrized:
             ("UNISWAP_V3-ETHEREUM", "defi"),
             ("BETFAIR", "sports"),
             ("DRAFTKINGS", "sports"),
-            ("KALSHI", "sports"),
+            ("KALSHI", "prediction"),
+            ("POLYMARKET", "prediction"),
         ],
     )
     def test_venue_category_mapping(self, venue: str, expected_category: str) -> None:

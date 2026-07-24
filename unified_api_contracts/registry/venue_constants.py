@@ -373,6 +373,19 @@ VENUE_CATEGORY_MAP: dict[str, str] = {
     POLYMARKET_PERP: "cefi",
 }
 VENUE_CATEGORY_MAP.update(dict.fromkeys(SPORTS_VENUES, "sports"))
+# KALSHI/POLYMARKET are members of SPORTS_PREDICTION_MARKET_VENUES (they list sports contracts
+# among other event types) so the SPORTS_VENUES bulk-update above stamps them "sports" — but their
+# asset_group is "prediction" everywhere else (market_data_categories.VENUE_TO_ASSET_GROUP,
+# execution.get_venue_asset_group()), and instruments-service's write path already resolves them
+# correctly via that registry, not this one. Override back to the correct category here so this
+# map agrees with the actual asset_group SSOT; membership in SPORTS_PREDICTION_MARKET_VENUES /
+# SPORTS_BET_PLACEMENT_VENUES is untouched (they DO offer sports bet-placement, that's a routing
+# fact, separate from asset_group). Root-caused 2026-07-24 as a live SSOT contradiction — one
+# confirmed consumer (execution-service get_venues_by_asset_group("sports")) was returning
+# KALSHI/POLYMARKET as sports venues before this fix:
+# plans/active/issues/cross_ag_prediction_rows_bleed_into_sports_instruments_index_2026_07_20.md
+VENUE_CATEGORY_MAP[KALSHI] = "prediction"
+VENUE_CATEGORY_MAP[POLYMARKET] = "prediction"
 
 INSTRUMENT_TYPES_BY_VENUE: dict[str, set[str]] = {
     BINANCE_SPOT: {"SPOT_PAIR"},
@@ -911,7 +924,9 @@ INSTRUCTION_VALID_DOMAINS: dict[str, set[str]] = {
     "FLASH_LOAN": {"defi"},
     "TRANSFER": {"defi"},
     "BET": {"sports"},
-    "PREDICTION_BET": {"sports"},
+    # "prediction" added 2026-07-24 alongside "sports" — mirrors instruction_constraints.py's
+    # PREDICTION_BET venue_categories (KALSHI/POLYMARKET correctly report category="prediction").
+    "PREDICTION_BET": {"sports", "prediction"},
     "SPORTS_BET": {"sports"},
     "SPORTS_EXCHANGE_ORDER": {"sports"},
     "FUTURES_ROLL": {"cefi", "tradfi"},
