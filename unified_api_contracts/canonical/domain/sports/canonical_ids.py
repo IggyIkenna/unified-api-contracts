@@ -33,12 +33,47 @@ import re
 import unicodedata
 
 
+class JunkSymbolError(ValueError):
+    """Raised when a raw display name carries a corruption marker, not a legitimate
+    international character. Distinct from a normal accented name (e.g. "México",
+    "São Paulo") — those are intentionally allowed through and diacritic-stripped
+    by ``_slug`` below."""
+
+
+_JUNK_CHARS = frozenset({"�"})  # Unicode replacement char — the canonical
+# mojibake/decode-failure marker, never a legitimate part of a real name.
+
+
+def _reject_junk_symbols(name: str) -> None:
+    """Reject genuinely corrupted input before it reaches ``_slug``.
+
+    Two junk classes, both real-world decode/encoding failures rather than
+    legitimate non-ASCII content:
+      - the Unicode replacement character (U+FFFD) — the standard signal that an
+        upstream decoder already lost the real character;
+      - C0/C1 control characters — never a legitimate part of a display name.
+    Ordinary accented Latin (or other script) characters are NOT junk and must
+    keep flowing through to ``_slug``'s diacritic-stripping — only decode-failure
+    markers are rejected here.
+    """
+    if any(ch in _JUNK_CHARS for ch in name):
+        msg = f"junk symbol (Unicode replacement character) in name: {name!r}"
+        raise JunkSymbolError(msg)
+    if any(unicodedata.category(ch) == "Cc" for ch in name):
+        msg = f"control character in name: {name!r}"
+        raise JunkSymbolError(msg)
+
+
 def _slug(name: str) -> str:
     """Convert a display name to SCREAMING_SNAKE_CASE slug.
 
     Strips diacritics, replaces spaces/hyphens with underscores,
-    removes non-alphanumeric chars, uppercases.
+    removes non-alphanumeric chars, uppercases. Rejects genuine junk symbols
+    (mojibake / control characters) via ``_reject_junk_symbols`` before
+    normalising — a corrupted name should fail loudly, not silently mangle
+    into a plausible-looking but wrong slug.
     """
+    _reject_junk_symbols(name)
     # Strip diacritics (e.g. ü → u, é → e)
     nfkd = unicodedata.normalize("NFKD", name)
     ascii_only = nfkd.encode("ascii", "ignore").decode("ascii")
