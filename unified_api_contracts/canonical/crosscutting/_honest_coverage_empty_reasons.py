@@ -361,6 +361,53 @@ class EmptyConfirmedReason(StrEnum):
     (the 215,864-cell backlog created by the ``available_to`` false-delisting fix,
     ``defi_catalogue_available_to_false_delisting_2026_07_20.md``)."""
 
+    EXPECTED_SUBGRAPH_DEINDEXED = "EXPECTED_SUBGRAPH_DEINDEXED"
+    """DeFi: the venue's Graph Protocol subgraph has ZERO indexer allocations on The Graph's
+    decentralized network — a 200-status GraphQL response carrying a top-level ``errors[]``
+    (e.g. ``{"errors":[{"message":"subgraph not found: no allocations"}]}``), distinct from an
+    HTTP 404 (``_SubgraphNotFoundError``) and from genuine schema drift
+    (``_SubgraphSchemaDriftError`` — a fixable query-shape mismatch). This is an
+    indexer-economics/deprecation state: PERMANENT until either a new indexer picks the subgraph
+    back up or the code stops depending on it — not a rate-limit, not a transient outage, and NOT
+    fixable by adding/adjusting a query schema (unlike drift).
+
+    Reference case (root-caused 2026-07-15): CURVE/OPTIMISM ``dex_pool_swaps``
+    (subgraph=``CXDZPduZE6nWuWEkSzWkRoJSSJ6CneSqiDxdnhhURShX``, from UAC
+    ``registry.capability_declarations._defi.SUBGRAPH_IDS["curve"]["OPTIMISM"]``) — live-probed
+    directly against ``gateway-arbitrum.network.thegraph.com`` returned HTTP 200 +
+    ``{"errors":[{"message":"subgraph not found: no allocations"}]}``; 5 comparison subgraphs
+    (BALANCER/POLYGON, UNISWAP_V3/POLYGON, PANCAKESWAP_V3/BSC, UNISWAP_V3/BASE,
+    UNISWAP_V3/ETHEREUM) all responded live in the same session, confirming this is isolated to
+    the one (protocol, chain) pair, not a gateway/API-key-wide issue. Before this reason existed,
+    the condition fell through the generic ``if "errors" in result`` branch in
+    ``dex_swaps_handler.py._run_cascade`` (market-tick-data-service), burned all 5 cascade schema
+    variants, then raised a misleading ``RuntimeError`` ("add a matching query schema") that
+    manifested as 952 ``attempted_failed`` rows spanning ``date`` 2021-01-01..2026-06-25 — a
+    permanently-dead subgraph masquerading as a retryable fetch failure. Issue:
+    ``defi_curve_optimism_subgraph_no_allocations_2026_07_15.md``. Retroactively reclassified for
+    the historical backlog by
+    ``instruments-service/scripts/reclassify_defi_curve_optimism_subgraph_deindexed_2026_07_24.py``.
+
+    OUT-of-coverage-window (below): a deindexed subgraph is not currently coverable by any
+    backfill retry, so the cell is clipped from the coverage-% denominator until the condition
+    resolves. Self-heals to real ``captured`` rows if a new indexer re-allocates to the subgraph
+    (mirrors ``EXPECTED_ACQUISITION_PENDING``'s self-healing semantic, but the DIRECTION is
+    reversed: acquisition-pending means "not built yet, will be"; this means "was capturable,
+    stopped being capturable").
+
+    Currently HAND-STAMPED per verified (protocol, chain, subgraph_id) instance (mirrors
+    ``EXPECTED_KNOWN_SOURCE_GAP``'s hand-stamped callsites) rather than registry-derived — unlike
+    ``EXPECTED_UPSTREAM_OUT_OF_BOUNDS`` (which is REGISTRY-DERIVED ONLY via
+    ``COVERAGE_EXCLUSIONS``), no generalized "list of dead subgraphs" registry exists yet for this
+    reason. The runtime writer-side detection (recognizing the "no allocations" GraphQL error at
+    fetch time in ``dex_swaps_handler.py`` so future backfill attempts self-classify instead of
+    re-creating ``attempted_failed`` rows) is a separate, not-yet-shipped follow-up in
+    market-tick-data-service — out of scope for the reason-taxonomy addition itself. If a second
+    dead-subgraph instance is found, promote to a small registry (e.g. sibling of
+    ``DEFI_INSTRUMENTS_NOT_YET_COLLECTED`` in
+    ``unified_api_contracts.registry.capability_declarations._defi_coverage``) rather than
+    continuing to hand-stamp N cases inline."""
+
     EXPECTED_OUTSIDE_PROCESSING_SCOPE = "EXPECTED_OUTSIDE_PROCESSING_SCOPE"
     """Instrument exists in the instruments-service catalog but is not included in the downstream
     service's subscription_list / MVP-scope configuration. The service explicitly skips it rather
@@ -573,6 +620,10 @@ OUT_OF_COVERAGE_WINDOW_REASONS: Final[frozenset[str]] = frozenset(
         # ``captured`` when the MTDS wiring ships + the venue leaves
         # ``DEFI_INSTRUMENTS_NOT_YET_COLLECTED``.
         EmptyConfirmedReason.EXPECTED_ACQUISITION_PENDING.value,
+        # DeFi Graph Protocol subgraph with zero indexer allocations — not currently
+        # coverable by any retry (see EXPECTED_SUBGRAPH_DEINDEXED docstring). Self-heals
+        # to captured if a new indexer picks the subgraph back up.
+        EmptyConfirmedReason.EXPECTED_SUBGRAPH_DEINDEXED.value,
         EmptyConfirmedReason.EXPECTED_NO_FIXTURE.value,
         EmptyConfirmedReason.EXPECTED_NO_MAPPING.value,
         EmptyConfirmedReason.EXPECTED_LEGACY_MIGRATION_MISSING_EXPIRY.value,
