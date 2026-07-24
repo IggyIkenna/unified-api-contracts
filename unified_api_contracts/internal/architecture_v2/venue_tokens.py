@@ -91,6 +91,22 @@ _DEFI_DEX_TOKENS: frozenset[str] = frozenset(
         "pancakeswapv3",
         "traderjoe",
         "jupiter",
+        # 2026-07-24 containment fix (UAC 211e0d05, Side-decision 2 —
+        # defi_archetype_universe_no_curtailment_mechanism_2026_07_23.md) widened
+        # ``archetype_leg_spec_seeds.py`` eligible_venue_ids to match
+        # catalog_trading.py's ``_dex_dispersion_pairs`` candidate_venues for
+        # ARBITRAGE_PRICE_DISPERSION, but the matching alnum-folded slot tokens
+        # were never added here, tripping the F47 regression gate
+        # (test_f47_unbuildable_venue_cells_are_not_available in
+        # unified-trading-pm). ``aerodrome_v3``/``camelot_v3`` are versioned
+        # Uniswap-v3-style concentrated-liquidity DEXes (same pattern as
+        # balancerv3/pancakeswapv3 above); ``phoenix`` is a Solana on-chain CLOB
+        # DEX (``PHOENIX-SOLANA`` in the venue registry) — its upstream feed is
+        # currently dead, but that is an orthogonal data-availability question,
+        # not a leg-eligibility one (see the seeds file's own phoenix comment).
+        "aerodromev3",
+        "camelotv3",
+        "phoenix",
     }
 )
 
@@ -181,6 +197,14 @@ _PREDICTION_TOKENS: frozenset[str] = frozenset(
     {
         "polymarket",
         "kalshi",
+        # 2026-07-24 containment fix (UAC 211e0d05, Side-decision 2) — the
+        # perp-product venue ids (distinct from the bare event-market ids above;
+        # ``VENUE_TO_ADAPTER_KEY["KALSHI-PERP"]="kalshi_perp"``,
+        # ``["POLYMARKET-PERP"]="polymarket_perp"``) are eligible on
+        # CARRY_BASIS_PERP / CARRY_FUNDING_DISPERSION / ARBITRAGE_PRICE_DISPERSION
+        # legs but lacked slot tokens, tripping the same F47 gate as above.
+        "kalshiperp",
+        "polymarketperp",
     }
 )
 
