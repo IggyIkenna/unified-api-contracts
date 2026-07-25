@@ -620,15 +620,28 @@ class TestSportsMvp:
         assert is_mvp("sports", "ODDS_API", "FIXED_ODDS", "markets", league="ENG_CHAMPIONSHIP")
 
     def test_full_94_football_universe_is_mvp(self) -> None:
-        """Every ``sport == "FOOTBALL"`` league (the 94) is MVP; non-football are not."""
+        """Every ``in_mvp_scope`` football league (the 96) is MVP; non-football are not.
+
+        Was ``sport == "FOOTBALL"`` before the curated-universe expansion
+        (plans/active/sports_satellite_ao_dispatch_batch2_2026_07_24.md)
+        added ``in_mvp_scope=False`` wider-reference football entries
+        (continental cups/majors) — those must NOT count as MVP, so this
+        filters on ``in_mvp_scope`` (the field that now decouples MVP
+        membership from ``sport``/``classification``) rather than the bare
+        sport check.
+        """
         from unified_api_contracts.canonical.domain.sports.league_data import LEAGUE_REGISTRY
 
-        football = [lg for lg in LEAGUE_REGISTRY.values() if lg.sport == "FOOTBALL"]
+        mvp_football = [lg for lg in LEAGUE_REGISTRY.values() if lg.sport == "FOOTBALL" and lg.in_mvp_scope]
+        non_mvp_football = [lg for lg in LEAGUE_REGISTRY.values() if lg.sport == "FOOTBALL" and not lg.in_mvp_scope]
         non_football = [lg for lg in LEAGUE_REGISTRY.values() if lg.sport != "FOOTBALL"]
-        assert len(football) == 96  # China+Russia added 2026-07-21 (operator ruling: in-universe)
+        assert len(mvp_football) == 96  # China+Russia added 2026-07-21 (operator ruling: in-universe)
+        assert len(non_mvp_football) == 11  # curated-universe continental cups/majors, in_mvp_scope=False
         assert len(non_football) == 7
-        for lg in football:
+        for lg in mvp_football:
             assert is_mvp("sports", "ODDS_API", "FIXED_ODDS", "odds", league=lg.league_id)
+        for lg in non_mvp_football:
+            assert not is_mvp("sports", "ODDS_API", "FIXED_ODDS", "odds", league=lg.league_id)
         for lg in non_football:
             assert not is_mvp("sports", "ODDS_API", "FIXED_ODDS", "odds", league=lg.league_id)
 

@@ -51,6 +51,19 @@ class LeagueDefinition:
             override is absent; lookups fall back to the module-level seed dict
             in ``league_data.LEAGUE_EXPECTED_TEAM_COUNTS`` (see
             ``get_expected_team_count_for_league``).
+        in_mvp_scope: Whether this entry counts toward MVP/prediction scope
+            (``_mvp_football_league_ids()`` in ``_mvp_scope_rules.py``).
+            Independent of ``classification`` — a ``Reference``-classified
+            entry (e.g. ``FA_CUP``) can legitimately be ``in_mvp_scope=True``
+            (part of the existing 96-league baseline), while a NEW
+            wider-reference addition (continental cups/majors added under
+            the curated-universe expansion,
+            plans/active/sports_satellite_ao_dispatch_batch2_2026_07_24.md)
+            should default ``False`` so adding it to the registry does not
+            silently widen prediction scope. Defaults ``True`` so every
+            pre-existing entry (before this field existed) keeps its
+            current MVP-scope behavior unchanged without needing to be
+            individually touched.
     """
 
     league_id: str
@@ -65,6 +78,7 @@ class LeagueDefinition:
     classification: str
     supports_live_stats: bool = False
     expected_team_count_per_season: dict[int, int] | None = None
+    in_mvp_scope: bool = True
 
     @property
     def is_cup(self) -> bool:
