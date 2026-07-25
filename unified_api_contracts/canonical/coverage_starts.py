@@ -172,7 +172,14 @@ TRADFI_SOURCE_COVERAGE_START: dict[str, date] = {
     "OPRA": date(2003, 1, 13),
     "DATABENTO": date(2003, 1, 13),
     "TARDIS": date(2017, 6, 1),  # TODO verify
-    "CME": date(2010, 1, 1),  # TODO verify
+    # Verified 2026-07-25 against live manifest (market-data-tick-tradfi
+    # availability_index.parquet): earliest CME capture_status=captured row
+    # is 2020-01-01; every pre-2020 date is empty_confirmed/expected_unattempted
+    # (EXPECTED_INSTRUMENT_NOT_LISTED), not real data. Matches
+    # registry/venue_mapping.py's CME=2020-01-01 (also "earliest manifest
+    # data", no TODO) — the two registries now agree for CME, closing the
+    # coverage_floor_registries_no_cross_propagation_2026_07_17.md P2 item.
+    "CME": date(2020, 1, 1),
 }
 
 # Per-ticker listing-date overrides for tradfi instruments whose source-wide
