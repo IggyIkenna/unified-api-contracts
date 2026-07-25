@@ -643,8 +643,9 @@ class TestSportsMvp:
         # countries, Crimea skipped) + 30 Middle East/AFC-WAFF (Bahrain/Iran/Iraq/Israel/
         # Jordan/Kuwait/Lebanon/Oman/Palestine/Qatar/Saudi Arabia/Syria/UAE/Yemen) + 16
         # West Africa (Benin/Cameroon/Congo/Gabon/Gambia/Ghana/Guinea/Liberia/Mali/
-        # Mauritania/Nigeria/Senegal/Togo), all curated-universe batches, in_mvp_scope=False
-        assert len(non_mvp_football) == 149
+        # Mauritania/Nigeria/Senegal/Togo) + 30 North/East/Southern Africa (CAF, 21
+        # countries), all curated-universe batches, in_mvp_scope=False
+        assert len(non_mvp_football) == 179
         assert len(non_football) == 7
         for lg in mvp_football:
             assert is_mvp("sports", "ODDS_API", "FIXED_ODDS", "odds", league=lg.league_id)
