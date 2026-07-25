@@ -134,9 +134,20 @@ SPORTS_DATA_TYPE_LAYOUT: dict[str, SportsPathLayout] = {
     "SFI_PROGRESSIVE_STATS": SportsPathLayout.PER_DAY_PER_LEAGUE,
     # Per-shot xG — per-league subpartition (one file per league per day)
     "XG_SHOTS": SportsPathLayout.PER_DAY_PER_LEAGUE,
-    # Bare path (single file per day — XG/WEATHER often un-partitioned)
+    # Bare path (single file per day — XG often un-partitioned)
     "XG": SportsPathLayout.PER_DAY_BARE,
-    "WEATHER": SportsPathLayout.PER_DAY_BARE,
+    # WEATHER: 2026-07-25 SSOT realignment (same drift class as PLAYER_VALUES
+    # above). The IS weather writer (engine/orchestrator/weather.py) emits
+    # ONE per-league partitioned parquet per (date, league) — "Per-league
+    # partitioned write — single SSOT, no bare write" per its own code
+    # comment — never a bare entity=weather/weather.parquet. Confirmed both
+    # in code and via live GCS listing (2026-07-25): entity=weather/ objects
+    # only ever exist under a league= subpartition, zero bare objects found.
+    # The pre-2026-07-25 SSOT pointed at PER_DAY_BARE, which never matched
+    # the writer — candidate_parquet_paths() then probed the wrong path and
+    # false-flagged every captured WEATHER row as phantom (>=106 proven false
+    # positives). Aligned to the writer's truth: PER_DAY_PER_LEAGUE.
+    "WEATHER": SportsPathLayout.PER_DAY_PER_LEAGUE,
     "LEAGUES": SportsPathLayout.PER_DAY_BARE,
     # Flat (singleton)
     "VENUES": SportsPathLayout.FLAT,
