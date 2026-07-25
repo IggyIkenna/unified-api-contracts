@@ -86,17 +86,11 @@ _CONNECTOR_TO_VENUE: Final[dict[str, str]] = {
     "etherfi_ethereum_ws": "etherfi",
     "extended_starknet_perp_ws": "extended",
     "fluid_ethereum_ws": "fluid",
-    # "gmx_arbitrum_ws": "gmx" — GMX removed 2026-07-25 (unreliable historical
+    # "gmx_arbitrum_ws": "gmx" removed 2026-07-25 (unreliable historical
     # funding data — see
     # unified-trading-pm/plans/active/defi_gmx_venue_removal_2026_07_25.md).
-    # Left in place pending the sibling market-tick-data-service todo (deletes
-    # the MTDS connector + this file's UAC ``external/gmx/`` mocks together,
-    # same pattern as the drift/pacifica removals above): this test reads the
-    # MTDS connector dir from the READ-ONLY root clone
-    # (``market-tick-data-service/.../connectors/``), which still has
-    # ``gmx_arbitrum_ws.py`` until that todo lands — removing this mapping now
-    # would fail ``test_ws_connector_has_cassette`` for an unrelated reason.
-    "gmx_arbitrum_ws": "gmx",
+    # MTDS connector + this file's UAC ``external/gmx/`` mocks both deleted in
+    # the same pass, same pattern as the drift/pacifica removals above.
     "hyperliquid_ws": "hyperliquid",
     "hyperliquid_l2book_ws": "hyperliquid",
     "hyperliquid_ticker_ws": "hyperliquid",
