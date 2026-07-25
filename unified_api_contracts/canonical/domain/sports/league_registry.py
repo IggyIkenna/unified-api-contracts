@@ -66,6 +66,19 @@ class LeagueDefinition:
     supports_live_stats: bool = False
     expected_team_count_per_season: dict[int, int] | None = None
 
+    @property
+    def is_cup(self) -> bool:
+        """Whether this entry is a cup/knockout competition, not a league table.
+
+        Derived from ``tier == 0`` (the existing convention — see the ``tier``
+        docstring above) scoped to football: every current ``tier == 0`` entry is
+        a football cup (FA_CUP, COPA_DEL_REY, ...), but the ``tier`` docstring
+        also reserves 0 for non-football entries, so this additionally requires
+        ``sport == "FOOTBALL"`` to avoid mislabeling a future non-football
+        tier-0 entry as a cup.
+        """
+        return self.tier == 0 and self.sport == "FOOTBALL"
+
 
 # ---------------------------------------------------------------------------
 # Data-source frozenset presets (convenience builders for league data modules)

@@ -111,3 +111,48 @@ class TestUnaffectedSources:
 
     def test_unknown_source_never_a_gap(self) -> None:
         assert not is_sports_structural_gap("some_unknown_source", "EPL")
+
+
+class TestGetExpectedLeaguesConsultsStructuralGap:
+    """``get_expected_leagues_for_source`` must actually CALL
+    ``is_sports_structural_gap`` — not just happen to agree with it because
+    ``data_sources`` is hand-curated the same way. Proven by monkeypatching a
+    synthetic gap for a league that ``data_sources`` alone would NOT exclude,
+    so the test can only pass if the structural-gap check is really wired in."""
+
+    def test_synthetic_gap_excludes_a_league_data_sources_would_keep(self, monkeypatch: object) -> None:
+        import unified_api_contracts.canonical.domain.sports.league_data as league_data_module
+        from unified_api_contracts.canonical.domain.sports.league_data import (
+            LEAGUE_REGISTRY,
+            get_expected_leagues_for_source,
+        )
+
+        # EPL carries api_football in its data_sources and has no real gap —
+        # confirm the baseline before injecting the synthetic one.
+        assert "api_football" in LEAGUE_REGISTRY["EPL"].data_sources
+        before = {lg.league_id for lg in get_expected_leagues_for_source("api_football")}
+        assert "EPL" in before
+
+        synthetic_gaps = {**league_data_module.SPORTS_STRUCTURAL_GAPS, "api_football": frozenset({"EPL"})}
+        monkeypatch.setattr(league_data_module, "SPORTS_STRUCTURAL_GAPS", synthetic_gaps)  # type: ignore[attr-defined]
+
+        after = {lg.league_id for lg in get_expected_leagues_for_source("api_football")}
+        assert "EPL" not in after
+        assert after == before - {"EPL"}
+
+
+class TestIsCupProperty:
+    """``LeagueDefinition.is_cup`` — derived from ``tier == 0`` scoped to football."""
+
+    def test_known_cups_are_cups(self) -> None:
+        for lid in ("FA_CUP", "COPA_DEL_REY", "DFB_POKAL", "COPPA_ITALIA"):
+            assert LEAGUE_REGISTRY[lid].is_cup, f"{lid} should be a cup"
+
+    def test_known_leagues_are_not_cups(self) -> None:
+        for lid in ("EPL", "LA_LIGA", "BUNDESLIGA", "SERIE_A", "LIGUE_1"):
+            assert not LEAGUE_REGISTRY[lid].is_cup, f"{lid} should not be a cup"
+
+    def test_is_cup_matches_tier_zero_football(self) -> None:
+        for league in LEAGUE_REGISTRY.values():
+            expected = league.tier == 0 and league.sport == "FOOTBALL"
+            assert league.is_cup == expected, f"{league.league_id}: is_cup mismatch"
