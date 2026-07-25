@@ -3843,6 +3843,112 @@ REFERENCE_LEAGUES: dict[str, LeagueDefinition] = {
         classification="Reference",
         in_mvp_scope=False,
     ),
+    # Domestic curated-universe expansion, Oceania (OFC) batch (2026-07-25)
+    # -- Fiji, New Zealand (2 countries). See
+    # plans/active/issues/sports_curated_universe_domestic_selection_remaining_2026_07_25.md
+    # for the full remaining-country list and near-miss error classes.
+    #  - Fiji: catalog carries only the top league (376, "National Football
+    #    League" -- api-football's vendor name; the current real name is
+    #    "Fiji Premier League", used as display_name here for the same
+    #    competition, founded 1977). No 2nd-tier or cup id in the catalog --
+    #    the real Fiji FA Cup exists (2023 tournament confirmed via
+    #    WebSearch) but has no api_football_id to cite, so it's omitted per
+    #    the never-fabricate-an-id rule.
+    #  - New Zealand: catalog's "Premiership" (280) IS the current top flight
+    #    under its PRE-2021 name -- New Zealand Football rebrand from
+    #    "New Zealand Football Championship / Premiership" to the
+    #    "New Zealand National League" in March 2021 is a rename of the same
+    #    competition, not a different one (WebSearch-confirmed). The 2nd tier
+    #    is genuinely 3 parallel regional leagues feeding national-league
+    #    qualification (Central/Northern/Southern) -- all 3 catalog ids
+    #    included as division-below, mirroring the Bosnia FBiH/RS precedent
+    #    for a real dual/multi-entity structure, not guessed as one
+    #    canonical "the" 2nd division. Catalog's "National League - National"
+    #    (955) and "Championship - Final" (1056) EXCLUDED -- their exact
+    #    role (aggregate stage vs. distinct competition) is not resolvable
+    #    from the catalog's bare name alone and no external source clearly
+    #    identifies them as a 4th regional peer; not guessed. Chatham Cup
+    #    (1127) confirmed via WebSearch as the primary cup (est. 1923, open
+    #    to all clubs in the league system).
+    # =======================================================================
+    "FIJI_PREMIER_LEAGUE": LeagueDefinition(
+        league_id="FIJI_PREMIER_LEAGUE",
+        display_name="Fiji Premier League",
+        sport="FOOTBALL",
+        country="FJ",
+        season_months=(2, 9),
+        has_playoffs=False,
+        data_sources=REF_API_ONLY,
+        api_football_id=376,
+        tier=1,
+        classification="Reference",
+        in_mvp_scope=False,
+    ),
+    "NEW_ZEALAND_NATIONAL_LEAGUE": LeagueDefinition(
+        league_id="NEW_ZEALAND_NATIONAL_LEAGUE",
+        display_name="New Zealand National League",
+        sport="FOOTBALL",
+        country="NZ",
+        season_months=(3, 12),
+        has_playoffs=True,
+        data_sources=REF_API_ONLY,
+        api_football_id=280,
+        tier=1,
+        classification="Reference",
+        in_mvp_scope=False,
+    ),
+    "NEW_ZEALAND_CENTRAL_LEAGUE": LeagueDefinition(
+        league_id="NEW_ZEALAND_CENTRAL_LEAGUE",
+        display_name="New Zealand Central League",
+        sport="FOOTBALL",
+        country="NZ",
+        season_months=(3, 9),
+        has_playoffs=True,
+        data_sources=REF_API_ONLY,
+        api_football_id=954,
+        tier=2,
+        classification="Reference",
+        in_mvp_scope=False,
+    ),
+    "NEW_ZEALAND_NORTHERN_LEAGUE": LeagueDefinition(
+        league_id="NEW_ZEALAND_NORTHERN_LEAGUE",
+        display_name="New Zealand Northern League",
+        sport="FOOTBALL",
+        country="NZ",
+        season_months=(3, 9),
+        has_playoffs=True,
+        data_sources=REF_API_ONLY,
+        api_football_id=956,
+        tier=2,
+        classification="Reference",
+        in_mvp_scope=False,
+    ),
+    "NEW_ZEALAND_SOUTHERN_LEAGUE": LeagueDefinition(
+        league_id="NEW_ZEALAND_SOUTHERN_LEAGUE",
+        display_name="New Zealand Southern League",
+        sport="FOOTBALL",
+        country="NZ",
+        season_months=(3, 9),
+        has_playoffs=True,
+        data_sources=REF_API_ONLY,
+        api_football_id=957,
+        tier=2,
+        classification="Reference",
+        in_mvp_scope=False,
+    ),
+    "NEW_ZEALAND_CHATHAM_CUP": LeagueDefinition(
+        league_id="NEW_ZEALAND_CHATHAM_CUP",
+        display_name="New Zealand Chatham Cup",
+        sport="FOOTBALL",
+        country="NZ",
+        season_months=(3, 9),
+        has_playoffs=True,
+        data_sources=REF_API_ONLY,
+        api_football_id=1127,
+        tier=0,
+        classification="Reference",
+        in_mvp_scope=False,
+    ),
 }
 
 # ---------------------------------------------------------------------------
