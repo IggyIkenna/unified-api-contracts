@@ -639,8 +639,9 @@ class TestSportsMvp:
         # 11 continental cups/majors + 15 domestic top+below+cup (Ukraine/Croatia/Morocco/
         # Serbia/Egypt) + 9 Central Asia (Kazakhstan/Kyrgyzstan/Tajikistan/Turkmenistan/
         # Uzbekistan) + 19 South America/CONMEBOL (Bolivia/Colombia/Ecuador/Paraguay/Peru/
-        # Uruguay/Venezuela), all curated-universe batches, in_mvp_scope=False
-        assert len(non_mvp_football) == 54
+        # Uruguay/Venezuela) + 49 Eastern Europe (UEFA) domestic top+below+cup (16
+        # countries, Crimea skipped), all curated-universe batches, in_mvp_scope=False
+        assert len(non_mvp_football) == 103
         assert len(non_football) == 7
         for lg in mvp_football:
             assert is_mvp("sports", "ODDS_API", "FIXED_ODDS", "odds", league=lg.league_id)
