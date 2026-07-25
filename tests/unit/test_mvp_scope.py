@@ -641,7 +641,7 @@ class TestSportsMvp:
         # a live measurement, not hand-arithmetic -- many concurrent slots land batches
         # into this same registry file; re-derive from len(LEAGUE_REGISTRY) rather than
         # trust a stale comment.
-        assert len(non_mvp_football) == 227
+        assert len(non_mvp_football) == 244
         assert len(non_football) == 7
         for lg in mvp_football:
             assert is_mvp("sports", "ODDS_API", "FIXED_ODDS", "odds", league=lg.league_id)
