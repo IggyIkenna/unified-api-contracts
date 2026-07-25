@@ -3268,6 +3268,154 @@ REFERENCE_LEAGUES: dict[str, LeagueDefinition] = {
         classification="Reference",
         in_mvp_scope=False,
     ),
+    # =======================================================================
+    # Domestic curated-universe expansion (Directive A/B) -- South Asia (AFC)
+    # confederation batch: Bangladesh, Bhutan, India, Maldives, Nepal, Pakistan
+    # (issues/sports_curated_universe_domestic_selection_remaining_2026_07_25.md).
+    # Every entry's tier + season window verified against a real external
+    # source (WebSearch, cited in the shipping evidence) -- not derived from
+    # the raw api-football catalog `name` field alone. Per the shared
+    # per-batch contract: a country's division-below/cup is included ONLY
+    # when a matching entry actually exists in the captured API-Football
+    # leagues catalog (1,228-row snapshot) -- Bangladesh/Bhutan/India got a
+    # partial or full 3-competition set; Maldives/Nepal/Pakistan's catalog
+    # only has a top-division entry, so their real division-below/cup (all
+    # independently verified to exist -- Bangladesh Championship League,
+    # Bhutan has none found, Maldives Second Division/FA Cup, Nepal
+    # Martyr's Memorial B-Division/ANFA Cup, Pakistan PFF League/PFF
+    # National Challenge Cup) are correctly SKIPPED rather than assigned a
+    # fabricated api_football_id.
+    # =======================================================================
+    "BANGLADESH_PREMIER_LEAGUE": LeagueDefinition(
+        league_id="BANGLADESH_PREMIER_LEAGUE",
+        display_name="Bangladesh Premier League (Bangladesh Football League)",
+        sport="FOOTBALL",
+        country="BD",
+        season_months=(9, 5),
+        has_playoffs=False,
+        data_sources=REF_API_ONLY,
+        api_football_id=398,
+        tier=1,
+        classification="Reference",
+        in_mvp_scope=False,
+    ),
+    "BANGLADESH_FEDERATION_CUP": LeagueDefinition(
+        league_id="BANGLADESH_FEDERATION_CUP",
+        display_name="Bangladesh Federation Cup",
+        sport="FOOTBALL",
+        country="BD",
+        season_months=(9, 5),
+        has_playoffs=True,
+        data_sources=REF_API_ONLY,
+        api_football_id=811,
+        tier=0,
+        classification="Reference",
+        in_mvp_scope=False,
+    ),
+    "BHUTAN_PREMIER_LEAGUE": LeagueDefinition(
+        league_id="BHUTAN_PREMIER_LEAGUE",
+        display_name="Bhutan Premier League",
+        sport="FOOTBALL",
+        country="BT",
+        season_months=(4, 11),
+        has_playoffs=False,
+        data_sources=REF_API_ONLY,
+        api_football_id=1031,
+        tier=1,
+        classification="Reference",
+        in_mvp_scope=False,
+    ),
+    "BHUTAN_SUPER_LEAGUE": LeagueDefinition(
+        league_id="BHUTAN_SUPER_LEAGUE",
+        display_name="Bhutan Super League",
+        sport="FOOTBALL",
+        country="BT",
+        season_months=(4, 11),
+        has_playoffs=True,
+        data_sources=REF_API_ONLY,
+        api_football_id=413,
+        tier=2,
+        classification="Reference",
+        in_mvp_scope=False,
+    ),
+    "INDIA_INDIAN_SUPER_LEAGUE": LeagueDefinition(
+        league_id="INDIA_INDIAN_SUPER_LEAGUE",
+        display_name="Indian Super League",
+        sport="FOOTBALL",
+        country="IN",
+        season_months=(2, 5),
+        has_playoffs=True,
+        data_sources=REF_API_ONLY,
+        api_football_id=323,
+        tier=1,
+        classification="Reference",
+        in_mvp_scope=False,
+    ),
+    "INDIA_I_LEAGUE": LeagueDefinition(
+        league_id="INDIA_I_LEAGUE",
+        display_name="I-League",
+        sport="FOOTBALL",
+        country="IN",
+        season_months=(2, 5),
+        has_playoffs=False,
+        data_sources=REF_API_ONLY,
+        api_football_id=324,
+        tier=2,
+        classification="Reference",
+        in_mvp_scope=False,
+    ),
+    "INDIA_AIFF_SUPER_CUP": LeagueDefinition(
+        league_id="INDIA_AIFF_SUPER_CUP",
+        display_name="AIFF Super Cup",
+        sport="FOOTBALL",
+        country="IN",
+        season_months=(2, 5),
+        has_playoffs=True,
+        data_sources=REF_API_ONLY,
+        api_football_id=545,
+        tier=0,
+        classification="Reference",
+        in_mvp_scope=False,
+    ),
+    "MALDIVES_DHIVEHI_PREMIER_LEAGUE": LeagueDefinition(
+        league_id="MALDIVES_DHIVEHI_PREMIER_LEAGUE",
+        display_name="Dhivehi Premier League",
+        sport="FOOTBALL",
+        country="MV",
+        season_months=(9, 2),
+        has_playoffs=False,
+        data_sources=REF_API_ONLY,
+        api_football_id=855,
+        tier=1,
+        classification="Reference",
+        in_mvp_scope=False,
+    ),
+    "NEPAL_A_DIVISION": LeagueDefinition(
+        league_id="NEPAL_A_DIVISION",
+        display_name="Martyr's Memorial A-Division League",
+        sport="FOOTBALL",
+        country="NP",
+        season_months=(11, 3),
+        has_playoffs=False,
+        data_sources=REF_API_ONLY,
+        api_football_id=590,
+        tier=1,
+        classification="Reference",
+        in_mvp_scope=False,
+    ),
+    "PAKISTAN_PREMIER_LEAGUE": LeagueDefinition(
+        league_id="PAKISTAN_PREMIER_LEAGUE",
+        display_name="Pakistan Premier League",
+        sport="FOOTBALL",
+        country="PK",
+        season_months=(8, 12),
+        has_playoffs=False,
+        data_sources=REF_API_ONLY,
+        api_football_id=868,
+        tier=1,
+        classification="Reference",
+        in_mvp_scope=False,
+    ),
 }
 
 # ---------------------------------------------------------------------------

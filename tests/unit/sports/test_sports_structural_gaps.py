@@ -72,10 +72,10 @@ class TestUnderstatAllowList:
         # skipped) + 30 Middle East/AFC-WAFF (Bahrain/Iran/Iraq/Israel/Jordan/Kuwait/
         # Lebanon/Oman/Palestine/Qatar/Saudi Arabia/Syria/UAE/Yemen) + 16 West Africa
         # (Benin/Cameroon/Congo/Gabon/Gambia/Ghana/Guinea/Liberia/Mali/Mauritania/
-        # Nigeria/Senegal/Togo) + 30 North/East/Southern Africa (CAF, 21 countries),
-        # all added 2026-07-25, in_mvp_scope=False but still genuine Understat gaps —
-        # verified below, not assumed)
-        assert len(others) == 270
+        # Nigeria/Senegal/Togo) + 30 North/East/Southern Africa (CAF, 21 countries)
+        # + 10 South Asia (AFC, 6 countries), all added 2026-07-25, in_mvp_scope=False
+        # but still genuine Understat gaps — verified below, not assumed)
+        assert len(others) == 280
         for lid in others:
             assert is_sports_structural_gap("understat", lid)
 
