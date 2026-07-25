@@ -167,11 +167,6 @@ SUBGRAPH_IDS: dict[str, dict[str, str]] = {
     "trader_joe_v2": {  # Messari schema (liquidityPoolDailySnapshots)
         "AVALANCHE": "H2VGe2tYavUEosSjomHwxbvCKy3LaNaW8Kjw2KhhHs1K",
     },
-    # ── Additional perps ──────────────────────────────────────────
-    "gmx": {  # Messari schema
-        "ARBITRUM": "DiR5cWwB3pwXXQWWdus7fDLR2mnFRQLiBFsVmHAH9VAs",
-        "AVALANCHE": "6pXgnXcL6mkXBjKX7NyHN7tCudv2JGFnXZ8wf8WbjPXv",
-    },
     # ── Additional lending ────────────────────────────────────────
     "spark": {  # Messari lending schema (same as Aave V3 — MakerDAO fork)
         "ETHEREUM": "GbKdmBe4ycCYCQLQSjqGg6UHYoYfbyJyq5WrG35pv1si",
@@ -347,7 +342,9 @@ _LENDING_DATA = ["lending_indices", "liquidations", "risk_params"]
 _DEX_DATA = ["dex_pool_state", "dex_pool_swaps"]
 _YIELD_DATA = ["lst_rates", "oracle_prices"]
 _STAKING_DATA = ["lst_rates", "oracle_prices"]
-_PERPS_DATA = ["perp_funding"]
+# _PERPS_DATA = ["perp_funding"] removed 2026-07-25 (its sole consumer, the GMX
+# hybrid pool+perp capability entry, was removed — see
+# unified-trading-pm/plans/active/defi_gmx_venue_removal_2026_07_25.md).
 
 PROTOCOL_CAPABILITIES: dict[str, _ProtocolCapability] = {
     # ── EVM Lending ──────────────────────────────────────────────
@@ -586,13 +583,6 @@ PROTOCOL_CAPABILITIES: dict[str, _ProtocolCapability] = {
         instrument_types=_POOL,
         data_types=[*_DEX_DATA],
         mtds_operations=["collect-dex-pools", "collect-dex-swaps"],
-    ),
-    "gmx": _ProtocolCapability(
-        venue_prefix="GMX",
-        protocol_class=ProtocolClass.PERPS,
-        instrument_types=_POOL,
-        data_types=[*_DEX_DATA, *_PERPS_DATA, "liquidations"],
-        mtds_operations=["collect-dex-pools", "collect-perp-funding"],
     ),
     # ── EVM Yield/Staking (static adapters, no subgraph) ────────
     "lido": _ProtocolCapability(

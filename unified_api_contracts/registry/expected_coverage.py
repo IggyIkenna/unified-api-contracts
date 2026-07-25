@@ -301,13 +301,9 @@ _DEFI: dict[str, list[str]] = {
     "MORPHO": list(_DEFI_LENDING_PAIRS),
     "FLUID": list(_DEFI_LENDING_PAIRS),
     "KAMINO-SOLANA": list(_DEFI_LENDING_PAIRS),
-    # On-chain perps (VENUE-CHAIN format coexists with flat GMX entry above)
-    # derivative_ticker added 2026-07-15 (defi_perp_funding_canonicalisation_derivative_ticker_all_perps
-    # issue, operator ruling — highest-resolution raw funding for ALL perps, even without OI at source).
-    # See defi_venue_capabilities.py (DEFI_VENUE_DATA_TYPE_CAPABILITIES) for the matching per-(venue,
-    # data_type) start-date declarations.
-    "GMX-ARBITRUM": ["perp_funding", "derivative_ticker"],
-    "GMX-AVALANCHE": ["perp_funding", "derivative_ticker"],
+    # On-chain perps: GMX (Arbitrum/Avalanche) expected-coverage entries removed
+    # 2026-07-25 (unreliable historical funding data — see
+    # unified-trading-pm/plans/active/defi_gmx_venue_removal_2026_07_25.md).
     # DRIFT (Solana) expected-coverage entry removed 2026-07-16 (operator
     # ruling: all Solana perp DEXes dropped except Jupiter, not integrated).
     # SSOT: unified-trading-pm/codex/04-architecture/solana-defi-coverage.md.
@@ -401,12 +397,8 @@ _DEFI: dict[str, list[str]] = {
     # (PACIFICA (Solana) was a fourth venue covered by this note until removed
     # entirely 2026-07-16 — operator ruling: all Solana perp DEXes dropped
     # except Jupiter, not integrated.)
-    # GMX still uses the standalone perp_funding data_type — NOT part of this
-    # retirement, left untouched. derivative_ticker added 2026-07-15 (same issue
-    # as the GMX-ARBITRUM/GMX-AVALANCHE entries above — flat "GMX"+chain-dimension
-    # is the format _collect_and_record_gmx actually records under; kept in sync
-    # with the legacy VENUE-CHAIN-embedded entries).
-    "GMX": ["perp_funding", "derivative_ticker"],
+    # GMX (flat "GMX"+chain-dimension entry) removed 2026-07-25 — see
+    # unified-trading-pm/plans/active/defi_gmx_venue_removal_2026_07_25.md.
     # --- Bridge protocols ---
     # bridge_events_handler _BRIDGE_PROTOCOLS = ["ACROSS", "STARGATE"]
     "ACROSS": ["bridge_events"],
@@ -720,7 +712,7 @@ def _is_deprecated_defi_venue(data_source: str) -> bool:
     """True if the DeFi venue is in the workspace-canonical deprecated/empty set.
 
     SSOT: ``capability_declarations._defi_coverage.EMPTY_OR_DEPRECATED_DEFI_VENUES``
-    (e.g. ``TRADER_JOE_V2-AVALANCHE``, ``UNISWAP_V3-POLYGON``, ``GMX-AVALANCHE``).
+    (e.g. ``TRADER_JOE_V2-AVALANCHE``, ``UNISWAP_V3-POLYGON``).
     These venues either have empty/retired subgraphs or no historical parquets;
     flagging them as ``EXPECTED_DEPRECATED_DATA_TYPE`` keeps the divergence
     report honest.

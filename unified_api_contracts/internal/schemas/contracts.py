@@ -543,8 +543,8 @@ DEFI_LENDING_LIQUIDATIONS = SchemaContract(
     required_row_count_min=1,
 )
 
-# All 13 DEX-pool protocols (Uniswap V2/V3/V4, Balancer, Curve, PancakeSwap_V3,
-# Sushiswap/_V3, Camelot_V3, Aerodrome_V3, TraderJoe_V2, Velodrome_V2, GMX) write
+# All DEX-pool protocols (Uniswap V2/V3/V4, Balancer, Curve, PancakeSwap_V3,
+# Sushiswap/_V3, Camelot_V3, Aerodrome_V3, TraderJoe_V2, Velodrome_V2) write
 # the canonical ``TOKEN0-TOKEN1[-FEE_TIER]`` pool symbol (dash-separated, real
 # basis points — instrument_id_format_canonicalization_2026_07_08.md finding 2,
 # mirrored from the instruments-service sibling fix commit 4e072d93) under
@@ -760,8 +760,8 @@ DEFI_PERPETUAL_PERP_FUNDING = SchemaContract(
 # derivative_ticker (2026-07-15, defi_perp_funding_canonicalisation_derivative_ticker_all_perps
 # issue, operator ruling): the canonical RAW-funding home for ALL DeFi perp venues, captured
 # at the highest resolution each source offers — even where the source genuinely has no OI
-# (GMX's native fundingRateChangedEvents query has no OI field; Drift/Aster/Pacifica/Extended
-# similarly omit it at settlement grain). Mirrors CEFI_PERPETUAL_DERIVATIVE_TICKER's shape —
+# (Drift/Aster/Pacifica/Extended omit it at settlement grain). Mirrors
+# CEFI_PERPETUAL_DERIVATIVE_TICKER's shape —
 # funding_rate mandatory, open_interest/mark_price/index_price nullable (never fabricated).
 DEFI_PERPETUAL_DERIVATIVE_TICKER = SchemaContract(
     asset_group="defi",

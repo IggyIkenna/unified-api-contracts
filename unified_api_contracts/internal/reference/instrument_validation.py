@@ -47,7 +47,8 @@ _DEFI_VENUE_PREFIXES = frozenset(
         "CAMELOT_V3",
         "VELODROME_V2",
         "TRADER_JOE_V2",
-        "GMX",
+        # "GMX" removed 2026-07-25 (unreliable historical funding data — see
+        # unified-trading-pm/plans/active/defi_gmx_venue_removal_2026_07_25.md).
         "SUSHISWAP",
         # Lending forks
         "SPARK",

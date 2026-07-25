@@ -509,27 +509,9 @@ COLLATERAL_REGISTRY: Final[list[CollateralPolicy]] = [
             "official docs win."
         ),
     ),
-    # ---- GMX v2 (Arbitrum perp DEX) ----
-    CollateralPolicy(
-        venue_id="gmx_v2",
-        venue_kind=VenueCollateralKind.PERP_DEX,
-        accepted_collateral=[
-            _ah("USDC", "0", src=_SRC_VC),
-            _ah("ETH", "5", src=_SRC_VC),
-            _ah("WBTC", "5", src=_SRC_VC),
-            _ah("stETH", "0", accepted=False, src=_SRC_VC),
-            _ah("wstETH", "0", accepted=False, src=_SRC_VC),
-        ],
-        maintenance_margin=None,  # per-market on-chain config; not statically sourced
-        margin_modes=[MarginMode.CROSS, MarginMode.ISOLATED],
-        liquidation_protocol=LiquidationProtocol.KEEPER_AUCTION,
-        liquidation_description="GMX v2 per-market collateral set; keeper-executed liquidation on-chain.",
-        source_of_truth=_SRC_VC,
-        collateral_notes=(
-            "Per-market collateral sets exclude LSTs. Maintenance-margin is per-market on-chain "
-            "(getMarketInfo) — left None (not statically sourceable; would be invented)."
-        ),
-    ),
+    # ---- GMX v2 (Arbitrum perp DEX) collateral policy removed 2026-07-25
+    # (unreliable historical funding data — see
+    # unified-trading-pm/plans/active/defi_gmx_venue_removal_2026_07_25.md).
     # ---- Drift (Solana perp DEX) collateral policy removed 2026-07-16 (operator ruling: all
     # Solana perp DEXes dropped except Jupiter, not integrated).
     # SSOT: unified-trading-pm/codex/04-architecture/solana-defi-coverage.md.

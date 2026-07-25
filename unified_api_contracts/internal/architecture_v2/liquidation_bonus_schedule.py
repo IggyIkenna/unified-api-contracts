@@ -46,7 +46,8 @@ class LiquidationProtocol(StrEnum):
     EULER = "euler"
     MORPHO = "morpho"
     KAMINO = "kamino"
-    GMX_V2 = "gmx_v2"
+    # GMX_V2 removed 2026-07-25 (unreliable historical funding data — see
+    # unified-trading-pm/plans/active/defi_gmx_venue_removal_2026_07_25.md).
 
 
 class LiquidationBonusEntry(BaseModel):

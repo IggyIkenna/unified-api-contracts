@@ -169,12 +169,6 @@ _SUBGRAPH_QUERIES: Final[dict[str, str]] = {
     timestamp
   }
 }""",
-    # GMX — Messari schema.
-    "gmx": """{
-  liquidityPoolDailySnapshots(first: 1, orderBy: timestamp, orderDirection: asc) {
-    timestamp
-  }
-}""",
     # Morpho Blue — Messari schema.
     "morpho": """{
   marketDailySnapshots(first: 1, orderBy: timestamp, orderDirection: asc) {
@@ -200,7 +194,6 @@ _PROTOCOL_TO_SUBGRAPH_KEY: Final[dict[str, str]] = {
     "VELODROME_V2": "velodrome_v2",
     "CAMELOT_V3": "camelot_v3",
     "TRADER_JOE_V2": "trader_joe_v2",
-    "GMX": "gmx",
     "MORPHO": "morpho",
     "SPARK": "spark",
 }

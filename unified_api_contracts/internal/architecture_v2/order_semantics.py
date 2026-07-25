@@ -302,19 +302,9 @@ VENUE_ORDER_SEMANTICS: Final[list[VenueOrderSemantics]] = [
             "not injected. BLOCKED-CREDENTIALS."
         ),
     ),
-    VenueOrderSemantics(
-        venue_id="gmx_v2",
-        honored_tif=[],
-        post_only=False,
-        make_take_modes=[],
-        ref_pricing_modes=[],
-        multi_leg_delta_owner=None,
-        atomic_execution_modes=[],
-        auth_wired=CapabilityEdgeStatus.NOT_REGISTERED,
-        notes=(
-            "No execution adapter found in execution-service (venues/ or trade_execution/adapters/) as of 2026-06-13."
-        ),
-    ),
+    # gmx_v2 VenueOrderSemantics entry removed 2026-07-25 (unreliable historical
+    # funding data — see
+    # unified-trading-pm/plans/active/defi_gmx_venue_removal_2026_07_25.md).
     VenueOrderSemantics(
         venue_id="aave_v3",
         honored_tif=[],

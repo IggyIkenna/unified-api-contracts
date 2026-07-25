@@ -110,7 +110,7 @@ class TestVenueAdapterKeyShape:
     def test_subgraph_expansion_produces_multichain_entries(self) -> None:
         # Representative dynamic entries: direct slug + adapter-reuse slug.
         assert VENUE_TO_ADAPTER_KEY.get("AAVE_V3-ARBITRUM") == "aave_v3"
-        assert VENUE_TO_ADAPTER_KEY.get("GMX-ARBITRUM") == "uniswap_v3"
+        assert VENUE_TO_ADAPTER_KEY.get("CAMELOT_V3-ARBITRUM") == "uniswap_v3"
 
     def test_reuse_map_targets_are_real_slugs(self) -> None:
         # Every reuse target must itself be a plausible adapter key (snake case);

@@ -59,7 +59,6 @@ DEX_VENUE_KEYWORDS: frozenset[str] = frozenset(
         "CAMELOT",
         "VELODROME",
         "TRADERJOE",
-        "GMX",
         # Solana DEXes
         "ORCA",
         "RAYDIUM",

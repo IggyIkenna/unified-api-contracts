@@ -238,7 +238,9 @@ def test_venue_launch_dates_no_new_drift_vs_chain_env() -> None:
         "ETHERFI-ETHEREUM",
         "KAMINO-SOLANA",
         "JITO-SOLANA",
-        "GMX-AVALANCHE",
+        # "GMX-AVALANCHE" removed 2026-07-25 (unreliable historical funding
+        # data — see
+        # unified-trading-pm/plans/active/defi_gmx_venue_removal_2026_07_25.md).
     )
     for resolved in reconciled_2026_07_18:
         assert resolved not in drifts, f"{resolved} regressed — its 2026-07-18 reconciliation was reverted"

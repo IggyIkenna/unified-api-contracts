@@ -232,7 +232,7 @@ MVP_REQUIRED_WINDOW_REGISTRY: Final[dict[tuple[str, str], RequiredWindowSpec]] =
         driver_feature_family="defi_perp_funding_carry_24h_90p",
         driver_lookback_periods=90,
         driver_coarsest_timeframe="24h",
-        notes="GMX / Hyperliquid perp funding rate carry features at 24h x 90d.",
+        notes="On-chain DeFi perp funding rate carry features at 24h x 90d.",
     ),
     # -----------------------------------------------------------------
     # TradFi MVP data_types — Databento ohlcv_1m base. M-F trading +

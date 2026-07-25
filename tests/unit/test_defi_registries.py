@@ -382,7 +382,8 @@ class TestVenueCollateral:
             "OKX",
             "DERIBIT",
             "ASTER",
-            "GMX",
+            # "GMX" removed 2026-07-25 (unreliable historical funding data —
+            # see unified-trading-pm/plans/active/defi_gmx_venue_removal_2026_07_25.md).
             "BINANCE-FUTURES",
             "BYBIT-FUTURES",
             "OKX-FUTURES",

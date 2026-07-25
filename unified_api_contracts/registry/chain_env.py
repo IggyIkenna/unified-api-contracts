@@ -307,8 +307,8 @@ PROTOCOL_LAUNCH_DATES: dict[tuple[str, str], str] = {
     ("SOLANA", "PHOENIX"): "2023-02-01",  # high; conservative -13d floor (mainnet 2023-02-14)
     ("SOLANA", "PYTH"): "2021-08-01",  # high; Pyth Network mainnet on Solana
     # ── Perp DEXes / aggregators ──
-    ("ARBITRUM", "GMX"): "2021-09-01",
-    ("AVALANCHE", "GMX"): "2022-01-05",
+    # GMX (Arbitrum/Avalanche) removed 2026-07-25 — see
+    # unified-trading-pm/plans/active/defi_gmx_venue_removal_2026_07_25.md.
     # ASTER perp DEX on BNB Chain — operator decision 2026-05-11 (defi_master Q1 #4 approved).
     # Conservative date: Aster DEX launched on BSC ~Q3 2024 per public news; first on-chain event
     # verifiable via BscScan. Eliminates ~759 false-flagged missing rows from defi_988 audit.

@@ -112,9 +112,10 @@ _CATALOGUE_VENUE_TO_PARQUET: dict[str, list[str]] = {
     "curve": ["CURVE-ETH", "CURVE"],
     "sushiswap": ["SUSHISWAP"],
     "maverick": ["MAVERICK"],
-    "gmx": ["GMX"],
     # "drift": ["DRIFT"] removed 2026-07-16 (operator ruling: all Solana perp
     # DEXes dropped except Jupiter, not integrated).
+    # "gmx": ["GMX"] removed 2026-07-25 (unreliable historical funding data —
+    # see unified-trading-pm/plans/active/defi_gmx_venue_removal_2026_07_25.md).
     "kamino": ["KAMINO"],
     "raydium": ["RAYDIUM"],
     "orca": ["ORCA"],

@@ -476,8 +476,7 @@ def candidate_parquet_paths(
             - CeFi / TradFi: ``venue``, ``instrument_type``, ``file_name``.
             - Prediction: ``venue``, ``condition_id``, ``instrument_type``,
               ``file_name``.
-            - Sports: ``league_id`` (optional). Sports has its own
-              ``include_legacy_archive`` knob — see
+            - Sports: ``league_id`` (optional). See
               :mod:`unified_api_contracts.canonical.domain.sports.gcs_paths`.
 
     Returns:
@@ -494,12 +493,10 @@ def candidate_parquet_paths(
 
         _league_id_raw = kwargs.get("league_id")
         league_id = str(_league_id_raw) if _league_id_raw is not None else ""
-        include_legacy_archive = bool(kwargs.get("include_legacy_archive", False))
         return sports_candidates(
             data_type=data_type,
             day=day.strftime("%Y-%m-%d"),
             league_id=league_id,
-            include_legacy_archive=include_legacy_archive,
             pipeline_mode=pipeline_mode,
         )
 
@@ -700,7 +697,7 @@ class CanonicalViolationClass(StrEnum):
 # Canonical instrument_id shape (the ID-FORM oracle). Mirrors the resolver SSOT
 # ``VENUE:ITYPE:BASE-QUOTE[@LIN|@INV][-YYYYMMDD][-STRIKE-C|P]`` plus the COMBO
 # arm (COMBO ids are canonical but carry a free-form tail). Also covers the
-# chain-less DeFi ``PERPETUAL`` lane (GMX) — ``VENUE:PERPETUAL:BASE-QUOTE`` —
+# chain-less DeFi ``PERPETUAL`` lane — ``VENUE:PERPETUAL:BASE-QUOTE`` —
 # which deliberately has NO ``-CHAIN`` suffix (routes the cefi-simple builder
 # branch, see ``canonical_id_builder.py``'s dispatch table).
 _CANONICAL_INSTRUMENT_ID_RE: Final[re.Pattern[str]] = re.compile(
@@ -724,7 +721,7 @@ _COMBO_INSTRUMENT_ID_RE: Final[re.Pattern[str]] = re.compile(r"^[A-Z0-9._-]+:COM
 # permissive symbol class covers every DeFi type without per-type
 # sub-patterns. Symbol case is PRESERVED (not upper-cased, unlike CeFi/TradFi)
 # because on-chain token symbols are case-sensitive (``aUSDC``, ``stETH``,
-# ``variableDebtUSDC``). GMX's chain-less ``PERPETUAL`` DeFi lane is
+# ``variableDebtUSDC``). The chain-less ``PERPETUAL`` DeFi lane is
 # deliberately ABSENT from the type alternation here — it already matches
 # :data:`_CANONICAL_INSTRUMENT_ID_RE` above. ``LENDING`` (the legacy flat
 # lending type) stays in the alternation for the migration interim — see

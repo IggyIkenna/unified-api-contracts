@@ -96,7 +96,7 @@ class LstRateRecord:
 class PerpFundingRecord:
     """One row in a perp-funding parquet file."""
 
-    protocol: str  # hyperliquid, gmx
+    protocol: str  # hyperliquid, etc.
     date: str  # YYYY-MM-DD
     time: str  # timestamp from source
     coin: str  # BTC, ETH, SOL, etc.

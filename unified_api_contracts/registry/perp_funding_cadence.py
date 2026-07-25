@@ -8,7 +8,7 @@ funding interval:
 
 * 8h period (3 figures/day): Binance, Bybit, OKX, Aster (perp-CCXT), Bitget, Bitfinex
 * 4h period (6 figures/day): Kraken Pro derivatives
-* 1h period (24 figures/day): Hyperliquid, GMX, Lighter
+* 1h period (24 figures/day): Hyperliquid, Lighter
 
 **Deribit is the one figure-vs-charge exception (codified 2026-06-17).** Deribit
 *charges* funding hourly, but the canonical ``derivative_ticker.funding_rate`` we
@@ -71,10 +71,11 @@ FUNDING_CADENCE_SECONDS: Final[dict[str, int]] = {
     "deribit": 8 * 3600,
     # DeFi — 1h figure (24/day)
     "hyperliquid": 1 * 3600,
-    "gmx": 1 * 3600,
     "lighter": 1 * 3600,
     # DRIFT / PACIFICA (Solana) removed 2026-07-16 (operator ruling: all Solana perp
     # DEXes dropped except Jupiter, which is a swap aggregator not a perp DEX).
+    # GMX removed 2026-07-25 (unreliable historical funding data — see
+    # unified-trading-pm/plans/active/defi_gmx_venue_removal_2026_07_25.md).
 }
 
 SECONDS_PER_YEAR: Final[int] = 365 * 24 * 3600

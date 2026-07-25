@@ -156,16 +156,19 @@ DATA_TYPES_BY_ASSET_GROUP: dict[str, list[str]] = {
         "dex_pool_swaps",  # DEX swap events (requires candle sampling)
         "lending_indices",  # Lending rate indices (supply/borrow APY, utilization)
         "liquidations",  # DeFi liquidation events
-        # Perpetual funding rates (GMX). HYPERLIQUID/ASTER/LIGHTER-ZKSYNC
+        # Perpetual funding rates. HYPERLIQUID/ASTER/LIGHTER-ZKSYNC
         # perp_funding RETIRED 2026-07-08 — funding now reads via
         # derivative_ticker's embedded funding_rate field for those venues.
-        # (DRIFT/PACIFICA (Solana) were among the venues this note originally
-        # covered; both removed entirely 2026-07-16 — operator ruling: all
-        # Solana perp DEXes dropped except Jupiter, not integrated.)
+        # (DRIFT/PACIFICA (Solana) + GMX (Arbitrum/Avalanche) were among the
+        # venues this note originally covered; all removed — DRIFT/PACIFICA
+        # 2026-07-16 (operator ruling: all Solana perp DEXes dropped except
+        # Jupiter, not integrated), GMX 2026-07-25 (unreliable historical
+        # funding data — see
+        # unified-trading-pm/plans/active/defi_gmx_venue_removal_2026_07_25.md).)
         "perp_funding",
         # derivative_ticker (2026-07-15, defi_perp_funding_canonicalisation_derivative_
         # ticker_all_perps issue, operator ruling): the canonical RAW-funding home for
-        # ALL perp venues, defi-asset-group ones included (GMX) — captured at the
+        # ALL perp venues, defi-asset-group ones included — captured at the
         # highest resolution each source offers, even when the source has no OI. Was
         # previously declared only under "cefi" (where HYPERLIQUID/ASTER/
         # EXTENDED-STARKNET/LIGHTER-ZKSYNC already emit it, despite their DeFi
@@ -1354,9 +1357,10 @@ def valid_data_types_for_venue_instrument_type(
     1. **DeFi protocol narrowing** (pre-existing). :func:`valid_data_types_for_instrument_type`
        builds the DeFi validity set as the UNION across every protocol that
        declares an instrument_type, so a hybrid protocol's data_types leak to
-       every instrument of that type — e.g. GMX declares both ``pool`` and
-       ``perp_funding`` → ``perp_funding`` reads as valid for ALL pools incl.
-       Uniswap → residual false ``expected_unattempted`` for non-GMX pools.
+       every instrument of that type — e.g. a protocol declaring both ``pool``
+       and ``perp_funding`` would make ``perp_funding`` read as valid for ALL
+       pools incl. Uniswap → residual false ``expected_unattempted`` for
+       non-hybrid pools.
        This narrows DeFi validity to the SPECIFIC protocol named by ``venue``
        (the ``PROTOCOL`` segment of the canonical ``PROTOCOL-CHAIN`` id, e.g.
        ``UNISWAP_V3-ETHEREUM`` → ``uniswap_v3``): it returns ONLY that

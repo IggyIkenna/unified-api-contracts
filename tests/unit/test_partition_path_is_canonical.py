@@ -503,10 +503,18 @@ def test_defi_canonical_stem_per_type_is_clean(file_name: str, itype: str, venue
     assert is_canonical(path), canonical_path_violations(path)
 
 
-def test_defi_gmx_chainless_perpetual_is_canonical() -> None:
-    """GMX's on-chain PERPETUAL lane has NO ``-CHAIN`` suffix (routes cefi-simple)."""
-    path = _defi_path("GMX:PERPETUAL:BTC-USD.parquet", itype="perpetual", venue="GMX", chain="")
-    # No ``chain=`` hive segment for the chain-less GMX lane.
+def test_defi_chainless_perpetual_is_canonical() -> None:
+    """A DeFi on-chain PERPETUAL lane has NO ``-CHAIN`` suffix (routes cefi-simple).
+
+    (GMX, the venue that originally exercised this lane, was removed
+    2026-07-25 — see
+    unified-trading-pm/plans/active/defi_gmx_venue_removal_2026_07_25.md —
+    the lane itself stays valid architecture for future venues.)
+    """
+    path = _defi_path(
+        "EXAMPLE_PERP_DEX:PERPETUAL:BTC-USD.parquet", itype="perpetual", venue="EXAMPLE_PERP_DEX", chain=""
+    )
+    # No ``chain=`` hive segment for the chain-less DeFi perp lane.
     path = path.replace("/chain=/", "/")
     assert is_canonical(path), canonical_path_violations(path)
 
@@ -558,7 +566,7 @@ def test_classified_view_reports_every_class() -> None:
         ("ETHENA-ETHEREUM:YIELD_BEARING:sUSDe", True),
         ("UNISWAP_V3-ETHEREUM:POOL:USDC-WETH-500", True),
         ("ORCA-SOLANA:SOLANA_AMM_POOL:SOL-USDC", True),
-        ("GMX:PERPETUAL:BTC-USD", True),  # chain-less DeFi perp lane, cefi-simple shape
+        ("EXAMPLE_PERP_DEX:PERPETUAL:BTC-USD", True),  # chain-less DeFi perp lane, cefi-simple shape
         ("aUSDC", False),  # bare defi symbol, no venue-chain/type wrapper
         ("0xabc123def456", False),  # raw pool/token address, unwrapped
     ],

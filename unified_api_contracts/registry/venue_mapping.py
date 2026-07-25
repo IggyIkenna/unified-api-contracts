@@ -365,8 +365,6 @@ class VenueMapping:
             "CAMELOT_V3-ARBITRUM": "2023-06-14",  # Earliest pool createdAtTimestamp
             "SUSHISWAP_V3-ETHEREUM": "2023-04-01",  # SushiSwap V3 ETH launch
             "SUSHISWAP_V3-AVALANCHE": "2023-04-01",
-            "GMX-ARBITRUM": "2021-09-06",  # GMX Arbitrum launch
-            "GMX-AVALANCHE": "2022-01-05",  # GMX Avalanche launch
             "AERODROME_V3-BASE": "2024-05-01",  # Earliest pool createdAtTimestamp from subgraph
             "VELODROME_V2-OPTIMISM": "2023-06-15",  # Velodrome V2 Optimism launch
             "TRADERJOE-AVALANCHE": "2021-07-04",  # TraderJoe Avalanche launch

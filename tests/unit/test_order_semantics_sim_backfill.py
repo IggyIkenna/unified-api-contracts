@@ -30,7 +30,7 @@ from unified_api_contracts.internal.architecture_v2.simulation_assumptions impor
 # ---------------------------------------------------------------------------
 
 _WIRED_VENUES = {"hyperliquid", "deribit", "aave_v3", "kamino"}  # drift removed 2026-07-16 (Solana perp DEX cull)
-_SCAFFOLD_VENUES = {"binance", "bybit", "okx", "gmx_v2"}
+_SCAFFOLD_VENUES = {"binance", "bybit", "okx"}  # gmx_v2 removed 2026-07-25 (unreliable historical funding data)
 
 
 def _os(venue_id: str):
@@ -39,8 +39,10 @@ def _os(venue_id: str):
 
 def test_order_semantics_is_backfilled_not_empty() -> None:
     # Count was >= 9 until "drift" (Solana perp DEX) removed 2026-07-16 (operator ruling: all
-    # Solana perp DEXes dropped except Jupiter, not integrated).
-    assert len(VENUE_ORDER_SEMANTICS) >= 8
+    # Solana perp DEXes dropped except Jupiter, not integrated), then >= 8 until "gmx_v2"
+    # removed 2026-07-25 (unreliable historical funding data — see
+    # unified-trading-pm/plans/active/defi_gmx_venue_removal_2026_07_25.md).
+    assert len(VENUE_ORDER_SEMANTICS) >= 7
 
 
 def test_order_semantics_covers_mvp_venue_universe() -> None:

@@ -187,7 +187,6 @@ def candidate_parquet_paths(
     league_id: str = "",
     *,
     season: str | None = None,
-    include_legacy_archive: bool = False,
     pipeline_mode: str | None = None,
 ) -> list[str]:
     """Return ordered list of candidate GCS paths (without bucket prefix) for
@@ -218,9 +217,6 @@ def candidate_parquet_paths(
             returns paths for ``[year-1, year, year+1]`` to cover transfer-
             window overlap where multiple seasons co-exist on the same day.
             Ignored for other layouts.
-        include_legacy_archive: If True, also include
-            ``sports_reference_v1_archive/...`` paths (pre-2026-04-28
-            schema migration). Default False.
         pipeline_mode: When provided, the pipeline_mode-aware canonical path
             ``sports_reference/by_date/day={D}/pipeline_mode={mode}/entity=...``
             is prepended as the first probe (Phase 5.3 migration fallback
@@ -268,9 +264,6 @@ def candidate_parquet_paths(
             for s in year_window:
                 paths.append(f"{base}/season={s}/{folder}.parquet")
         paths.append(f"{base}/{folder}.parquet")
-        if include_legacy_archive:
-            archive_base = f"sports_reference_v1_archive/by_date/day={day}/entity={folder}"
-            paths.append(f"{archive_base}/{folder}.parquet")
 
         # (b) Legacy filename: pre-SSOT-realignment writes used transfermarkt_teams.parquet
         # as the filename even after the entity folder moved to player_values/. Add these as
@@ -310,11 +303,6 @@ def candidate_parquet_paths(
     if layout == SportsPathLayout.PER_DAY_PER_LEAGUE and league_id:
         paths.append(f"{base}/league={league_id}/{folder}.parquet")
     paths.append(f"{base}/{folder}.parquet")
-    if include_legacy_archive:
-        archive_base = f"sports_reference_v1_archive/by_date/day={day}/entity={folder}"
-        if league_id:
-            paths.append(f"{archive_base}/league={league_id}/{folder}.parquet")
-        paths.append(f"{archive_base}/{folder}.parquet")
 
     # (a) fetched_at_hour= sub-partitioning (footystats ODDS + PREDICTIONS):
     # Each polling run writes its own hourly snapshot partition between entity= and league=.
@@ -344,7 +332,6 @@ def candidate_parquet_paths(
                 FIXTURES_SCHEDULE,
                 day,
                 league_id,
-                include_legacy_archive=include_legacy_archive,
                 pipeline_mode=pipeline_mode,
             )
         )
@@ -360,7 +347,6 @@ def candidate_parquet_uris(
     project_id: str,
     env: str = "prd",
     season: str | None = None,
-    include_legacy_archive: bool = False,
     pipeline_mode: str | None = None,
 ) -> list[str]:
     """Same as ``candidate_parquet_paths`` but returns full ``gs://`` URIs.
@@ -374,7 +360,6 @@ def candidate_parquet_uris(
             ``"dev"``). Defaults to ``"prd"``. Passed to
             :func:`sports_bucket_name` to produce the env-tiered bucket name.
         season: Explicit season for ``PER_DAY_PER_SEASON`` data_types.
-        include_legacy_archive: Include v1 archive paths.
         pipeline_mode: Pipeline-mode canonical path prefix.
     """
     bucket = sports_bucket_name(project_id, env=env)
@@ -385,7 +370,6 @@ def candidate_parquet_uris(
             day,
             league_id,
             season=season,
-            include_legacy_archive=include_legacy_archive,
             pipeline_mode=pipeline_mode,
         )
     ]

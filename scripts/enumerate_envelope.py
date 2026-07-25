@@ -63,7 +63,6 @@ _DEFI_VENUE_CHAINS: dict[str, list[str]] = {
     "maverick": ["ethereum", "base", "bsc"],
     "sushiswap": ["ethereum", "arbitrum", "polygon", "base"],
     "pancakeswap": ["bsc", "ethereum", "arbitrum", "base"],
-    "gmx": ["arbitrum", "avalanche"],
     "spark": ["ethereum"],
     "lido": ["ethereum"],
     "etherfi": ["ethereum"],
@@ -100,7 +99,7 @@ _CEFI_SPOT_PERP_VENUES = [
 ]
 _CEFI_OPTION_VENUES = ["deribit", "okx", "bybit", "binance", "bit_com"]
 _DEFI_DEX_SPOT = ["uniswap_v3", "pancakeswap_v3", "balancer", "curve", "sushiswap", "maverick"]
-_DEFI_PERP = ["hyperliquid", "gmx", "dydx_v4", "aster"]  # drift removed 2026-07-16 (Solana perp DEX cull)
+_DEFI_PERP = ["hyperliquid", "dydx_v4", "aster"]  # drift removed 2026-07-16, gmx removed 2026-07-25 (Solana perp DEX cull / unreliable funding data)
 _DEFI_LENDING = ["aave_v3", "compound_v3", "morpho", "spark"]
 _DEFI_STAKING = ["lido", "etherfi", "ethena", "jito", "kamino"]
 _DEFI_LP_CONC = ["uniswap_v3", "pancakeswap_v3"]

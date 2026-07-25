@@ -79,9 +79,10 @@ _DOC_STAKED = (
 #: except Jupiter, not integrated). Solana-side hedge now runs via the CeFi perp venues below
 #: (see jito-kamino-bybit-sol-usdt-prod slot label). SSOT:
 #: unified-trading-pm/codex/04-architecture/solana-defi-coverage.md.
+#: "gmx_v2" removed 2026-07-25 (unreliable historical funding data — see
+#: unified-trading-pm/plans/active/defi_gmx_venue_removal_2026_07_25.md).
 _STAKED_HEDGE_VENUES: Final[tuple[str, ...]] = (
     "hyperliquid",
-    "gmx_v2",
     "binance",
     "bybit",
     "deribit",
@@ -291,7 +292,7 @@ def _basis_perp_structure(archetype: StrategyArchetype, *, inverse: bool, notes:
                 eligible_venue_ids=(
                     "aster",  # 2026-07-24 containment fix: catalog_carry.py _CARRY_BASIS_PERP_VENUE_BUNDLES
                     # sets spot_venue=full_venue for every single-venue-netted bundle (incl. aster/deribit/
-                    # gmx/kalshi-perp/polymarket-perp) — see defi_archetype_universe_no_curtailment_
+                    # kalshi-perp/polymarket-perp) — see defi_archetype_universe_no_curtailment_
                     # mechanism_2026_07_23.md Finding 3 addendum + Side-decision 2 containment check.
                     "binance",
                     "bitfinex",  # bitfinex_native.py:167 (BITFINEX-SPOT adapter — spot only, no futures adapter exists)
@@ -299,9 +300,8 @@ def _basis_perp_structure(archetype: StrategyArchetype, *, inverse: bool, notes:
                     "bybit",
                     "coinbase",  # F39: coinbase_ccxt.py:32 (COINBASE-SPOT adapter)
                     "deribit",  # 2026-07-24 containment fix (see aster comment above)
-                    "gmx_v2",  # 2026-07-24 containment fix — catalog emits bare "gmx"; same real GMX-V2
-                    # perp DEX this module already calls "gmx_v2" everywhere else (see _STAKED_HEDGE_VENUES /
-                    # this function's own perp leg below) — NOT a naming bug, aliased in the containment check.
+                    # "gmx_v2" removed 2026-07-25 (unreliable historical funding data — see
+                    # unified-trading-pm/plans/active/defi_gmx_venue_removal_2026_07_25.md).
                     "hyperliquid",
                     "kalshi_perp",  # 2026-07-24 containment fix (see aster comment above); distinct from
                     # bare "kalshi" (the event-market product) — VENUE_TO_ADAPTER_KEY["KALSHI-PERP"]="kalshi_perp".
@@ -340,7 +340,6 @@ def _basis_perp_structure(archetype: StrategyArchetype, *, inverse: bool, notes:
                     "bitget",  # F39: bitget_native.py:125 (BITGET-FUTURES adapter — perp leg)
                     "bybit",
                     "deribit",
-                    "gmx_v2",
                     "hyperliquid",
                     "kalshi_perp",  # 2026-07-24 containment fix (see aster comment above)
                     "kraken",  # F39: kraken_rest_adapter.py:159 (KRAKEN-FUTURES adapter — perp leg)
@@ -663,7 +662,6 @@ def _price_dispersion_structure() -> ArchetypeLegStructure:
         "compound_v3",  # 2026-07-24 containment fix (see aave_v3 comment above; catalog "compound" aliased)
         "curve",
         "deribit",
-        "gmx_v2",
         "hyperliquid",
         "kalshi",  # 2026-07-24 containment fix — same function's Kalshi<->Polymarket cross-venue row sets
         # arb_venues="polymarket,kalshi" (bare event-market id, distinct from the perp-product "kalshi_perp"
@@ -1139,7 +1137,7 @@ def _stat_arb_cross_sectional_structure() -> ArchetypeLegStructure:
     # ibkr-sp500-sector-rotation / ibkr-russell2000-mr — S&P 500 + Russell 2000 baskets span
     # both exchanges; equities are spot-only so the combined SPOT+PERP `instr` above doesn't
     # misclaim a PERP capability for either exchange.
-    venues = ("binance", "hyperliquid", "bybit", "gmx_v2", "ibkr", "nasdaq", "nyse")
+    venues = ("binance", "hyperliquid", "bybit", "ibkr", "nasdaq", "nyse")
     return ArchetypeLegStructure(
         archetype_id=StrategyArchetype.STAT_ARB_CROSS_SECTIONAL,
         legs=(
@@ -1363,7 +1361,7 @@ def _directional_seeds() -> tuple[ArchetypeLegStructure, ...]:
     # Shared by 3 archetypes below (ML/RULES_DIRECTIONAL_CONTINUOUS + TSMOM_BTC_CTA) — do NOT
     # add fx/nasdaq/nyse here, TSMOM_BTC_CTA's own codex doc states "BTC-only CeFi archetype by
     # design", so a TradFi-equity/FX addition to this shared tuple would leak into it.
-    continuous_venues = ("binance", "okx", "bybit", "hyperliquid", "gmx_v2", "ibkr", "cme")
+    continuous_venues = ("binance", "okx", "bybit", "hyperliquid", "ibkr", "cme")
     # ML/RULES_DIRECTIONAL_CONTINUOUS-only extension: codex ml-directional-continuous.md /
     # rules-directional-continuous.md example instances ibkr-spy-1m-usd-prod (NYSE),
     # ibkr-aapl-daily-usd-prod / ibkr-qqq-15m-breakout (NASDAQ), ibkr-eurusd-fx-15m-usd-prod /

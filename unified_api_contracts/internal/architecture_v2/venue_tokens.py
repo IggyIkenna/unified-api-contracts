@@ -152,12 +152,9 @@ _DEFI_STAKING_TOKENS: frozenset[str] = frozenset(
 # DeFi perp protocols
 _DEFI_PERP_TOKENS: frozenset[str] = frozenset(
     {
-        "gmx",
-        # 2026-06-15 Phase V — GMX-V2 perp DEX. The ``gmx`` family base exists,
-        # but ``archetype_leg_spec_seeds.py`` lists the venue id ``gmx_v2`` as a
-        # hedge-leg ``eligible_venue_id`` (folds to ``gmxv2``); the parser needs
-        # the exact folded token to build a slot routing a perp leg there.
-        "gmxv2",
+        # "gmx" / "gmxv2" removed 2026-07-25 (unreliable historical funding
+        # data — see
+        # unified-trading-pm/plans/active/defi_gmx_venue_removal_2026_07_25.md).
         # "drift" (Solana-native perps) removed 2026-07-16 (operator ruling: all Solana perp DEXes
         # dropped except Jupiter, not integrated).
         # SSOT: unified-trading-pm/codex/04-architecture/solana-defi-coverage.md.

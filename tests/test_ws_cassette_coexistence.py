@@ -86,7 +86,11 @@ _CONNECTOR_TO_VENUE: Final[dict[str, str]] = {
     "etherfi_ethereum_ws": "etherfi",
     "extended_starknet_perp_ws": "extended",
     "fluid_ethereum_ws": "fluid",
-    "gmx_arbitrum_ws": "gmx",
+    # "gmx_arbitrum_ws": "gmx" removed 2026-07-25 (unreliable historical
+    # funding data — see
+    # unified-trading-pm/plans/active/defi_gmx_venue_removal_2026_07_25.md).
+    # MTDS connector + this file's UAC ``external/gmx/`` mocks both deleted in
+    # the same pass, same pattern as the drift/pacifica removals above.
     "hyperliquid_ws": "hyperliquid",
     "hyperliquid_l2book_ws": "hyperliquid",
     "hyperliquid_ticker_ws": "hyperliquid",
