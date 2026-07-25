@@ -486,8 +486,24 @@ ENDPOINT_REGISTRY: list[EndpointSpec] = [
     #     - Markets: h2h, spreads, totals, btts, draw_no_bet, double_chance, player_props, outrights
     #     - Polling interval: ~5 minutes
     #
-    # Consumers should check available_from_date and v3_era_cutoff to avoid
-    # querying markets or intervals that don't exist for the requested time range.
+    # Consumers should check available_from_date to avoid querying markets that
+    # don't exist for the requested time range (there is no v3_era_cutoff field —
+    # an earlier version of this comment referenced one that was never built).
+    #
+    # GRANULARITY-MISLABELING CHECK (2026-07-25, watch-item from
+    # sports_canonical_universe_and_apifootball_reference_expansion_2026_06_24.md):
+    # checked whether pre-cutover 10-min snapshots would be evaluated against a
+    # 5-min expectation anywhere downstream and read as "missing" coverage.
+    # RESULT: not confirmed, no dated capability entry added. Every actual
+    # sports-odds completeness path is grain-insensitive to the raw poll
+    # interval — MDPS bucket assignment (bucket_assignment_adapter.py
+    # TIER1_HORIZONS) matches snapshots to fixed pre-match offsets with a
+    # 30-90min staleness tolerance, and the honest-coverage expected-universe
+    # key for odds is (date, league_id, timeframe/horizon) with no per-snapshot
+    # or per-minute axis. No code path computes an expected snapshot count from
+    # a 5-min/10-min cadence constant, so the mislabeling scenario cannot occur
+    # today. Re-check this note before building any future raw-tick-count
+    # completeness check for odds_api.
     #
     EndpointSpec(
         venue="odds_api",
