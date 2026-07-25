@@ -640,8 +640,10 @@ class TestSportsMvp:
         # Serbia/Egypt) + 9 Central Asia (Kazakhstan/Kyrgyzstan/Tajikistan/Turkmenistan/
         # Uzbekistan) + 19 South America/CONMEBOL (Bolivia/Colombia/Ecuador/Paraguay/Peru/
         # Uruguay/Venezuela) + 49 Eastern Europe (UEFA) domestic top+below+cup (16
-        # countries, Crimea skipped), all curated-universe batches, in_mvp_scope=False
-        assert len(non_mvp_football) == 103
+        # countries, Crimea skipped) + 30 Middle East/AFC-WAFF (Bahrain/Iran/Iraq/Israel/
+        # Jordan/Kuwait/Lebanon/Oman/Palestine/Qatar/Saudi Arabia/Syria/UAE/Yemen), all
+        # curated-universe batches, in_mvp_scope=False
+        assert len(non_mvp_football) == 133
         assert len(non_football) == 7
         for lg in mvp_football:
             assert is_mvp("sports", "ODDS_API", "FIXED_ODDS", "odds", league=lg.league_id)

@@ -69,9 +69,11 @@ class TestUnderstatAllowList:
         # (Kazakhstan/Kyrgyzstan/Tajikistan/Turkmenistan/Uzbekistan) + 19 curated-universe
         # South America/CONMEBOL (Bolivia/Colombia/Ecuador/Paraguay/Peru/Uruguay/Venezuela)
         # + 49 Eastern Europe (UEFA) domestic top+below+cup (16 countries, Crimea
-        # skipped), all added 2026-07-25, in_mvp_scope=False but still genuine
-        # Understat gaps — verified below, not assumed)
-        assert len(others) == 194
+        # skipped) + 30 Middle East/AFC-WAFF (Bahrain/Iran/Iraq/Israel/Jordan/Kuwait/
+        # Lebanon/Oman/Palestine/Qatar/Saudi Arabia/Syria/UAE/Yemen), all added
+        # 2026-07-25, in_mvp_scope=False but still genuine Understat gaps —
+        # verified below, not assumed)
+        assert len(others) == 224
         for lid in others:
             assert is_sports_structural_gap("understat", lid)
 
