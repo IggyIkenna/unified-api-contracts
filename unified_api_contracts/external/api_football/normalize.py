@@ -139,6 +139,7 @@ def normalize_api_football_fixture(raw: ApiFootballFixture, venue: str = "api_fo
             country=raw.league.country or "",
             league_type=raw.league.type,
             logo_url=raw.league.logo,
+            api_football_id=raw.league.id,
         )
 
     venue_obj: CanonicalVenue | None = None

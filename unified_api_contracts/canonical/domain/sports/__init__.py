@@ -495,6 +495,14 @@ class CanonicalLeague(BaseModel):
     country: str
     league_type: str | None = None
     logo_url: str | None = None
+    # Raw provider numeric id (e.g. api-football's `league.id`). Populated by
+    # normalizers that have it so downstream consumers can resolve the
+    # CANONICAL LEAGUE_REGISTRY slug via get_league_by_api_football_id()
+    # instead of joining on `league_id`/`name`, which are provider display
+    # strings, not registry keys, and are ambiguous for several leagues (e.g.
+    # "Championship" -> English + Scottish). None when the provider doesn't
+    # supply a numeric id.
+    api_football_id: int | None = None
 
     @classmethod
     def from_raw(cls, data: dict[str, str | int | float | bool | None]) -> Self:
