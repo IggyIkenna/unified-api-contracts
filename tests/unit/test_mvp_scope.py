@@ -636,16 +636,12 @@ class TestSportsMvp:
         non_mvp_football = [lg for lg in LEAGUE_REGISTRY.values() if lg.sport == "FOOTBALL" and not lg.in_mvp_scope]
         non_football = [lg for lg in LEAGUE_REGISTRY.values() if lg.sport != "FOOTBALL"]
         assert len(mvp_football) == 96  # China+Russia added 2026-07-21 (operator ruling: in-universe)
-        # 11 continental cups/majors + 15 domestic top+below+cup (Ukraine/Croatia/Morocco/
-        # Serbia/Egypt) + 9 Central Asia (Kazakhstan/Kyrgyzstan/Tajikistan/Turkmenistan/
-        # Uzbekistan) + 19 South America/CONMEBOL (Bolivia/Colombia/Ecuador/Paraguay/Peru/
-        # Uruguay/Venezuela) + 49 Eastern Europe (UEFA) domestic top+below+cup (16
-        # countries, Crimea skipped) + 30 Middle East/AFC-WAFF (Bahrain/Iran/Iraq/Israel/
-        # Jordan/Kuwait/Lebanon/Oman/Palestine/Qatar/Saudi Arabia/Syria/UAE/Yemen) + 16
-        # West Africa (Benin/Cameroon/Congo/Gabon/Gambia/Ghana/Guinea/Liberia/Mali/
-        # Mauritania/Nigeria/Senegal/Togo) + 30 North/East/Southern Africa (CAF, 21
-        # countries), all curated-universe batches, in_mvp_scope=False
-        assert len(non_mvp_football) == 179
+        # curated-universe additions 2026-07-25 (continental cups/majors, domestic
+        # top+below+cup batches for many regions), all in_mvp_scope=False. This count is
+        # a live measurement, not hand-arithmetic -- many concurrent slots land batches
+        # into this same registry file; re-derive from len(LEAGUE_REGISTRY) rather than
+        # trust a stale comment.
+        assert len(non_mvp_football) == 190
         assert len(non_football) == 7
         for lg in mvp_football:
             assert is_mvp("sports", "ODDS_API", "FIXED_ODDS", "odds", league=lg.league_id)

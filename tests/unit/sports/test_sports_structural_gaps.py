@@ -63,19 +63,13 @@ class TestUnderstatAllowList:
         big5 = {"EPL", "LA_LIGA", "BUNDESLIGA", "SERIE_A", "LIGUE_1"}
         football = [lg.league_id for lg in LEAGUE_REGISTRY.values() if lg.sport == "FOOTBALL"]
         others = [lid for lid in football if lid not in big5]
-        # 131 football - 5 big-5 (China+Russia added 2026-07-21; +11 curated-universe
-        # continental cups/majors + 15 curated-universe domestic top+below+cup
-        # (Ukraine/Croatia/Morocco/Serbia/Egypt) + 9 curated-universe Central Asia
-        # (Kazakhstan/Kyrgyzstan/Tajikistan/Turkmenistan/Uzbekistan) + 19 curated-universe
-        # South America/CONMEBOL (Bolivia/Colombia/Ecuador/Paraguay/Peru/Uruguay/Venezuela)
-        # + 49 Eastern Europe (UEFA) domestic top+below+cup (16 countries, Crimea
-        # skipped) + 30 Middle East/AFC-WAFF (Bahrain/Iran/Iraq/Israel/Jordan/Kuwait/
-        # Lebanon/Oman/Palestine/Qatar/Saudi Arabia/Syria/UAE/Yemen) + 16 West Africa
-        # (Benin/Cameroon/Congo/Gabon/Gambia/Ghana/Guinea/Liberia/Mali/Mauritania/
-        # Nigeria/Senegal/Togo) + 30 North/East/Southern Africa (CAF, 21 countries),
-        # all added 2026-07-25, in_mvp_scope=False but still genuine Understat gaps —
-        # verified below, not assumed)
-        assert len(others) == 270
+        # curated-universe additions 2026-07-25 (continental cups/majors, domestic
+        # top+below+cup batches for many regions), all in_mvp_scope=False but still
+        # genuine Understat gaps -- verified below, not assumed. This count is a live
+        # measurement, not hand-arithmetic -- many concurrent slots land batches into
+        # this same registry file; re-derive from len(LEAGUE_REGISTRY) rather than
+        # trust a stale comment.
+        assert len(others) == 281
         for lid in others:
             assert is_sports_structural_gap("understat", lid)
 
