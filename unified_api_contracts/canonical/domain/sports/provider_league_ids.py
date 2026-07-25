@@ -786,6 +786,17 @@ SPORTS_ENTITY_LEAGUE_COVERAGE: dict[str, frozenset[str] | None] = {
     "XG_SHOTS": _UNDERSTAT_LEAGUE_COVERAGE,  # Understat: per-shot xG, same leagues
     "MATCHES": None,  # FootyStats: all leagues
     "PREDICTIONS": None,  # FootyStats: all leagues
+    # ODDS_HORIZON_BUCKET (mdps_odds_horizon_bucket): observed coverage from a
+    # full-history manifest read (2026-07-25,
+    # sports_post_backfill_relabel_premise_resolved_residual_gap_2026_07_25.md
+    # todo). The provider (odds_api) only lists markets for major domestic top
+    # flights — cup/lower-tier leagues structurally never appear. Captured
+    # league_id values were NOT fully canonicalized (mixed raw odds_api slugs
+    # in 2 casings alongside canonical UAC ids, e.g. "soccer_australia_aleague"
+    # / "A-LEAGUE" / "A_LEAGUE" all the same real league) — resolved via
+    # DEFAULT_CLASSIFICATION_REGISTRY's odds_api_league_name before building
+    # this allow-list, not taken from the raw manifest values verbatim.
+    "ODDS_HORIZON_BUCKET": frozenset(_ENTITY_COVERAGE.get("ODDS_HORIZON_BUCKET") or []),
     # TRANSFERMARKT_LEAGUES + SFI_LEAGUES retired 2026-05-05 — provider catalog
     # mappings live in UAC (TRANSFERMARKT_IDS / SOCCER_FOOTBALL_INFO_IDS).
     # PLAYER_VALUES: observed coverage from manifest (≥1 captured row).

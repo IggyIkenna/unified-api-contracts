@@ -633,9 +633,15 @@ def get_expected_leagues_for_source(
     given source (``api_football``, ``footystats``, ``odds_api``,
     ``open_meteo``, ``soccer_football_info``, ``transfermarkt``,
     ``understat``), returns the list of leagues whose ``data_sources``
-    frozenset contains ``source_key``. Optionally restrict by league
-    classification (``Prediction`` / ``Features`` / ``Reference`` /
-    ``Other``).
+    frozenset contains ``source_key`` AND that are not a structural gap for
+    that source per :func:`is_sports_structural_gap` (the explicit
+    ``SPORTS_STRUCTURAL_GAPS``/``SPORTS_SOURCE_LEAGUE_ALLOWLIST`` SSOT). The
+    two checks currently agree for every registry entry (``data_sources`` is
+    hand-curated to already exclude known gaps) — this is defense-in-depth so
+    a future ``data_sources`` edit can't silently diverge from the explicit
+    gap/allowlist SSOT and reintroduce an ad-hoc-vs-declared mismatch.
+    Optionally restrict by league classification (``Prediction`` /
+    ``Features`` / ``Reference`` / ``Other``).
 
     SSOT: ``codex/02-data/sports-data-source-coverage-matrix.md``.
 
@@ -653,7 +659,9 @@ def get_expected_leagues_for_source(
     return [
         league
         for league in LEAGUE_REGISTRY.values()
-        if source_key in league.data_sources and (allowed is None or league.classification.lower() in allowed)
+        if source_key in league.data_sources
+        and not is_sports_structural_gap(source_key, league.league_id)
+        and (allowed is None or league.classification.lower() in allowed)
     ]
 
 

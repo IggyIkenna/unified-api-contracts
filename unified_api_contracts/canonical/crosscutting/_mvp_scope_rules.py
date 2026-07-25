@@ -258,12 +258,26 @@ class FeaturesModelsMvpStub:
 # at MVP_SCOPE construction (verified safe: the package __init__ is mid-flight
 # but the sports leaf modules import only stdlib/pydantic + config_versioning).
 def _mvp_football_league_ids() -> frozenset[str]:
-    """Return the canonical 94 football league_ids (``sport == "FOOTBALL"``)."""
+    """Return the canonical 96 football league_ids in MVP/prediction scope.
+
+    Filters on ``LeagueDefinition.in_mvp_scope`` (NOT just ``sport ==
+    "FOOTBALL"``) — the curated-universe expansion
+    (plans/active/sports_satellite_ao_dispatch_batch2_2026_07_24.md) adds
+    wider-reference football entries (continental cups, majors) explicitly
+    tagged ``in_mvp_scope=False`` that must NOT widen prediction/MVP scope
+    (operator 2026-07-24 Directive B: "I'm not suggesting we increase the
+    scope of what we are predicting now"). Before ``in_mvp_scope`` existed,
+    ANY new football registry entry silently expanded MVP scope regardless
+    of intent — ``in_mvp_scope`` defaults ``True`` so every pre-existing
+    entry keeps its current behavior unchanged.
+    """
     from unified_api_contracts.canonical.domain.sports.league_data import (
         LEAGUE_REGISTRY,
     )
 
-    return frozenset(league.league_id for league in LEAGUE_REGISTRY.values() if league.sport == "FOOTBALL")
+    return frozenset(
+        league.league_id for league in LEAGUE_REGISTRY.values() if league.sport == "FOOTBALL" and league.in_mvp_scope
+    )
 
 
 # ---------------------------------------------------------------------------

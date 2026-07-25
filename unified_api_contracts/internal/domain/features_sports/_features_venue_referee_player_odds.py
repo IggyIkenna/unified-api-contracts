@@ -174,65 +174,94 @@ class PlayerLineupFeaturesMixin(BaseModel):
 
 
 class OddsFeaturesMixin(BaseModel):
-    """Odds feature fields (OddsFeatureCalculator)."""
+    """Odds feature fields (OddsFeatureCalculator).
+
+    Field names follow the operator-decided scheme (2026-07-23, DECIDED todo 1
+    in sports_odds_feature_naming_canonicalization_2026_07_21.md):
+    ``<category>_<metric>[_<outcome>][_<venue>]``, outcome in {home, draw, away}.
+    Renamed 2026-07-25 from the pre-scheme names, cross-checked against
+    ``features-service``'s ``odds_calculator.py``/``odds_velocity.py`` (which producer
+    columns are actually live) and downstream consumers (``strategy-service`` already
+    expects ``prob_implied_*``/``prob_fair_*``/``odds_decimal_*``).
+
+    ``market_home_odds_best``/``market_away_odds_best`` win the ``odds_decimal_``
+    (consensus/best) slot -- that is this scheme's own worked example
+    (``best_odds_home`` -> ``odds_decimal_home``) and what
+    ``SportsValueBettingEngine`` needs. ``odds_home_win``/``odds_draw``/``odds_away_win``
+    (a DIFFERENT, currently-live FSS column under the exact same old name) get the
+    distinct ``odds_moneyline_`` metric instead of colliding with it.
+    ``market_home_away_odds_ratio``/``odds_home_away_ratio`` are disambiguated the
+    same way (``consensus`` qualifier on the schema-only one).
+
+    Left UNCHANGED despite being scheme-adjacent, not scheme-exact:
+    ``odds_sharp_money_on_home``/``_away`` -- exact-string match to a currently-live
+    FSS producer column; renaming would zero out ``SportsFeatureLoaderMixin``'s
+    producer/consumer overlap check for this field ahead of the FSS-side migration
+    (features_service/sports/calculators/odds_columns.py`` migration todo, P2 in the
+    same plan) with no compensating benefit today. The over/under fixed-line fields
+    (``odds_over_2_5`` etc.) are likewise left unchanged -- already ``odds_<market>_``
+    compliant per this scheme's own alternate-market rule, and schema-only today (no
+    live FSS producer under ANY name for the fixed-line variants).
+    """
 
     model_config = ConfigDict(frozen=False)
 
     # Implied probabilities
-    market_home_implied_prob: float | None = None
-    market_draw_implied_prob: float | None = None
-    market_away_implied_prob: float | None = None
+    prob_implied_home: float | None = None
+    prob_implied_draw: float | None = None
+    prob_implied_away: float | None = None
     # Market efficiency
-    market_overround: float | None = None
-    market_consensus_home_prob: float | None = None
-    market_consensus_draw_prob: float | None = None
-    market_consensus_away_prob: float | None = None
-    market_vig_pct: float | None = None
-    market_num_bookmakers: int | None = None
+    odds_market_overround: float | None = None
+    prob_fair_home: float | None = None
+    prob_fair_draw: float | None = None
+    prob_fair_away: float | None = None
+    odds_market_vig_pct: float | None = None
+    odds_book_count_total: int | None = None
     # Raw 1X2 odds
-    odds_home_win: float | None = None
-    odds_draw: float | None = None
-    odds_away_win: float | None = None
-    odds_home_away_ratio: float | None = None
-    market_home_away_odds_ratio: float | None = None
-    # Over/Under lines
+    odds_moneyline_home: float | None = None
+    odds_moneyline_draw: float | None = None
+    odds_moneyline_away: float | None = None
+    odds_market_home_away_ratio: float | None = None
+    odds_market_consensus_home_away_ratio: float | None = None
+    # Over/Under lines (schema-only today; FSS's real OU support is a single dynamic
+    # line, not fixed 1.5/2.5/3.5 columns -- already odds_<market>_ compliant, unchanged)
     odds_over_2_5: float | None = None
     odds_under_2_5: float | None = None
-    market_over_25_implied_prob: float | None = None
-    market_under_25_implied_prob: float | None = None
+    prob_implied_over_2_5: float | None = None
+    prob_implied_under_2_5: float | None = None
     odds_over_1_5: float | None = None
     odds_under_1_5: float | None = None
     odds_over_3_5: float | None = None
     odds_under_3_5: float | None = None
     # Market consensus (cross-bookmaker)
-    market_home_odds_best: float | None = None
-    market_away_odds_best: float | None = None
-    market_home_odds_variance: float | None = None
-    market_away_odds_variance: float | None = None
+    odds_decimal_home: float | None = None
+    odds_decimal_away: float | None = None
+    odds_variance_home: float | None = None
+    odds_variance_away: float | None = None
     # Odds movement (opening / closing)
-    odds_home_opening: float | None = None
-    odds_home_closing: float | None = None
-    odds_home_movement: float | None = None
-    odds_home_movement_pct: float | None = None
-    odds_away_opening: float | None = None
-    odds_away_closing: float | None = None
-    odds_away_movement: float | None = None
-    odds_away_movement_pct: float | None = None
-    # Sharp money indicators
+    odds_opening_home: float | None = None
+    odds_closing_home: float | None = None
+    odds_movement_home: float | None = None
+    odds_movement_pct_home: float | None = None
+    odds_opening_away: float | None = None
+    odds_closing_away: float | None = None
+    odds_movement_away: float | None = None
+    odds_movement_pct_away: float | None = None
+    # Sharp money indicators -- unchanged, see class docstring
     odds_sharp_money_on_home: int | None = None
     odds_sharp_money_on_away: int | None = None
 
     # -- Odds Extended (OddsFeatureCalculator) --
-    asian_handicap_line: float | None = None
-    ev_away_win: float | None = None
-    ev_home_win: float | None = None
-    implied_prob_btts_no: float | None = None
-    implied_prob_btts_yes: float | None = None
+    odds_asian_handicap_line: float | None = None
+    odds_ev_away: float | None = None
+    odds_ev_home: float | None = None
+    prob_implied_btts_no: float | None = None
+    prob_implied_btts_yes: float | None = None
     odds_asian_handicap_away: float | None = None
     odds_asian_handicap_home: float | None = None
     odds_btts_no: float | None = None
     odds_btts_yes: float | None = None
-    value_away_win: float | None = None
-    value_btts: float | None = None
-    value_home_win: float | None = None
-    value_over_2_5: float | None = None
+    odds_value_away: float | None = None
+    odds_value_btts: float | None = None
+    odds_value_home: float | None = None
+    odds_value_over_2_5: float | None = None
