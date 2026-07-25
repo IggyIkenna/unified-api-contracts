@@ -637,8 +637,9 @@ class TestSportsMvp:
         non_football = [lg for lg in LEAGUE_REGISTRY.values() if lg.sport != "FOOTBALL"]
         assert len(mvp_football) == 96  # China+Russia added 2026-07-21 (operator ruling: in-universe)
         # 11 continental cups/majors + 15 domestic top+below+cup (Ukraine/Croatia/Morocco/
-        # Serbia/Egypt), both curated-universe batches, in_mvp_scope=False
-        assert len(non_mvp_football) == 26
+        # Serbia/Egypt) + 9 Central Asia (Kazakhstan/Kyrgyzstan/Tajikistan/Turkmenistan/
+        # Uzbekistan), all curated-universe batches, in_mvp_scope=False
+        assert len(non_mvp_football) == 35
         assert len(non_football) == 7
         for lg in mvp_football:
             assert is_mvp("sports", "ODDS_API", "FIXED_ODDS", "odds", league=lg.league_id)
