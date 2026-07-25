@@ -476,8 +476,7 @@ def candidate_parquet_paths(
             - CeFi / TradFi: ``venue``, ``instrument_type``, ``file_name``.
             - Prediction: ``venue``, ``condition_id``, ``instrument_type``,
               ``file_name``.
-            - Sports: ``league_id`` (optional). Sports has its own
-              ``include_legacy_archive`` knob — see
+            - Sports: ``league_id`` (optional). See
               :mod:`unified_api_contracts.canonical.domain.sports.gcs_paths`.
 
     Returns:
@@ -494,12 +493,10 @@ def candidate_parquet_paths(
 
         _league_id_raw = kwargs.get("league_id")
         league_id = str(_league_id_raw) if _league_id_raw is not None else ""
-        include_legacy_archive = bool(kwargs.get("include_legacy_archive", False))
         return sports_candidates(
             data_type=data_type,
             day=day.strftime("%Y-%m-%d"),
             league_id=league_id,
-            include_legacy_archive=include_legacy_archive,
             pipeline_mode=pipeline_mode,
         )
 
