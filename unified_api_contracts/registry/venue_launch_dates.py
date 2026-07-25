@@ -78,7 +78,8 @@ CEFI_VENUE_LAUNCH_DATES: dict[str, str] = {
     # trading-pm/codex/04-architecture/solana-defi-coverage.md.
     "EXTENDED-STARKNET": "2024-09-01",  # Extended on Starknet
     "LIGHTER-ZKSYNC": "2024-09-01",  # Lighter on zkSync Era
-    "GMX": "2021-09-01",  # GMX V1 on Arbitrum (V2 launched 2023-08)
+    # GMX removed 2026-07-25 (unreliable historical funding data — see
+    # unified-trading-pm/plans/active/defi_gmx_venue_removal_2026_07_25.md).
     # Prediction-platform PERPETUAL FUTURES — crypto perps with funding. NOT
     # the same as KALSHI/POLYMARKET prediction YES/NO markets (those are in
     # PREDICTION_VENUE_LAUNCH_DATES). These are CFTC-regulated crypto perps in
@@ -207,9 +208,9 @@ DEFI_VENUE_LAUNCH_DATES: dict[str, str] = {
     # dropped except Jupiter, not integrated).
     "RAYDIUM-SOLANA": "2021-02-21",  # Raydium AMM launch
     "ORCA-SOLANA": "2021-02-09",  # Orca AMM launch
-    # GMX — Sept 2021 Arbitrum, Jan 2022 Avalanche.
-    "GMX-ARBITRUM": "2021-09-01",
-    "GMX-AVALANCHE": "2022-01-05",
+    # GMX (Arbitrum/Avalanche) removed 2026-07-25 (unreliable historical
+    # funding data — see
+    # unified-trading-pm/plans/active/defi_gmx_venue_removal_2026_07_25.md).
     # Yearn V3 — March 13 2024 launch (V2 earlier but V3 is referenced here).
     "YEARN_V3": "2024-03-13",
     # Morpho Vaults (MetaMorpho) — Jan 4 2024 launch.

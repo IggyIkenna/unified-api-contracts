@@ -49,7 +49,6 @@ VENUE_PREFIX_TO_PROTOCOL: dict[str, str] = {
     "VELODROMEV2": "velodrome_v2",
     "TRADER_JOE_V2": "trader_joe_v2",
     "TRADER_JOEV2": "trader_joe_v2",
-    "GMX": "gmx",
     # Messari lending (Spark = Aave V3 fork, same schema).
     "SPARK": "spark",
     "SUSHISWAP": "sushiswap",
@@ -68,7 +67,6 @@ PROTOCOL_TO_ADAPTER_KEY: dict[str, str] = {
     "camelot_v3": "uniswap_v3",
     "velodrome_v2": "uniswap_v3",
     "trader_joe_v2": "uniswap_v3",
-    "gmx": "uniswap_v3",
     "sushiswap": "uniswap_v3",
 }
 

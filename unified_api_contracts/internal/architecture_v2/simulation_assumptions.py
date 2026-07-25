@@ -179,7 +179,9 @@ _BATCH_LIVE_DIVERGENCE: Final[str] = (
 # Perp/spot CEX surfaces: TRADE action → ARRIVAL_MID → CANDLE_CLOSE.
 # "drift" (Solana perp DEX) removed 2026-07-16 (operator ruling: all Solana perp DEXes dropped
 # except Jupiter, not integrated). SSOT: unified-trading-pm/codex/04-architecture/solana-defi-coverage.md.
-_CLOB_PERP_VENUES: Final[list[str]] = ["hyperliquid", "binance", "bybit", "okx", "deribit", "gmx_v2"]
+# "gmx_v2" removed 2026-07-25 (unreliable historical funding data — see
+# unified-trading-pm/plans/active/defi_gmx_venue_removal_2026_07_25.md).
+_CLOB_PERP_VENUES: Final[list[str]] = ["hyperliquid", "binance", "bybit", "okx", "deribit"]
 _CLOB_SPOT_VENUES: Final[list[str]] = ["binance", "bybit", "okx"]
 # DeFi AMM surfaces: SWAP action → POOL_MID_AT_BLOCK.
 _AMM_VENUES: Final[list[str]] = ["uniswap_v3", "curve", "balancer"]

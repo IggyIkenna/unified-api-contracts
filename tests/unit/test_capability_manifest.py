@@ -302,9 +302,11 @@ def test_collateral_registry_is_backfilled() -> None:
     backfill assertions (per-venue counts, source_of_truth non-empty, missing
     venues) live in ``test_collateral_registry_backfill.py``.
     """
-    # 6 perp + 2 lending MVP venues (was 7 perp until "drift" (Solana perp DEX) removed 2026-07-16,
-    # operator ruling: all Solana perp DEXes dropped except Jupiter, not integrated).
-    assert len(COLLATERAL_REGISTRY) >= 8
+    # 5 perp + 2 lending MVP venues (was 6 perp until "gmx_v2" removed 2026-07-25,
+    # unreliable historical funding data; was 7 perp until "drift" (Solana perp DEX)
+    # removed 2026-07-16, operator ruling: all Solana perp DEXes dropped except Jupiter,
+    # not integrated).
+    assert len(COLLATERAL_REGISTRY) >= 7
     assert all(p.source_of_truth for p in COLLATERAL_REGISTRY)
 
 
@@ -443,8 +445,10 @@ def test_venue_order_semantics_backfilled() -> None:
     see test_order_semantics_sim_backfill.py for full coverage assertions.
 
     Count was >= 9 until "drift" (Solana perp DEX) removed 2026-07-16 (operator ruling: all
-    Solana perp DEXes dropped except Jupiter, not integrated)."""
-    assert len(VENUE_ORDER_SEMANTICS) >= 8
+    Solana perp DEXes dropped except Jupiter, not integrated), then >= 8 until "gmx_v2"
+    removed 2026-07-25 (unreliable historical funding data — see
+    unified-trading-pm/plans/active/defi_gmx_venue_removal_2026_07_25.md)."""
+    assert len(VENUE_ORDER_SEMANTICS) >= 7
 
 
 def test_time_in_force_values() -> None:

@@ -58,7 +58,7 @@ DEFI_ONCHAIN_INSTRUMENT_TYPES: frozenset[InstrumentType] = frozenset(
         InstrumentType.STAKING,
         InstrumentType.SPOT_ASSET,
         # DeFi DOES have on-chain perps (operator-locked 2026-06-01): Drift /
-        # GMX / Hyperliquid are on-chain perp DEXs, so ``instrument_type=
+        # Hyperliquid are on-chain perp DEXs, so ``instrument_type=
         # perpetual`` is valid for ``asset_group=defi``. NOTE: PERPETUAL is
         # also in CEFI_PAIR_INSTRUMENT_TYPES, and the InstrumentRecord
         # model_validator checks CeFi-pair FIRST (if/elif), so a DeFi perp's
@@ -72,7 +72,7 @@ DEFI_ONCHAIN_INSTRUMENT_TYPES: frozenset[InstrumentType] = frozenset(
 """DeFi on-chain instrument types. Workspace rule: at least one on-chain
 identifier (pool_address OR base_asset_contract_address) must be non-empty.
 Enforced by InstrumentRecord model_validator. Includes PERPETUAL for DeFi
-on-chain perp DEXs (Drift/GMX/Hyperliquid; operator-locked 2026-06-01)."""
+on-chain perp DEXs (Drift/Hyperliquid; operator-locked 2026-06-01)."""
 
 
 class InstrumentLeg(BaseModel):

@@ -102,7 +102,6 @@ ALL_DEFI_VENUES: list[str] = [
     "SUSHISWAP-ARBITRUM",
     "PANCAKESWAP_V3-ARBITRUM",
     "CAMELOT_V3-ARBITRUM",
-    "GMX-ARBITRUM",
     # ── Catalogue Phase 1A new Arbitrum entries (slot 5 2026-05-11) ──
     "YEARN_V3-ARBITRUM",
     "BEEFY-ARBITRUM",
@@ -151,7 +150,6 @@ ALL_DEFI_VENUES: list[str] = [
     "AAVE_V3-AVALANCHE",
     "BALANCER-AVALANCHE",
     "CURVE-AVALANCHE",
-    "GMX-AVALANCHE",
     "SUSHISWAP_V3-AVALANCHE",
     "TRADER_JOE_V2-AVALANCHE",
     # ── Catalogue Phase 1A new Avalanche entries (slot 5 2026-05-11) ──
@@ -327,8 +325,6 @@ LEGACY_DEFI_VENUE_ALIASES: dict[str, str] = {
     "MORPHO": "MORPHO-ETHEREUM",
     "FLUID": "FLUID-ETHEREUM",
     "SPARK": "SPARK-ETHEREUM",
-    # Perpetual DEXes
-    "GMX": "GMX-ARBITRUM",
     # LST / yield
     "LIDO": "LIDO-ETHEREUM",
     "ETHERFI": "ETHERFI-ETHEREUM",
@@ -486,7 +482,6 @@ DEFI_VENUE_PHASE: dict[str, str] = {
     "BALANCER-ARBITRUM": "live",
     "SUSHISWAP-ARBITRUM": "live",
     "CAMELOT_V3-ARBITRUM": "live",
-    "GMX-ARBITRUM": "live",
     # RADIANT-ARBITRUM: 2026-07-10 — wired into _build_defi_venues() (mtds_is_full_
     # adapter_smoketest_findings_2026_07_07.md P1, adapter was functional but never
     # invoked). Flipped pipeline→live per the phase=="live" ⟺ IS-producible invariant.
@@ -546,7 +541,6 @@ DEFI_VENUE_PHASE: dict[str, str] = {
     "AAVE_V3-AVALANCHE": "live",
     "BALANCER-AVALANCHE": "live",
     "CURVE-AVALANCHE": "live",
-    "GMX-AVALANCHE": "live",
     "SUSHISWAP_V3-AVALANCHE": "live",
     "TRADER_JOE_V2-AVALANCHE": "live",
     # BENQI-AVALANCHE: 2026-07-10 — wired into _build_defi_venues() (mtds_is_full_
@@ -723,14 +717,12 @@ DEFI_VENUE_MTDS_ADAPTER_VERIFIED_NOT_YET_SCHEDULED: dict[str, str] = {
 # SSOT: cross_asset_group_catalogue_audit_2026_05_10.md Phase 1C
 # (revised 2026-05-13 per operator — GMX/DRIFT are DeFi-only; prior cefi-axis
 # routing via DEFI_VENUE_AXIS_OVERRIDES was incorrect).
-DEFI_PERP_VENUES: list[str] = [
-    # GMX perpetual DEX — Arbitrum + Avalanche (on-chain, wallet-signed settlement)
-    "GMX-ARBITRUM",
-    "GMX-AVALANCHE",
-    # DRIFT (Solana) removed 2026-07-16 (operator ruling): all Solana perp DEXes
-    # dropped except Jupiter (not integrated). SSOT: unified-trading-pm/codex/
-    # 04-architecture/solana-defi-coverage.md.
-]
+# DRIFT (Solana) removed 2026-07-16 (operator ruling): all Solana perp DEXes
+# dropped except Jupiter (not integrated). GMX (Arbitrum/Avalanche) removed
+# 2026-07-25 (unreliable historical funding data — see
+# unified-trading-pm/plans/active/defi_gmx_venue_removal_2026_07_25.md). SSOT:
+# unified-trading-pm/codex/04-architecture/solana-defi-coverage.md.
+DEFI_PERP_VENUES: list[str] = []
 
 # Formerly routed GMX/DRIFT to the cefi axis (CLOB-style data shape reasoning).
 # Emptied 2026-05-13: operator revised — GMX/DRIFT are DeFi-only; see
@@ -795,9 +787,9 @@ MTDS_DEFI_VENUES: list[str] = [
     "ETHENA-ETHEREUM",
     "JITO-SOLANA",
     # --- DeFi perp DEXes (EVM + Solana) ---
-    # GMX: operator revised 2026-05-13 — DeFi-only (not CeFi axis).
-    "GMX-ARBITRUM",
-    "GMX-AVALANCHE",
+    # GMX (Arbitrum/Avalanche) removed 2026-07-25 (unreliable historical
+    # funding data — see
+    # unified-trading-pm/plans/active/defi_gmx_venue_removal_2026_07_25.md).
     # DRIFT (Solana) removed 2026-07-16 (operator ruling): all Solana perp DEXes
     # dropped except Jupiter (not integrated). SSOT: unified-trading-pm/codex/
     # 04-architecture/solana-defi-coverage.md.

@@ -187,11 +187,6 @@ _SRC_HL_US = (
     "Hyperliquid front-end geofences US persons (US IPs blocked from the dApp "
     "UI); well-known public fact. as_of 2026-06-13"
 )
-_SRC_GMX_PERMISSIONLESS = (
-    "GMX is a permissionless on-chain perp DEX; the hosted front-end geofences "
-    "US/UK persons but the protocol itself is not entity-gated. Treated UNKNOWN "
-    "for US/UK pending legal review of front-end-vs-protocol access. as_of 2026-06-13"
-)
 _SRC_DEX_PERMISSIONLESS = (
     "Permissionless on-chain protocol (no entity onboarding / KYC gate at the "
     "contract level); access via self-custody wallet. Documented as not "
@@ -251,9 +246,10 @@ def _unknown(venue: str, jur: Jurisdiction, reason: str, src: str) -> Jurisdicti
 #: lending/staking venues). Used by the filter as the candidate universe.
 #: "drift" (Solana perp DEX) removed 2026-07-16 (operator ruling: all Solana perp DEXes dropped
 #: except Jupiter, not integrated). SSOT: unified-trading-pm/codex/04-architecture/solana-defi-coverage.md.
+#: "gmx_v2" removed 2026-07-25 (unreliable historical funding data — see
+#: unified-trading-pm/plans/active/defi_gmx_venue_removal_2026_07_25.md).
 KNOWN_VENUE_IDS: Final[tuple[str, ...]] = (
     "hyperliquid",
-    "gmx_v2",
     "binance",
     "bybit",
     "deribit",
@@ -275,12 +271,6 @@ JURISDICTION_VENUE_POLICIES: Final[tuple[JurisdictionVenuePolicy, ...]] = (
     _block("deribit", Jurisdiction.US_CFTC, "Deribit not available to US persons.", _SRC_DERIBIT_US),
     _block("hyperliquid", Jurisdiction.US_CFTC, "Hyperliquid dApp front-end geofences US persons.", _SRC_HL_US),
     _unknown(
-        "gmx_v2",
-        Jurisdiction.US_CFTC,
-        "GMX permissionless protocol vs geofenced front-end — needs legal review for US persons.",
-        _SRC_GMX_PERMISSIONLESS,
-    ),
-    _unknown(
         "aave_v3",
         Jurisdiction.US_CFTC,
         "Aave permissionless lending protocol; US-person access (yield/securities framing) uncertain.",
@@ -298,7 +288,6 @@ JURISDICTION_VENUE_POLICIES: Final[tuple[JurisdictionVenuePolicy, ...]] = (
     _allow("okx", Jurisdiction.UK_FCA, "Institutional/professional-client access.", _SRC_UK_HOME),
     _allow("deribit", Jurisdiction.UK_FCA, "Institutional/professional-client access.", _SRC_UK_HOME),
     _allow("hyperliquid", Jurisdiction.UK_FCA, "Self-custody on-chain perp access.", _SRC_UK_HOME),
-    _allow("gmx_v2", Jurisdiction.UK_FCA, "Permissionless on-chain perp DEX.", _SRC_DEX_PERMISSIONLESS),
     _allow("aave_v3", Jurisdiction.UK_FCA, "Permissionless lending protocol.", _SRC_DEX_PERMISSIONLESS),
     _allow("kamino", Jurisdiction.UK_FCA, "Permissionless Solana lending protocol.", _SRC_DEX_PERMISSIONLESS),
     # ===================== CAYMAN home entity — documented ALLOWS ===========
@@ -307,7 +296,6 @@ JURISDICTION_VENUE_POLICIES: Final[tuple[JurisdictionVenuePolicy, ...]] = (
     _allow("okx", Jurisdiction.CAYMAN, "Offshore-domicile institutional access.", _SRC_CAYMAN_HOME),
     _allow("deribit", Jurisdiction.CAYMAN, "Offshore-domicile institutional access.", _SRC_CAYMAN_HOME),
     _allow("hyperliquid", Jurisdiction.CAYMAN, "Self-custody on-chain perp access.", _SRC_CAYMAN_HOME),
-    _allow("gmx_v2", Jurisdiction.CAYMAN, "Permissionless on-chain perp DEX.", _SRC_DEX_PERMISSIONLESS),
     _allow("aave_v3", Jurisdiction.CAYMAN, "Permissionless lending protocol.", _SRC_DEX_PERMISSIONLESS),
     _allow("kamino", Jurisdiction.CAYMAN, "Permissionless Solana lending protocol.", _SRC_DEX_PERMISSIONLESS),
     # ===================== EU_MiCA — derivative-venue access UNKNOWN ========
@@ -348,7 +336,6 @@ JURISDICTION_VENUE_POLICIES: Final[tuple[JurisdictionVenuePolicy, ...]] = (
     _block("okx", Jurisdiction.RETAIL_RESTRICTED, "Retail crypto-derivatives restricted.", _SRC_RETAIL_DERIV),
     _block("deribit", Jurisdiction.RETAIL_RESTRICTED, "Retail crypto-derivatives restricted.", _SRC_RETAIL_DERIV),
     _block("hyperliquid", Jurisdiction.RETAIL_RESTRICTED, "Retail crypto-derivatives restricted.", _SRC_RETAIL_DERIV),
-    _block("gmx_v2", Jurisdiction.RETAIL_RESTRICTED, "Retail crypto-derivatives restricted.", _SRC_RETAIL_DERIV),
     _unknown(
         "aave_v3",
         Jurisdiction.RETAIL_RESTRICTED,

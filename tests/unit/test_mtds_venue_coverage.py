@@ -299,9 +299,9 @@ class TestMultiChainDefiExpansion:
             ("SUSHISWAP_V3", "ETHEREUM"),
             ("SUSHISWAP_V3", "AVALANCHE"),
             ("SUSHISWAP_V3", "BASE"),
-            # GMX
-            ("GMX", "ARBITRUM"),
-            ("GMX", "AVALANCHE"),
+            # GMX (ARBITRUM/AVALANCHE) removed 2026-07-25 (unreliable historical
+            # funding data — see
+            # unified-trading-pm/plans/active/defi_gmx_venue_removal_2026_07_25.md).
             # Solana
             ("KAMINO", "SOLANA"),
             ("MARINADE", "SOLANA"),
@@ -585,8 +585,8 @@ class TestWave8GDefiSeeds:
     def test_defi_venue_level_dt_still_empty(self) -> None:
         # `perp_funding` + `liquidations` + `gas_fees` stay venue-level
         # even on DEFI venues — must not trigger the seed path.
-        assert get_expected_instruments_for_venue("GMX-ARBITRUM", "perp_funding") == []
-        assert get_expected_instruments_for_venue("GMX-ARBITRUM", "liquidations") == []
+        assert get_expected_instruments_for_venue("AAVE_V3-ETHEREUM", "perp_funding") == []
+        assert get_expected_instruments_for_venue("AAVE_V3-ETHEREUM", "liquidations") == []
 
 
 class TestWave8GPredictionSeeds:

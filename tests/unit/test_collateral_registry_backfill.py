@@ -24,7 +24,9 @@ from unified_api_contracts.internal.architecture_v2.collateral_registry import (
 # MVP venue universe from archetype_leg_spec.py eligible venues.
 # "drift" (Solana perp DEX) removed 2026-07-16 (operator ruling: all Solana perp DEXes dropped
 # except Jupiter, not integrated). SSOT: unified-trading-pm/codex/04-architecture/solana-defi-coverage.md.
-_PERP_VENUES = {"hyperliquid", "gmx_v2", "binance", "bybit", "deribit", "okx"}
+# "gmx_v2" removed 2026-07-25 (unreliable historical funding data — see
+# unified-trading-pm/plans/active/defi_gmx_venue_removal_2026_07_25.md).
+_PERP_VENUES = {"hyperliquid", "binance", "bybit", "deribit", "okx"}
 _LENDING_VENUES = {"aave_v3", "kamino"}
 _STAKING_VENUES = {"lido", "rocketpool", "jito", "marinade"}
 

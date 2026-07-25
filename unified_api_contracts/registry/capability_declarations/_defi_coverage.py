@@ -14,7 +14,6 @@ EMPTY_OR_DEPRECATED_DEFI_VENUES: frozenset[str] = frozenset(
     {
         "TRADER_JOE_V2-AVALANCHE",  # 0 instruments as of 2026-04-29 (DF-17; underscore-canonical 2026-06-01)
         "UNISWAP_V3-POLYGON",  # subgraph returns 0 instruments as of 2026-04-29 (migration finding)
-        "GMX-AVALANCHE",  # 0 historical parquets / minimal subgraph data (1 instrument) as of 2026-04-29
     }
 )
 

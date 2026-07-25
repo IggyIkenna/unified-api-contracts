@@ -700,7 +700,7 @@ class CanonicalViolationClass(StrEnum):
 # Canonical instrument_id shape (the ID-FORM oracle). Mirrors the resolver SSOT
 # ``VENUE:ITYPE:BASE-QUOTE[@LIN|@INV][-YYYYMMDD][-STRIKE-C|P]`` plus the COMBO
 # arm (COMBO ids are canonical but carry a free-form tail). Also covers the
-# chain-less DeFi ``PERPETUAL`` lane (GMX) — ``VENUE:PERPETUAL:BASE-QUOTE`` —
+# chain-less DeFi ``PERPETUAL`` lane — ``VENUE:PERPETUAL:BASE-QUOTE`` —
 # which deliberately has NO ``-CHAIN`` suffix (routes the cefi-simple builder
 # branch, see ``canonical_id_builder.py``'s dispatch table).
 _CANONICAL_INSTRUMENT_ID_RE: Final[re.Pattern[str]] = re.compile(
@@ -724,7 +724,7 @@ _COMBO_INSTRUMENT_ID_RE: Final[re.Pattern[str]] = re.compile(r"^[A-Z0-9._-]+:COM
 # permissive symbol class covers every DeFi type without per-type
 # sub-patterns. Symbol case is PRESERVED (not upper-cased, unlike CeFi/TradFi)
 # because on-chain token symbols are case-sensitive (``aUSDC``, ``stETH``,
-# ``variableDebtUSDC``). GMX's chain-less ``PERPETUAL`` DeFi lane is
+# ``variableDebtUSDC``). The chain-less ``PERPETUAL`` DeFi lane is
 # deliberately ABSENT from the type alternation here — it already matches
 # :data:`_CANONICAL_INSTRUMENT_ID_RE` above. ``LENDING`` (the legacy flat
 # lending type) stays in the alternation for the migration interim — see

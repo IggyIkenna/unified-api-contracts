@@ -37,8 +37,6 @@ DEFI_VENUE_TO_PROTOCOL: dict[str, tuple[str, str | None]] = {
     "CAMELOT_V3-ARBITRUM": ("camelot_v3", "ARBITRUM"),
     "TRADER_JOE_V2-AVALANCHE": ("trader_joe_v2", "AVALANCHE"),
     # ── Additional perps / lending ────────────────────────────────
-    "GMX-ARBITRUM": ("gmx", "ARBITRUM"),
-    "GMX-AVALANCHE": ("gmx", "AVALANCHE"),
     "SPARK-ETHEREUM": ("spark", "ETHEREUM"),
 }
 
@@ -67,6 +65,5 @@ DEFI_PROTOCOLS: list[tuple[str, str | None]] = [
     ("camelot_v3", "ARBITRUM"),
     ("trader_joe_v2", "AVALANCHE"),
     # Additional perps / lending
-    ("gmx", "ARBITRUM"),
     ("spark", "ETHEREUM"),
 ]

@@ -98,8 +98,10 @@ def test_unmodelled_pair_blocks() -> None:
 
 def test_unknown_access_row_evaluates_to_blocked() -> None:
     """An UNKNOWN-access (needs_legal_review) row is never treated as allowed."""
-    # gmx_v2 / US_CFTC is a seeded UNKNOWN row.
-    allowed, reason = is_venue_allowed("gmx_v2", Jurisdiction.US_CFTC)
+    # aave_v3 / US_CFTC is a seeded UNKNOWN row. (gmx_v2 / US_CFTC was also a
+    # seeded UNKNOWN row until GMX was removed 2026-07-25 — see
+    # unified-trading-pm/plans/active/defi_gmx_venue_removal_2026_07_25.md.)
+    allowed, reason = is_venue_allowed("aave_v3", Jurisdiction.US_CFTC)
     assert allowed is False
     assert "blocked" in reason.lower()
 
@@ -163,14 +165,16 @@ def test_us_persons_get_fewer_venues_than_home_entity() -> None:
 def test_retail_restricted_blocks_derivative_venues() -> None:
     """A retail-restricted entity sees no leveraged-derivative venues.
 
-    "drift" (Solana perp DEX) removed from this set 2026-07-16 (operator ruling: all Solana
-    perp DEXes dropped except Jupiter, not integrated) — it is no longer a KNOWN_VENUE_ID at
-    all, so asserting it "not in allowed" would pass vacuously off the absence-default rather
-    than exercising a real RETAIL_RESTRICTED _block row. The remaining venues below each carry
-    an explicit _block(..., Jurisdiction.RETAIL_RESTRICTED, ...) row, so coverage stays real.
+    "drift" (Solana perp DEX) removed from this set 2026-07-16 and "gmx_v2" removed
+    2026-07-25 (unreliable historical funding data — see
+    unified-trading-pm/plans/active/defi_gmx_venue_removal_2026_07_25.md) — neither
+    is a KNOWN_VENUE_ID any more, so asserting "not in allowed" for them would pass
+    vacuously off the absence-default rather than exercising a real
+    RETAIL_RESTRICTED _block row. The remaining venues below each carry an explicit
+    _block(..., Jurisdiction.RETAIL_RESTRICTED, ...) row, so coverage stays real.
     """
     allowed = allowed_venues_for_jurisdiction(Jurisdiction.RETAIL_RESTRICTED)
-    for venue in ("binance", "bybit", "okx", "deribit", "hyperliquid", "gmx_v2"):
+    for venue in ("binance", "bybit", "okx", "deribit", "hyperliquid"):
         assert venue not in allowed, f"{venue} must be blocked for RETAIL_RESTRICTED"
 
 

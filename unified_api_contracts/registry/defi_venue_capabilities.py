@@ -171,27 +171,11 @@ DEFI_VENUE_DATA_TYPE_CAPABILITIES: dict[str, dict[str, str]] = {
     "VELODROME_V2-OPTIMISM": {"dex_pool_swaps": "2022-06-01", "dex_pool_state": "2022-06-01"},
     "TRADER_JOE_V2-AVALANCHE": {"dex_pool_swaps": "2022-01-01", "dex_pool_state": "2022-01-01"},
     # ── DeFi — Perpetual DEXes (funding + liquidations) ──
-    # axis_override = "cefi" — CLOB-style perp funding captured via MTDS
-    # perp_funding_handler. See DEFI_VENUE_AXIS_OVERRIDES in defi_venues.py.
-    # derivative_ticker (2026-07-15, defi_perp_funding_canonicalisation_derivative_ticker_all_perps issue,
-    # operator ruling "highest-resolution derivative_ticker for ALL perps, even without OI at source"):
-    # GMX's fundingRateChangedEvents subgraph query has no OI field on the entity at all (verified against
-    # market-tick-data-service/cli/handlers/_perp_funding_gmx.py:115-130 — the Messari financialsDailySnapshots
-    # fallback has a daily-aggregate OI proxy but that's a degraded fallback path, not additive to the primary
-    # query). Same start date as perp_funding — it's the SAME underlying event feed, now dual-written under both
-    # data_types (mtds@<sha to be filled by shipping commit>).
-    "GMX-ARBITRUM": {
-        "perp_funding": "2021-09-01",
-        "liquidations": "2021-09-01",
-        "oracle_prices": "2021-09-01",
-        "derivative_ticker": "2021-09-01",
-    },
-    "GMX-AVALANCHE": {
-        "perp_funding": "2021-12-31",
-        "liquidations": "2021-12-31",
-        "oracle_prices": "2021-12-31",
-        "derivative_ticker": "2021-12-31",
-    },
+    # GMX (Arbitrum/Avalanche) capability entries removed 2026-07-25: the
+    # entire captured perp_funding history (2022-2023) turned out to be a
+    # synthetic OI-imbalance proxy, not real funding-rate observations (the
+    # native subgraph query never worked for this window). See
+    # unified-trading-pm/plans/active/defi_gmx_venue_removal_2026_07_25.md.
     # ── DeFi — Solana ──
     # DRIFT (Solana) capability entry removed 2026-07-16 (operator ruling: all
     # Solana perp DEXes dropped except Jupiter, not integrated). SSOT:

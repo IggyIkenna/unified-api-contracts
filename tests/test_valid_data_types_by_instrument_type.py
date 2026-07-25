@@ -296,10 +296,11 @@ class TestTradfiBundleGrainWriterAlignment:
     def test_defi_pool_has_dex_data(self) -> None:
         """DeFi POOL must include DEX data_types (primary pool data types).
 
-        Note: some pool-type protocols (e.g. GMX) also carry perp_funding since
-        GMX is a pool-based perp — POOL including perp_funding is therefore
-        CORRECT for those protocols. The matrix is the union across all protocols
-        using that instrument_type, so we only assert DEX data is present.
+        Note: a hybrid pool-type protocol that also carries perp_funding (e.g.
+        a pool-based perp DEX) would legitimately leak perp_funding into this
+        union — POOL including perp_funding is CORRECT for such protocols. The
+        matrix is the union across all protocols using that instrument_type,
+        so we only assert DEX data is present here.
         """
         result = valid_data_types_for_instrument_type("defi", "POOL")
         assert result is not None
@@ -442,9 +443,12 @@ class TestValidDataTypesForVenueInstrumentType:
 
     The instrument_type-grain ``valid_data_types_for_instrument_type`` builds
     the DeFi set as the UNION across every protocol that declares an
-    instrument_type, so a hybrid protocol (GMX = pool + perp_funding) leaks
-    ``perp_funding`` into the valid set for ALL pools. The venue-aware accessor
-    keys validity to the protocol named by the venue id.
+    instrument_type, so a hybrid protocol (pool + perp_funding — e.g. GMX,
+    removed 2026-07-25, see
+    unified-trading-pm/plans/active/defi_gmx_venue_removal_2026_07_25.md)
+    would leak ``perp_funding`` into the valid set for ALL pools. The
+    venue-aware accessor keys validity to the protocol named by the venue id,
+    which is what prevents that leak from reaching a pure-DEX venue.
     """
 
     def test_uniswap_pool_excludes_perp_funding(self) -> None:
@@ -454,22 +458,6 @@ class TestValidDataTypesForVenueInstrumentType:
         assert "dex_pool_state" in valid
         assert "dex_pool_swaps" in valid
         assert "perp_funding" not in valid
-
-    def test_gmx_pool_includes_perp_funding(self) -> None:
-        # GMX is a hybrid protocol — its POOL legitimately carries perp_funding.
-        valid = valid_data_types_for_venue_instrument_type("defi", "GMX-ARBITRUM", "pool")
-        assert valid is not None
-        assert "perp_funding" in valid
-        assert "dex_pool_state" in valid
-
-    def test_union_leaks_perp_funding_but_venue_grain_does_not(self) -> None:
-        # Demonstrates the bug the refinement fixes: the instrument_type-grain
-        # union DOES include perp_funding for ``pool`` (from GMX); the
-        # venue-grain accessor removes it for a pure-DEX venue.
-        union = valid_data_types_for_instrument_type("defi", "pool")
-        assert union is not None and "perp_funding" in union
-        uni = valid_data_types_for_venue_instrument_type("defi", "UNISWAP_V3-ETHEREUM", "pool")
-        assert uni is not None and "perp_funding" not in uni
 
     def test_unmapped_protocol_falls_back_to_union(self) -> None:
         # An unknown protocol must NOT under-report — it delegates to the union.

@@ -854,13 +854,18 @@ class TestBuildCanonicalInstrumentId:
             == "AAVE_V3-ARBITRUM:LENDING:USDC"
         )
 
-    def test_defi_gmx_types_as_perpetual_no_chain(self) -> None:
-        # GMX (on-chain perp DEX) types as PERPETUAL, routed through the
+    def test_defi_perpetual_types_no_chain(self) -> None:
+        # A DeFi on-chain perp DEX types as PERPETUAL, routed through the
         # cefi-simple branch — NO ``-CHAIN`` suffix (operator 2026-07-18),
-        # never POOL/lending. Pins the operator grammar ``GMX:PERPETUAL:BTC-USD``.
+        # never POOL/lending. Pins the operator grammar
+        # ``VENUE:PERPETUAL:BASE-QUOTE`` for the chain-less DeFi perp lane
+        # (GMX, the venue that originally exercised this lane, was removed
+        # 2026-07-25 — see
+        # unified-trading-pm/plans/active/defi_gmx_venue_removal_2026_07_25.md
+        # — the lane itself stays valid architecture for future venues).
         assert (
-            build_canonical_instrument_id(AssetGroup.DEFI, "gmx", InstrumentType.PERPETUAL, "BTC-USD")
-            == "GMX:PERPETUAL:BTC-USD"
+            build_canonical_instrument_id(AssetGroup.DEFI, "example_perp_dex", InstrumentType.PERPETUAL, "BTC-USD")
+            == "EXAMPLE_PERP_DEX:PERPETUAL:BTC-USD"
         )
 
     def test_tradfi_delegates_with_expiry(self) -> None:

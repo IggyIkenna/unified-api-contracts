@@ -102,17 +102,12 @@ VENUE_COLLATERAL_MATRIX: list[CollateralAcceptance] = [
     ),
     CollateralAcceptance("BITFINEX-FUTURES", "USDT", True, Decimal("0"), "CROSS", "Linear", "PERP_CEX"),
     CollateralAcceptance("BITGET-FUTURES", "USDT", True, Decimal("0"), "CROSS", "Linear", "PERP_CEX"),
-    # Onchain perp DEXes — GMX (Arbitrum). GMX-V2 has its own per-market
-    # collateral set; entries here describe the typical cross-margin
-    # acceptance. funding_rate captured in
-    # ``gs://perp-funding-{pid}/perp_funding/{venue_lc}/``.
-    # DRIFT (Solana) + PACIFICA (Solana) collateral rows removed 2026-07-16
-    # (operator ruling: all Solana perp DEXes dropped except Jupiter, not
-    # integrated).
+    # DRIFT (Solana) + PACIFICA (Solana) + GMX (Arbitrum/Avalanche) collateral
+    # rows removed 2026-07-16 / 2026-07-25 (operator ruling: all Solana perp
+    # DEXes dropped except Jupiter, not integrated; GMX removed for unreliable
+    # historical funding data — see
+    # unified-trading-pm/plans/active/defi_gmx_venue_removal_2026_07_25.md).
     # SSOT: unified-trading-pm/codex/04-architecture/solana-defi-coverage.md.
-    CollateralAcceptance("GMX", "USDC", True, Decimal("0"), "CROSS", "GMX-V2 USDC margin", "PERP_DEX"),
-    CollateralAcceptance("GMX", "ETH", True, Decimal("0.05"), "CROSS", "ETH-margined per-market", "PERP_DEX"),
-    CollateralAcceptance("GMX", "WBTC", True, Decimal("0.05"), "CROSS", "BTC-margined per-market", "PERP_DEX"),
     # ----- ETH LST acceptance gaps (explicit `accepted=False` so the catalog ----
     # generator's `accepted_perp_collateral(venue)` short-circuits cleanly and
     # the absence is documented, not silently absent. Positive rows wait on
@@ -136,7 +131,7 @@ VENUE_COLLATERAL_MATRIX: list[CollateralAcceptance] = [
     # wstETH, METH, USDe} until that probe lands and the rows below flip.
     # Hyperliquid (L1) + Binance (Multi-Assets Mode currently
     # BTC/ETH/BNB/XRP/ADA/DOT/SOL/USDC/USDT only) + Aster (USDT/USDF/asBNB)
-    # + GMX (per-market sets exclude LSTs) remain genuine ``accepted=False``.
+    # remain genuine ``accepted=False``.
     #
     # When Aevo / Lyra-V2 / dYdX / Hyperliquid ship LST-margin support, flip
     # the row to ``accepted=True`` with a haircut citation in ``notes``.
@@ -207,12 +202,6 @@ VENUE_COLLATERAL_MATRIX: list[CollateralAcceptance] = [
     CollateralAcceptance("ASTER", "stETH", False, None, "", "Not accepted (USDC/USDT-only)", "PERP_CEX"),
     CollateralAcceptance("ASTER", "wstETH", False, None, "", "Not accepted", "PERP_CEX"),
     CollateralAcceptance("ASTER", "weETH", False, None, "", "Not accepted", "PERP_CEX"),
-    CollateralAcceptance(
-        "GMX", "stETH", False, None, "", "Not accepted (per-market collateral set excludes LSTs)", "PERP_DEX"
-    ),
-    CollateralAcceptance("GMX", "wstETH", False, None, "", "Not accepted", "PERP_DEX"),
-    CollateralAcceptance("GMX", "weETH", False, None, "", "Not accepted", "PERP_DEX"),
-    CollateralAcceptance("GMX", "rETH", False, None, "", "Not accepted", "PERP_DEX"),
     # Tardis-captured futures venues: same gap (linear-USDT or coin-margined
     # only; no LST acceptance).
     CollateralAcceptance("BINANCE-FUTURES", "stETH", False, None, "", "Not accepted", "PERP_CEX"),
