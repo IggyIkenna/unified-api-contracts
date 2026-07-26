@@ -94,6 +94,14 @@ def test_cefi_has_trades_data_type() -> None:
     assert "trades" in DATA_TYPES_BY_ASSET_GROUP.get("cefi", [])
 
 
+def test_cefi_has_volatility_index_data_type() -> None:
+    # Regression (cefi_shard_enumeration_blindspots_and_canonical_fetch_dependency_2026_07_18):
+    # DERIBIT captures real PROD volatility_index data (already a live DataTypeCapability +
+    # SOURCE_PRIORITY entry) but this enumeration list omitted it, leaving any consumer that
+    # enumerates from DATA_TYPES_BY_ASSET_GROUP directly blind to the cell.
+    assert "volatility_index" in DATA_TYPES_BY_ASSET_GROUP.get("cefi", [])
+
+
 def test_tradfi_has_ohlcv_data_types() -> None:
     tradfi_types = DATA_TYPES_BY_ASSET_GROUP.get("tradfi", [])
     assert "ohlcv_1m" in tradfi_types

@@ -137,6 +137,15 @@ DATA_TYPES_BY_ASSET_GROUP: dict[str, list[str]] = {
         # a dedicated /markets/{ticker}/funding_rates REST endpoint (cursor-paginated,
         # public-read). Source priority: ("cefi", "perp_funding"). SSOT: prediction-perps-sourcing.md.
         "perp_funding",
+        # volatility_index — DERIBIT captures real PROD data (DVOL implied-vol index,
+        # public REST /public/get_volatility_index_data, already a live DataTypeCapability
+        # and SOURCE_PRIORITY[("cefi", "volatility_index")] entry) but this enumeration
+        # list omitted it, leaving any consumer that enumerates from
+        # DATA_TYPES_BY_ASSET_GROUP directly (e.g. expected_universe._expected_generic,
+        # the data-status Axis Value Census) blind to the cell — same class of
+        # enumeration-blind-spot bug as the OKX-FUTURES/OKX-SWAP fix above. SSOT:
+        # cefi_shard_enumeration_blindspots_and_canonical_fetch_dependency_2026_07_18.md.
+        "volatility_index",
     ],
     "tradfi": [
         "trades",
