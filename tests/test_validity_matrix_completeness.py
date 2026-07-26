@@ -86,6 +86,18 @@ from unified_api_contracts.registry.market_data_categories import (
 #       an instrument_type frozenset (if genuinely producible) or demoting the
 #       SOURCE_PRIORITY entry.
 #
+#   SOURCE_PRIORITY_CASE_FALLBACK_KEY — an uppercase SOURCE_PRIORITY key that
+#       exists ONLY to serve unified_trading_library.pipeline_mode_resolver's
+#       ``derive_pipeline_mode_for_row`` dual-case lookup ("try as-is, then
+#       .upper()" — sports SOURCE_PRIORITY keys are conventionally uppercase,
+#       see that function's own comment). The manifest's actual data_type
+#       COLUMN content is lower-case (matches DATA_TYPES_BY_ASSET_GROUP /
+#       VALID_DATA_TYPES_BY_AG_AND_INSTRUMENT_TYPE, both lower-case-only for
+#       this pair) — this key is never itself a valid manifest content value,
+#       it is a pipeline_mode-resolution fallback target only. Do not "fix" by
+#       re-adding the uppercase form to the content-validity matrix (that would
+#       misrepresent what the manifest actually contains).
+#
 # If a pair is removed from this list without being present in the matrix, the
 # test will fail loudly — that is the point.
 #
@@ -98,6 +110,7 @@ _ERA_B_LEGACY_RETAINED = "ERA_B_LEGACY_RETAINED"
 _BLOCKED_UPSTREAM_CAPABILITY = "BLOCKED_UPSTREAM_CAPABILITY"
 _REFERENCE_NOT_INSTRUMENT_GRAIN = "REFERENCE_NOT_INSTRUMENT_GRAIN"
 _CEFI_MATRIX_GAP = "CEFI_MATRIX_GAP"
+_SOURCE_PRIORITY_CASE_FALLBACK_KEY = "SOURCE_PRIORITY_CASE_FALLBACK_KEY"
 # PENDING_SNAPSHOT_SLICE — options_chain / futures_chain SOURCE_PRIORITY entries
 #     retained for cefi/tradfi pending the per-AG instrument_type snapshot slice
 #     widening (slot-3 widens cefi futures_chain to admit data_type=options_chain;
@@ -206,6 +219,13 @@ _SOURCE_PRIORITY_EXCLUSION_REASONS: dict[tuple[str, str], str] = {
     #    and weather forecast data — tracked in SOURCE_PRIORITY for
     #    reference-layer provenance but not enumerated at instrument grain.
     ("sports", "ARBITRAGE"): _REFERENCE_NOT_INSTRUMENT_GRAIN,
+    # TRADES (uppercase) is the derive_pipeline_mode_for_row() case-fallback key
+    # for the pair whose real manifest content is lower-case ("odds"/"trades") —
+    # see SOURCE_PRIORITY_CASE_FALLBACK_KEY above. Added 2026-07-22 alongside K1's
+    # (now-reverted, 2026-07-27) uppercase writer flip; kept as the fallback target
+    # since the resolver tries upper() unconditionally as its second attempt
+    # regardless of which casing the writer currently emits.
+    ("sports", "TRADES"): _SOURCE_PRIORITY_CASE_FALLBACK_KEY,
     # NOTE: FIXTURE_PLAYER_STATS was excluded here precisely BECAUSE it was not in
     # SPORTS_DATA_TYPE_TO_SOURCE — the tell that it was a phantom name. Reconciled to
     # PLAYER_STATS 2026-07-15, which IS in the domain map and therefore reachable at
@@ -345,6 +365,7 @@ class TestSourcePriorityReachability:
             _REFERENCE_NOT_INSTRUMENT_GRAIN,
             _CEFI_MATRIX_GAP,
             _PENDING_SNAPSHOT_SLICE,
+            _SOURCE_PRIORITY_CASE_FALLBACK_KEY,
         }
 
         # Every exclusion key must appear in the reasons dict.
