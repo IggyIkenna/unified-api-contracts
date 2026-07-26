@@ -614,8 +614,20 @@ _PROTOCOL_LAUNCH_PENDING_INVESTIGATION_BASE: frozenset[tuple[str, str]] = frozen
         ("BASE", "ALCHEMY"),
         ("OPTIMISM", "ALCHEMY"),
         ("POLYGON", "ALCHEMY"),
-        # PLASMA chain — Polygon Plasma bridge-side; non-standard chain;
-        # date pending operator decision on scope.
+        # PLASMA chain — IDENTITY RESOLVED 2026-07-26 (was previously mislabeled "Polygon
+        # Plasma bridge-side", the wrong/dead 2018-2020 bridge): this is the 2025
+        # Tether-backed Plasma L1 (XPL, chain_id 9745, mainnet launched 2025-09-25).
+        # Real-world verified: Aave went live on Plasma 2025-09-25 with >$6.5B deposits in
+        # its first week, now Aave's 2nd-largest deployment by TVL after Ethereum mainnet;
+        # Fluid (Instadapp) also has a live Plasma deployment (confirmed via DefiLlama
+        # protocol listing). NOT a dead/speculative chain — a large, real, currently-active
+        # market this codebase has zero chain registration for (no MAINNET_CHAIN_IDS entry,
+        # no CHAIN_GENESIS_DATES entry, no RPC config, no capture adapter). Dates stay
+        # pending here deliberately — adding either to PROTOCOL_LAUNCH_DATES requires a
+        # matching CHAIN_GENESIS_DATES entry (STEP 5.72's MAINNET_CHAIN_IDS ⊇
+        # CHAIN_GENESIS_DATES invariant), i.e. real chain onboarding, which is out of scope
+        # for this identity-resolution fix. Full onboarding (chain_id 9745, genesis date,
+        # RPC, capture wiring) filed as issues/defi_plasma_chain_onboarding_gap_2026_07_26.md.
         ("PLASMA", "AAVE"),
         ("PLASMA", "FLUID"),
         # ONCHAIN pseudo-chain — Alchemy Infrastructure data, not a real L1/L2;
