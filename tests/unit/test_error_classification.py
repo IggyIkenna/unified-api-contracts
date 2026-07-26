@@ -514,3 +514,24 @@ class TestClassifyVenueError:
             result = classify_venue_error(venue, "400")
             assert result is not None, f"classify_venue_error({venue!r}, '400') returned None"
             assert result.action == ErrorAction.FAIL, f"{venue}: 400 should be FAIL"
+
+    def test_tardis_structural_absence_codes_return_skip(self):
+        """Tardis 300 (invalid symbol) and 140 (date outside listing) map to SKIP,
+        never FAIL/RETRY — a structural-absence 400, not a fetch failure. SSOT:
+        tardis_impossible_combinations_recorded_as_attempted_failed_2026_07_17.md.
+        """
+        from unified_api_contracts.canonical.crosscutting.errors import classify_venue_error
+
+        for code in ("300", "140"):
+            result = classify_venue_error("tardis", code)
+            assert result is not None, f"classify_venue_error('tardis', {code!r}) returned None"
+            assert result.action == ErrorAction.SKIP, f"tardis {code} should be SKIP (honest absence)"
+            assert result.retry_safe is False
+
+    def test_tardis_generic_400_still_returns_fail(self):
+        """The generic tardis '400' entry is untouched — only the 140/300 sub-codes are SKIP."""
+        from unified_api_contracts.canonical.crosscutting.errors import classify_venue_error
+
+        result = classify_venue_error("tardis", "400")
+        assert result is not None
+        assert result.action == ErrorAction.FAIL

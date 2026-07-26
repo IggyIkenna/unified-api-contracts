@@ -214,6 +214,24 @@ def _classify_databento_combo(symbol: str, asset_class_hint: str | None) -> Data
         # stays as the underlying and is quarantined downstream (the write-time guard
         # rejects it; the enrichment drops the row). SSOT:
         # tradfi_canonical_path_migration_design_2026_07_19.md categories A/D.
+        #
+        # ROOT CAUSE (cme_combo_underlying_extraction_garbage_2026_07_19.md): this is
+        # the historical writer that stamped the ~189,830-object garbage-underlying
+        # corpus. ``_CBOE_UD_RE`` originally only matched an alpha globex code
+        # (``[A-Z]{2,4}``, mtds@85117592, 2026-04-18); it was widened same-day to
+        # ``[A-Z0-9]{1,4}`` (mtds@c4dc28b4) to also accept CBOE's NUMERIC globex group
+        # codes (``UD:1V: 12 <id>``) and mixed alnum fragments (``3W``) — with NO
+        # downstream check that the captured code resolved to a real product root, so
+        # every numeric/opaque UD combo was written verbatim as ``underlying=12`` /
+        # ``underlying=GN`` for 3 months. That gap closed 2026-07-20 by adding the
+        # ``is_recognized_tradfi_underlying`` gate (below) — using it to recover a real
+        # root when possible (root-qualified UD) or fall back to the opaque code only
+        # when genuinely unrecoverable — PLUS the write-time
+        # ``canonical_path_violations`` guard (``unified_api_contracts.canonical.
+        # partition_paths._tradfi_path_violations``) rejecting any leftover/future
+        # numeric-or-opaque underlying as defense-in-depth (mtds@f645ea02,
+        # uac@7e179ae8). No new writer regresses this: a fresh combo can only reach
+        # GCS with a recognized root or be dropped/quarantined.
         recovered_root = UNDERLYING_NORMALIZATION.get(qualifier)
         ud_underlying = recovered_root if recovered_root is not None else globex_code
         leg = ComboLeg(

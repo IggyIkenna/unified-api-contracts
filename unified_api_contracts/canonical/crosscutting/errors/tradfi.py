@@ -38,6 +38,31 @@ VENUE_ERRORS_TRADFI: dict[str, list[VenueErrorClassification]] = {
             action=ErrorAction.FAIL,
             desc="Bad request",
         ),
+        # Structural-absence 400 sub-codes (the JSON body's numeric `code`, not the HTTP
+        # status) — a PERMANENT impossible/absent combination, NOT a fetch failure. SKIP
+        # (honest absence), never FAIL/RETRY — matches
+        # TardisHTTPError.STRUCTURAL_ABSENCE_400_CODES in market-tick-data-service. SSOT:
+        # plans/active/issues/tardis_impossible_combinations_recorded_as_attempted_failed_2026_07_17.md
+        ve(
+            "tardis",
+            "300",
+            retry=False,
+            reconnect=False,
+            action=ErrorAction.SKIP,
+            desc="Invalid 'symbol' param — the symbol is not in Tardis's archive at all (honest absence)",
+        ),
+        ve(
+            "tardis",
+            "140",
+            retry=False,
+            reconnect=False,
+            action=ErrorAction.SKIP,
+            desc=(
+                "Requested dataset is not available for the given date — the symbol IS "
+                "archived but the date is outside its availableSince..availableTo window "
+                "(honest absence)"
+            ),
+        ),
     ],
     "yahoo_finance": [
         ve(
