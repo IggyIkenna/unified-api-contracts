@@ -1195,6 +1195,86 @@
       "from_node_id": "ARBITRAGE_PRICE_DISPERSION",
       "gap_type": null,
       "readiness": "live-proven",
+      "reason": "signals funding_rate,iv_dispersion,odds,price \u2192 targets clv,clv_meta,direction,funding_rate (cefi,defi,sports,tradfi)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:catboost"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "ARBITRAGE_PRICE_DISPERSION",
+      "gap_type": null,
+      "readiness": "live-proven",
+      "reason": "signals funding_rate,iv_dispersion,price \u2192 targets direction,funding_rate,swing_high,swing_low (cefi,defi,tradfi)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:ensemble"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "ARBITRAGE_PRICE_DISPERSION",
+      "gap_type": null,
+      "readiness": "live-proven",
+      "reason": "signals funding_rate,iv_dispersion,odds,price \u2192 targets clv,clv_meta,direction,funding_rate (cefi,defi,sports,tradfi)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:huber"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "ARBITRAGE_PRICE_DISPERSION",
+      "gap_type": null,
+      "readiness": "live-proven",
+      "reason": "signals funding_rate,iv_dispersion,odds,price \u2192 targets clv,clv_meta,direction,funding_rate (cefi,defi,sports,tradfi)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:lightgbm"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "ARBITRAGE_PRICE_DISPERSION",
+      "gap_type": null,
+      "readiness": "live-proven",
+      "reason": "signals funding_rate,iv_dispersion,price \u2192 targets direction,funding_rate,swing_high,swing_low (cefi,defi,tradfi)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:poisson_glm"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "ARBITRAGE_PRICE_DISPERSION",
+      "gap_type": null,
+      "readiness": "live-proven",
+      "reason": "signals funding_rate,iv_dispersion,price \u2192 targets direction,funding_rate,swing_high,swing_low (cefi,defi,tradfi)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:random_forest"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "ARBITRAGE_PRICE_DISPERSION",
+      "gap_type": null,
+      "readiness": "live-proven",
+      "reason": "signals funding_rate,iv_dispersion,odds,price \u2192 targets clv,clv_meta,direction,funding_rate (cefi,defi,sports,tradfi)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:ridge"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "ARBITRAGE_PRICE_DISPERSION",
+      "gap_type": null,
+      "readiness": "live-proven",
+      "reason": "signals funding_rate,iv_dispersion,odds,price \u2192 targets clv,clv_meta,direction,funding_rate (cefi,defi,sports,tradfi)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:xgboost"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "ARBITRAGE_PRICE_DISPERSION",
+      "gap_type": null,
+      "readiness": "live-proven",
       "reason": null,
       "relation": "supports",
       "status": "available",
@@ -2415,6 +2495,86 @@
       "from_node_id": "CARRY_BASIS_PERP",
       "gap_type": null,
       "readiness": "backtest-only",
+      "reason": "signals funding_rate \u2192 targets funding_rate (defi)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:catboost"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "CARRY_BASIS_PERP",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals funding_rate \u2192 targets funding_rate (defi)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:ensemble"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "CARRY_BASIS_PERP",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals funding_rate \u2192 targets funding_rate (defi)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:huber"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "CARRY_BASIS_PERP",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals funding_rate \u2192 targets funding_rate (defi)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:lightgbm"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "CARRY_BASIS_PERP",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals funding_rate \u2192 targets funding_rate (defi)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:poisson_glm"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "CARRY_BASIS_PERP",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals funding_rate \u2192 targets funding_rate (defi)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:random_forest"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "CARRY_BASIS_PERP",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals funding_rate \u2192 targets funding_rate (defi)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:ridge"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "CARRY_BASIS_PERP",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals funding_rate \u2192 targets funding_rate (defi)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:xgboost"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "CARRY_BASIS_PERP",
+      "gap_type": null,
+      "readiness": "backtest-only",
       "reason": null,
       "relation": "supports",
       "status": "available",
@@ -2709,6 +2869,86 @@
       "relation": "has_leg",
       "status": "available",
       "to_node_id": "leg:CARRY_BASIS_PERP_INV:spot"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "CARRY_BASIS_PERP_INV",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals funding_rate \u2192 targets funding_rate (defi)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:catboost"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "CARRY_BASIS_PERP_INV",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals funding_rate \u2192 targets funding_rate (defi)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:ensemble"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "CARRY_BASIS_PERP_INV",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals funding_rate \u2192 targets funding_rate (defi)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:huber"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "CARRY_BASIS_PERP_INV",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals funding_rate \u2192 targets funding_rate (defi)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:lightgbm"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "CARRY_BASIS_PERP_INV",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals funding_rate \u2192 targets funding_rate (defi)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:poisson_glm"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "CARRY_BASIS_PERP_INV",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals funding_rate \u2192 targets funding_rate (defi)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:random_forest"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "CARRY_BASIS_PERP_INV",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals funding_rate \u2192 targets funding_rate (defi)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:ridge"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "CARRY_BASIS_PERP_INV",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals funding_rate \u2192 targets funding_rate (defi)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:xgboost"
     },
     {
       "agent_annotation": null,
@@ -3719,6 +3959,86 @@
       "relation": "has_leg",
       "status": "available",
       "to_node_id": "leg:CARRY_STAKED_BASIS:stake"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "CARRY_STAKED_BASIS",
+      "gap_type": null,
+      "readiness": "live-proven",
+      "reason": "signals funding_rate \u2192 targets funding_rate (defi)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:catboost"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "CARRY_STAKED_BASIS",
+      "gap_type": null,
+      "readiness": "live-proven",
+      "reason": "signals funding_rate \u2192 targets funding_rate (defi)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:ensemble"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "CARRY_STAKED_BASIS",
+      "gap_type": null,
+      "readiness": "live-proven",
+      "reason": "signals funding_rate \u2192 targets funding_rate (defi)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:huber"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "CARRY_STAKED_BASIS",
+      "gap_type": null,
+      "readiness": "live-proven",
+      "reason": "signals funding_rate \u2192 targets funding_rate (defi)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:lightgbm"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "CARRY_STAKED_BASIS",
+      "gap_type": null,
+      "readiness": "live-proven",
+      "reason": "signals funding_rate \u2192 targets funding_rate (defi)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:poisson_glm"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "CARRY_STAKED_BASIS",
+      "gap_type": null,
+      "readiness": "live-proven",
+      "reason": "signals funding_rate \u2192 targets funding_rate (defi)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:random_forest"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "CARRY_STAKED_BASIS",
+      "gap_type": null,
+      "readiness": "live-proven",
+      "reason": "signals funding_rate \u2192 targets funding_rate (defi)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:ridge"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "CARRY_STAKED_BASIS",
+      "gap_type": null,
+      "readiness": "live-proven",
+      "reason": "signals funding_rate \u2192 targets funding_rate (defi)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:xgboost"
     },
     {
       "agent_annotation": null,
@@ -5085,6 +5405,86 @@
       "from_node_id": "EVENT_DRIVEN",
       "gap_type": null,
       "readiness": "backtest-only",
+      "reason": "signals iv_dispersion \u2192 targets volatility (cefi,tradfi)",
+      "relation": "uses_model",
+      "status": "partial",
+      "to_node_id": "ml_model:catboost"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "EVENT_DRIVEN",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals iv_dispersion \u2192 targets volatility (cefi,tradfi)",
+      "relation": "uses_model",
+      "status": "partial",
+      "to_node_id": "ml_model:ensemble"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "EVENT_DRIVEN",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals iv_dispersion \u2192 targets volatility (cefi,tradfi)",
+      "relation": "uses_model",
+      "status": "partial",
+      "to_node_id": "ml_model:huber"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "EVENT_DRIVEN",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals iv_dispersion \u2192 targets volatility (cefi,tradfi)",
+      "relation": "uses_model",
+      "status": "partial",
+      "to_node_id": "ml_model:lightgbm"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "EVENT_DRIVEN",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals iv_dispersion \u2192 targets volatility (cefi,tradfi)",
+      "relation": "uses_model",
+      "status": "partial",
+      "to_node_id": "ml_model:poisson_glm"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "EVENT_DRIVEN",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals iv_dispersion \u2192 targets volatility (cefi,tradfi)",
+      "relation": "uses_model",
+      "status": "partial",
+      "to_node_id": "ml_model:random_forest"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "EVENT_DRIVEN",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals iv_dispersion \u2192 targets volatility (cefi,tradfi)",
+      "relation": "uses_model",
+      "status": "partial",
+      "to_node_id": "ml_model:ridge"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "EVENT_DRIVEN",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals iv_dispersion \u2192 targets volatility (cefi,tradfi)",
+      "relation": "uses_model",
+      "status": "partial",
+      "to_node_id": "ml_model:xgboost"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "EVENT_DRIVEN",
+      "gap_type": null,
+      "readiness": "backtest-only",
       "reason": null,
       "relation": "supports",
       "status": "partial",
@@ -5805,6 +6205,86 @@
       "from_node_id": "MARKET_MAKING_CONTINUOUS",
       "gap_type": null,
       "readiness": "backtest-only",
+      "reason": "signals odds,spread_capture,vol_metric \u2192 targets clv,clv_meta,cross_venue_spread,ht_delta (cefi,sports,tradfi)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:catboost"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "MARKET_MAKING_CONTINUOUS",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals spread_capture,vol_metric \u2192 targets cross_venue_spread,volatility (cefi,tradfi)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:ensemble"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "MARKET_MAKING_CONTINUOUS",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals odds,spread_capture,vol_metric \u2192 targets clv,clv_meta,cross_venue_spread,ht_delta (cefi,sports,tradfi)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:huber"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "MARKET_MAKING_CONTINUOUS",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals odds,spread_capture,vol_metric \u2192 targets clv,clv_meta,cross_venue_spread,ht_delta (cefi,sports,tradfi)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:lightgbm"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "MARKET_MAKING_CONTINUOUS",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals spread_capture,vol_metric \u2192 targets cross_venue_spread,volatility (cefi,tradfi)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:poisson_glm"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "MARKET_MAKING_CONTINUOUS",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals spread_capture,vol_metric \u2192 targets cross_venue_spread,volatility (cefi,tradfi)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:random_forest"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "MARKET_MAKING_CONTINUOUS",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals odds,spread_capture,vol_metric \u2192 targets clv,clv_meta,cross_venue_spread,ht_delta (cefi,sports,tradfi)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:ridge"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "MARKET_MAKING_CONTINUOUS",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals odds,spread_capture,vol_metric \u2192 targets clv,clv_meta,cross_venue_spread,ht_delta (cefi,sports,tradfi)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:xgboost"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "MARKET_MAKING_CONTINUOUS",
+      "gap_type": null,
+      "readiness": "backtest-only",
       "reason": null,
       "relation": "supports",
       "status": "available",
@@ -6249,6 +6729,56 @@
       "relation": "has_leg",
       "status": "available",
       "to_node_id": "leg:MARKET_MAKING_EVENT_SETTLED:quote"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "MARKET_MAKING_EVENT_SETTLED",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals odds \u2192 targets clv,clv_meta,ht_delta,xg (sports)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:catboost"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "MARKET_MAKING_EVENT_SETTLED",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals odds \u2192 targets clv,clv_meta,ht_delta,xg (sports)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:huber"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "MARKET_MAKING_EVENT_SETTLED",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals odds \u2192 targets clv,clv_meta,ht_delta,xg (sports)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:lightgbm"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "MARKET_MAKING_EVENT_SETTLED",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals odds \u2192 targets clv,clv_meta,ht_delta,xg (sports)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:ridge"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "MARKET_MAKING_EVENT_SETTLED",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals odds \u2192 targets clv,clv_meta,ht_delta,xg (sports)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:xgboost"
     },
     {
       "agent_annotation": null,
@@ -8135,6 +8665,86 @@
       "from_node_id": "ML_DIRECTIONAL_CONTINUOUS",
       "gap_type": null,
       "readiness": "backtest-only",
+      "reason": "signals price \u2192 targets direction,swing_high,swing_low (cefi,tradfi)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:catboost"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "ML_DIRECTIONAL_CONTINUOUS",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals price \u2192 targets direction,swing_high,swing_low (cefi,tradfi)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:ensemble"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "ML_DIRECTIONAL_CONTINUOUS",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals price \u2192 targets direction,swing_high,swing_low (cefi,tradfi)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:huber"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "ML_DIRECTIONAL_CONTINUOUS",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals price \u2192 targets direction,swing_high,swing_low (cefi,tradfi)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:lightgbm"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "ML_DIRECTIONAL_CONTINUOUS",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals price \u2192 targets direction,swing_high,swing_low (cefi,tradfi)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:poisson_glm"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "ML_DIRECTIONAL_CONTINUOUS",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals price \u2192 targets direction,swing_high,swing_low (cefi,tradfi)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:random_forest"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "ML_DIRECTIONAL_CONTINUOUS",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals price \u2192 targets direction,swing_high,swing_low (cefi,tradfi)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:ridge"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "ML_DIRECTIONAL_CONTINUOUS",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals price \u2192 targets direction,swing_high,swing_low (cefi,tradfi)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:xgboost"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "ML_DIRECTIONAL_CONTINUOUS",
+      "gap_type": null,
+      "readiness": "backtest-only",
       "reason": null,
       "relation": "supports",
       "status": "partial",
@@ -8539,6 +9149,56 @@
       "relation": "has_leg",
       "status": "available",
       "to_node_id": "leg:ML_DIRECTIONAL_EVENT_SETTLED:directional"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "ML_DIRECTIONAL_EVENT_SETTLED",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals odds \u2192 targets clv,clv_meta,ht_delta,xg (sports)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:catboost"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "ML_DIRECTIONAL_EVENT_SETTLED",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals odds \u2192 targets clv,clv_meta,ht_delta,xg (sports)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:huber"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "ML_DIRECTIONAL_EVENT_SETTLED",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals odds \u2192 targets clv,clv_meta,ht_delta,xg (sports)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:lightgbm"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "ML_DIRECTIONAL_EVENT_SETTLED",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals odds \u2192 targets clv,clv_meta,ht_delta,xg (sports)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:ridge"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "ML_DIRECTIONAL_EVENT_SETTLED",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals odds \u2192 targets clv,clv_meta,ht_delta,xg (sports)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:xgboost"
     },
     {
       "agent_annotation": null,
@@ -9685,6 +10345,86 @@
       "from_node_id": "RULES_DIRECTIONAL_CONTINUOUS",
       "gap_type": null,
       "readiness": "backtest-only",
+      "reason": "signals funding_rate,price \u2192 targets direction,funding_rate,swing_high,swing_low (cefi,defi,tradfi)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:catboost"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "RULES_DIRECTIONAL_CONTINUOUS",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals funding_rate,price \u2192 targets direction,funding_rate,swing_high,swing_low (cefi,defi,tradfi)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:ensemble"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "RULES_DIRECTIONAL_CONTINUOUS",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals funding_rate,price \u2192 targets direction,funding_rate,swing_high,swing_low (cefi,defi,tradfi)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:huber"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "RULES_DIRECTIONAL_CONTINUOUS",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals funding_rate,price \u2192 targets direction,funding_rate,swing_high,swing_low (cefi,defi,tradfi)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:lightgbm"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "RULES_DIRECTIONAL_CONTINUOUS",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals funding_rate,price \u2192 targets direction,funding_rate,swing_high,swing_low (cefi,defi,tradfi)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:poisson_glm"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "RULES_DIRECTIONAL_CONTINUOUS",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals funding_rate,price \u2192 targets direction,funding_rate,swing_high,swing_low (cefi,defi,tradfi)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:random_forest"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "RULES_DIRECTIONAL_CONTINUOUS",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals funding_rate,price \u2192 targets direction,funding_rate,swing_high,swing_low (cefi,defi,tradfi)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:ridge"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "RULES_DIRECTIONAL_CONTINUOUS",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals funding_rate,price \u2192 targets direction,funding_rate,swing_high,swing_low (cefi,defi,tradfi)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:xgboost"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "RULES_DIRECTIONAL_CONTINUOUS",
+      "gap_type": null,
+      "readiness": "backtest-only",
       "reason": null,
       "relation": "supports",
       "status": "available",
@@ -10035,6 +10775,56 @@
       "from_node_id": "RULES_DIRECTIONAL_EVENT_SETTLED",
       "gap_type": null,
       "readiness": "backtest-only",
+      "reason": "signals odds \u2192 targets clv,clv_meta,ht_delta,xg (sports)",
+      "relation": "uses_model",
+      "status": "partial",
+      "to_node_id": "ml_model:catboost"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "RULES_DIRECTIONAL_EVENT_SETTLED",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals odds \u2192 targets clv,clv_meta,ht_delta,xg (sports)",
+      "relation": "uses_model",
+      "status": "partial",
+      "to_node_id": "ml_model:huber"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "RULES_DIRECTIONAL_EVENT_SETTLED",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals odds \u2192 targets clv,clv_meta,ht_delta,xg (sports)",
+      "relation": "uses_model",
+      "status": "partial",
+      "to_node_id": "ml_model:lightgbm"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "RULES_DIRECTIONAL_EVENT_SETTLED",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals odds \u2192 targets clv,clv_meta,ht_delta,xg (sports)",
+      "relation": "uses_model",
+      "status": "partial",
+      "to_node_id": "ml_model:ridge"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "RULES_DIRECTIONAL_EVENT_SETTLED",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals odds \u2192 targets clv,clv_meta,ht_delta,xg (sports)",
+      "relation": "uses_model",
+      "status": "partial",
+      "to_node_id": "ml_model:xgboost"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "RULES_DIRECTIONAL_EVENT_SETTLED",
+      "gap_type": null,
+      "readiness": "backtest-only",
       "reason": null,
       "relation": "supports",
       "status": "partial",
@@ -10319,6 +11109,86 @@
       "relation": "has_leg",
       "status": "available",
       "to_node_id": "leg:STAT_ARB_CROSS_SECTIONAL:short_basket"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "STAT_ARB_CROSS_SECTIONAL",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals momentum_ranking \u2192 targets direction,swing_high,swing_low (cefi,tradfi)",
+      "relation": "uses_model",
+      "status": "partial",
+      "to_node_id": "ml_model:catboost"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "STAT_ARB_CROSS_SECTIONAL",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals momentum_ranking \u2192 targets direction,swing_high,swing_low (cefi,tradfi)",
+      "relation": "uses_model",
+      "status": "partial",
+      "to_node_id": "ml_model:ensemble"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "STAT_ARB_CROSS_SECTIONAL",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals momentum_ranking \u2192 targets direction,swing_high,swing_low (cefi,tradfi)",
+      "relation": "uses_model",
+      "status": "partial",
+      "to_node_id": "ml_model:huber"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "STAT_ARB_CROSS_SECTIONAL",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals momentum_ranking \u2192 targets direction,swing_high,swing_low (cefi,tradfi)",
+      "relation": "uses_model",
+      "status": "partial",
+      "to_node_id": "ml_model:lightgbm"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "STAT_ARB_CROSS_SECTIONAL",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals momentum_ranking \u2192 targets direction,swing_high,swing_low (cefi,tradfi)",
+      "relation": "uses_model",
+      "status": "partial",
+      "to_node_id": "ml_model:poisson_glm"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "STAT_ARB_CROSS_SECTIONAL",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals momentum_ranking \u2192 targets direction,swing_high,swing_low (cefi,tradfi)",
+      "relation": "uses_model",
+      "status": "partial",
+      "to_node_id": "ml_model:random_forest"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "STAT_ARB_CROSS_SECTIONAL",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals momentum_ranking \u2192 targets direction,swing_high,swing_low (cefi,tradfi)",
+      "relation": "uses_model",
+      "status": "partial",
+      "to_node_id": "ml_model:ridge"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "STAT_ARB_CROSS_SECTIONAL",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals momentum_ranking \u2192 targets direction,swing_high,swing_low (cefi,tradfi)",
+      "relation": "uses_model",
+      "status": "partial",
+      "to_node_id": "ml_model:xgboost"
     },
     {
       "agent_annotation": null,
@@ -10629,6 +11499,86 @@
       "relation": "has_leg",
       "status": "available",
       "to_node_id": "leg:STAT_ARB_PAIRS_FIXED:short"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "STAT_ARB_PAIRS_FIXED",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals zscore_reversion \u2192 targets direction,swing_high,swing_low (cefi,tradfi)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:catboost"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "STAT_ARB_PAIRS_FIXED",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals zscore_reversion \u2192 targets direction,swing_high,swing_low (cefi,tradfi)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:ensemble"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "STAT_ARB_PAIRS_FIXED",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals zscore_reversion \u2192 targets direction,swing_high,swing_low (cefi,tradfi)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:huber"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "STAT_ARB_PAIRS_FIXED",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals zscore_reversion \u2192 targets direction,swing_high,swing_low (cefi,tradfi)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:lightgbm"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "STAT_ARB_PAIRS_FIXED",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals zscore_reversion \u2192 targets direction,swing_high,swing_low (cefi,tradfi)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:poisson_glm"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "STAT_ARB_PAIRS_FIXED",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals zscore_reversion \u2192 targets direction,swing_high,swing_low (cefi,tradfi)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:random_forest"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "STAT_ARB_PAIRS_FIXED",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals zscore_reversion \u2192 targets direction,swing_high,swing_low (cefi,tradfi)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:ridge"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "STAT_ARB_PAIRS_FIXED",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals zscore_reversion \u2192 targets direction,swing_high,swing_low (cefi,tradfi)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:xgboost"
     },
     {
       "agent_annotation": null,
@@ -10959,6 +11909,86 @@
       "relation": "has_leg",
       "status": "available",
       "to_node_id": "leg:TSMOM_BTC_CTA:directional"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "TSMOM_BTC_CTA",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals price \u2192 targets direction,swing_high,swing_low (cefi)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:catboost"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "TSMOM_BTC_CTA",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals price \u2192 targets direction,swing_high,swing_low (cefi)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:ensemble"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "TSMOM_BTC_CTA",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals price \u2192 targets direction,swing_high,swing_low (cefi)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:huber"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "TSMOM_BTC_CTA",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals price \u2192 targets direction,swing_high,swing_low (cefi)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:lightgbm"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "TSMOM_BTC_CTA",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals price \u2192 targets direction,swing_high,swing_low (cefi)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:poisson_glm"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "TSMOM_BTC_CTA",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals price \u2192 targets direction,swing_high,swing_low (cefi)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:random_forest"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "TSMOM_BTC_CTA",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals price \u2192 targets direction,swing_high,swing_low (cefi)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:ridge"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "TSMOM_BTC_CTA",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals price \u2192 targets direction,swing_high,swing_low (cefi)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:xgboost"
     },
     {
       "agent_annotation": null,
@@ -15499,6 +16529,86 @@
       "relation": "has_leg",
       "status": "available",
       "to_node_id": "leg:VOL_TRADING_OPTIONS:put"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "VOL_TRADING_OPTIONS",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals iv_dispersion,vol_metric \u2192 targets volatility (cefi,tradfi)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:catboost"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "VOL_TRADING_OPTIONS",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals iv_dispersion,vol_metric \u2192 targets volatility (cefi,tradfi)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:ensemble"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "VOL_TRADING_OPTIONS",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals iv_dispersion,vol_metric \u2192 targets volatility (cefi,tradfi)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:huber"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "VOL_TRADING_OPTIONS",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals iv_dispersion,vol_metric \u2192 targets volatility (cefi,tradfi)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:lightgbm"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "VOL_TRADING_OPTIONS",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals iv_dispersion,vol_metric \u2192 targets volatility (cefi,tradfi)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:poisson_glm"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "VOL_TRADING_OPTIONS",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals iv_dispersion,vol_metric \u2192 targets volatility (cefi,tradfi)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:random_forest"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "VOL_TRADING_OPTIONS",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals iv_dispersion,vol_metric \u2192 targets volatility (cefi,tradfi)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:ridge"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "VOL_TRADING_OPTIONS",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals iv_dispersion,vol_metric \u2192 targets volatility (cefi,tradfi)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:xgboost"
     },
     {
       "agent_annotation": null,
@@ -25632,16 +26742,6 @@
     },
     {
       "agent_annotation": null,
-      "from_node_id": "service_registry:ml_models",
-      "gap_type": "missing_extraction",
-      "readiness": null,
-      "reason": "ml_models: ModuleNotFoundError: No module named 'ml_service.training.ml.model_registry'",
-      "relation": "registry_gap",
-      "status": "not_registered",
-      "to_node_id": "service_registry:ml_models"
-    },
-    {
-      "agent_annotation": null,
       "from_node_id": "signing_surface:CLOUD_KMS_ENCRYPTED",
       "gap_type": null,
       "readiness": null,
@@ -27616,14 +28716,14 @@
     "broker_classed_venues": 0,
     "logical_dead_end": 467,
     "logical_dead_ends": 16,
-    "missing_extraction": 2,
+    "missing_extraction": 1,
     "missing_registry": 166,
     "needs_code_scan": 1,
-    "not_registered_total": 168,
+    "not_registered_total": 167,
     "orphan_nodes": 82,
     "unbuilt_dead_ends": 168
   },
-  "generated_from_commit": "5b57f6d285703b96c5c66126d02abef2fd7b70d7",
+  "generated_from_commit": "344a73f193f2dc84063d07593f2a7edb1c64e82a",
   "manifest_version": "1.0.0",
   "nodes": [
     {
@@ -29161,14 +30261,6 @@
         "registry": "trading_agent"
       },
       "node_id": "gap_registry:trading_agent"
-    },
-    {
-      "kind": "gap_registry",
-      "label": "ML model registry",
-      "metadata": {
-        "registry": "ml_models"
-      },
-      "node_id": "service_registry:ml_models"
     },
     {
       "kind": "instrument_type",
@@ -30766,6 +31858,94 @@
         "role": "stake"
       },
       "node_id": "leg:YIELD_STAKING_SIMPLE:stake"
+    },
+    {
+      "kind": "ml_model",
+      "label": "ML Model: Catboost",
+      "metadata": {
+        "model_type": "catboost",
+        "serves_asset_groups": "cefi,defi,sports,tradfi",
+        "target_types": "clv,clv_meta,cross_venue_spread,direction,ht_delta,swing_high,swing_low,volatility,xg,xg_meta",
+        "variant_fields": "instrument_id,target_params,target_type,timeframe"
+      },
+      "node_id": "ml_model:catboost"
+    },
+    {
+      "kind": "ml_model",
+      "label": "ML Model: Ensemble",
+      "metadata": {
+        "model_type": "ensemble",
+        "serves_asset_groups": "cefi,defi,tradfi",
+        "target_types": "clv,clv_meta,cross_venue_spread,direction,ht_delta,swing_high,swing_low,volatility,xg,xg_meta",
+        "variant_fields": "instrument_id,target_params,target_type,timeframe"
+      },
+      "node_id": "ml_model:ensemble"
+    },
+    {
+      "kind": "ml_model",
+      "label": "ML Model: Huber",
+      "metadata": {
+        "model_type": "huber",
+        "serves_asset_groups": "cefi,defi,sports,tradfi",
+        "target_types": "clv,clv_meta,cross_venue_spread,direction,ht_delta,swing_high,swing_low,volatility,xg,xg_meta",
+        "variant_fields": "instrument_id,target_params,target_type,timeframe"
+      },
+      "node_id": "ml_model:huber"
+    },
+    {
+      "kind": "ml_model",
+      "label": "ML Model: Lightgbm",
+      "metadata": {
+        "model_type": "lightgbm",
+        "serves_asset_groups": "cefi,defi,sports,tradfi",
+        "target_types": "clv,clv_meta,cross_venue_spread,direction,ht_delta,swing_high,swing_low,volatility,xg,xg_meta",
+        "variant_fields": "instrument_id,target_params,target_type,timeframe"
+      },
+      "node_id": "ml_model:lightgbm"
+    },
+    {
+      "kind": "ml_model",
+      "label": "ML Model: Poisson Glm",
+      "metadata": {
+        "model_type": "poisson_glm",
+        "serves_asset_groups": "cefi,defi,tradfi",
+        "target_types": "clv,clv_meta,cross_venue_spread,direction,ht_delta,swing_high,swing_low,volatility,xg,xg_meta",
+        "variant_fields": "instrument_id,target_params,target_type,timeframe"
+      },
+      "node_id": "ml_model:poisson_glm"
+    },
+    {
+      "kind": "ml_model",
+      "label": "ML Model: Random Forest",
+      "metadata": {
+        "model_type": "random_forest",
+        "serves_asset_groups": "cefi,defi,tradfi",
+        "target_types": "clv,clv_meta,cross_venue_spread,direction,ht_delta,swing_high,swing_low,volatility,xg,xg_meta",
+        "variant_fields": "instrument_id,target_params,target_type,timeframe"
+      },
+      "node_id": "ml_model:random_forest"
+    },
+    {
+      "kind": "ml_model",
+      "label": "ML Model: Ridge",
+      "metadata": {
+        "model_type": "ridge",
+        "serves_asset_groups": "cefi,defi,sports,tradfi",
+        "target_types": "clv,clv_meta,cross_venue_spread,direction,ht_delta,swing_high,swing_low,volatility,xg,xg_meta",
+        "variant_fields": "instrument_id,target_params,target_type,timeframe"
+      },
+      "node_id": "ml_model:ridge"
+    },
+    {
+      "kind": "ml_model",
+      "label": "ML Model: Xgboost",
+      "metadata": {
+        "model_type": "xgboost",
+        "serves_asset_groups": "cefi,defi,sports,tradfi",
+        "target_types": "clv,clv_meta,cross_venue_spread,direction,ht_delta,swing_high,swing_low,volatility,xg,xg_meta",
+        "variant_fields": "instrument_id,target_params,target_type,timeframe"
+      },
+      "node_id": "ml_model:xgboost"
     },
     {
       "kind": "risk_gate_layer",
