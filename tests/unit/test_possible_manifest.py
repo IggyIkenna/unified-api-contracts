@@ -122,9 +122,15 @@ class TestCanonicalPathTemplates:
         each AG's pipeline_mode-prefix count = capability-derived baseline + its own extra-probe."""
         # cefi 16→17 (2026-07-18: +batch_lighter_api); 17→21 (2026-07-19: +4 live_ CEX probes
         # binance/bybit/kraken/okx). defi 15→16 (2026-07-21: +batch_aave — AAVE on-chain
-        # oracle, lst_rate_honest_coverage plan Phase 1). Other AGs stay at their
-        # capability-derived baseline.
-        expected_pipeline_mode_counts = {"cefi": 21, "defi": 16, "tradfi": 6, "sports": 0}
+        # oracle, lst_rate_honest_coverage plan Phase 1). 2026-07-26: the batch+live loop in
+        # _canonical_pipeline_mode_prefixes gained a Mode.REPLAY case (same rationale as the
+        # batch+live union — a captured cell may live under any of the three prefixes), adding
+        # one replay_<source> prefix per non-legacy source that has a registered Mode.REPLAY
+        # pipeline_mode: cefi 21→27 (+aster/databento/deribit/extended/hyperliquid/kalshi_perp),
+        # defi 16→23 (+chainlink/helius_rpc/hyperliquid/onchain_rpc/onchain_subgraph/
+        # pyth_hermes/solana_rpc), tradfi 6→9 (+databento/eia/massive). sports stays 0 — it
+        # dispatches to its own candidate_parquet_paths SSOT, never this function.
+        expected_pipeline_mode_counts = {"cefi": 27, "defi": 23, "tradfi": 9, "sports": 0}
         for ag, expected in expected_pipeline_mode_counts.items():
             templates = canonical_path_templates(ag)
             pmode = [t for t in templates if "pipeline_mode=" in t]

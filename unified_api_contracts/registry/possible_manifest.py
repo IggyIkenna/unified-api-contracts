@@ -313,16 +313,18 @@ def _canonical_pipeline_mode_prefixes(asset_group: str) -> list[str]:
             # gated migrator rewrites them, so emit the raw legacy prefix directly.
             pmodes.append(f"{Mode.BATCH.value}_{source}")
         else:
-            # BOTH batch AND live prefixes: the phantom-existence probe must find an
-            # object at EITHER — a ``captured`` cell has data whether it was written by
-            # the batch backfill or the live writer (live=batch spine; CF-12 batch=live
-            # symmetry says the CELL has data either way). Enumerating ONLY ``batch_``
-            # false-phantomed every LIVE-captured cell whose object lives under
-            # ``pipeline_mode=live_<source>/`` (the 2026-07-11 prediction CF-15 finding:
-            # 13,292 KALSHI/POLYMARKET ``book_snapshot_5``/``trades`` rows). Adding a
-            # probe prefix can only REDUCE false-demotion (never introduce one), so this
-            # is safe cross-AG.
-            for mode in (Mode.BATCH, Mode.LIVE):
+            # BATCH, LIVE, AND REPLAY prefixes: the phantom-existence probe must find an
+            # object at ANY of the three — a ``captured`` cell has data whether it was
+            # written by the batch backfill, the live writer (live=batch spine; CF-12
+            # batch=live symmetry says the CELL has data either way), or a gap-fill
+            # replay run (M4: ``replay`` is always the middle reconciliation tier).
+            # Enumerating ONLY ``batch_``/``live_`` false-phantomed every LIVE-captured
+            # cell whose object lives under ``pipeline_mode=live_<source>/`` (the
+            # 2026-07-11 prediction CF-15 finding: 13,292 KALSHI/POLYMARKET
+            # ``book_snapshot_5``/``trades`` rows) — the same class of bug applies to a
+            # ``replay_<source>/`` cell. Adding a probe prefix can only REDUCE
+            # false-demotion (never introduce one), so this is safe cross-AG.
+            for mode in (Mode.BATCH, Mode.LIVE, Mode.REPLAY):
                 try:
                     pmodes.append(pipeline_mode_for_source(source, mode).value)
                 except ValueError:
