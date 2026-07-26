@@ -213,7 +213,6 @@ DATA_TYPES_BY_ASSET_GROUP: dict[str, list[str]] = {
     ],
     "sports": [
         "odds",  # Raw bookmaker odds from Odds API (MTDS raw tick data)
-        "ODDS",  # Canonical uppercase form per mega-audit R2 (ODDS_API emits this)
         "odds_snapshot",  # Point-in-time bookmaker odds (LOCF sampled)
         "odds_movement",  # Odds line movement OHLC candles
         "arbitrage_opportunity",  # Cross-bookmaker arbitrage detection
