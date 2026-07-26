@@ -664,6 +664,44 @@ class TestSportsMvp:
         assert not is_mvp("sports", "ODDS_API", "FIXED_ODDS", "odds", league=None)
 
 
+class TestGetMvpFootballLeagueIds:
+    """Public accessor ``get_mvp_football_league_ids()`` — the SSOT any
+    per-fixture-enrichment or strategy/features consumer must use to stay
+    inside MVP scope, independent of the much wider FIXTURES curated-universe
+    denominator. Not a mirror of ``MVP_SCOPE["sports"].leagues`` — this IS its
+    construction, exercised through the public entrypoint each consumer uses.
+    """
+
+    def test_matches_mvp_scope_sports_leagues(self) -> None:
+        from unified_api_contracts.canonical.crosscutting.mvp_scope import MVP_SCOPE, SportsMvpRule
+        from unified_api_contracts.sports import get_mvp_football_league_ids
+
+        rule = MVP_SCOPE["sports"]
+        assert isinstance(rule, SportsMvpRule)
+        assert get_mvp_football_league_ids() == rule.leagues
+
+    def test_epl_in_mls_in_non_mvp_widened_league_out(self) -> None:
+        from unified_api_contracts.canonical.domain.sports.league_data import LEAGUE_REGISTRY
+        from unified_api_contracts.sports import get_mvp_football_league_ids
+
+        mvp = get_mvp_football_league_ids()
+        assert "EPL" in mvp
+        assert "MLS" in mvp
+        non_mvp_widened = next(lg for lg in LEAGUE_REGISTRY.values() if lg.sport == "FOOTBALL" and not lg.in_mvp_scope)
+        assert non_mvp_widened.league_id not in mvp
+
+    def test_entity_league_coverage_enrichment_entities_match_mvp(self) -> None:
+        """FIXTURE_STATS/FIXTURE_EVENTS/FIXTURE_LINEUPS/PLAYER_STATS coverage
+        must equal the MVP set, not the wider could-exist FIXTURES universe —
+        otherwise per-fixture enrichment fan-out silently follows the 383-league
+        curated-universe denominator instead of the 96-league MVP scope."""
+        from unified_api_contracts.sports import get_entity_league_coverage, get_mvp_football_league_ids
+
+        mvp = get_mvp_football_league_ids()
+        for entity in ("FIXTURE_STATS", "FIXTURE_EVENTS", "FIXTURE_LINEUPS", "PLAYER_STATS"):
+            assert get_entity_league_coverage(entity) == mvp, f"{entity} coverage drifted from MVP scope"
+
+
 # ---------------------------------------------------------------------------
 # Prediction tests
 # ---------------------------------------------------------------------------

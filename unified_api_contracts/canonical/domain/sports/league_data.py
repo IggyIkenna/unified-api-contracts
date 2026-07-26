@@ -441,6 +441,27 @@ def get_leagues_by_classification(classification: str) -> list[LeagueDefinition]
     return [league for league in LEAGUE_REGISTRY.values() if league.classification.lower() == cls_lower]
 
 
+def get_mvp_football_league_ids() -> frozenset[str]:
+    """Canonical MVP/prediction-scope football league_ids (``in_mvp_scope=True``).
+
+    SSOT for "which leagues are in the MVP football universe" — the scope any
+    per-fixture enrichment or strategy/features consumer must use, as distinct
+    from the much wider could-exist FIXTURES denominator
+    (``get_expected_leagues_for_source``, 383 leagues post curated-universe
+    expansion). The curated-universe expansion
+    (plans/active/sports_satellite_ao_dispatch_batch2_2026_07_24.md) added
+    wider-reference football entries (continental cups, majors) explicitly
+    tagged ``in_mvp_scope=False`` so they widen FIXTURES coverage without
+    widening MVP/prediction scope (operator 2026-07-24 Directive B).
+
+    ``unified_api_contracts.canonical.crosscutting._mvp_scope_rules._mvp_football_league_ids()``
+    delegates here — this is the single implementation, not a mirror.
+    """
+    return frozenset(
+        league.league_id for league in LEAGUE_REGISTRY.values() if league.sport == "FOOTBALL" and league.in_mvp_scope
+    )
+
+
 def get_leagues_by_country(country: str) -> list[LeagueDefinition]:
     """Return all leagues for a given ISO country code (case-insensitive)."""
     country_upper = country.upper()
@@ -719,6 +740,7 @@ __all__ = [
     "get_leagues_by_country",
     "get_leagues_for_sport",
     "get_live_stats_api_football_ids",
+    "get_mvp_football_league_ids",
     "get_prediction_leagues",
     "get_source_coverage_start",
     "is_sports_structural_gap",
