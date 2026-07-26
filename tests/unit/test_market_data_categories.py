@@ -14,6 +14,7 @@ from unified_api_contracts.registry.market_data_categories import (
     VENUES_BY_ASSET_GROUP,
     get_valid_timeframes_for_data_type,
     needs_candle_processing,
+    resolve_data_type_for_feature_group,
 )
 
 # ---------------------------------------------------------------------------
@@ -195,3 +196,57 @@ def test_chain_bundle_accepted_exceptions_are_not_instrument_type_enum_members()
             f"'{value}' leaked into the InstrumentType enum — it must stay an accepted-exception "
             f"(CHAIN_BUNDLE_ACCEPTED_NONCANONICAL_INSTRUMENT_TYPES), never a canonical instrument_type."
         )
+
+
+# ---------------------------------------------------------------------------
+# resolve_data_type_for_feature_group -- TradFi candle-group override
+# (tradfi_mdps_build_continuous_mismatches_2_and_4_still_open_2026_07_26.md):
+# live-reproduced bug -- every TradFi candle-based feature group fell through
+# to the CeFi-oriented "trades" default, so features-delta-one-tradfi's
+# lookback validation (keyed on data_type against the availability manifest)
+# reported 0 candles for EVERY real, already-landed continuous-future day
+# (manifest rows are written with data_type="ohlcv_1m", never "trades").
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.parametrize(
+    "feature_group",
+    [
+        "technical_indicators",
+        "moving_averages",
+        "oscillators",
+        "volatility_realized",
+        "momentum",
+        "volume_analysis",
+        "vwap",
+        "candlestick_patterns",
+        "market_structure",
+        "returns",
+        "round_numbers",
+        "streaks",
+        "futures_basis",
+        "volume_flow",
+        "temporal",
+        "targets",
+        "supply_demand_zones",
+        "fibonacci",
+        "level_confluence",
+        "market_structure_sequence",
+        "risk_reward",
+        "wedge_quality",
+    ],
+)
+def test_tradfi_candle_feature_groups_resolve_to_ohlcv_1m(feature_group: str) -> None:
+    assert resolve_data_type_for_feature_group(feature_group, "TRADFI") == "ohlcv_1m"
+    assert resolve_data_type_for_feature_group(feature_group, "tradfi") == "ohlcv_1m"
+
+
+def test_tradfi_microstructure_still_resolves_to_tbbo() -> None:
+    """The pre-existing tradfi override must survive the candle-group additions."""
+    assert resolve_data_type_for_feature_group("microstructure", "TRADFI") == "tbbo"
+
+
+def test_cefi_candle_feature_groups_unaffected_by_tradfi_override() -> None:
+    """The tradfi-only override must not leak into CeFi's own "trades" default."""
+    assert resolve_data_type_for_feature_group("futures_basis", "CEFI") == "trades"
+    assert resolve_data_type_for_feature_group("technical_indicators", "CEFI") == "trades"

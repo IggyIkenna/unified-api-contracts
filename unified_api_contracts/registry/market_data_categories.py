@@ -746,6 +746,36 @@ FEATURE_GROUP_DATA_TYPES: dict[str, str] = {
 FEATURE_GROUP_DATA_TYPE_OVERRIDES: dict[str, dict[str, str]] = {
     "tradfi": {
         "microstructure": "tbbo",  # Top of Book for TradFi equities
+        # Candle-based groups: FEATURE_GROUP_DATA_TYPES's "trades" default is CeFi's raw
+        # data_type; TradFi's own candle stream is "ohlcv_1m" (TradfiTradesAdapter writes
+        # output_data_type=ohlcv_1m, and build-continuous's stitched continuous_future
+        # series carries the same data_type) -- leaving these unmapped meant
+        # dependency_checker's lookback validation (keyed on data_type) could never find
+        # ANY TradFi candle history regardless of real data on disk (0/N candles on every
+        # check), even after the MDPS writer-side fix landed
+        # (tradfi_mdps_build_continuous_mismatches_2_and_4_still_open_2026_07_26.md).
+        "technical_indicators": "ohlcv_1m",
+        "moving_averages": "ohlcv_1m",
+        "oscillators": "ohlcv_1m",
+        "volatility_realized": "ohlcv_1m",
+        "momentum": "ohlcv_1m",
+        "volume_analysis": "ohlcv_1m",
+        "vwap": "ohlcv_1m",
+        "candlestick_patterns": "ohlcv_1m",
+        "market_structure": "ohlcv_1m",
+        "returns": "ohlcv_1m",
+        "round_numbers": "ohlcv_1m",
+        "streaks": "ohlcv_1m",
+        "futures_basis": "ohlcv_1m",
+        "volume_flow": "ohlcv_1m",
+        "temporal": "ohlcv_1m",
+        "targets": "ohlcv_1m",
+        "supply_demand_zones": "ohlcv_1m",
+        "fibonacci": "ohlcv_1m",
+        "level_confluence": "ohlcv_1m",
+        "market_structure_sequence": "ohlcv_1m",
+        "risk_reward": "ohlcv_1m",
+        "wedge_quality": "ohlcv_1m",
     },
     "defi": {
         "technical_indicators": "oracle_prices",
