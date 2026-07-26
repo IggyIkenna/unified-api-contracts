@@ -77,10 +77,13 @@ SERVICE_OUTPUT_POLICIES: Final[dict[tuple[str, str], ServiceEmissionPolicy]] = {
     ("features-service", "rewards"): ServiceEmissionPolicy.PARTIAL_OK,
     ("features-service", "liquidation_events"): ServiceEmissionPolicy.PARTIAL_OK,
     #
-    # features-sports-service — 7 entries.
+    # features-sports-service — 8 entries.
     # Three canonical data_types (FIXTURE_FEATURES / ODDS_FEATURES / DERIVED_FEATURES)
     # split current/historical per slice convention = 6; plus live PubSub
-    # subset = 7. Tree-based ML consumer → NaN-fill native (1-10% tolerance).
+    # subset = 7; plus the odds_targets ML TARGET table (historical-only, no
+    # live slice — see odds_targets_exporter.py +
+    # sports_clv_target_pit_gated_out_of_odds_features_export_2026_07_26.md
+    # [DATA] P2) = 8. Tree-based ML consumer → NaN-fill native (1-10% tolerance).
     # In-play HT-odds = STRICT_FAIL (live pricing input).
     ("features-sports-service", "fixture_features:current"): ServiceEmissionPolicy.NAN_FILL,
     ("features-sports-service", "fixture_features:historical"): ServiceEmissionPolicy.NAN_FILL,
@@ -89,6 +92,10 @@ SERVICE_OUTPUT_POLICIES: Final[dict[tuple[str, str], ServiceEmissionPolicy]] = {
     ("features-sports-service", "derived_features:current"): ServiceEmissionPolicy.NAN_FILL,
     ("features-sports-service", "derived_features:historical"): ServiceEmissionPolicy.NAN_FILL,
     ("features-sports-service", "live_feature_subset"): ServiceEmissionPolicy.STRICT_FAIL,
+    # odds_targets is structurally sparse BY DESIGN (CLV requires both a T-24h
+    # and a T-0 leg for the same fixture) — NAN_FILL, same rationale as
+    # odds_features:historical, not STRICT_FAIL.
+    ("features-sports-service", "odds_targets:historical"): ServiceEmissionPolicy.NAN_FILL,
     #
     # features-cross-instrument-service — 21 entries.
     # Source: CALCULATOR_REGISTRY in features_service/cross_instrument/engine/orchestrator.py
