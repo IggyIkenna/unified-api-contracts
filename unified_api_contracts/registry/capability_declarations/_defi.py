@@ -105,7 +105,13 @@ SUBGRAPH_IDS: dict[str, dict[str, str]] = {
         # IDs here are subgraph IDs from docs.morpho.org but only used to declare
         # which chains instruments-service should query. Only list chains where
         # Morpho Blue has markets with major assets (DEFI_MAJOR_ASSET_SYMBOLS).
-        # ARBITRUM/OPTIMISM/POLYGON: 0 major-asset markets as of 2026-03.
+        # Re-verified 2026-07-26 via a live blue-api.morpho.org query (the adapter's real
+        # data source, not this declaration dict): ARBITRUM now has real major-asset
+        # liquidity (~$3.0B supplied/borrowed on the USDC/K market alone) and is wired into
+        # morpho_adapter.py's _CHAIN_ID_BY_CHAIN — no subgraph ID needed here since the
+        # adapter doesn't query The Graph for Morpho. OPTIMISM (~$117k max single-market
+        # liquidity) and POLYGON (only single-sided idle markets, no genuine paired
+        # liquidity) remain intentionally unwired — re-check both in a future pass.
         "ETHEREUM": "8Lz789DP5VKLXumTMTgygjU2xtuzx8AhbaacgN5PYCAs",
         "BASE": "71ZTy1veF9twER9CLMnPWeLQ7GZcwKsjmygejrgKirqs",
     },
