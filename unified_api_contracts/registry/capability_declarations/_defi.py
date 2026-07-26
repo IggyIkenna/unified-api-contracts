@@ -285,6 +285,7 @@ class _ProtocolCapability:
 
     __slots__ = (
         "data_types",
+        "factory_address_by_chain",
         "instrument_types",
         "mtds_operations",
         "protocol_class",
@@ -300,6 +301,7 @@ class _ProtocolCapability:
         data_types: list[str],
         mtds_operations: list[str],
         required_tokens: frozenset[str] | None = None,
+        factory_address_by_chain: dict[str, str] | None = None,
     ) -> None:
         self.venue_prefix = venue_prefix
         self.protocol_class = protocol_class
@@ -307,6 +309,13 @@ class _ProtocolCapability:
         self.data_types = data_types
         self.mtds_operations = mtds_operations
         self.required_tokens = required_tokens or frozenset()
+        # DeFi completeness-oracle Tier-B input (design SSOT
+        # /codex/02-data/defi-completeness-oracle.md §3.1): one canonical
+        # factory/registry contract address per chain, used by the Tier-B RPC
+        # probe (eth_getLogs(PoolCreated)) as the chain-truth denominator
+        # source. Empty dict for protocols without a landed Tier-B probe yet —
+        # schema-only step (§9 P0), never fabricated for an unverified chain.
+        self.factory_address_by_chain: dict[str, str] = factory_address_by_chain or {}
 
 
 # Instrument type shorthands
@@ -502,6 +511,10 @@ PROTOCOL_CAPABILITIES: dict[str, _ProtocolCapability] = {
         data_types=[*_DEX_DATA],
         mtds_operations=["collect-dex-pools", "collect-dex-swaps"],
         required_tokens=frozenset({"UNI"}),
+        # Source: docs.uniswap.org/contracts/v2/reference/smart-contracts/factory.
+        factory_address_by_chain={
+            "ETHEREUM": "0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f",  # DERIVED 2026-07-26 from ethereum etherscan
+        },
     ),
     "uniswap_v3": _ProtocolCapability(
         venue_prefix="UNISWAP_V3",
@@ -513,6 +526,14 @@ PROTOCOL_CAPABILITIES: dict[str, _ProtocolCapability] = {
         ],
         mtds_operations=["collect-dex-pools", "collect-dex-swaps", "collect-position-data"],
         required_tokens=frozenset({"UNI"}),
+        # Verified 2026-07-26 — the SAME UniswapV3Factory address is deployed on all 5 chains, cross-referenced.
+        factory_address_by_chain={
+            "ETHEREUM": "0x1F98431c8aD98523631AE4a59f267346ea31F984",  # DERIVED 2026-07-26 from ethereum etherscan
+            "ARBITRUM": "0x1F98431c8aD98523631AE4a59f267346ea31F984",  # DERIVED 2026-07-26 from arbitrum arbiscan
+            "BASE": "0x1F98431c8aD98523631AE4a59f267346ea31F984",  # DERIVED 2026-07-26 from base basescan
+            "OPTIMISM": "0x1F98431c8aD98523631AE4a59f267346ea31F984",  # DERIVED 2026-07-26 from optimism opt-etherscan
+            "POLYGON": "0x1F98431c8aD98523631AE4a59f267346ea31F984",  # DERIVED 2026-07-26 from polygon polygonscan
+        },
     ),
     "uniswap_v4": _ProtocolCapability(
         venue_prefix="UNISWAP_V4",
@@ -521,6 +542,11 @@ PROTOCOL_CAPABILITIES: dict[str, _ProtocolCapability] = {
         data_types=[*_DEX_DATA],
         mtds_operations=["collect-dex-pools", "collect-dex-swaps"],
         required_tokens=frozenset({"UNI"}),
+        # V4 PoolManager is a singleton, address differs per chain unlike V3 — only ETHEREUM is
+        # declared for this protocol today, per SUBGRAPH_IDS above.
+        factory_address_by_chain={
+            "ETHEREUM": "0x000000000004444c5dc75cB358380D2e3dE08A90",  # DERIVED 2026-07-26 from ethereum etherscan
+        },
     ),
     "balancer": _ProtocolCapability(
         venue_prefix="BALANCER",
@@ -529,6 +555,16 @@ PROTOCOL_CAPABILITIES: dict[str, _ProtocolCapability] = {
         data_types=[*_DEX_DATA],
         mtds_operations=["collect-dex-pools", "collect-dex-swaps"],
         required_tokens=frozenset({"BAL"}),
+        # Balancer V2's single Vault (not a per-pool factory) is deployed at the SAME address on
+        # every supported chain, cross-referenced.
+        factory_address_by_chain={
+            "ETHEREUM": "0xBA12222222228d8Ba445958a75a0704d566BF2C8",  # DERIVED 2026-07-26 from ethereum etherscan
+            "ARBITRUM": "0xBA12222222228d8Ba445958a75a0704d566BF2C8",  # DERIVED 2026-07-26 from arbitrum arbiscan
+            "POLYGON": "0xBA12222222228d8Ba445958a75a0704d566BF2C8",  # DERIVED 2026-07-26 from polygon polygonscan
+            "OPTIMISM": "0xBA12222222228d8Ba445958a75a0704d566BF2C8",  # DERIVED 2026-07-26 from optimism opt-etherscan
+            "AVALANCHE": "0xBA12222222228d8Ba445958a75a0704d566BF2C8",  # DERIVED 2026-07-26 from avalanche snowscan
+            "BASE": "0xBA12222222228d8Ba445958a75a0704d566BF2C8",  # DERIVED 2026-07-26 from base basescan
+        },
     ),
     "curve": _ProtocolCapability(
         venue_prefix="CURVE",
@@ -537,6 +573,14 @@ PROTOCOL_CAPABILITIES: dict[str, _ProtocolCapability] = {
         data_types=[*_DEX_DATA],
         mtds_operations=["collect-dex-pools", "collect-dex-swaps"],
         required_tokens=frozenset({"CRV", "CRVUSD"}),
+        # Curve has no single per-pool factory; the canonical chain-agnostic entry point is the
+        # immutable AddressProvider (docs.curve.finance/integration/address-provider), deployed at
+        # the SAME address on every chain Curve operates on, cross-referenced.
+        factory_address_by_chain={
+            "ETHEREUM": "0x0000000022D53366457F9d5E68Ec105046FC4383",  # DERIVED 2026-07-26 from ethereum etherscan
+            "OPTIMISM": "0x0000000022D53366457F9d5E68Ec105046FC4383",  # DERIVED 2026-07-26 from optimism opt-etherscan
+            "AVALANCHE": "0x0000000022D53366457F9d5E68Ec105046FC4383",  # DERIVED 2026-07-26 from avalanche snowscan
+        },
     ),
     # ── EVM DEX — Forks (reuse uniswap_v3 adapter) ─────────────
     "pancakeswap_v3": _ProtocolCapability(
@@ -545,6 +589,13 @@ PROTOCOL_CAPABILITIES: dict[str, _ProtocolCapability] = {
         instrument_types=_POOL,
         data_types=[*_DEX_DATA],
         mtds_operations=["collect-dex-pools", "collect-dex-swaps"],
+        # Verified 2026-07-26 — the SAME PancakeV3Factory address is deployed on all 3 chains,
+        # cross-referenced; developer.pancakeswap.finance/contracts/v3/pancakev3factory.
+        factory_address_by_chain={
+            "BSC": "0x0BFbCF9fa4f9C56B0F40a671Ad40E0805A091865",  # DERIVED 2026-07-26 from bsc bscscan
+            "ETHEREUM": "0x0BFbCF9fa4f9C56B0F40a671Ad40E0805A091865",  # DERIVED 2026-07-26 from ethereum etherscan
+            "BASE": "0x0BFbCF9fa4f9C56B0F40a671Ad40E0805A091865",  # DERIVED 2026-07-26 from base basescan
+        },
     ),
     "sushiswap_v3": _ProtocolCapability(
         venue_prefix="SUSHISWAP_V3",
@@ -553,6 +604,13 @@ PROTOCOL_CAPABILITIES: dict[str, _ProtocolCapability] = {
         data_types=[*_DEX_DATA],
         mtds_operations=["collect-dex-pools", "collect-dex-swaps"],
         required_tokens=frozenset({"SUSHI"}),
+        # SushiSwap V3's factory address DIFFERS per chain (not deterministic like Uniswap V3's).
+        # AVALANCHE omitted — no address verified this pass (honest partial population per
+        # external-data-always-available-rule.md, never fabricated).
+        factory_address_by_chain={
+            "ETHEREUM": "0xbACEB8eC6b9355Dfc0269C18bac9d6E2Bdc29C4F",  # DERIVED 2026-07-26 from ethereum etherscan
+            "BASE": "0xc35DADB65012eC5796536bD9864eD8773aBc74C4",  # DERIVED 2026-07-26 from base basescan
+        },
     ),
     "sushiswap": _ProtocolCapability(
         venue_prefix="SUSHISWAP",
@@ -568,6 +626,10 @@ PROTOCOL_CAPABILITIES: dict[str, _ProtocolCapability] = {
         instrument_types=_POOL,
         data_types=[*_DEX_DATA],
         mtds_operations=["collect-dex-pools", "collect-dex-swaps"],
+        # Source: aerodrome-finance/contracts (PoolFactory.sol).
+        factory_address_by_chain={
+            "BASE": "0x420dd381b31aef6683db6b902084cb0ffece40da",  # DERIVED 2026-07-26 from base basescan
+        },
     ),
     "camelot_v3": _ProtocolCapability(
         venue_prefix="CAMELOT_V3",
@@ -575,6 +637,10 @@ PROTOCOL_CAPABILITIES: dict[str, _ProtocolCapability] = {
         instrument_types=_POOL,
         data_types=[*_DEX_DATA],
         mtds_operations=["collect-dex-pools", "collect-dex-swaps"],
+        # Source: docs.camelot.exchange/contracts/arbitrum/one-mainnet.
+        factory_address_by_chain={
+            "ARBITRUM": "0x1a3c9B1d2F0529D97f2afC5136Cc23e58f1FD35B",  # DERIVED 2026-07-26 from arbitrum arbiscan
+        },
     ),
     "velodrome_v2": _ProtocolCapability(
         venue_prefix="VELODROME_V2",
@@ -582,6 +648,10 @@ PROTOCOL_CAPABILITIES: dict[str, _ProtocolCapability] = {
         instrument_types=_POOL,
         data_types=[*_DEX_DATA],
         mtds_operations=["collect-dex-pools", "collect-dex-swaps"],
+        # Source: velodrome-finance/contracts GitHub.
+        factory_address_by_chain={
+            "OPTIMISM": "0xF1046053aa5682b4F9a81b5481394DA16BE5FF5a",  # DERIVED 2026-07-26 from optimism opt-etherscan
+        },
     ),
     "trader_joe_v2": _ProtocolCapability(
         venue_prefix="TRADER_JOE_V2",
