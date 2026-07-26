@@ -19,9 +19,14 @@ Design:
 2. **Rule-based fallback** — call
    ``classify_polymarket_market`` and project the 4-tuple onto a canonical
    group via :data:`_CATEGORY_UNDERLYING_PERIOD_TO_GROUP`.
-3. **Sub-threshold** — when neither path produces a group, return ``None``;
-   caller marks the shard as
-   ``attempted_failed[reason=ClassifierConfidenceLow]``.
+3. **Catch-all** — when neither path produces a group, return
+   :attr:`~CanonicalQuestionGroup.OTHER` (never ``None`` — both
+   ``classify_polymarket_to_canonical_group`` and
+   ``classify_kalshi_to_canonical_group`` are non-Optional). Ratified
+   contract for BOTH venues (`autonomous_session_operator_decisions_2026_07_25.md`
+   entry #14, 2026-07-26): honest-absence capture via ``OTHER`` replaces the
+   older ``attempted_failed[reason=ClassifierConfidenceLow]`` silent-failure
+   path, which no unmatched market can reach anymore.
 
 The internal classifier already exposes ``CLASSIFIER_STABILITY_HASH``
 (commit ``5f76bd4`` 2026-05-06). This module re-exports it as
