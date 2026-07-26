@@ -268,7 +268,10 @@ SOURCE_PRIORITY: Final[dict[tuple[str, str], list[str]]] = {
     ("defi", "governance_events"): ["onchain_subgraph"],
     ("defi", "liquidation_events"): ["onchain_rpc"],
     ("defi", "liquidations"): ["onchain_subgraph"],
-    ("defi", "lst_rates"): ["onchain_subgraph"],
+    # "defillama" (Tier-4 historical price-ratio proxy) is the fallback behind
+    # onchain_subgraph — solana_lst_archival.py's 4-tier strategy only reaches it
+    # when Tiers 1-3 (alchemy/thegraph/rest) don't resolve a rate for the date.
+    ("defi", "lst_rates"): ["onchain_subgraph", "defillama"],
     ("defi", "mev_events"): ["onchain_rpc"],
     # native_staking_rates: Solana RPC (getInflationRate/getEpochInfo) is primary;
     # helius_rpc for per-validator APY breakdown (requires Helius API key).
@@ -514,6 +517,11 @@ SOURCE_MODE_CAPABILITY: Final[dict[str, frozenset[Mode]]] = {
     # exists in PipelineMode (no LIVE_AAVE/REPLAY_AAVE member) — widen this
     # + add the matching enum members together if/when a live leg lands.
     "aave": frozenset({Mode.BATCH}),
+    # DefiLlama LST-USD/SOL-USD historical price ratio (solana_lst_archival.py
+    # Tier-4 fallback) — a historical-price archive, BATCH-only: only
+    # BATCH_DEFILLAMA exists in PipelineMode (no LIVE_DEFILLAMA/REPLAY_DEFILLAMA
+    # member).
+    "defillama": frozenset({Mode.BATCH}),
     # ---- Prediction ----
     "polymarket_clob": frozenset({Mode.BATCH, Mode.LIVE, Mode.REPLAY}),
     "polymarket_gamma_api": frozenset({Mode.BATCH}),  # market metadata; not a tick series
@@ -707,6 +715,10 @@ EMISSION_LATENCY_MS_BY_SOURCE: Final[dict[str, int]] = {
     # 2026-07-21 (lst_rate_honest_coverage plan Phase 1). Same RPC-style class
     # as chainlink (both are on-chain reads via Alchemy RPC).
     "aave": 200,  # 200ms: on-chain getAssetPrice eth_call (RPC-style, mirrors chainlink)
+    # DefiLlama historical price-ratio proxy (solana_lst_archival.py Tier-4
+    # fallback, coins.llama.fi/prices/historical) — a daily-granularity price
+    # archive, BATCH-only. Conservative 24h cadence, same class as eia/footystats.
+    "defillama": 86_400_000,  # 24h: DefiLlama historical daily-price archive cadence
     # Solana native-staking sources — epoch-granularity (~2.5 day cadence).
     "solana_rpc": 60_000,  # 1 min: Solana RPC getInflationRate/getEpochInfo polling
     "helius_rpc": 60_000,  # 1 min: Helius APY aggregation endpoint polling

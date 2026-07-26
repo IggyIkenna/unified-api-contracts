@@ -83,6 +83,16 @@ class PipelineMode(StrEnum):
     BATCH_CHAINLINK = "batch_chainlink"
     BATCH_CROSS_INSTRUMENT = "batch_cross_instrument"
     BATCH_DATABENTO = "batch_databento"
+    # DefiLlama LST-USD/SOL-USD historical price-ratio proxy — the Tier-4 fallback
+    # in solana_lst_archival.py's 4-tier capture strategy (row method=
+    # "defillama_historical_ratio"). A market-price PROXY, not genuine on-chain
+    # data, so it must carry a DISTINCT pipeline_mode from the Tier 1-3
+    # (alchemy_get_account_info/thegraph_subgraph/rest_api) rows, which stay
+    # batch_onchain_subgraph. Added 2026-07-26 per
+    # defi_satellite_ao_dispatch_batch1_2026_07_25.md's lst_rates_handler.py fix
+    # sub-item (a). BATCH-only: DefiLlama is a historical-price archive, no
+    # live/replay leg.
+    BATCH_DEFILLAMA = "batch_defillama"
     BATCH_EIA = "batch_eia"
     BATCH_EXECUTION_SERVICE = "batch_execution_service"
     BATCH_FEATURES_ONCHAIN_SERVICE = "batch_features_onchain_service"
