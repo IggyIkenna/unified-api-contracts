@@ -5231,17 +5231,6 @@
       "reason": "",
       "relation": "supports",
       "status": "partial",
-      "to_node_id": "venue:drift",
-      "unlock_distance": 1
-    },
-    {
-      "demand": 0,
-      "from_node_id": "RULES_DIRECTIONAL_CONTINUOUS",
-      "gap_type": null,
-      "missing_pieces": ["needs-config"],
-      "reason": "",
-      "relation": "supports",
-      "status": "partial",
       "to_node_id": "venue:gmx_v2",
       "unlock_distance": 1
     },
@@ -5374,17 +5363,6 @@
       "reason": "",
       "relation": "supports",
       "status": "partial",
-      "to_node_id": "venue:drift",
-      "unlock_distance": 1
-    },
-    {
-      "demand": 0,
-      "from_node_id": "STAT_ARB_CROSS_SECTIONAL",
-      "gap_type": null,
-      "missing_pieces": ["needs-config"],
-      "reason": "",
-      "relation": "supports",
-      "status": "partial",
       "to_node_id": "venue:gmx_v2",
       "unlock_distance": 1
     },
@@ -5441,17 +5419,6 @@
       "relation": "supports",
       "status": "partial",
       "to_node_id": "venue:cme",
-      "unlock_distance": 1
-    },
-    {
-      "demand": 0,
-      "from_node_id": "STAT_ARB_PAIRS_FIXED",
-      "gap_type": null,
-      "missing_pieces": ["needs-config"],
-      "reason": "",
-      "relation": "supports",
-      "status": "partial",
-      "to_node_id": "venue:drift",
       "unlock_distance": 1
     },
     {
@@ -7227,12 +7194,12 @@
     }
   ],
   "summary": {
-    "blocked_edges_total": 697,
+    "blocked_edges_total": 694,
     "impossible_edges": 446,
     "missing_piece_counts": {
       "needs-auth": 1,
       "needs-code-scan": 1,
-      "needs-config": 72,
+      "needs-config": 69,
       "needs-data-feed": 7,
       "needs-docs": 2,
       "needs-extraction": 1,
@@ -7240,9 +7207,9 @@
       "needs-registry-entry": 60,
       "needs-test": 2
     },
-    "roadmap_edges": 251,
+    "roadmap_edges": 248,
     "unlock_distance_histogram": {
-      "1": 251
+      "1": 248
     }
   }
 }
