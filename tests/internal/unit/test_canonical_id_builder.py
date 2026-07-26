@@ -829,6 +829,42 @@ class TestBuildLeg:
         assert leg.ratio == 1
 
 
+class TestBuildLegIncludeVenue:
+    """``include_venue=False`` — venue-omission mode
+    (canonical_id_p1_tradfi_combo_leg_canonicalization_2026_07_08.md, the
+    UAC ``build_leg()`` extension follow-up)."""
+
+    def test_include_venue_false_drops_venue_prefix(self) -> None:
+        leg = build_leg("CME", InstrumentType.FUTURE, "ESM6", side="BUY", passthrough=True, include_venue=False)
+        assert leg == InstrumentLeg(instrument_key="FUTURE:ESM6", side="BUY", ratio=1)
+
+    def test_include_venue_default_true_unchanged(self) -> None:
+        """Default behaviour (include_venue omitted) is byte-identical to before this mode existed."""
+        leg = build_leg("CME", InstrumentType.FUTURE, "ESM6", side="BUY", passthrough=True)
+        assert leg == InstrumentLeg(instrument_key="CME:FUTURE:ESM6", side="BUY", ratio=1)
+
+    def test_matches_tradfi_build_leg_key_convention_byte_identical(self) -> None:
+        """Byte-identical to instruments-service's local ``_build_leg_key(FUTURE, "SP500")`` —
+        ``f"{InstrumentType.FUTURE}:SP500"`` == ``"FUTURE:SP500"`` since ``InstrumentType`` is a
+        ``StrEnum`` (``str(member) == member.value``). Proves the real shared builder can replace
+        the local helper with zero output drift for existing TradFi combo legs."""
+        leg = build_leg("XCBF.PITCH", InstrumentType.FUTURE, "SP500", side="BUY", passthrough=True, include_venue=False)
+        assert leg.instrument_key == f"{InstrumentType.FUTURE}:SP500"
+        assert leg.instrument_key == "FUTURE:SP500"
+
+    def test_include_venue_false_multi_leg_ratio_and_side(self) -> None:
+        leg = build_leg(
+            "XCBF.PITCH",
+            InstrumentType.FUTURE,
+            "VIX",
+            side="SELL",
+            ratio=2,
+            passthrough=True,
+            include_venue=False,
+        )
+        assert leg == InstrumentLeg(instrument_key="FUTURE:VIX", side="SELL", ratio=2)
+
+
 # ---------------------------------------------------------------------------
 # build_canonical_instrument_id — one entry point, every asset group
 # ---------------------------------------------------------------------------

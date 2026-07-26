@@ -940,6 +940,7 @@ def build_leg(
     quote_asset: str = "",
     margin_type: str = "",
     margin_marker: str = "",
+    include_venue: bool = True,
 ) -> InstrumentLeg:
     """Build one multi-leg combo/spread :class:`InstrumentLeg` via the shared builder.
 
@@ -962,6 +963,21 @@ def build_leg(
             fully-formed native leg symbol (e.g. a Deribit
             ``instrument_name``) straight through instead of reconstructing
             it from ``expiry_date``/``strike``/``option_right``.
+        include_venue: When ``False``, drop the leading ``VENUE:`` segment
+            from the leg key, producing ``TYPE:SYMBOL`` instead of
+            ``VENUE:TYPE:SYMBOL``. ``venue`` is still required (used to
+            build the id internally, e.g. DeFi's ``VENUE-CHAIN`` composition)
+            — only the OUTPUT prefix is omitted. For a combo already scoped
+            to one venue at its own top-level ``VENUE:COMBO:...`` id,
+            repeating the venue on every leg is redundant (the TradFi
+            CBOE/VX combo-leg convention —
+            ``canonical_id_p1_tradfi_combo_leg_canonicalization_2026_07_08.md``).
+            Safe to strip unconditionally: every :func:`build_instrument_id`
+            dispatch path formats its result as
+            ``{_venue_token(...)}:{itype.value}:{symbol...}`` and
+            :func:`_venue_token` never itself contains a ``:`` (DeFi's
+            chain composition uses ``-``), so the leading segment up to the
+            first ``:`` is always exactly the venue token.
 
     Examples
     --------
@@ -978,6 +994,12 @@ def build_leg(
             side="SELL", ratio=2, passthrough=True,
         )
         # → InstrumentLeg(instrument_key="DERIBIT:OPTION:BTC-25DEC26-70000-C", side="SELL", ratio=2)
+
+    Venue-less TradFi combo leg (matches the ``_build_leg_key`` convention
+    ``databento/symbology.py`` used before this mode existed)::
+
+        build_leg("CME", InstrumentType.FUTURE, "SP500", side="BUY", passthrough=True, include_venue=False)
+        # → InstrumentLeg(instrument_key="FUTURE:SP500", side="BUY", ratio=1)
     """
     leg_key = build_instrument_id(
         venue,
@@ -992,6 +1014,8 @@ def build_leg(
         passthrough=passthrough,
         margin_marker=margin_marker,
     )
+    if not include_venue:
+        leg_key = leg_key.split(":", 1)[1]
     return InstrumentLeg(instrument_key=leg_key, side=side, ratio=ratio)
 
 
