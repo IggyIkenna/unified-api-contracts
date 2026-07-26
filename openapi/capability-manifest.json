@@ -25625,37 +25625,17 @@
       "from_node_id": "min_data_to_run:feature_lookback",
       "gap_type": "missing_extraction",
       "readiness": null,
-      "reason": "feature-group lookbacks unavailable (features-service import gap) \u2014 min-data-to-run not derivable",
+      "reason": "feature-lookback component derived (max 252 bars, group returns); ML training-window factor is a runtime config with no static registry constant \u2014 full min-data-to-run = feature_lookback x training_window pending ML training-window extraction",
       "relation": "min_data_to_run",
-      "status": "not_registered",
+      "status": "partial",
       "to_node_id": "min_data_to_run:feature_lookback"
-    },
-    {
-      "agent_annotation": null,
-      "from_node_id": "service_registry:execution_algos",
-      "gap_type": "missing_extraction",
-      "readiness": null,
-      "reason": "execution_algos: no .venv at /home/ubuntu/unified-trading-system-repos/.tabs/7/execution-service/.venv/bin/python",
-      "relation": "registry_gap",
-      "status": "not_registered",
-      "to_node_id": "service_registry:execution_algos"
-    },
-    {
-      "agent_annotation": null,
-      "from_node_id": "service_registry:feature_groups",
-      "gap_type": "missing_extraction",
-      "readiness": null,
-      "reason": "feature_groups: no .venv at /home/ubuntu/unified-trading-system-repos/.tabs/7/features-service/.venv/bin/python",
-      "relation": "registry_gap",
-      "status": "not_registered",
-      "to_node_id": "service_registry:feature_groups"
     },
     {
       "agent_annotation": null,
       "from_node_id": "service_registry:ml_models",
       "gap_type": "missing_extraction",
       "readiness": null,
-      "reason": "ml_models: no .venv at /home/ubuntu/unified-trading-system-repos/.tabs/7/ml-service/.venv/bin/python",
+      "reason": "ml_models: ModuleNotFoundError: No module named 'ml_service.training.ml.model_registry'",
       "relation": "registry_gap",
       "status": "not_registered",
       "to_node_id": "service_registry:ml_models"
@@ -27636,14 +27616,14 @@
     "broker_classed_venues": 0,
     "logical_dead_end": 467,
     "logical_dead_ends": 16,
-    "missing_extraction": 4,
+    "missing_extraction": 2,
     "missing_registry": 166,
     "needs_code_scan": 1,
-    "not_registered_total": 171,
-    "orphan_nodes": 48,
+    "not_registered_total": 168,
+    "orphan_nodes": 82,
     "unbuilt_dead_ends": 168
   },
-  "generated_from_commit": "431cb79a1e83d45dfc74caf0c71c00da38e09eaa",
+  "generated_from_commit": "5b57f6d285703b96c5c66126d02abef2fd7b70d7",
   "manifest_version": "1.0.0",
   "nodes": [
     {
@@ -28812,8 +28792,283 @@
     },
     {
       "kind": "feature_group",
+      "label": "Candlestick Patterns",
+      "metadata": {
+        "max_lookback_bars": "0"
+      },
+      "node_id": "feature_group:candlestick_patterns"
+    },
+    {
+      "kind": "feature_group",
+      "label": "Confluence",
+      "metadata": {
+        "max_lookback_bars": "0"
+      },
+      "node_id": "feature_group:confluence"
+    },
+    {
+      "kind": "feature_group",
+      "label": "Economic Events",
+      "metadata": {
+        "max_lookback_bars": "0"
+      },
+      "node_id": "feature_group:economic_events"
+    },
+    {
+      "kind": "feature_group",
+      "label": "Fibonacci",
+      "metadata": {
+        "max_lookback_bars": "0"
+      },
+      "node_id": "feature_group:fibonacci"
+    },
+    {
+      "kind": "feature_group",
+      "label": "Funding Oi",
+      "metadata": {
+        "max_lookback_bars": "0"
+      },
+      "node_id": "feature_group:funding_oi"
+    },
+    {
+      "kind": "feature_group",
+      "label": "Futures Basis",
+      "metadata": {
+        "max_lookback_bars": "0"
+      },
+      "node_id": "feature_group:futures_basis"
+    },
+    {
+      "kind": "feature_group",
+      "label": "Level Confluence",
+      "metadata": {
+        "max_lookback_bars": "0"
+      },
+      "node_id": "feature_group:level_confluence"
+    },
+    {
+      "kind": "feature_group",
+      "label": "Liquidations",
+      "metadata": {
+        "max_lookback_bars": "0"
+      },
+      "node_id": "feature_group:liquidations"
+    },
+    {
+      "kind": "feature_group",
+      "label": "Market Structure",
+      "metadata": {
+        "max_lookback_bars": "0"
+      },
+      "node_id": "feature_group:market_structure"
+    },
+    {
+      "kind": "feature_group",
+      "label": "Market Structure Sequence",
+      "metadata": {
+        "max_lookback_bars": "0"
+      },
+      "node_id": "feature_group:market_structure_sequence"
+    },
+    {
+      "kind": "feature_group",
+      "label": "Microstructure",
+      "metadata": {
+        "max_lookback_bars": "0"
+      },
+      "node_id": "feature_group:microstructure"
+    },
+    {
+      "kind": "feature_group",
+      "label": "Momentum",
+      "metadata": {
+        "max_lookback_bars": "0"
+      },
+      "node_id": "feature_group:momentum"
+    },
+    {
+      "kind": "feature_group",
+      "label": "Moving Averages",
+      "metadata": {
+        "max_lookback_bars": "200"
+      },
+      "node_id": "feature_group:moving_averages"
+    },
+    {
+      "kind": "feature_group",
+      "label": "Order Flow Inference",
+      "metadata": {
+        "max_lookback_bars": "0"
+      },
+      "node_id": "feature_group:order_flow_inference"
+    },
+    {
+      "kind": "feature_group",
+      "label": "Oscillators",
+      "metadata": {
+        "max_lookback_bars": "21"
+      },
+      "node_id": "feature_group:oscillators"
+    },
+    {
+      "kind": "feature_group",
+      "label": "Polynomial Trendlines",
+      "metadata": {
+        "max_lookback_bars": "0"
+      },
+      "node_id": "feature_group:polynomial_trendlines"
+    },
+    {
+      "kind": "feature_group",
+      "label": "Return Kurtosis",
+      "metadata": {
+        "max_lookback_bars": "0"
+      },
+      "node_id": "feature_group:return_kurtosis"
+    },
+    {
+      "kind": "feature_group",
+      "label": "Returns",
+      "metadata": {
+        "max_lookback_bars": "252"
+      },
+      "node_id": "feature_group:returns"
+    },
+    {
+      "kind": "feature_group",
+      "label": "Risk Reward",
+      "metadata": {
+        "max_lookback_bars": "0"
+      },
+      "node_id": "feature_group:risk_reward"
+    },
+    {
+      "kind": "feature_group",
+      "label": "Round Numbers",
+      "metadata": {
+        "max_lookback_bars": "0"
+      },
+      "node_id": "feature_group:round_numbers"
+    },
+    {
+      "kind": "feature_group",
+      "label": "Signal Confirmation",
+      "metadata": {
+        "max_lookback_bars": "0"
+      },
+      "node_id": "feature_group:signal_confirmation"
+    },
+    {
+      "kind": "feature_group",
+      "label": "Sr Memory",
+      "metadata": {
+        "max_lookback_bars": "0"
+      },
+      "node_id": "feature_group:sr_memory"
+    },
+    {
+      "kind": "feature_group",
+      "label": "Statistical Anomaly",
+      "metadata": {
+        "max_lookback_bars": "240"
+      },
+      "node_id": "feature_group:statistical_anomaly"
+    },
+    {
+      "kind": "feature_group",
+      "label": "Streaks",
+      "metadata": {
+        "max_lookback_bars": "0"
+      },
+      "node_id": "feature_group:streaks"
+    },
+    {
+      "kind": "feature_group",
+      "label": "Supply Demand Zones",
+      "metadata": {
+        "max_lookback_bars": "0"
+      },
+      "node_id": "feature_group:supply_demand_zones"
+    },
+    {
+      "kind": "feature_group",
+      "label": "Swing Outcome Targets",
+      "metadata": {
+        "max_lookback_bars": "0"
+      },
+      "node_id": "feature_group:swing_outcome_targets"
+    },
+    {
+      "kind": "feature_group",
+      "label": "Targets",
+      "metadata": {
+        "max_lookback_bars": "0"
+      },
+      "node_id": "feature_group:targets"
+    },
+    {
+      "kind": "feature_group",
+      "label": "Technical Indicators",
+      "metadata": {
+        "max_lookback_bars": "26"
+      },
+      "node_id": "feature_group:technical_indicators"
+    },
+    {
+      "kind": "feature_group",
+      "label": "Temporal",
+      "metadata": {
+        "max_lookback_bars": "0"
+      },
+      "node_id": "feature_group:temporal"
+    },
+    {
+      "kind": "feature_group",
+      "label": "Volatility Realized",
+      "metadata": {
+        "max_lookback_bars": "0"
+      },
+      "node_id": "feature_group:volatility_realized"
+    },
+    {
+      "kind": "feature_group",
+      "label": "Volume Analysis",
+      "metadata": {
+        "max_lookback_bars": "0"
+      },
+      "node_id": "feature_group:volume_analysis"
+    },
+    {
+      "kind": "feature_group",
+      "label": "Volume Flow",
+      "metadata": {
+        "max_lookback_bars": "0"
+      },
+      "node_id": "feature_group:volume_flow"
+    },
+    {
+      "kind": "feature_group",
+      "label": "Vwap",
+      "metadata": {
+        "max_lookback_bars": "0"
+      },
+      "node_id": "feature_group:vwap"
+    },
+    {
+      "kind": "feature_group",
+      "label": "Wedge Quality",
+      "metadata": {
+        "max_lookback_bars": "0"
+      },
+      "node_id": "feature_group:wedge_quality"
+    },
+    {
+      "kind": "feature_group",
       "label": "Min Data To Run (feature lookback)",
-      "metadata": {},
+      "metadata": {
+        "deepest_group": "returns",
+        "max_feature_lookback_bars": "252"
+      },
       "node_id": "min_data_to_run:feature_lookback"
     },
     {
@@ -28906,22 +29161,6 @@
         "registry": "trading_agent"
       },
       "node_id": "gap_registry:trading_agent"
-    },
-    {
-      "kind": "gap_registry",
-      "label": "Execution algorithms",
-      "metadata": {
-        "registry": "execution_algos"
-      },
-      "node_id": "service_registry:execution_algos"
-    },
-    {
-      "kind": "gap_registry",
-      "label": "Feature groups",
-      "metadata": {
-        "registry": "feature_groups"
-      },
-      "node_id": "service_registry:feature_groups"
     },
     {
       "kind": "gap_registry",
