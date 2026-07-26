@@ -37,66 +37,81 @@ def test_sports_odds_trades_lookup_returns_contract() -> None:
 
 
 def test_sports_odds_trades_symbol_column_is_fixture_id() -> None:
-    """Sports contracts key on ``fixture_id`` — not ``symbol``, not ``venue``.
+    """Sports contracts key on ``fixture_id`` — not ``symbol``, not ``bookmaker_key``.
 
-    ``venue`` is the bookmaker (BET365/PINNACLE/BETFAIR) and is a shard
+    ``bookmaker_key`` (row-level rename of the manifest 'venue' dimension —
+    see venue_fetch.py) is the bookmaker (BET365/PINNACLE/BETFAIR) shard
     dimension. ``fixture_id`` is the per-row instrument id anchor.
     """
     assert SPORTS_ODDS_TRADES.symbol_column == "fixture_id"
 
 
 def test_sports_odds_trades_has_required_v4_shard_columns() -> None:
-    """data_source + venue + league_id are all mandatory (v4 manifest shard dims)."""
+    """source + bookmaker_key + league_id are all mandatory (v4 manifest shard dims).
+
+    Corrected 2026-07-26 (T2.9 schema-contract-drift fix): the previously
+    registered field names (``venue``/``ts_event``/``data_source``/
+    ``market_type``/``outcome``/``odds_decimal``) never matched what the
+    native live writer actually persists — verified directly against a live
+    ``pipeline_mode=batch_odds_api`` canonical object.
+    """
     declared = {c.name for c in SPORTS_ODDS_TRADES.columns}
     required = {
         "instrument_id",
-        "venue",
-        "ts_event",
-        "data_source",
+        "bookmaker_key",
+        "bm_time",
+        "source",
         "league_id",
         "fixture_id",
-        "market_type",
-        "outcome",
-        "odds_decimal",
+        "market_key",
+        "outcome_name",
+        "price",
     }
     assert required.issubset(declared)
 
 
-def test_sports_odds_trades_broker_and_client_are_nullable_row_columns() -> None:
-    """broker + client are execution-side row columns, not shard dims — nullable."""
-    by_name = {c.name: c for c in SPORTS_ODDS_TRADES.columns}
-    assert by_name["broker"].nullable is True
-    assert by_name["client"].nullable is True
+def test_sports_odds_trades_no_broker_client_columns() -> None:
+    """broker/client never existed in the real writer output — removed 2026-07-26.
+
+    The prior contract declared them as nullable row columns, but no sports
+    odds ingestion path (checked live) ever emits a ``broker``/``client``
+    field — declaring absent columns as "nullable" still fails validation
+    (``missing_column``, independent of nullability), so they were dropped
+    rather than kept nullable.
+    """
+    declared = {c.name for c in SPORTS_ODDS_TRADES.columns}
+    assert "broker" not in declared
+    assert "client" not in declared
 
 
-def test_sports_odds_trades_venue_data_source_league_are_non_nullable() -> None:
-    """venue + data_source + league_id are shard dims — NEVER null."""
+def test_sports_odds_trades_bookmaker_key_source_league_are_non_nullable() -> None:
+    """bookmaker_key + source + league_id are shard dims — NEVER null."""
     by_name = {c.name: c for c in SPORTS_ODDS_TRADES.columns}
-    assert by_name["venue"].nullable is False
-    assert by_name["data_source"].nullable is False
+    assert by_name["bookmaker_key"].nullable is False
+    assert by_name["source"].nullable is False
     assert by_name["league_id"].nullable is False
 
 
 def test_sports_odds_trades_validates_sample_dataframe() -> None:
+    """Sample mirrors a live ``pipeline_mode=batch_odds_api`` canonical object's
+    real column names + dtypes (verified 2026-07-26 against a captured
+    ``venue=WILLIAMHILL/league_id=ALLSVENSKAN`` shard) — ``bm_time`` is the
+    writer's raw ISO8601 string, not a parsed datetime64 column.
+    """
     df = pd.DataFrame(
         {
             "instrument_id": pd.Series(
                 ["FOOTBALL:BETFAIR_EX_UK:MATCH_ODDS:EPL:2025-26:ARSENAL-CHELSEA::HOME"],
                 dtype="string",
             ),
-            "venue": pd.Series(["BETFAIR_EX_UK"], dtype="string"),
-            "ts_event": pd.Series(
-                [datetime(2026, 3, 22, 14, 0, tzinfo=UTC)],
-                dtype="datetime64[ns, UTC]",
-            ),
-            "data_source": pd.Series(["ODDS_API"], dtype="string"),
+            "bookmaker_key": pd.Series(["BETFAIR_EX_UK"], dtype="string"),
+            "bm_time": pd.Series(["2026-03-22T14:00:00Z"], dtype="string"),
+            "source": pd.Series(["ODDS_API"], dtype="string"),
             "league_id": pd.Series(["EPL"], dtype="string"),
             "fixture_id": pd.Series(["EPL:ARSENAL_v_CHELSEA:20260322"], dtype="string"),
-            "market_type": pd.Series(["H2H"], dtype="string"),
-            "outcome": pd.Series(["HOME"], dtype="string"),
-            "odds_decimal": pd.Series([1.85], dtype="float64"),
-            "broker": pd.Series([pd.NA], dtype="string"),
-            "client": pd.Series([pd.NA], dtype="string"),
+            "market_key": pd.Series(["h2h"], dtype="string"),
+            "outcome_name": pd.Series(["HOME"], dtype="string"),
+            "price": pd.Series([1.85], dtype="float64"),
         }
     )
     violations = validate_dataframe(df, SPORTS_ODDS_TRADES)

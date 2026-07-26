@@ -9,13 +9,25 @@ performs a lookup.
 **Shard dimensions (per availability manifest v4)**
 
 Sports:
-    ``(category=sports, venue=BOOKMAKER, data_source=ODDS_API|SFI|FOOTYSTATS,
+    ``(category=sports, venue=BOOKMAKER, source=odds_api|sfi|footystats,
        league_id=EPL|LALIGA|…, instrument_type=odds, data_type=trades)``
 
-    ``venue`` is the bookmaker (BET365, PINNACLE, BETFAIR, MATCHBOOK,
-    UNITY_BETFAIR). ``data_source`` is the provider. ``league_id`` is a
-    first-class shard column — never overload ``venue``. ``broker`` and
-    ``client`` are execution-side row columns, NOT partition dimensions.
+    ``venue`` (manifest/path dimension) is the bookmaker (BET365, PINNACLE,
+    BETFAIR, MATCHBOOK, UNITY_BETFAIR). ``source`` is the provider.
+    ``league_id`` is a first-class shard column — never overload ``venue``.
+
+    **Row-level schema (SPORTS_ODDS_TRADES contract, corrected 2026-07-26 —
+    T2.9 of `sports_mtds_odds_trades_index_correctness_followup_2026_07_24.md`):**
+    the ROW columns persisted by the native live writer do NOT mirror the
+    manifest partition-dimension names 1:1 — `venue_fetch.py`'s per-bookmaker
+    shard grouping renames the row-level ``venue`` key to ``bookmaker_key``
+    before write, and the writer emits ``bm_time`` / ``source`` / ``market_key``
+    / ``outcome_name`` / ``price`` rather than the previously-registered
+    ``ts_event`` / ``data_source`` / ``market_type`` / ``outcome`` /
+    ``odds_decimal``. There is no ``broker``/``client`` pairing anywhere in
+    this ingestion shape (those never existed in the real writer output) —
+    verified directly against a live captured
+    ``pipeline_mode=batch_odds_api`` object, not inferred.
 
 Prediction:
     ``(category=prediction, venue=POLYMARKET, chain=POLYGON,
@@ -54,10 +66,27 @@ SPORTS_ODDS_TRADES = SchemaContract(
     data_type="trades",
     columns=[
         INSTRUMENT_ID_COL,
-        VENUE_COL,
-        TS_EVENT_COL,
         ColumnSpec(
-            name="data_source",
+            name="bookmaker_key",
+            dtype="string",
+            nullable=False,
+            description=(
+                "Bookmaker identifier (BET365, PINNACLE, BETFAIR, …). Row-level rename of the "
+                "manifest/path 'venue' dimension applied by venue_fetch.py's per-bookmaker shard "
+                "grouping before write — the real writer output never carries a 'venue' column."
+            ),
+        ),
+        ColumnSpec(
+            name="bm_time",
+            dtype="string",
+            nullable=False,
+            description=(
+                "Bookmaker-reported ground-truth event time — ISO8601 string as persisted by the "
+                "writer, NOT a parsed datetime64 column (see docs/SPORTS_ODDS.md)."
+            ),
+        ),
+        ColumnSpec(
+            name="source",
             dtype="string",
             nullable=False,
             description="Provider: ODDS_API, SFI, FOOTYSTATS.",
@@ -70,25 +99,13 @@ SPORTS_ODDS_TRADES = SchemaContract(
         ),
         ColumnSpec(name="fixture_id", dtype="string", nullable=False),
         ColumnSpec(
-            name="market_type",
+            name="market_key",
             dtype="string",
             nullable=False,
             description="H2H, OU, BTTS, ASIAN_HANDICAP, CORRECT_SCORE, …",
         ),
-        ColumnSpec(name="outcome", dtype="string", nullable=False),
-        ColumnSpec(name="odds_decimal", dtype="float64", nullable=False),
-        ColumnSpec(
-            name="broker",
-            dtype="string",
-            nullable=True,
-            description="Execution-side broker (e.g. UNITY). Row-level, not a partition dim.",
-        ),
-        ColumnSpec(
-            name="client",
-            dtype="string",
-            nullable=True,
-            description="Allocation-side client id. Row-level, not a partition dim.",
-        ),
+        ColumnSpec(name="outcome_name", dtype="string", nullable=False),
+        PRICE_COL,
     ],
     symbol_column="fixture_id",
     required_row_count_min=1,
