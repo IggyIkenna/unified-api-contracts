@@ -1,6 +1,6 @@
 # Capability Manifest — Orphan + Dead-End Report
 # manifest_version: 1.0.0
-# generated_from_commit: f0b66b2659c1843cbd7e4fabad91a66963e3af55
+# generated_from_commit: 431cb79a1e83d45dfc74caf0c71c00da38e09eaa
 #
 # Orphan nodes have no edges. Unbuilt dead-ends are registry-available
 # archetype/instrument combos with no supporting venue (build gap).
@@ -12,7 +12,7 @@
 
 (none — all declared brokers correctly classified as broker nodes)
 
-## Orphan nodes (81)
+## Orphan nodes (48)
 
 ORPHAN: chain:1101
 ORPHAN: chain:11155111
@@ -43,40 +43,6 @@ ORPHAN: chain:MOONBEAM
 ORPHAN: chain:POLYGON
 ORPHAN: chain:SCROLL
 ORPHAN: chain:ZKSYNC
-ORPHAN: feature_group:candlestick_patterns
-ORPHAN: feature_group:confluence
-ORPHAN: feature_group:economic_events
-ORPHAN: feature_group:fibonacci
-ORPHAN: feature_group:funding_oi
-ORPHAN: feature_group:futures_basis
-ORPHAN: feature_group:level_confluence
-ORPHAN: feature_group:liquidations
-ORPHAN: feature_group:market_structure
-ORPHAN: feature_group:market_structure_sequence
-ORPHAN: feature_group:microstructure
-ORPHAN: feature_group:momentum
-ORPHAN: feature_group:moving_averages
-ORPHAN: feature_group:order_flow_inference
-ORPHAN: feature_group:oscillators
-ORPHAN: feature_group:polynomial_trendlines
-ORPHAN: feature_group:return_kurtosis
-ORPHAN: feature_group:returns
-ORPHAN: feature_group:risk_reward
-ORPHAN: feature_group:round_numbers
-ORPHAN: feature_group:signal_confirmation
-ORPHAN: feature_group:sr_memory
-ORPHAN: feature_group:statistical_anomaly
-ORPHAN: feature_group:streaks
-ORPHAN: feature_group:supply_demand_zones
-ORPHAN: feature_group:swing_outcome_targets
-ORPHAN: feature_group:targets
-ORPHAN: feature_group:technical_indicators
-ORPHAN: feature_group:temporal
-ORPHAN: feature_group:volatility_realized
-ORPHAN: feature_group:volume_analysis
-ORPHAN: feature_group:volume_flow
-ORPHAN: feature_group:vwap
-ORPHAN: feature_group:wedge_quality
 ORPHAN: selector_contradiction:ghost_algorithms
 ORPHAN: selector_contradiction:heuristic_selector_bypasses_instruction_type
 ORPHAN: selector_contradiction:iceberg_path_split
@@ -86,6 +52,7 @@ ORPHAN: signing_surface:FIREBLOCKS_MPC
 ORPHAN: venue:API_FOOTBALL
 ORPHAN: venue:BINANCE
 ORPHAN: venue:FOOTYSTATS
+ORPHAN: venue:FX
 ORPHAN: venue:METABET
 ORPHAN: venue:ODDS_API
 ORPHAN: venue:ODDS_ENGINE
@@ -96,7 +63,7 @@ ORPHAN: venue:SOCCER_FOOTBALL_INFO
 ORPHAN: venue:TRANSFERMARKT
 ORPHAN: venue:UNDERSTAT
 
-## Unbuilt dead-ends (159)
+## Unbuilt dead-ends (168)
 
 UNBUILT: ARBITRAGE_PRICE_DISPERSION x event_settled (SPORTS) — capability registry marks (archetype, instrument_type) available, but no SPORTS venue lists this instrument type — unbuilt dead-end (missing adapter/registry)
 UNBUILT: ARBITRAGE_PRICE_DISPERSION x perp (CEFI) — capability registry marks (archetype, instrument_type) available, but no CEFI venue lists this instrument type — unbuilt dead-end (missing adapter/registry)
@@ -104,9 +71,11 @@ UNBUILT: ARBITRAGE_PRICE_DISPERSION x spot (CEFI) — capability registry marks 
 UNBUILT: CARRY_BASIS_DATED x dated_future (CEFI) — capability registry marks (archetype, instrument_type) available, but no CEFI venue lists this instrument type — unbuilt dead-end (missing adapter/registry)
 UNBUILT: CARRY_BASIS_DATED_INV x dated_future (CEFI) — capability registry marks (archetype, instrument_type) available, but no CEFI venue lists this instrument type — unbuilt dead-end (missing adapter/registry)
 UNBUILT: CARRY_BASIS_PERP x perp (CEFI) — capability registry marks (archetype, instrument_type) available, but no CEFI venue lists this instrument type — unbuilt dead-end (missing adapter/registry)
+UNBUILT: CARRY_BASIS_PERP_INV x perp (CEFI) — capability registry marks (archetype, instrument_type) available, but no CEFI venue lists this instrument type — unbuilt dead-end (missing adapter/registry)
 UNBUILT: CARRY_BASIS_PERP_INV x staking (DEFI) — capability registry marks (archetype, instrument_type) available, but no DEFI venue lists this instrument type — unbuilt dead-end (missing adapter/registry)
 UNBUILT: CARRY_RECURSIVE_BORROW_LENDING_ONLY x staking (DEFI) — capability registry marks (archetype, instrument_type) available, but no DEFI venue lists this instrument type — unbuilt dead-end (missing adapter/registry)
 UNBUILT: CARRY_RECURSIVE_STAKED x staking (DEFI) — capability registry marks (archetype, instrument_type) available, but no DEFI venue lists this instrument type — unbuilt dead-end (missing adapter/registry)
+UNBUILT: CARRY_STAKED_BASIS x perp (CEFI) — capability registry marks (archetype, instrument_type) available, but no CEFI venue lists this instrument type — unbuilt dead-end (missing adapter/registry)
 UNBUILT: CARRY_STAKED_BASIS x staking (DEFI) — capability registry marks (archetype, instrument_type) available, but no DEFI venue lists this instrument type — unbuilt dead-end (missing adapter/registry)
 UNBUILT: LIQUIDATION_CAPTURE x lending (CEFI) — capability registry marks (archetype, instrument_type) available, but no CEFI venue lists this instrument type — unbuilt dead-end (missing adapter/registry)
 UNBUILT: MARKET_MAKING_CONTINUOUS x lp (DEFI) — capability registry marks (archetype, instrument_type) available, but no DEFI venue lists this instrument type — unbuilt dead-end (missing adapter/registry)
@@ -120,6 +89,8 @@ UNBUILT: RULES_DIRECTIONAL_CONTINUOUS x perp (CEFI) — capability registry mark
 UNBUILT: RULES_DIRECTIONAL_CONTINUOUS x spot (CEFI) — capability registry marks (archetype, instrument_type) available, but no CEFI venue lists this instrument type — unbuilt dead-end (missing adapter/registry)
 UNBUILT: STAT_ARB_PAIRS_FIXED x perp (CEFI) — capability registry marks (archetype, instrument_type) available, but no CEFI venue lists this instrument type — unbuilt dead-end (missing adapter/registry)
 UNBUILT: STAT_ARB_PAIRS_FIXED x spot (CEFI) — capability registry marks (archetype, instrument_type) available, but no CEFI venue lists this instrument type — unbuilt dead-end (missing adapter/registry)
+UNBUILT: TSMOM_BTC_CTA x perp (CEFI) — capability registry marks (archetype, instrument_type) available, but no CEFI venue lists this instrument type — unbuilt dead-end (missing adapter/registry)
+UNBUILT: TSMOM_BTC_CTA x spot (CEFI) — capability registry marks (archetype, instrument_type) available, but no CEFI venue lists this instrument type — unbuilt dead-end (missing adapter/registry)
 UNBUILT: VOL_TRADING_OPTIONS x option (CEFI) — capability registry marks (archetype, instrument_type) available, but no CEFI venue lists this instrument type — unbuilt dead-end (missing adapter/registry)
 UNBUILT: YIELD_ROTATION_LENDING x lending (CEFI) — capability registry marks (archetype, instrument_type) available, but no CEFI venue lists this instrument type — unbuilt dead-end (missing adapter/registry)
 UNBUILT: YIELD_STAKING_SIMPLE x staking (DEFI) — capability registry marks (archetype, instrument_type) available, but no DEFI venue lists this instrument type — unbuilt dead-end (missing adapter/registry)
@@ -138,6 +109,8 @@ UNBUILT: leg:ARBITRAGE_PRICE_DISPERSION:buy x spot (CEFI) — capability registr
 UNBUILT: leg:ARBITRAGE_PRICE_DISPERSION:sell x event_settled (SPORTS) — capability registry marks (archetype, instrument_type) available, but no SPORTS venue lists this instrument type — unbuilt dead-end (missing adapter/registry)
 UNBUILT: leg:ARBITRAGE_PRICE_DISPERSION:sell x perp (CEFI) — capability registry marks (archetype, instrument_type) available, but no CEFI venue lists this instrument type — unbuilt dead-end (missing adapter/registry)
 UNBUILT: leg:ARBITRAGE_PRICE_DISPERSION:sell x spot (CEFI) — capability registry marks (archetype, instrument_type) available, but no CEFI venue lists this instrument type — unbuilt dead-end (missing adapter/registry)
+UNBUILT: leg:ARBITRAGE_SPORTS_DUTCHING:outcome_a x event_settled (SPORTS) — capability registry marks (archetype, instrument_type) available, but no SPORTS venue lists this instrument type — unbuilt dead-end (missing adapter/registry)
+UNBUILT: leg:ARBITRAGE_SPORTS_DUTCHING:outcome_b x event_settled (SPORTS) — capability registry marks (archetype, instrument_type) available, but no SPORTS venue lists this instrument type — unbuilt dead-end (missing adapter/registry)
 UNBUILT: leg:CARRY_BASIS_DATED:future x dated_future (CEFI) — capability registry marks (archetype, instrument_type) available, but no CEFI venue lists this instrument type — unbuilt dead-end (missing adapter/registry)
 UNBUILT: leg:CARRY_BASIS_DATED:spot x spot (CEFI) — capability registry marks (archetype, instrument_type) available, but no CEFI venue lists this instrument type — unbuilt dead-end (missing adapter/registry)
 UNBUILT: leg:CARRY_BASIS_DATED_INV:future x dated_future (CEFI) — capability registry marks (archetype, instrument_type) available, but no CEFI venue lists this instrument type — unbuilt dead-end (missing adapter/registry)
@@ -146,6 +119,8 @@ UNBUILT: leg:CARRY_BASIS_PERP:perp x perp (CEFI) — capability registry marks (
 UNBUILT: leg:CARRY_BASIS_PERP:spot x spot (CEFI) — capability registry marks (archetype, instrument_type) available, but no CEFI venue lists this instrument type — unbuilt dead-end (missing adapter/registry)
 UNBUILT: leg:CARRY_BASIS_PERP_INV:perp x perp (CEFI) — capability registry marks (archetype, instrument_type) available, but no CEFI venue lists this instrument type — unbuilt dead-end (missing adapter/registry)
 UNBUILT: leg:CARRY_BASIS_PERP_INV:spot x spot (CEFI) — capability registry marks (archetype, instrument_type) available, but no CEFI venue lists this instrument type — unbuilt dead-end (missing adapter/registry)
+UNBUILT: leg:CARRY_FUNDING_DISPERSION:perp_long x perp (CEFI) — capability registry marks (archetype, instrument_type) available, but no CEFI venue lists this instrument type — unbuilt dead-end (missing adapter/registry)
+UNBUILT: leg:CARRY_FUNDING_DISPERSION:perp_short x perp (CEFI) — capability registry marks (archetype, instrument_type) available, but no CEFI venue lists this instrument type — unbuilt dead-end (missing adapter/registry)
 UNBUILT: leg:CARRY_RECURSIVE_BORROW_LENDING_ONLY:loop_borrow x lending (CEFI) — capability registry marks (archetype, instrument_type) available, but no CEFI venue lists this instrument type — unbuilt dead-end (missing adapter/registry)
 UNBUILT: leg:CARRY_RECURSIVE_BORROW_LENDING_ONLY:loop_collateral x lending (CEFI) — capability registry marks (archetype, instrument_type) available, but no CEFI venue lists this instrument type — unbuilt dead-end (missing adapter/registry)
 UNBUILT: leg:CARRY_RECURSIVE_STAKED:loop_borrow x lending (CEFI) — capability registry marks (archetype, instrument_type) available, but no CEFI venue lists this instrument type — unbuilt dead-end (missing adapter/registry)
@@ -197,6 +172,7 @@ UNBUILT: leg:STAT_ARB_PAIRS_FIXED:long x perp (CEFI) — capability registry mar
 UNBUILT: leg:STAT_ARB_PAIRS_FIXED:long x spot (CEFI) — capability registry marks (archetype, instrument_type) available, but no CEFI venue lists this instrument type — unbuilt dead-end (missing adapter/registry)
 UNBUILT: leg:STAT_ARB_PAIRS_FIXED:short x perp (CEFI) — capability registry marks (archetype, instrument_type) available, but no CEFI venue lists this instrument type — unbuilt dead-end (missing adapter/registry)
 UNBUILT: leg:STAT_ARB_PAIRS_FIXED:short x spot (CEFI) — capability registry marks (archetype, instrument_type) available, but no CEFI venue lists this instrument type — unbuilt dead-end (missing adapter/registry)
+UNBUILT: leg:TSMOM_BTC_CTA:directional x perp (CEFI) — capability registry marks (archetype, instrument_type) available, but no CEFI venue lists this instrument type — unbuilt dead-end (missing adapter/registry)
 UNBUILT: leg:VOL_0DTE_GAMMA_SCALPING:call x option (CEFI) — capability registry marks (archetype, instrument_type) available, but no CEFI venue lists this instrument type — unbuilt dead-end (missing adapter/registry)
 UNBUILT: leg:VOL_0DTE_GAMMA_SCALPING:delta_hedge x dated_future (CEFI) — capability registry marks (archetype, instrument_type) available, but no CEFI venue lists this instrument type — unbuilt dead-end (missing adapter/registry)
 UNBUILT: leg:VOL_0DTE_GAMMA_SCALPING:delta_hedge x perp (CEFI) — capability registry marks (archetype, instrument_type) available, but no CEFI venue lists this instrument type — unbuilt dead-end (missing adapter/registry)
@@ -283,12 +259,3 @@ LOGICAL: YIELD_ROTATION_LENDING x lending (CEFI) — CeFi lending out-of-scope: 
 # edge in the current manifest. They are listed here for triage.
 
 # (none)
-
-=== VERDICT MATRIX SUMMARY (Phase 6A) ===
-Exhaustive cross-join: archetype x venue x instrument_type x (instruction_action x algo).
-  total cells:    24672
-  available:      17293 (70.1%)
-  blocked:        6931 (28.1%)
-  not_registered: 448 (1.8%)
-Output: openapi/capability-verdict-matrix.json
-=== END VERDICT MATRIX SUMMARY ===

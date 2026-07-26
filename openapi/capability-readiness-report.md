@@ -18,11 +18,11 @@ non-`backtest-only` stamp cites its evidence source.
 **Maturity → C/D/B gate** (`plans/PLAN_FORMAT.md` § 3-Tier Readiness Model):
 `backtest-only`→C2, `shadow-observed`→D2, `staging-proven`→D3, `live-proven`→D5.
 
-Manifest commit: `f0b66b2659c1843cbd7e4fabad91a66963e3af55`
+Manifest commit: `431cb79a1e83d45dfc74caf0c71c00da38e09eaa`
 
 ## Tier distribution (4)
 
-- `backtest-only` (gate C2): **55**
+- `backtest-only` (gate C2): **58**
 - `shadow-observed` (gate D2): **0**
 - `staging-proven` (gate D3): **0**
 - `live-proven` (gate D5): **2**
@@ -32,17 +32,19 @@ Manifest commit: `f0b66b2659c1843cbd7e4fabad91a66963e3af55`
 - `ARBITRAGE_PRICE_DISPERSION` — **live-proven** (gate D5) — evidence: `live_cluster_registry:mtds-live-binance`
 - `CARRY_STAKED_BASIS` — **live-proven** (gate D5) — evidence: `live_cluster_registry:mtds-live-binance`
 
-## Backtest-only archetypes (no operational evidence on-host) (55)
+## Backtest-only archetypes (no operational evidence on-host) (58)
 
 - `ARBITRAGE_CROSS_DOMAIN_EVENT`
 - `ARBITRAGE_MEV_BACKRUN`
 - `ARBITRAGE_MEV_JIT_LIQUIDITY`
 - `ARBITRAGE_MEV_LIQUIDATION_BUNDLE`
 - `ARBITRAGE_MEV_SANDWICH`
+- `ARBITRAGE_SPORTS_DUTCHING`
 - `CARRY_BASIS_DATED`
 - `CARRY_BASIS_DATED_INV`
 - `CARRY_BASIS_PERP`
 - `CARRY_BASIS_PERP_INV`
+- `CARRY_FUNDING_DISPERSION`
 - `CARRY_RECURSIVE_BORROW_LENDING_ONLY`
 - `CARRY_RECURSIVE_STAKED`
 - `CARRY_STAKED_BASIS_DATED`
@@ -68,6 +70,7 @@ Manifest commit: `f0b66b2659c1843cbd7e4fabad91a66963e3af55`
 - `RULES_DIRECTIONAL_EVENT_SETTLED`
 - `STAT_ARB_CROSS_SECTIONAL`
 - `STAT_ARB_PAIRS_FIXED`
+- `TSMOM_BTC_CTA`
 - `VOL_0DTE_GAMMA_SCALPING`
 - `VOL_0DTE_PIN_RISK`
 - `VOL_ARB_RV_IV`

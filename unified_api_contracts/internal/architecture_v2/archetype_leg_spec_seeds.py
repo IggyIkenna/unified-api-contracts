@@ -313,6 +313,18 @@ def _basis_perp_structure(archetype: StrategyArchetype, *, inverse: bool, notes:
                     # ("raydium", "hyperliquid", "sol", ...) sets spot_venue="raydium" (SOL/USDC AMM,
                     # DEX spot leg paired with a Hyperliquid perp hedge); confirmed missing via the
                     # Side-decision 2 containment check.
+                    # "orca"/"whirlpool" intentionally ABSENT (issue
+                    # e2e_defi_config_taxonomy_wizard_roundtrip_2026_06_17.md D3): the drift-perp /
+                    # Orca(Raydium) SOL-DEX-spot basis that motivated D3 was modeled only by
+                    # `backtest_solana_basis.py`, which was DELETED in the 2026-07-16 Solana-perp-DEX
+                    # cull (commit e2e-testing@76a1071, "re-point SOL staked-basis to Hyperliquid") —
+                    # DRIFT itself was removed workspace-wide the same day, so that config can no
+                    # longer be built at all, on any spot venue. `catalog_carry.py`'s SURVIVING SOL
+                    # cross-venue row pairs raydium spot with a Hyperliquid perp hedge (not drift) —
+                    # it never emits an orca/whirlpool row, so adding those venues here would claim a
+                    # wizard-buildable cell with zero catalog slot behind it (a false positive). If a
+                    # future catalog row pairs orca/whirlpool spot with a live perp hedge, add it here
+                    # then, cited to that row.
                     "uniswap_v3",
                 ),
                 source_of_truth=(
