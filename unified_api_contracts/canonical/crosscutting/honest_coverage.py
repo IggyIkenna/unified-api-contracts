@@ -50,8 +50,9 @@ module stays the import surface.
 
 from __future__ import annotations
 
+from collections.abc import Mapping
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import date, datetime
 from enum import StrEnum
 from typing import Final
 
@@ -550,6 +551,104 @@ def build_fetch_evidence(
     )
 
 
+# ---------------------------------------------------------------------------
+# CompletenessProbe — the DeFi completeness-oracle chain-truth denominator.
+# ---------------------------------------------------------------------------
+#
+# Schema-only landing of the design SSOT's §2 data contract
+# (``/codex/02-data/defi-completeness-oracle.md``). One ``CompletenessProbe``
+# per ``(protocol, chain, as_of_date)`` answers "do we have ALL DeFi
+# instruments for this (protocol, chain)?" from on-chain truth (factory
+# ``poolCount`` / lending registry / protocol markets endpoint), replacing the
+# circular ``EXPECTED = ENUMERATED`` DeFi Layer-1 measurement. This is the P0
+# schema step only (§9 of the design doc) — no probe implementations, no
+# ``--use-defi-oracle`` wiring.
+
+
+class CompletenessProbeStatus(StrEnum):
+    """Closed-set verdict for one :class:`CompletenessProbe`.
+
+    Semantics (design doc §1, fail-CLOSED per ``honest-coverage-model.md``):
+
+    * ``enumerated == expected == 0`` -> :attr:`UNDEFINED` (never green — empty-denominator guard).
+    * ``enumerated == expected > 0`` -> :attr:`COMPLETE` (100%; every on-chain instrument seen).
+    * ``enumerated < expected`` -> :attr:`GAP` (``missing_delta`` is named + quantified).
+    * ``enumerated > expected`` -> :attr:`OVER_ENUMERATED` (stray; catalogue holds ghosts).
+    * probe throws / subgraph indexing-behind / RPC down -> :attr:`PROBE_FAILED` (never silently 100%).
+    """
+
+    COMPLETE = "complete"
+    GAP = "gap"
+    OVER_ENUMERATED = "over_enumerated"
+    UNDEFINED = "undefined"
+    PROBE_FAILED = "probe_failed"
+
+
+class CompletenessProbeKind(StrEnum):
+    """Which on-chain truth source a :class:`CompletenessProbe` read.
+
+    Tier-A (fast, indexed subgraph/API reads) is the rollout accelerator;
+    Tier-B (direct on-chain RPC reads) is the certification bar (design doc
+    §6/§12) — a protocol is CERTIFIED complete only once its Tier-B probe
+    returns :attr:`CompletenessProbeStatus.COMPLETE`.
+    """
+
+    # Tier-A: fast, indexed — trust unless subgraph drift detected.
+    DEX_FACTORY_SUBGRAPH_TIER_A = "dex_factory_subgraph_tierA"
+    LENDING_REGISTRY_SUBGRAPH_TIER_A = "lending_registry_subgraph_tierA"
+    PERPS_MARKETS_API_TIER_A = "perps_markets_api_tierA"
+    YIELD_REGISTRY_TIER_A = "yield_registry_tierA"
+    # Tier-B: on-chain truth — replaces Tier-A per protocol as the RPC adapter lands.
+    DEX_FACTORY_RPC_TIER_B = "dex_factory_rpc_tierB"
+    LENDING_REGISTRY_RPC_TIER_B = "lending_registry_rpc_tierB"
+    PERPS_MARKETS_RPC_TIER_B = "perps_markets_rpc_tierB"
+
+
+@dataclass(frozen=True, slots=True)
+class CompletenessProbe:
+    """One immutable chain-truth denominator reading for ``(protocol, chain, as_of_date)``.
+
+    Lives beside :class:`EmptyConfirmedReason` per the design SSOT (§2). A
+    probe is a snapshot pinned to ``probe_block`` — downstream consumers keep
+    the whole record; they never read a bare ``completeness_pct`` divorced
+    from ``probe_block`` and ``probe_source``.
+
+    Fields:
+        protocol: UAC ``PROTOCOL_CAPABILITIES`` key, e.g. ``"uniswap_v3"``.
+        chain: UAC chain name (upper), e.g. ``"ETHEREUM"``.
+        as_of_date: UTC date the probe was pinned to.
+        probe_block: Block number at which the on-chain count was read.
+        probe_ts_utc: UTC probe execution timestamp.
+        probe_kind: Which :class:`CompletenessProbeKind` produced this reading.
+        probe_source: subgraph_id / RPC endpoint URL / registry contract addr.
+        expected_count: On-chain truth (this oracle's output).
+        enumerated_count: IS-catalogue count for ``(protocol, chain)`` at ``as_of_date``.
+        missing_delta: ``max(expected_count - enumerated_count, 0)``.
+        stray_delta: ``max(enumerated_count - expected_count, 0)``.
+        completeness_pct: ``None`` when ``expected_count == 0`` (UNDEFINED).
+        status: The closed-set verdict.
+        error_reason: Populated iff ``status == PROBE_FAILED``.
+        creation_blocks: Optional address -> creation-block map (genesis
+            oracle, design doc §5) — ``None`` when not collected this probe.
+    """
+
+    protocol: str
+    chain: str
+    as_of_date: date
+    probe_block: int
+    probe_ts_utc: datetime
+    probe_kind: CompletenessProbeKind
+    probe_source: str
+    expected_count: int
+    enumerated_count: int
+    missing_delta: int
+    stray_delta: int
+    completeness_pct: float | None
+    status: CompletenessProbeStatus
+    error_reason: str | None
+    creation_blocks: Mapping[str, int] | None
+
+
 __all__ = [
     "BUNDLED_DATA_TYPES",
     "DATA_TYPE_TO_CLUSTER_REGISTRY",
@@ -568,6 +667,9 @@ __all__ = [
     "SPORTS_FIXTURE_CLUSTERS",
     "WITHIN_WINDOW_EXPECTED_ABSENCE_REASONS",
     "CaptureStatusCounts",
+    "CompletenessProbe",
+    "CompletenessProbeKind",
+    "CompletenessProbeStatus",
     "EmptyConfirmedReason",
     "EmptyFromLiveInstrumentError",
     "FetchErrorSignal",
