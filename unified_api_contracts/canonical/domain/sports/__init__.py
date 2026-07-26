@@ -95,6 +95,7 @@ from .league_data import get_league_fixture_calendar as get_league_fixture_calen
 from .league_data import get_leagues_by_classification as get_leagues_by_classification
 from .league_data import get_leagues_by_country as get_leagues_by_country
 from .league_data import get_leagues_for_sport as get_leagues_for_sport
+from .league_data import get_mvp_football_league_ids as get_mvp_football_league_ids
 from .league_data import get_prediction_leagues as get_prediction_leagues
 from .league_data import get_source_coverage_start as get_source_coverage_start
 from .league_data import get_source_for_data_type as get_source_for_data_type

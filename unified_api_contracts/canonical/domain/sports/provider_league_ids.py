@@ -19,6 +19,10 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+from unified_api_contracts.canonical.domain.sports.league_data import (
+    get_mvp_football_league_ids,
+)
+
 # Direct JSON read avoids triggering registry/__init__.py during the canonical
 # domain sports init chain (which causes a circular import via archetype_config).
 _ENTITY_COV_JSON = (
@@ -776,11 +780,13 @@ SPORTS_ENTITY_LEAGUE_COVERAGE: dict[str, frozenset[str] | None] = {
     "TEAMS": None,
     "STANDINGS": None,
     "INJURIES": None,
-    # Per-fixture entities — expected on all fixture dates
-    "FIXTURE_STATS": None,
-    "FIXTURE_EVENTS": None,
-    "FIXTURE_LINEUPS": None,
-    "PLAYER_STATS": None,
+    # Per-fixture ENRICHMENT entities — MVP-scoped (operator ruling: enrichment
+    # fan-out must not follow the wider FIXTURES curated-universe expansion,
+    # 96 leagues not 383 — see get_mvp_football_league_ids() docstring).
+    "FIXTURE_STATS": get_mvp_football_league_ids(),
+    "FIXTURE_EVENTS": get_mvp_football_league_ids(),
+    "FIXTURE_LINEUPS": get_mvp_football_league_ids(),
+    "PLAYER_STATS": get_mvp_football_league_ids(),
     # Enrichment entities — coverage varies by source
     "XG": _UNDERSTAT_LEAGUE_COVERAGE,  # Understat: 5 European leagues
     "XG_SHOTS": _UNDERSTAT_LEAGUE_COVERAGE,  # Understat: per-shot xG, same leagues
