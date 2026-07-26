@@ -37,6 +37,12 @@
       "readiness": "live-proven"
     },
     {
+      "archetype_id": "ARBITRAGE_SPORTS_DUTCHING",
+      "evidence": "",
+      "gate": "C2",
+      "readiness": "backtest-only"
+    },
+    {
       "archetype_id": "CARRY_BASIS_DATED",
       "evidence": "",
       "gate": "C2",
@@ -56,6 +62,12 @@
     },
     {
       "archetype_id": "CARRY_BASIS_PERP_INV",
+      "evidence": "",
+      "gate": "C2",
+      "readiness": "backtest-only"
+    },
+    {
+      "archetype_id": "CARRY_FUNDING_DISPERSION",
       "evidence": "",
       "gate": "C2",
       "readiness": "backtest-only"
@@ -217,6 +229,12 @@
       "readiness": "backtest-only"
     },
     {
+      "archetype_id": "TSMOM_BTC_CTA",
+      "evidence": "",
+      "gate": "C2",
+      "readiness": "backtest-only"
+    },
+    {
       "archetype_id": "VOL_0DTE_GAMMA_SCALPING",
       "evidence": "",
       "gate": "C2",
@@ -344,7 +362,7 @@
     }
   ],
   "evidence_model": "live_cluster_registry (PROD\u2192live-proven, STAGING\u2192staging-proven); absent evidence \u2192 backtest-only (honest default); shadow-observed only via committed override (none on-host today)",
-  "manifest_commit": "f0b66b2659c1843cbd7e4fabad91a66963e3af55",
+  "manifest_commit": "431cb79a1e83d45dfc74caf0c71c00da38e09eaa",
   "readiness_tiers": [
     "backtest-only",
     "shadow-observed",
@@ -358,7 +376,7 @@
     "staging-proven": "D3"
   },
   "tier_distribution": {
-    "backtest-only": 55,
+    "backtest-only": 58,
     "live-proven": 2,
     "shadow-observed": 0,
     "staging-proven": 0
