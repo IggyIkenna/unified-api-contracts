@@ -69,6 +69,10 @@ EXPECTED_SOURCE_MODE_CAPABILITY: dict[str, frozenset[Mode]] = {
     # (lst_rate_honest_coverage plan Phase 1). BATCH-only: only BATCH_AAVE
     # exists in PipelineMode today.
     "aave": _B,
+    # DefiLlama historical price-ratio proxy (solana_lst_archival.py Tier-4
+    # fallback) — added 2026-07-26 (defi_satellite_ao_dispatch_batch1 lst_rates
+    # sub-item (a)). BATCH-only: only BATCH_DEFILLAMA exists in PipelineMode.
+    "defillama": _B,
     # Prediction
     "polymarket_clob": _BLR,
     "polymarket_gamma_api": _B,
