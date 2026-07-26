@@ -83,6 +83,13 @@ class PipelineMode(StrEnum):
     BATCH_CHAINLINK = "batch_chainlink"
     BATCH_CROSS_INSTRUMENT = "batch_cross_instrument"
     BATCH_DATABENTO = "batch_databento"
+    # DefiLlama historical-ratio API — Tier-4 Solana LST exchange-rate FALLBACK
+    # (a market-price PROXY, not a genuine on-chain read; distinct from the
+    # Tier 1-3 ``onchain_subgraph`` methods `alchemy_get_account_info` /
+    # `thegraph_subgraph` / `rest_api`). Added 2026-07-26 per
+    # defi_satellite_ao_dispatch_batch1_2026_07_25.md sub-item (a) — see
+    # ``lst_rates_handler.py``'s per-row ``method``-based derivation.
+    BATCH_DEFILLAMA = "batch_defillama"
     BATCH_EIA = "batch_eia"
     BATCH_EXECUTION_SERVICE = "batch_execution_service"
     BATCH_FEATURES_ONCHAIN_SERVICE = "batch_features_onchain_service"
@@ -189,6 +196,12 @@ class PipelineMode(StrEnum):
     # {batch, live, replay} sources — both live + replay members.
     LIVE_DATABENTO = "live_databento"
     REPLAY_DATABENTO = "replay_databento"
+    # DefiLlama historical-ratio Tier-4 LST fallback — registered {BATCH,LIVE,REPLAY}
+    # to mirror the handler's existing generic ``Mode(self.runtime.mode.value)``
+    # threading (same as onchain_subgraph/chainlink/pyth_hermes above), even though
+    # today's only caller path is batch.
+    LIVE_DEFILLAMA = "live_defillama"
+    REPLAY_DEFILLAMA = "replay_defillama"
     LIVE_MASSIVE = "live_massive"
     REPLAY_MASSIVE = "replay_massive"
     LIVE_PYTH_HERMES = "live_pyth_hermes"

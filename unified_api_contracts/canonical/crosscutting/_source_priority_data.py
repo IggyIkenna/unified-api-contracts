@@ -268,7 +268,15 @@ SOURCE_PRIORITY: Final[dict[tuple[str, str], list[str]]] = {
     ("defi", "governance_events"): ["onchain_subgraph"],
     ("defi", "liquidation_events"): ["onchain_rpc"],
     ("defi", "liquidations"): ["onchain_subgraph"],
-    ("defi", "lst_rates"): ["onchain_subgraph"],
+    # "defillama" added 2026-07-26 (defi_satellite_ao_dispatch_batch1_2026_07_25.md
+    # sub-item (a)): Solana LST rates' Tier-4 fallback (defillama_historical_ratio, a
+    # market-price PROXY) needs a distinct provenance label from the genuine Tier 1-3
+    # on-chain methods (alchemy_get_account_info/thegraph_subgraph/rest_api, all
+    # source=onchain_subgraph) — mirrors the oracle_prices multi-source pattern above.
+    # Flips source_required(defi, lst_rates) to True; lst_rates_handler.py's
+    # record_captured call sites now pass an explicit per-row source= (EVM + Tier 1-3
+    # Solana keep source="onchain_subgraph", byte-identical output).
+    ("defi", "lst_rates"): ["onchain_subgraph", "defillama"],
     ("defi", "mev_events"): ["onchain_rpc"],
     # native_staking_rates: Solana RPC (getInflationRate/getEpochInfo) is primary;
     # helius_rpc for per-validator APY breakdown (requires Helius API key).
@@ -508,6 +516,10 @@ SOURCE_MODE_CAPABILITY: Final[dict[str, frozenset[Mode]]] = {
     "onchain_subgraph": frozenset({Mode.BATCH, Mode.LIVE, Mode.REPLAY}),  # live = poll
     "chainlink": frozenset({Mode.BATCH, Mode.LIVE, Mode.REPLAY}),
     "pyth_hermes": frozenset({Mode.BATCH, Mode.LIVE, Mode.REPLAY}),
+    # DefiLlama historical-ratio Tier-4 LST fallback (2026-07-26) — registered
+    # {BATCH,LIVE,REPLAY} to mirror the handler's generic Mode threading (today's
+    # only caller path is batch).
+    "defillama": frozenset({Mode.BATCH, Mode.LIVE, Mode.REPLAY}),
     # AAVE on-chain oracle (AaveOracle.getAssetPrice) — added 2026-07-21
     # (lst_rate_honest_coverage plan Phase 1). BATCH-only for now: the
     # collection branch (Phase 2) is a batch RPC backfill; only BATCH_AAVE
@@ -707,6 +719,10 @@ EMISSION_LATENCY_MS_BY_SOURCE: Final[dict[str, int]] = {
     # 2026-07-21 (lst_rate_honest_coverage plan Phase 1). Same RPC-style class
     # as chainlink (both are on-chain reads via Alchemy RPC).
     "aave": 200,  # 200ms: on-chain getAssetPrice eth_call (RPC-style, mirrors chainlink)
+    # DefiLlama historical-ratio Tier-4 LST fallback (a market-price PROXY, not a
+    # live tick source) — conservative hourly cadence, same class as the other
+    # periodic-series REST sources (deribit DVOL-history above).
+    "defillama": 3_600_000,  # 1h: DefiLlama historical-ratio REST cadence
     # Solana native-staking sources — epoch-granularity (~2.5 day cadence).
     "solana_rpc": 60_000,  # 1 min: Solana RPC getInflationRate/getEpochInfo polling
     "helius_rpc": 60_000,  # 1 min: Helius APY aggregation endpoint polling

@@ -122,9 +122,11 @@ class TestCanonicalPathTemplates:
         each AG's pipeline_mode-prefix count = capability-derived baseline + its own extra-probe."""
         # cefi 16→17 (2026-07-18: +batch_lighter_api); 17→21 (2026-07-19: +4 live_ CEX probes
         # binance/bybit/kraken/okx). defi 15→16 (2026-07-21: +batch_aave — AAVE on-chain
-        # oracle, lst_rate_honest_coverage plan Phase 1). Other AGs stay at their
+        # oracle, lst_rate_honest_coverage plan Phase 1); 16→18 (2026-07-26: +batch_defillama +
+        # live/replay_defillama collapsing to 1 extra template — Solana LST Tier-4 fallback,
+        # defi_satellite_ao_dispatch_batch1_2026_07_25.md sub-item (a)). Other AGs stay at their
         # capability-derived baseline.
-        expected_pipeline_mode_counts = {"cefi": 21, "defi": 16, "tradfi": 6, "sports": 0}
+        expected_pipeline_mode_counts = {"cefi": 21, "defi": 18, "tradfi": 6, "sports": 0}
         for ag, expected in expected_pipeline_mode_counts.items():
             templates = canonical_path_templates(ag)
             pmode = [t for t in templates if "pipeline_mode=" in t]

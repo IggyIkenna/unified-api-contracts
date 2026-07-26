@@ -69,6 +69,9 @@ EXPECTED_SOURCE_MODE_CAPABILITY: dict[str, frozenset[Mode]] = {
     # (lst_rate_honest_coverage plan Phase 1). BATCH-only: only BATCH_AAVE
     # exists in PipelineMode today.
     "aave": _B,
+    # DefiLlama historical-ratio Tier-4 LST fallback — added 2026-07-26
+    # (defi_satellite_ao_dispatch_batch1_2026_07_25.md sub-item (a)).
+    "defillama": _BLR,
     # Prediction
     "polymarket_clob": _BLR,
     "polymarket_gamma_api": _B,
