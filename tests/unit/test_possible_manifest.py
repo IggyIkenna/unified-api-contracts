@@ -125,8 +125,15 @@ class TestCanonicalPathTemplates:
         # oracle, lst_rate_honest_coverage plan Phase 1); 16→17 (2026-07-26: +batch_defillama
         # — solana_lst_archival.py Tier-4 historical price-ratio proxy,
         # defi_satellite_ao_dispatch_batch1_2026_07_25.md lst_rates_handler.py sub-item (a)).
+        # 2026-07-27: `_canonical_pipeline_mode_prefixes` gained a `Mode.REPLAY` leg
+        # (defi_satellite_ao_dispatch_batch1_2026_07_25.md) — every REPLAY-capable batch
+        # source (per SOURCE_MODE_CAPABILITY) now also emits a `replay_<source>/` prefix.
+        # cefi 21→27 (+6: aster/databento/deribit/extended/hyperliquid/kalshi_perp — tardis
+        # and lighter_api stay BATCH-only). defi 17→24 (+7: chainlink/helius_rpc/
+        # hyperliquid/onchain_rpc/onchain_subgraph/pyth_hermes/solana_rpc — aave/defillama
+        # stay BATCH-only). tradfi 6→9 (+3: databento/eia/massive — yahoo stays BATCH-only).
         # Other AGs stay at their capability-derived baseline.
-        expected_pipeline_mode_counts = {"cefi": 21, "defi": 17, "tradfi": 6, "sports": 0}
+        expected_pipeline_mode_counts = {"cefi": 27, "defi": 24, "tradfi": 9, "sports": 0}
         for ag, expected in expected_pipeline_mode_counts.items():
             templates = canonical_path_templates(ag)
             pmode = [t for t in templates if "pipeline_mode=" in t]
