@@ -459,7 +459,11 @@ ALL_VENUES: list[str] = sorted({v for vs in VENUES_BY_ASSET_GROUP.values() for v
 
 # The 20 ODDS_API fan-out bookmakers reverted out of VENUES_BY_ASSET_GROUP
 # ["sports"] above (operator ruling 2026-07-22,
-# `plans/active/distinct_values_noncanonical_audit_2026_07_20.md`). They are
+# `plans/active/distinct_values_noncanonical_audit_2026_07_20.md`), PLUS 2 added
+# 2026-07-27 (UNIBET_EU/UNIBET_UK — see the SPORTS_VENUE_FOLD comment above for
+# why these are here as their OWN accepted entries rather than folded into bare
+# UNIBET: live content comparison proved them genuinely distinct bookmaker feeds,
+# not a casing/alias duplicate of it). They are
 # deliberately NOT canonical (do NOT add to any canonical venue list — the
 # 2026-05-12 scraper-deferral decision stands, no per-bookmaker capture
 # adapter exists or is planned) but ARE real raw manifest values (the
@@ -490,6 +494,8 @@ SPORTS_ODDS_API_ACCEPTED_NONCANONICAL_BOOKMAKERS: frozenset[str] = frozenset(
         "PROPHETX",
         "SKYBET",
         "UNIBET",
+        "UNIBET_EU",
+        "UNIBET_UK",
         "VIRGINBET",
         "WILLIAMHILL",
     }
@@ -592,18 +598,31 @@ CEFI_VENUE_ACCEPTED_NONCANONICAL_ALIASES: frozenset[str] = frozenset(CEFI_VENUE_
 # the ODDS_API adapter stamps `venue` from the vendor's raw, unnormalised bookmaker key
 # (`odds_api_adapter.py`'s `bm.key`) with no alias pass, so vendor spelling drift reaches the
 # manifest verbatim. Unlike CEFI_VENUE_FOLD (dialects tolerated permanently), every key here
-# has a confirmed correctly-cased canonical entry in `venue_constants.py` already — this fold
-# is consumed by BOTH the adapter (to normalise at capture time, stopping new pollution) and
-# the historical-backlog re-stamp migration (to fix already-written manifest rows + GCS
-# objects). Live-census-confirmed 2026-07-27: LADBROKES_UK/UNIBET_UK/SPORT888 are actively
-# captured through the day before this fold shipped, so the writer-side fix is NOT optional —
-# a re-stamp alone would be undone by the very next capture cycle. UNIBET_EU is dormant
-# (last captured 2025-09-10) but folds identically. NOT a canonical set — never merge into
+# has a confirmed correctly-cased canonical entry in `venue_constants.py` already, AND (unlike
+# UNIBET_UK/UNIBET_EU below) zero pre-existing canonical-spelling rows to collide with — this
+# fold is consumed by BOTH the adapter (to normalise at capture time, stopping new pollution)
+# and the historical-backlog re-stamp migration (to fix already-written manifest rows + GCS
+# objects). Live-census-confirmed 2026-07-27: both are actively captured through the day
+# before this fold shipped, so the writer-side fix is NOT optional — a re-stamp alone would be
+# undone by the very next capture cycle. NOT a canonical set — never merge into
 # VENUES_BY_ASSET_GROUP/ALL_VENUES or any canonicality check.
+#
+# UNIBET_UK/UNIBET_EU were REMOVED from this fold 2026-07-27 (originally shipped here, then
+# corrected same-day) after live content comparison proved them GENUINELY DISTINCT bookmakers
+# from bare UNIBET, not a casing/alias variant: on a shared (day, league, fixture, market) —
+# 2022-10-17, ALLSVENSKAN, IFK Goteborg vs Malmo FF — UNIBET_UK and UNIBET stamped DIFFERENT
+# simultaneous odds (HOME 4.25 vs 4.10, AWAY 1.85 vs 1.81, DRAW 3.65 vs 3.55) at slightly
+# different bm_time (05:05:30Z vs 05:01:25Z), with 1,066/1,090 UNIBET_UK dates and 9,028/9,443
+# (date, league_id) shards overlapping bare UNIBET's own captured population — i.e. the vendor
+# fans BOTH out as separate real bookmaker feeds every day, not a rename event. Folding would
+# have silently conflated two distinct bookmakers' live market data under one venue key on
+# every future capture — see `SPORTS_ODDS_API_ACCEPTED_NONCANONICAL_BOOKMAKERS` below, where
+# they now live as their own accepted, non-canonical, non-folded bookmaker entries instead
+# (mirroring BETMGM/BETONLINEAG/... exactly). UNIBET_EU treated the same way on the strength
+# of the identical UK-vs-EU sub-brand pattern (0 shared dates with bare UNIBET to compare
+# directly, but no basis to assume it's an alias when its UK sibling demonstrably isn't).
 SPORTS_VENUE_FOLD: dict[str, str] = {
     "LADBROKES_UK": "LADBROKES",
-    "UNIBET_UK": "UNIBET",
-    "UNIBET_EU": "UNIBET",
     "SPORT888": "BET888SPORT",
 }
 
