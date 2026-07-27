@@ -332,6 +332,17 @@ for _tf in _TIMEFRAMES_CEFI:
     # spot_pair — no derivative_ticker / liquidations
     _register(_build("cefi", "spot_pair", _trades_key(_tf), symbol_column="symbol", extra_cols=[], nullable_ohlcv=True))
     _register(_build("cefi", "spot_pair", _book5_key(_tf), symbol_column="symbol", extra_cols=_BOOK5_EXT))
+    # standalone dated future (non-chain-bundled per-contract futures, e.g. DERIBIT
+    # BTC-USD@INV-20260627) — mirrors TradFi's `future` registration below (trades
+    # only, no derivative_ticker/liquidations: those are perp-specific funding/
+    # liquidation events that dated futures don't emit).
+    # cefi_future_instrument_type_no_candle_schema_contract_2026_07_21: this
+    # instrument_type is deliberately excluded from CEFI_CHAIN_INSTRUMENT_TYPES
+    # (unified_api_contracts.gcs_paths, frozenset({"options_chain", "futures_chain"}))
+    # so raw per-contract future ticks correctly route here rather than through the
+    # chain-bundle path — the gap was a missing contract registration, not a routing
+    # bug (confirmed: TradFi already registers standalone `future` the same way).
+    _register(_build("cefi", "future", _trades_key(_tf), symbol_column="symbol", extra_cols=[], nullable_ohlcv=True))
 
 for _tf in _TIMEFRAMES_OPTIONS:
     _register(
