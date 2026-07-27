@@ -155,14 +155,29 @@ _AUDIT_DOC = "plans/active/issues/coverage_floor_registries_no_cross_propagation
 
 KNOWN_DIVERGENCES: tuple[_KnownDivergence, ...] = (
     # --- [DATA] P1: 8 confirmed multi-year/multi-month CeFi mismatches ---
-    _KnownDivergence("cefi", "BITFINEX", f"{_AUDIT_DOC} [DATA] P1 — ~6.5yr gap, unresolved"),
-    _KnownDivergence("cefi", "KRAKEN", f"{_AUDIT_DOC} [DATA] P1 — ~6.3yr gap, unresolved"),
-    _KnownDivergence("cefi", "COINBASE-SPOT", f"{_AUDIT_DOC} [DATA] P1 — ~5yr gap, unresolved"),
-    _KnownDivergence("cefi", "DERIBIT", f"{_AUDIT_DOC} [DATA] P1 — ~2.75yr gap, unresolved"),
-    _KnownDivergence("cefi", "OKX", f"{_AUDIT_DOC} [DATA] P1 — ~2.6yr gap, unresolved"),
-    _KnownDivergence("cefi", "BINANCE", f"{_AUDIT_DOC} [DATA] P1 — ~2-2.5yr gap, unresolved"),
-    _KnownDivergence("cefi", "BYBIT", f"{_AUDIT_DOC} [DATA] P1 — ~1.1yr gap, unresolved"),
-    _KnownDivergence("cefi", "HYPERLIQUID", f"{_AUDIT_DOC} [DATA] P1 — 75-day gap, unresolved"),
+    # RESOLVED 2026-07-27 (same issue doc, [DATA] P1) — KRAKEN/COINBASE-SPOT/
+    # DERIBIT/OKX/BINANCE/HYPERLIQUID all fully agree now (manifest-probe-
+    # verified; entries removed, this IS the ratchet firing as intended).
+    # BITFINEX + BYBIT below are NARROWED, not removed: the bare-key vs
+    # primary-suffix mismatch is fixed, but a real, deliberate, per-suffix
+    # product-launch-timing gap remains (not a data error to "fix away").
+    _KnownDivergence(
+        "cefi",
+        "BITFINEX",
+        f"{_AUDIT_DOC} [DATA] P1 — RESOLVED for BITFINEX-SPOT (2020-01-01, matches). "
+        "Narrowed, not closed: BITFINEX-FUTURES stays 2019-12-01 (Tardis bitfinex-derivatives "
+        "availableSince) vs bare 2020-01-01 — deliberate, per venue_mapping.py's own comment "
+        "(symbols reliable only from 2020-05-27, pre-filter emits EXPECTED_PRE_SOURCE_COVERAGE_START "
+        "for the gap) — a real symbol-reliability design, not an unverified seed.",
+    ),
+    _KnownDivergence(
+        "cefi",
+        "BYBIT",
+        f"{_AUDIT_DOC} [DATA] P1 — RESOLVED for the BYBIT perp floor (2021-01-01, matches, was a "
+        "full year off). Narrowed, not closed: BYBIT-SPOT stays 2021-12-04 (measured, confirmed clean "
+        "boundary) vs bare 2021-01-01 — a real ~11-month product-launch gap (spot listed after perps), "
+        "not a registry error.",
+    ),
     # --- [DATA] P2: POLYMARKET (~2.3yr gap, CLOB-launch vs first-instrument) ---
     _KnownDivergence("prediction", "POLYMARKET", f"{_AUDIT_DOC} [DATA] P2 — unresolved"),
     # --- [DATA] P3: small 1-21 day DeFi drifts + the AAVE_V3 chain-axis question ---

@@ -32,10 +32,16 @@ from unified_api_contracts.registry.schema_spec import (
 
 
 def test_cefi_seed_known_venues() -> None:
-    """The CeFi venues we onboarded have realistic launch dates."""
-    assert coverage_start(AssetGroup.CEFI, "BINANCE") == date(2017, 8, 17)
-    assert coverage_start(AssetGroup.CEFI, "DERIBIT") == date(2016, 6, 13)
-    assert coverage_start(AssetGroup.CEFI, "HYPERLIQUID") == date(2023, 6, 29)
+    """The CeFi venues we onboarded have measured (not venue-launch-date) coverage floors.
+
+    Values corrected 2026-07-27 (coverage_floor_registries_no_cross_
+    propagation_2026_07_17.md [DATA] P1) — the prior dates were unverified
+    venue-launch-date guesses; see coverage_starts.py's own inline comments
+    for the manifest-probe evidence per venue.
+    """
+    assert coverage_start(AssetGroup.CEFI, "BINANCE") == date(2020, 1, 1)
+    assert coverage_start(AssetGroup.CEFI, "DERIBIT") == date(2019, 5, 8)
+    assert coverage_start(AssetGroup.CEFI, "HYPERLIQUID") == date(2023, 4, 15)
 
 
 def test_unknown_venue_returns_none() -> None:
@@ -55,7 +61,7 @@ def test_sports_re_export_matches_canonical_ssot() -> None:
 
 
 def test_string_asset_group_accepted() -> None:
-    assert coverage_start("cefi", "BINANCE") == date(2017, 8, 17)
+    assert coverage_start("cefi", "BINANCE") == date(2020, 1, 1)
 
 
 def test_each_asset_group_has_at_least_one_seed() -> None:

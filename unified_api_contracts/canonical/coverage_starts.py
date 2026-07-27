@@ -39,14 +39,45 @@ from unified_api_contracts.canonical.gcs_paths import AssetGroup
 # canonical/partition_paths build_*_partition_path output.
 
 CEFI_SOURCE_COVERAGE_START: dict[str, date] = {
-    "BITFINEX": date(2013, 4, 30),
-    "KRAKEN": date(2013, 9, 10),
-    "COINBASE-SPOT": date(2014, 12, 8),
-    "DERIBIT": date(2016, 6, 13),
-    "OKX": date(2017, 5, 31),
-    "BINANCE": date(2017, 8, 17),
-    "BYBIT": date(2018, 11, 21),
-    "HYPERLIQUID": date(2023, 6, 29),
+    # 8 values below corrected 2026-07-27 (coverage_floor_registries_no_
+    # cross_propagation_2026_07_17.md [DATA] P1) — the prior dates were
+    # unverified VENUE-LAUNCH-DATE guesses (per this module's own "derived
+    # from venue launch dates" docstring caveat); probed live against
+    # market-data-tick-cefi-prd-central-element-323112's availability index
+    # (`read_availability_index(bucket).groupby("venue")["date"].min()` on
+    # capture_status="captured" rows) — every value below is the measured
+    # min(date) across that venue's registry-2 (venue_mapping.py) suffixed
+    # keys, each independently confirmed to be a CLEAN boundary (zero rows
+    # of ANY capture_status before the measured date, so it is a genuine
+    # first-attempt, not an unbackfilled gap masquerading as a floor).
+    "BITFINEX": date(2020, 1, 1),
+    "KRAKEN": date(2020, 1, 1),
+    "COINBASE-SPOT": date(2020, 1, 1),
+    # DERIBIT: measured min is 2019-05-08 (real, substantial `trades` rows —
+    # thousands to hundreds of thousands of instrument_count per day — not a
+    # placeholder), earlier than book_snapshot_5/derivative_ticker's clean
+    # 2020-01-01 floor. The 2019-05..2019-12 window is sparse (not every
+    # calendar day has a row), suggesting a partial historical backfill —
+    # real lower bound confirmed, but more pre-2020 history may exist
+    # unbackfilled. Flagged as a follow-up in the same issue doc, not blocking
+    # this floor correction (a partial-coverage lower bound is still a real,
+    # truthful floor — never treat "some data below the old floor" as reason
+    # to keep the floor artificially late).
+    "DERIBIT": date(2019, 5, 8),
+    "OKX": date(2020, 1, 1),
+    "BINANCE": date(2020, 1, 1),
+    "BYBIT": date(2021, 1, 1),
+    # HYPERLIQUID: NOT set to the measured captured-min (2024-01-01) —
+    # venue_mapping.py's 2023-04-15 is vendor-verified (Hyperliquid
+    # book_snapshot_5 S3 archive start, cross-checked against a documented
+    # 2026-05-05 incident investigation into the discovery-API's narrower
+    # window). The 2023-04-15..2023-12-31 gap has ZERO manifest rows of any
+    # capture_status (never attempted, not confirmed-empty) — a real,
+    # unbackfilled window, not evidence the floor should move later. Matching
+    # registry 2's verified value here (not the naive manifest probe) is the
+    # correct fix; the backfill gap itself is a separate, already-documented
+    # data-completeness finding.
+    "HYPERLIQUID": date(2023, 4, 15),
     # Bitget native USDT-M perp launched 2019-07-10 but Tardis only carries
     # bitget-futures from 2024-11-08. `availableSince` probe confirmed
     # 2026-05-07 against `https://api.tardis.dev/v1/exchanges/bitget-futures`
