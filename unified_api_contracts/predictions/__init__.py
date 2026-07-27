@@ -90,6 +90,10 @@ from unified_api_contracts.canonical.domain.predictions.venue_fee_model import (
     net_edge_sell_polymarket,
     polymarket_fee,
 )
+from unified_api_contracts.canonical.domain.predictions.write_guard import (
+    validate_canonical_question_group,
+    validate_prediction_instrument_type,
+)
 
 __all__ = [
     "BETFAIR_COMMISSION_FRACTION",
@@ -129,4 +133,6 @@ __all__ = [
     "parse_polymarket_sports_fixture",
     "polymarket_fee",
     "underlying_for_group",
+    "validate_canonical_question_group",
+    "validate_prediction_instrument_type",
 ]
