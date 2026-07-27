@@ -709,6 +709,52 @@ def get_odds_api_display_league(canonical_league_id: str) -> str | None:
     return _CANONICAL_TO_ODDS_API_DISPLAY.get(canonical_league_id)
 
 
+def canonicalize_odds_api_league_id(raw: str) -> str:
+    """Canonicalise a captured sports-ODDS ``league_id`` value to its UAC canonical id.
+
+    ``BOOKMAKER_LEAGUE_COVERAGE`` (``registry/sports_bookmaker_league_coverage.py``) is
+    derived straight from the manifest's raw ``league_id`` column via
+    ``refresh_sports_bookmaker_league_coverage_2026_06_21.py``, which is NOT always
+    canonical: some historical captures recorded the raw Odds-API ``sport_key``
+    (e.g. ``SOCCER_EPL``, ``SOCCER_ARGENTINA_PRIMERA_DIVISION``) instead of the UAC
+    canonical league_id (``EPL``, ``ARGENTINA_PRIMERA``). A canonical-id caller (the
+    sports v2 sentinel, ``sentinels.py``) then reads a false-negative coverage miss
+    for that (bookmaker, league) cell even though it was actually captured.
+
+    Resolution order:
+      1. Already canonical (``get_league(s)`` resolves) -> return unchanged.
+      2. Matches a registered Odds-API ``sport_key`` (case-insensitive, via
+         ``DEFAULT_CLASSIFICATION_REGISTRY``'s ``odds_api_name`` field) -> resolve
+         through its ``api_football_id`` to the canonical league_id.
+      3. Unresolved -> return ``raw.upper().strip()`` unchanged (registry gap; callers
+         get the pre-existing raw-keyed behaviour, not a crash).
+
+    Idempotent: canonicalising an already-canonical value is a no-op.
+    """
+    # Lazy import mirrors canonicalize_league_id's own lazy get_league import above —
+    # keeps this module import-order-agnostic within canonical.domain.sports.
+    from unified_api_contracts.canonical.domain.sports.league_classification_data import (
+        DEFAULT_CLASSIFICATION_REGISTRY,
+    )
+    from unified_api_contracts.canonical.domain.sports.league_data import (
+        get_league,
+        get_league_by_api_football_id,
+    )
+
+    s: str = raw.upper().strip()
+    if get_league(s) is not None:
+        return s
+
+    sport_key = s.lower()
+    for classification in DEFAULT_CLASSIFICATION_REGISTRY.get_all_leagues():
+        if classification.odds_api_name is not None and classification.odds_api_name.lower() == sport_key:
+            league = get_league_by_api_football_id(classification.league_id)
+            if league is not None:
+                return league.league_id
+            break
+    return s
+
+
 def get_provider_league_id(canonical_league_id: str, provider: str) -> str | int | None:
     """Look up a provider-specific league ID from canonical league ID.
 
