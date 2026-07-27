@@ -8,7 +8,7 @@
 
 **Workspace SSOTs**: [POST_PLAN_REALITY](../../unified-trading-pm/codex/POST_PLAN_REALITY_2026_05_06.md) (10 cross-cutting principles + active plans), [availability-manifest-and-data-status](../../unified-trading-pm/codex/02-data/availability-manifest-and-data-status.md), [deployment-clusters-live-vs-batch](../../unified-trading-pm/codex/05-infrastructure/deployment-clusters-live-vs-batch.md), [shard-level-failure-isolation](../../unified-trading-pm/codex/04-architecture/shard-level-failure-isolation.md), [error-handling](../../unified-trading-pm/codex/06-coding-standards/error-handling.md), [validation-patterns](../../unified-trading-pm/codex/06-coding-standards/validation-patterns.md).
 
-**SSOT for:** Where schemas live, UAC vs UIC scope, placement rules. See also `unified-trading-codex/02-data/contracts-scope-and-layout.md`.
+**SSOT for:** Where schemas live, UAC vs UIC scope, placement rules. See also `../../unified-trading-pm/codex/02-data/contracts-scope-and-layout.md`.
 
 ## Dependency Rule (Blocking)
 
