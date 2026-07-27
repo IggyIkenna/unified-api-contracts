@@ -68,8 +68,29 @@ class CanonicalDerivativeTicker(CanonicalBase):
     prev_day_price: Decimal | None = None
     funding_rate: Decimal | None = None
     predicted_funding_rate: Decimal | None = None
-    next_funding_timestamp: AwareDatetime | None = None
-    funding_timestamp: AwareDatetime | None = None
+    next_funding_timestamp: AwareDatetime | None = Field(
+        default=None,
+        description=(
+            "The UPCOMING funding settlement instant (forward-looking; matches the venue's own "
+            "'next funding time' field, e.g. OKX/Binance/Aster nextFundingTime). Paired with "
+            "predicted_funding_rate when the venue publishes a forward estimate."
+        ),
+    )
+    funding_timestamp: AwareDatetime | None = Field(
+        default=None,
+        description=(
+            "The instant funding_rate was actually CHARGED (matches the venue's own "
+            "charge-instant field, e.g. OKX/Aster fundingTime, Hyperliquid fundingHistory "
+            "'time'). NOT the same as next_funding_timestamp. See "
+            "plans/active/issues/perp_funding_data_semantics_and_cadence_2026_06_16.md Finding 2: "
+            "Tardis's raw bulk-CSV wire field literally named 'funding_timestamp' is actually "
+            "forward-looking (the venue's NEXT settlement, one cadence period ahead of the "
+            "charge instant), so a consumer reading Tardis-CSV-derived derivative_ticker "
+            "parquet written before this fix must NOT assume the stored funding_timestamp "
+            "column is the charge instant without subtracting one cadence period "
+            "(unified_api_contracts.registry.perp_funding_cadence.FUNDING_CADENCE_SECONDS) first."
+        ),
+    )
     open_interest: Decimal | None = None
     open_interest_value: Decimal | None = None
     day_ntl_volume: Decimal | None = None

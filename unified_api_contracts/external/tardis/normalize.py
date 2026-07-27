@@ -7,7 +7,7 @@ options, derivative_tickers, liquidations, connectivity, errors).
 from __future__ import annotations
 
 from collections.abc import Callable
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 from decimal import Decimal, InvalidOperation
 
 from ...canonical.crosscutting.errors import (
@@ -31,6 +31,7 @@ from ...canonical.domain import (
 )
 from ...normalize_utils._helpers import to_levels
 from ...normalize_utils.errors._utils import from_http_status
+from ...registry.perp_funding_cadence import fundings_per_day, is_supported_venue
 from ..tardis import TardisOptionQuote
 from .schemas import (
     TardisInstrument,
@@ -216,7 +217,20 @@ def normalize_tardis_derivative_ticker(
     index_price = _to_decimal(raw.get("indexPrice") or raw.get("index_price"))
     last_price = _to_decimal(raw.get("lastPrice") or raw.get("last_price"))
     funding_rate = _to_decimal(raw.get("fundingRate") or raw.get("funding_rate"))
-    next_funding_timestamp = _ms_to_utc(raw.get("nextFundingTime") or raw.get("next_funding_timestamp"))
+    # Tardis's raw wire field literally named "funding_timestamp" is actually
+    # forward-looking (the venue's NEXT settlement instant), matching our canonical
+    # next_funding_timestamp -- NOT our canonical funding_timestamp (the charge
+    # instant). See perp_funding_data_semantics_and_cadence_2026_06_16.md Finding 2.
+    next_funding_timestamp = _ms_to_utc(
+        raw.get("nextFundingTime") or raw.get("next_funding_timestamp") or raw.get("funding_timestamp")
+    )
+    # Derive the true charge instant by shifting back one cadence period. Only
+    # done when the venue's cadence is registered (perp_funding_cadence SSOT) --
+    # otherwise funding_timestamp stays None (honest absence over a guess).
+    funding_timestamp: datetime | None = None
+    if next_funding_timestamp is not None and is_supported_venue(venue):
+        cadence_seconds = float(Decimal(86400) / fundings_per_day(venue))
+        funding_timestamp = next_funding_timestamp - timedelta(seconds=cadence_seconds)
     open_interest = _to_decimal(raw.get("openInterest") or raw.get("open_interest"))
     open_interest_value = _to_decimal(raw.get("openInterestValue") or raw.get("open_interest_value"))
 
@@ -228,6 +242,7 @@ def normalize_tardis_derivative_ticker(
         index_price=index_price,
         last_price=last_price,
         funding_rate=funding_rate,
+        funding_timestamp=funding_timestamp,
         next_funding_timestamp=next_funding_timestamp,
         open_interest=open_interest,
         open_interest_value=open_interest_value,
