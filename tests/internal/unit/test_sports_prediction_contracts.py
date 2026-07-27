@@ -16,6 +16,8 @@ import pandas as pd
 from unified_api_contracts.internal.schemas.contracts import (
     CONTRACT_REGISTRY,
     PREDICTION_PREDICTION_MARKET_TRADES,
+    SPORTS_EXCHANGE_ODDS_TRADES,
+    SPORTS_FIXED_ODDS_TRADES,
     SPORTS_ODDS_TRADES,
     lookup_contract,
     validate_dataframe,
@@ -115,6 +117,98 @@ def test_sports_odds_trades_validates_sample_dataframe() -> None:
         }
     )
     violations = validate_dataframe(df, SPORTS_ODDS_TRADES)
+    assert violations == [], f"expected no violations, got {violations}"
+
+
+# ---------------------------------------------------------------------------
+# SPORTS_EXCHANGE_ODDS_TRADES / SPORTS_FIXED_ODDS_TRADES
+#
+# sports_closeout_exchange_fixed_odds_fork_2026_07_25.md todo 3: contracts-
+# first EXCHANGE_ODDS/FIXED_ODDS fork of the legacy "odds" instrument_type.
+# Same row schema as SPORTS_ODDS_TRADES (columns list is shared by reference —
+# both ColumnSpec and SchemaContract are frozen pydantic models). The legacy
+# "odds" entry stays registered for the dual-read window (next todo).
+# ---------------------------------------------------------------------------
+
+
+def test_sports_exchange_odds_trades_registered_in_contract_registry() -> None:
+    contract = CONTRACT_REGISTRY[("sports", "exchange_odds", "trades")]
+    assert contract is SPORTS_EXCHANGE_ODDS_TRADES
+
+
+def test_sports_fixed_odds_trades_registered_in_contract_registry() -> None:
+    contract = CONTRACT_REGISTRY[("sports", "fixed_odds", "trades")]
+    assert contract is SPORTS_FIXED_ODDS_TRADES
+
+
+def test_sports_exchange_odds_trades_lookup_returns_contract() -> None:
+    contract = lookup_contract(asset_group="sports", instrument_type="exchange_odds", data_type="trades")
+    assert contract is SPORTS_EXCHANGE_ODDS_TRADES
+
+
+def test_sports_fixed_odds_trades_lookup_returns_contract() -> None:
+    contract = lookup_contract(asset_group="sports", instrument_type="fixed_odds", data_type="trades")
+    assert contract is SPORTS_FIXED_ODDS_TRADES
+
+
+def test_sports_exchange_fixed_odds_trades_share_columns_with_legacy_odds() -> None:
+    """The fork splits the instrument_type partition, not the row schema."""
+    assert SPORTS_EXCHANGE_ODDS_TRADES.columns == SPORTS_ODDS_TRADES.columns
+    assert SPORTS_FIXED_ODDS_TRADES.columns == SPORTS_ODDS_TRADES.columns
+    assert SPORTS_EXCHANGE_ODDS_TRADES.symbol_column == SPORTS_ODDS_TRADES.symbol_column
+    assert SPORTS_FIXED_ODDS_TRADES.symbol_column == SPORTS_ODDS_TRADES.symbol_column
+
+
+def test_sports_exchange_fixed_odds_trades_declare_their_own_instrument_type() -> None:
+    assert SPORTS_EXCHANGE_ODDS_TRADES.instrument_type == "exchange_odds"
+    assert SPORTS_FIXED_ODDS_TRADES.instrument_type == "fixed_odds"
+
+
+def test_legacy_odds_trades_still_registered_during_dual_read_window() -> None:
+    """The fork adds new entries; it must not remove the legacy odds entry."""
+    assert ("sports", "odds", "trades") in CONTRACT_REGISTRY
+    assert CONTRACT_REGISTRY[("sports", "odds", "trades")] is SPORTS_ODDS_TRADES
+
+
+def test_sports_exchange_odds_trades_validates_sample_dataframe() -> None:
+    df = pd.DataFrame(
+        {
+            "instrument_id": pd.Series(
+                ["FOOTBALL:BETFAIR_EX_UK:MATCH_ODDS:EPL:2025-26:ARSENAL-CHELSEA::HOME"],
+                dtype="string",
+            ),
+            "bookmaker_key": pd.Series(["BETFAIR_EX_UK"], dtype="string"),
+            "bm_time": pd.Series(["2026-03-22T14:00:00Z"], dtype="string"),
+            "source": pd.Series(["ODDS_API"], dtype="string"),
+            "league_id": pd.Series(["EPL"], dtype="string"),
+            "fixture_id": pd.Series(["EPL:ARSENAL_v_CHELSEA:20260322"], dtype="string"),
+            "market_key": pd.Series(["h2h"], dtype="string"),
+            "outcome_name": pd.Series(["HOME"], dtype="string"),
+            "price": pd.Series([1.85], dtype="float64"),
+        }
+    )
+    violations = validate_dataframe(df, SPORTS_EXCHANGE_ODDS_TRADES)
+    assert violations == [], f"expected no violations, got {violations}"
+
+
+def test_sports_fixed_odds_trades_validates_sample_dataframe() -> None:
+    df = pd.DataFrame(
+        {
+            "instrument_id": pd.Series(
+                ["FOOTBALL:BETMGM:MATCH_ODDS:EPL:2025-26:ARSENAL-CHELSEA::HOME"],
+                dtype="string",
+            ),
+            "bookmaker_key": pd.Series(["BETMGM"], dtype="string"),
+            "bm_time": pd.Series(["2026-03-22T14:00:00Z"], dtype="string"),
+            "source": pd.Series(["ODDS_API"], dtype="string"),
+            "league_id": pd.Series(["EPL"], dtype="string"),
+            "fixture_id": pd.Series(["EPL:ARSENAL_v_CHELSEA:20260322"], dtype="string"),
+            "market_key": pd.Series(["h2h"], dtype="string"),
+            "outcome_name": pd.Series(["HOME"], dtype="string"),
+            "price": pd.Series([1.85], dtype="float64"),
+        }
+    )
+    violations = validate_dataframe(df, SPORTS_FIXED_ODDS_TRADES)
     assert violations == [], f"expected no violations, got {violations}"
 
 
@@ -228,7 +322,12 @@ def test_prediction_market_trades_validates_sample_dataframe() -> None:
 
 
 def test_new_contracts_require_instrument_id_non_nullable_string() -> None:
-    for contract in (SPORTS_ODDS_TRADES, PREDICTION_PREDICTION_MARKET_TRADES):
+    for contract in (
+        SPORTS_ODDS_TRADES,
+        SPORTS_EXCHANGE_ODDS_TRADES,
+        SPORTS_FIXED_ODDS_TRADES,
+        PREDICTION_PREDICTION_MARKET_TRADES,
+    ):
         id_specs = [c for c in contract.columns if c.name == "instrument_id"]
         assert len(id_specs) == 1
         assert id_specs[0].dtype == "string"
@@ -236,7 +335,12 @@ def test_new_contracts_require_instrument_id_non_nullable_string() -> None:
 
 
 def test_new_contracts_declared_symbol_columns_are_present_in_schema() -> None:
-    for contract in (SPORTS_ODDS_TRADES, PREDICTION_PREDICTION_MARKET_TRADES):
+    for contract in (
+        SPORTS_ODDS_TRADES,
+        SPORTS_EXCHANGE_ODDS_TRADES,
+        SPORTS_FIXED_ODDS_TRADES,
+        PREDICTION_PREDICTION_MARKET_TRADES,
+    ):
         names = {c.name for c in contract.columns}
         assert contract.symbol_column in names
 
