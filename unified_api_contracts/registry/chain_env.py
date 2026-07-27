@@ -35,6 +35,14 @@ MAINNET_CHAIN_IDS: dict[str, int] = {
     # added to enforce MAINNET ⊇ GENESIS_DATES invariant (DF-7, STEP 5.72).
     "STARKNET": 0,  # Not EVM -- StarkNet native chain
     "HYPERLIQUID_L1": 0,  # Not EVM -- Hyperliquid L1 native chain
+    # PLASMA (XPL) — 2025 Tether-backed stablecoin L1, EVM-compatible. Real-world
+    # verified 2026-07-27 (web search): Mainnet Beta + XPL TGE went live 2025-09-25,
+    # chain_id 9745 (plasma.org/docs/guides/network-configuration/mainnet-details;
+    # bitget.com/academy/plasma-tge-september-25-2025-xpl-token-mainnet-beta-launch).
+    # Aave launched same-day with >$6.5B deposits in week 1 (2nd-largest Aave
+    # deployment by TVL after Ethereum mainnet). See
+    # issues/defi_plasma_chain_onboarding_gap_2026_07_26.md.
+    "PLASMA": 9745,
 }
 
 # Testnet chain IDs
@@ -142,6 +150,7 @@ CHAIN_GENESIS_DATES: dict[str, str] = {
     "BITCOIN": "2009-01-03",  # Bitcoin genesis
     "STARKNET": "2021-11-08",  # Starknet Alpha mainnet
     "HYPERLIQUID_L1": "2023-11-14",  # Hyperliquid L1 mainnet
+    "PLASMA": "2025-09-25",  # Plasma (XPL) Mainnet Beta + TGE launch, chain_id 9745
 }
 
 
@@ -546,6 +555,12 @@ PROTOCOL_LAUNCH_DATES: dict[tuple[str, str], str] = {
     # _PROTOCOL_LAUNCH_PENDING_INVESTIGATION_BASE 2026-07-18 now that SOLBLAZE-SOLANA
     # is IS-producible (needs a resolvable launch floor for the coverage denominator).
     ("SOLANA", "SOLBLAZE"): "2022-10-15",  # SolBlaze bSOL stake-pool (conservative); medium
+    # PLASMA chain onboarding (defi_plasma_chain_onboarding_gap_2026_07_26.md P1) —
+    # AAVE launched same-day as chain mainnet (2025-09-25), well-sourced. FLUID's
+    # Plasma launch date is NOT yet confirmed (needs its own block-explorer/DefiLlama
+    # audit per the same doc's P2 scoping todo) — stays on
+    # _PROTOCOL_LAUNCH_PENDING_INVESTIGATION, do not add here without that audit.
+    ("PLASMA", "AAVE"): "2025-09-25",  # Aave Plasma mainnet day-1, >$6.5B deposits week 1; high
 }
 
 # ── Canonical underscore-name aliases for protocol names ──
@@ -614,21 +629,14 @@ _PROTOCOL_LAUNCH_PENDING_INVESTIGATION_BASE: frozenset[tuple[str, str]] = frozen
         ("BASE", "ALCHEMY"),
         ("OPTIMISM", "ALCHEMY"),
         ("POLYGON", "ALCHEMY"),
-        # PLASMA chain — IDENTITY RESOLVED 2026-07-26 (was previously mislabeled "Polygon
-        # Plasma bridge-side", the wrong/dead 2018-2020 bridge): this is the 2025
-        # Tether-backed Plasma L1 (XPL, chain_id 9745, mainnet launched 2025-09-25).
-        # Real-world verified: Aave went live on Plasma 2025-09-25 with >$6.5B deposits in
-        # its first week, now Aave's 2nd-largest deployment by TVL after Ethereum mainnet;
-        # Fluid (Instadapp) also has a live Plasma deployment (confirmed via DefiLlama
-        # protocol listing). NOT a dead/speculative chain — a large, real, currently-active
-        # market this codebase has zero chain registration for (no MAINNET_CHAIN_IDS entry,
-        # no CHAIN_GENESIS_DATES entry, no RPC config, no capture adapter). Dates stay
-        # pending here deliberately — adding either to PROTOCOL_LAUNCH_DATES requires a
-        # matching CHAIN_GENESIS_DATES entry (STEP 5.72's MAINNET_CHAIN_IDS ⊇
-        # CHAIN_GENESIS_DATES invariant), i.e. real chain onboarding, which is out of scope
-        # for this identity-resolution fix. Full onboarding (chain_id 9745, genesis date,
-        # RPC, capture wiring) filed as issues/defi_plasma_chain_onboarding_gap_2026_07_26.md.
-        ("PLASMA", "AAVE"),
+        # PLASMA chain — chain onboarded 2026-07-27 (MAINNET_CHAIN_IDS=9745,
+        # CHAIN_GENESIS_DATES=2025-09-25, both web-search-reverified) per
+        # issues/defi_plasma_chain_onboarding_gap_2026_07_26.md. AAVE's launch date is
+        # well-sourced (same-day as chain mainnet) and now DECLARED in
+        # PROTOCOL_LAUNCH_DATES above — removed from this pending set. FLUID
+        # (Instadapp) has a confirmed live Plasma deployment (DefiLlama protocol
+        # listing) but its exact launch date is NOT yet confirmed — stays pending
+        # until its own block-explorer/DefiLlama audit (P2 scoping todo in the same doc).
         ("PLASMA", "FLUID"),
         # ONCHAIN pseudo-chain — Alchemy Infrastructure data, not a real L1/L2;
         # pending operator decision on whether to keep or remove this venue.
