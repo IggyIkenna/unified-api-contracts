@@ -333,9 +333,7 @@ for _tf in _TIMEFRAMES_CEFI:
     _register(_build("cefi", "spot_pair", _trades_key(_tf), symbol_column="symbol", extra_cols=[], nullable_ohlcv=True))
     _register(_build("cefi", "spot_pair", _book5_key(_tf), symbol_column="symbol", extra_cols=_BOOK5_EXT))
     # standalone dated future (non-chain-bundled per-contract futures, e.g. DERIBIT
-    # BTC-USD@INV-20260627) — mirrors TradFi's `future` registration below (trades
-    # only, no derivative_ticker/liquidations: those are perp-specific funding/
-    # liquidation events that dated futures don't emit).
+    # BTC-USD@INV-20260627) — mirrors TradFi's `future` registration below.
     # cefi_future_instrument_type_no_candle_schema_contract_2026_07_21: this
     # instrument_type is deliberately excluded from CEFI_CHAIN_INSTRUMENT_TYPES
     # (unified_api_contracts.gcs_paths, frozenset({"options_chain", "futures_chain"}))
@@ -343,6 +341,23 @@ for _tf in _TIMEFRAMES_CEFI:
     # chain-bundle path — the gap was a missing contract registration, not a routing
     # bug (confirmed: TradFi already registers standalone `future` the same way).
     _register(_build("cefi", "future", _trades_key(_tf), symbol_column="symbol", extra_cols=[], nullable_ohlcv=True))
+    # liquidations: dated futures DO emit liquidation events (real-VM proof-sweep,
+    # mdps_liq_agg_contract_missing_future_instrument_type_2026_07_27 — 4 BINANCE-FUTURES
+    # dated-futures instruments failed with "No SchemaContract registered ...
+    # instrument_type='FUTURE' data_type='liq_agg_1d'"). The earlier assumption that
+    # liquidations were perp-specific-only was wrong; mirror `perpetual`'s liq_agg
+    # registration here rather than continuing to exclude `future`.
+    _register(
+        _build(
+            "cefi",
+            "future",
+            _liq_key(_tf),
+            symbol_column="symbol",
+            extra_cols=[],
+            ohlcv_core=False,
+            liq_shape=True,
+        )
+    )
 
 for _tf in _TIMEFRAMES_OPTIONS:
     _register(

@@ -145,6 +145,22 @@ def test_cefi_future_trades_candles(tf: str) -> None:
     assert contract.symbol_column == "symbol"
 
 
+@pytest.mark.parametrize("tf", MDPS_TIMEFRAMES_CEFI)
+def test_cefi_future_liq_aggregates(tf: str) -> None:
+    """Dated CeFi futures (e.g. BINANCE-FUTURES ETH-USDT@LIN-20260925) DO emit
+    liquidation events — regression for
+    mdps_liq_agg_contract_missing_future_instrument_type_2026_07_27: a real-VM
+    proof-sweep found 4 dated-futures instruments failing "No SchemaContract
+    registered ... instrument_type='FUTURE' data_type='liq_agg_1d'" because the
+    contract only ever covered `perpetual`.
+    """
+    contract = lookup_contract(asset_group="cefi", instrument_type="future", data_type=MDPS_KEY_LIQ(tf))
+    names = {c.name for c in contract.columns}
+    assert "liquidation_count" in names
+    assert "liquidation_notional_usd" in names
+    assert "open" not in names
+
+
 @pytest.mark.parametrize("tf", MDPS_TIMEFRAMES_OPTIONS)
 def test_cefi_options_chain_candles_key_on_underlying(tf: str) -> None:
     contract = lookup_contract(asset_group="cefi", instrument_type="options_chain", data_type=MDPS_KEY_TRADES(tf))

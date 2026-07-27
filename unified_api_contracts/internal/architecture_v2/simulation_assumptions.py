@@ -1,14 +1,25 @@
 """Simulation-assumptions gap registry — matching/fill model, supported
 granularities, and batch-live symmetry nuances per venue / instrument type.
 
-STATUS: schema shipped; ``SIM_ASSUMPTIONS_REGISTRY`` is intentionally empty.
-The ``MatchingModel`` vocabulary IS derived from ``BenchmarkFillMode`` (the
+STATUS (2026-06-13): ``SIM_ASSUMPTIONS_REGISTRY`` BACKFILLED from a code-scan
+of ``strategy_service/engine/backtest/`` (``runner.py`` / ``benchmark_fills.py``
+/ ``batch_harness.py``) — every entry cites its source file:line, nothing
+invented. Covers CeFi perp/spot CLOB venues + Deribit options (TRADE action →
+``CANDLE_CLOSE``), DeFi AMM swaps (``POOL_MID_AT_BLOCK``), and lending/staking
+surfaces (``FUNDING_SNAPSHOT``). Every entry also carries the shared
+``_BATCH_LIVE_DIVERGENCE`` note (batch fills are benchmark-only, no real
+slippage/partial fills, in-process position state vs PBMS live) and the
+supported backtest granularities (``strategy_service/cli/resolvers.py``
+``TIMEFRAMES``). F11 answer: fill model is dispatched by INSTRUCTION ACTION
+TYPE, not archetype family — the one archetype-specific exception
+(LIQUIDATION_CAPTURE → ``LIQUIDATION_BONUS``) is documented inline above. The
+``MatchingModel`` vocabulary is derived from ``BenchmarkFillMode`` (the
 existing canonical enum in ``architecture_v2.enums``), which documents
 per-action reference-price semantics used by the backtest matching engine.
-Mapping those to the per-venue/granularity surface requires reading
-``strategy_service/engine/backtest/runner.py`` — a ``needs_code_scan`` gap
-documented in
-``plans/active/issues/capability_wizard_gap_discovery_2026_06_11.md``.
+Residual ``needs_code_scan`` gap: the exact intra-bar OHLC interpolation
+method for ``CANDLE_OHLC_INTERPOLATED`` (no venue currently uses this model).
+See ``tests/unit/test_order_semantics_sim_backfill.py`` for the full coverage
+assertions.
 
 Key source:
   ``unified_api_contracts.internal.architecture_v2.enums.BenchmarkFillMode``
@@ -17,7 +28,7 @@ Key source:
 Codex SSOT:
   ``codex/09-strategy/architecture-v2/capability-wizard.md``
 Plan:
-  ``plans/active/capability_wizard_and_manifest_2026_06_11.md``
+  ``plans/active/issues/capability_wizard_gap_discovery_2026_06_11.md``
   Phase 2 [SPEC] P1.
 """
 
