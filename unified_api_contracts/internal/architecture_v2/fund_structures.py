@@ -1,9 +1,11 @@
 """Fund-structure gap registry — what pooled/SMA/prop structures are offerable.
 
-STATUS: schema shipped; ``OFFERED_FUND_STRUCTURES`` is intentionally empty.
-The fund-administration-service state machines (subscription/redemption cadence
-rules) are the runtime SSOT; this registry declares what is *offerable* to
-the wizard — a separate, currently-unregistered surface.
+STATUS: backfilled 2026-06-13 (``5e7d0685``) from the SMA-vs-Pooled codex SSOT.
+``OFFERED_FUND_STRUCTURES`` carries POOLED + SMA (the two documented offerable
+structures); PROP is honestly omitted (no documented external offering). The
+fund-administration-service state machines (subscription/redemption cadence
+rules) remain the runtime SSOT; this registry declares what is *offerable* to
+the wizard — a separate surface that was previously unregistered.
 
 ``ShareClass`` is REUSED from ``architecture_v2.enums`` (USDC/ETH/SOL/BTC/etc.).
 No duplicate definition.
