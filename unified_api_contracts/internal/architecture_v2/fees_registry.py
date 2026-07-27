@@ -1,17 +1,26 @@
 """Fees gap registry — exchange/gas/broker/clearing/funding fees per venue.
 
-STATUS: schema shipped; ``FEES_REGISTRY`` is intentionally empty because
-per-venue fee schedules (maker/taker tiers, gas units, broker rates) are not
-derivable from existing UAC constants or docs without a dedicated per-venue
-code scan.
+STATUS (2026-06-13): ``FEES_REGISTRY`` BACKFILLED for the MVP venue universe —
+CeFi perp + spot maker/taker (official base/VIP0 tier, cited per venue) and
+DeFi AMM swap fee + gas estimate + Aave flash-loan fee (transcribed from
+execution-service code, file:line cited in each ``source_note``). Never
+invented — every populated entry carries a source.
 
-Honest ``not_registered`` gap — the manifest emits this dimension as missing
-rather than omitting it.
+Residual honest gaps (mirrors ``collateral_registry.py``'s ``BROKER_REGISTRY``
+pattern — partial-but-cited beats complete-but-invented):
+  - ``FeeComponent.BROKER`` — zero entries. No TradFi broker commission table
+    exists in-repo (the IBKR schema's ``commission`` field is a live
+    ``commissionReport`` callback value, not a static rate constant).
+  - ``FeeComponent.CLEARING`` — zero entries. No CME/ICE/Deribit/CBOE clearing
+    fee constant exists in-repo.
+  - Volume/VIP fee tiers — every entry carries ``tier="base"`` only; no
+    in-repo volume-discount schedule exists (unlike margin's sibling
+    ``cefi_margin_tiers.py``, there is no ``cefi_fee_tiers.py``).
 
 Codex SSOT:
   ``codex/09-strategy/architecture-v2/capability-wizard.md``
 Plan:
-  ``plans/active/capability_wizard_and_manifest_2026_06_11.md``
+  ``plans/archive/2026_07/capability_wizard_and_manifest_2026_06_11.md``
   Phase 2 [SPEC] P1.
 """
 

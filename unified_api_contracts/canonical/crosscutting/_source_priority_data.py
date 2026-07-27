@@ -69,6 +69,11 @@ SOURCE_PRIORITY: Final[dict[tuple[str, str], list[str]]] = {
     # sports sentinel/expected-row for this shape as source=api_football — the root
     # cause of a 1.26M-row wrong-source re-accumulation found 2026-07-22/23
     # (issues/mtds_sports_api_football_wrong_source_reaccumulated_post_wipe_2026_07_22.md).
+    # KEPT UPPERCASE 2026-07-27 (K1's writer flip itself was reverted back to
+    # lower-case "trades") — derive_pipeline_mode_for_row() tries the data_type
+    # as-is FIRST, then unconditionally retries with .upper() as its documented
+    # sports fallback, so this uppercase key still resolves the now-lower-case
+    # writer's lookups. No lower-case "trades" entry is needed alongside it.
     ("sports", "TRADES"): ["odds_api"],
     ("sports", "WEATHER_FORECAST"): ["open_meteo"],
     # Sports raw data types (instruments-service manifest data_type names).

@@ -27,6 +27,10 @@ from unified_api_contracts.internal.domain.defi.gas_cost import (
     GasTokenBalanceImpact,
     InstructionGasCost,
 )
+from unified_api_contracts.internal.domain.defi.lending_underlying_resolver import (
+    LendingUnderlyingRef,
+    resolve_lending_underlying,
+)
 from unified_api_contracts.internal.domain.defi.lst import (
     LST_TOKEN_TO_PROTOCOL_ASSET,
     protocol_asset_for_token,
@@ -228,6 +232,7 @@ __all__ = [
     "LendingIndexRecord",
     "LendingMarketState",
     "LendingRate",
+    "LendingUnderlyingRef",
     "LidoRequestWithdrawalsParams",
     "LidoSubmitParams",
     "LidoSubmitResponse",
@@ -285,6 +290,7 @@ __all__ = [
     "get_aave_v3_rate_model_defaults",
     "post_trade_rate",
     "protocol_asset_for_token",
+    "resolve_lending_underlying",
     "simulate_rate_impact",
     "tokens_for_protocol_asset",
     "wallet_config_gcs_path",

@@ -290,11 +290,17 @@ def test_prediction_unknown_fallback_candles(tf: str) -> None:
 
 @pytest.mark.parametrize(
     "source_dt",
-    ("odds_movement", "odds_horizon_bucket", "arbitrage_opportunity"),
+    ("odds_movement", "odds_snapshot", "odds_horizon_bucket", "arbitrage_opportunity"),
 )
 @pytest.mark.parametrize("tf", MDPS_TIMEFRAMES_SPORTS)
 def test_sports_derived_candles_registered(tf: str, source_dt: str) -> None:
-    """§6E P1: odds_movement / odds_horizon_bucket / arbitrage_opportunity contracts exist."""
+    """§6E P1: odds_movement / odds_snapshot / odds_horizon_bucket /
+    arbitrage_opportunity contracts exist. ``odds_snapshot`` was missing from
+    the registration loop until 2026-07-27 — its CandleAdapterRegistry
+    adapter (SportsOddsSnapshotAdapter) existed but had no SchemaContract,
+    so every write hard-failed. Regression:
+    plans/active/issues/mdps_t1_recon_job_oom_failing_7_days_2026_07_26.md
+    Update 5."""
     contract = lookup_contract(
         asset_group="sports",
         instrument_type="odds",
@@ -308,6 +314,46 @@ def test_sports_derived_candles_registered(tf: str, source_dt: str) -> None:
     open_col = next(c for c in contract.columns if c.name == "open")
     assert open_col.nullable is True
     assert "quote_count" not in names, f"{source_dt} adapter does not emit quote_count"
+
+
+@pytest.mark.parametrize(
+    "source_dt",
+    ("odds_movement", "odds_snapshot", "odds_horizon_bucket", "arbitrage_opportunity"),
+)
+@pytest.mark.parametrize("tf", MDPS_TIMEFRAMES_SPORTS)
+@pytest.mark.parametrize(
+    "market_instrument_type",
+    (
+        "MATCH_ODDS",
+        "MATCH_ODDS_LAY",
+        "ASIAN_HANDICAP_0_25",
+        "ASIAN_HANDICAP_M1_5",
+        "OVER_UNDER_2_5",
+        "BOTH_TEAMS_TO_SCORE",
+        "SOME_FUTURE_MARKET_TYPE_NOT_YET_INVENTED",
+    ),
+)
+def test_sports_derived_candles_resolve_per_market_instrument_type(
+    tf: str, source_dt: str, market_instrument_type: str
+) -> None:
+    """Regression for the t1-recon sports leg failure (2026-07-27): MDPS's
+    ``_infer_instrument_type`` extracts the raw per-market token (MATCH_ODDS,
+    ASIAN_HANDICAP_0_25, OVER_UNDER_2_5, ...) from the canonical instrument_id
+    for these candle writes — an open-ended vocabulary (handicap/total points
+    are arbitrary floats per ``build_instrument_id``'s ``point`` arg) that can
+    never be fully enumerated. Every real market must still resolve to the
+    single generic ``("sports", "odds", data_type)`` contract because all
+    four adapters emit the identical CandleOutput shape regardless of market.
+    Deliberately includes a nonsense/never-registered market-type string to
+    prove the fallback is genuinely open-ended, not a disguised enumeration.
+    """
+    generic = CONTRACT_REGISTRY[("sports", "odds", f"{source_dt}_{tf}")]
+    contract = lookup_contract(
+        asset_group="sports",
+        instrument_type=market_instrument_type,
+        data_type=f"{source_dt}_{tf}",
+    )
+    assert contract is generic
 
 
 # ---------------------------------------------------------------------------
