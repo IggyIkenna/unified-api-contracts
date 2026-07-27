@@ -588,6 +588,25 @@ CEFI_VENUE_ACCEPTED_NONCANONICAL_ALIASES: frozenset[str] = frozenset(CEFI_VENUE_
     VENUES_BY_ASSET_GROUP["cefi"]
 )
 
+# Sports bookmaker-venue fold (sports_consolidated_native_ao_extract_2026_07_25.md Track C):
+# the ODDS_API adapter stamps `venue` from the vendor's raw, unnormalised bookmaker key
+# (`odds_api_adapter.py`'s `bm.key`) with no alias pass, so vendor spelling drift reaches the
+# manifest verbatim. Unlike CEFI_VENUE_FOLD (dialects tolerated permanently), every key here
+# has a confirmed correctly-cased canonical entry in `venue_constants.py` already — this fold
+# is consumed by BOTH the adapter (to normalise at capture time, stopping new pollution) and
+# the historical-backlog re-stamp migration (to fix already-written manifest rows + GCS
+# objects). Live-census-confirmed 2026-07-27: LADBROKES_UK/UNIBET_UK/SPORT888 are actively
+# captured through the day before this fold shipped, so the writer-side fix is NOT optional —
+# a re-stamp alone would be undone by the very next capture cycle. UNIBET_EU is dormant
+# (last captured 2025-09-10) but folds identically. NOT a canonical set — never merge into
+# VENUES_BY_ASSET_GROUP/ALL_VENUES or any canonicality check.
+SPORTS_VENUE_FOLD: dict[str, str] = {
+    "LADBROKES_UK": "LADBROKES",
+    "UNIBET_UK": "UNIBET",
+    "UNIBET_EU": "UNIBET",
+    "SPORT888": "BET888SPORT",
+}
+
 # Bundle-grain "chain snapshot" instrument_type tokens (audit follow-up 2026-07-22,
 # distinct_values_noncanonical_audit_2026_07_20.md § "D5 — bundle-grain
 # recognition"): ``options_chain``/``futures_chain`` are the REAL, deliberate
