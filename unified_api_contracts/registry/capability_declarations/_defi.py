@@ -1095,6 +1095,10 @@ from ._defi_lst import (  # placed after conditional setup to avoid circular imp
     get_lst_token_genesis,
     get_lst_venue_genesis,
 )
+from ._defi_oracle_coverage import (  # placed after conditional setup to avoid circular import at load time
+    ORACLE_COVERAGE_START,
+    get_oracle_coverage_start,
+)
 
 
 def get_protocol_capability(protocol: str) -> _ProtocolCapability | None:
@@ -1427,6 +1431,7 @@ __all__ = [
     "KNOWN_CHAINS",
     "LST_TOKEN_GENESIS",
     "LST_VENUE_TO_TOKENS",
+    "ORACLE_COVERAGE_START",
     "PROTECTED_RPC_URLS",
     "PROTOCOL_CAPABILITIES",
     "SOLANA_DEFI_PROTOCOLS",
@@ -1455,6 +1460,7 @@ __all__ = [
     "get_lst_venue_genesis",
     "get_mtds_operations_for_protocol",
     "get_native_gas_token",
+    "get_oracle_coverage_start",
     "get_protocol_capability",
     "get_required_tokens_for_protocol",
     "get_required_tokens_for_venue",

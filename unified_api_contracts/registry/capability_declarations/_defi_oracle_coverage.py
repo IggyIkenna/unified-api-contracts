@@ -16,8 +16,14 @@ Per Tab 14 fork1 prep audit 2026-05-08
 
 * jitoSOL pre-archive gap (2022-11-01 to 2023-10-01) -- the Pyth Hermes archive
   does NOT cover the ~11-month window between jitoSOL token genesis (2022-11-01,
-  see ``LST_TOKEN_GENESIS["jitoSOL"]``) and Hermes archive start. Operator
-  decision pending on backfill source -- see ``defi_master.md``.
+  see ``LST_TOKEN_GENESIS["jitoSOL"]``) and Hermes archive start. **RESOLVED
+  2026-07-27** (``plans/active/defi_onchain_derivable_values_and_date_drift_2026_06_20.md``
+  P1, operator-stated default): CLIP -- backtests involving jitoSOL start no
+  earlier than ``ORACLE_COVERAGE_START["pyth_hermes"]`` (2023-10-01); the
+  slower/costlier Pythnet-RPC replay backfill for the pre-archive window is
+  NOT pursued. A consumer wiring this default into an actual backtest-window
+  derivation is separate, cross-craft follow-on work (not yet built anywhere
+  in the codebase -- see that plan's Progress Log).
 
 Consumers:
 * MTDS ``oracle_prices_handler`` -- short-circuit Hermes fetches for
