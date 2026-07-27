@@ -130,7 +130,10 @@ def test_falsifier_stays_quiet_on_a_baselined_divergence(monkeypatch: object) ->
     import scripts.check_coverage_floor_registry_drift as mod
 
     patched = _real_registries_copy()
-    patched["cefi"]["BINANCE"] = date(1999, 1, 1)  # BINANCE is baselined in KNOWN_DIVERGENCES
+    # BITFINEX is baselined in KNOWN_DIVERGENCES (2026-07-27 [DATA] P1: 6 of
+    # the original 8 cefi entries were resolved + removed; BITFINEX/BYBIT
+    # remain, narrowed to a real per-suffix product-timing gap).
+    patched["cefi"]["BITFINEX"] = date(1999, 1, 1)
     monkeypatch.setattr(mod, "_ASSET_GROUP_REGISTRIES", patched)  # pyright: ignore[reportAttributeAccessIssue]
 
     new_findings, _stale_findings = mod.find_cross_registry_mismatches()
@@ -142,14 +145,15 @@ def test_falsifier_catches_a_stale_baseline_entry(monkeypatch: object) -> None:
     import scripts.check_coverage_floor_registry_drift as mod
 
     patched = _real_registries_copy()
-    # Remove every cefi baseline key (BITFINEX/KRAKEN/.../HYPERLIQUID) so no
-    # mismatch is possible for them — simulating "the [DATA] todo landed and
-    # fixed it" without removing the baseline entry. defi/tradfi/prediction
-    # stay untouched so they contribute zero stale findings.
+    # Remove every cefi baseline key (BITFINEX/BYBIT, post-2026-07-27
+    # narrowing) so no mismatch is possible for them — simulating "the
+    # [DATA] todo landed and fixed it" without removing the baseline entry.
+    # defi/tradfi/prediction stay untouched so they contribute zero stale
+    # findings.
     patched["cefi"] = {}
     monkeypatch.setattr(mod, "_ASSET_GROUP_REGISTRIES", patched)  # pyright: ignore[reportAttributeAccessIssue]
 
     _new_findings, stale_findings = mod.find_cross_registry_mismatches()
-    assert len(stale_findings) == 8  # every cefi KNOWN_DIVERGENCES entry
+    assert len(stale_findings) == 2  # every cefi KNOWN_DIVERGENCES entry (BITFINEX, BYBIT)
     assert all("STALE BASELINE" in f.message for f in stale_findings)
-    assert any("BINANCE" in f.message for f in stale_findings)
+    assert any("BITFINEX" in f.message for f in stale_findings)

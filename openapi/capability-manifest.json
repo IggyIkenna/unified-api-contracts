@@ -1195,86 +1195,6 @@
       "from_node_id": "ARBITRAGE_PRICE_DISPERSION",
       "gap_type": null,
       "readiness": "live-proven",
-      "reason": "signals funding_rate,iv_dispersion,odds,price \u2192 targets clv,clv_meta,direction,funding_rate (cefi,defi,sports,tradfi)",
-      "relation": "uses_model",
-      "status": "available",
-      "to_node_id": "ml_model:catboost"
-    },
-    {
-      "agent_annotation": null,
-      "from_node_id": "ARBITRAGE_PRICE_DISPERSION",
-      "gap_type": null,
-      "readiness": "live-proven",
-      "reason": "signals funding_rate,iv_dispersion,price \u2192 targets direction,funding_rate,swing_high,swing_low (cefi,defi,tradfi)",
-      "relation": "uses_model",
-      "status": "available",
-      "to_node_id": "ml_model:ensemble"
-    },
-    {
-      "agent_annotation": null,
-      "from_node_id": "ARBITRAGE_PRICE_DISPERSION",
-      "gap_type": null,
-      "readiness": "live-proven",
-      "reason": "signals funding_rate,iv_dispersion,odds,price \u2192 targets clv,clv_meta,direction,funding_rate (cefi,defi,sports,tradfi)",
-      "relation": "uses_model",
-      "status": "available",
-      "to_node_id": "ml_model:huber"
-    },
-    {
-      "agent_annotation": null,
-      "from_node_id": "ARBITRAGE_PRICE_DISPERSION",
-      "gap_type": null,
-      "readiness": "live-proven",
-      "reason": "signals funding_rate,iv_dispersion,odds,price \u2192 targets clv,clv_meta,direction,funding_rate (cefi,defi,sports,tradfi)",
-      "relation": "uses_model",
-      "status": "available",
-      "to_node_id": "ml_model:lightgbm"
-    },
-    {
-      "agent_annotation": null,
-      "from_node_id": "ARBITRAGE_PRICE_DISPERSION",
-      "gap_type": null,
-      "readiness": "live-proven",
-      "reason": "signals funding_rate,iv_dispersion,price \u2192 targets direction,funding_rate,swing_high,swing_low (cefi,defi,tradfi)",
-      "relation": "uses_model",
-      "status": "available",
-      "to_node_id": "ml_model:poisson_glm"
-    },
-    {
-      "agent_annotation": null,
-      "from_node_id": "ARBITRAGE_PRICE_DISPERSION",
-      "gap_type": null,
-      "readiness": "live-proven",
-      "reason": "signals funding_rate,iv_dispersion,price \u2192 targets direction,funding_rate,swing_high,swing_low (cefi,defi,tradfi)",
-      "relation": "uses_model",
-      "status": "available",
-      "to_node_id": "ml_model:random_forest"
-    },
-    {
-      "agent_annotation": null,
-      "from_node_id": "ARBITRAGE_PRICE_DISPERSION",
-      "gap_type": null,
-      "readiness": "live-proven",
-      "reason": "signals funding_rate,iv_dispersion,odds,price \u2192 targets clv,clv_meta,direction,funding_rate (cefi,defi,sports,tradfi)",
-      "relation": "uses_model",
-      "status": "available",
-      "to_node_id": "ml_model:ridge"
-    },
-    {
-      "agent_annotation": null,
-      "from_node_id": "ARBITRAGE_PRICE_DISPERSION",
-      "gap_type": null,
-      "readiness": "live-proven",
-      "reason": "signals funding_rate,iv_dispersion,odds,price \u2192 targets clv,clv_meta,direction,funding_rate (cefi,defi,sports,tradfi)",
-      "relation": "uses_model",
-      "status": "available",
-      "to_node_id": "ml_model:xgboost"
-    },
-    {
-      "agent_annotation": null,
-      "from_node_id": "ARBITRAGE_PRICE_DISPERSION",
-      "gap_type": null,
-      "readiness": "live-proven",
       "reason": null,
       "relation": "supports",
       "status": "available",
@@ -2495,86 +2415,6 @@
       "from_node_id": "CARRY_BASIS_PERP",
       "gap_type": null,
       "readiness": "backtest-only",
-      "reason": "signals funding_rate \u2192 targets funding_rate (defi)",
-      "relation": "uses_model",
-      "status": "available",
-      "to_node_id": "ml_model:catboost"
-    },
-    {
-      "agent_annotation": null,
-      "from_node_id": "CARRY_BASIS_PERP",
-      "gap_type": null,
-      "readiness": "backtest-only",
-      "reason": "signals funding_rate \u2192 targets funding_rate (defi)",
-      "relation": "uses_model",
-      "status": "available",
-      "to_node_id": "ml_model:ensemble"
-    },
-    {
-      "agent_annotation": null,
-      "from_node_id": "CARRY_BASIS_PERP",
-      "gap_type": null,
-      "readiness": "backtest-only",
-      "reason": "signals funding_rate \u2192 targets funding_rate (defi)",
-      "relation": "uses_model",
-      "status": "available",
-      "to_node_id": "ml_model:huber"
-    },
-    {
-      "agent_annotation": null,
-      "from_node_id": "CARRY_BASIS_PERP",
-      "gap_type": null,
-      "readiness": "backtest-only",
-      "reason": "signals funding_rate \u2192 targets funding_rate (defi)",
-      "relation": "uses_model",
-      "status": "available",
-      "to_node_id": "ml_model:lightgbm"
-    },
-    {
-      "agent_annotation": null,
-      "from_node_id": "CARRY_BASIS_PERP",
-      "gap_type": null,
-      "readiness": "backtest-only",
-      "reason": "signals funding_rate \u2192 targets funding_rate (defi)",
-      "relation": "uses_model",
-      "status": "available",
-      "to_node_id": "ml_model:poisson_glm"
-    },
-    {
-      "agent_annotation": null,
-      "from_node_id": "CARRY_BASIS_PERP",
-      "gap_type": null,
-      "readiness": "backtest-only",
-      "reason": "signals funding_rate \u2192 targets funding_rate (defi)",
-      "relation": "uses_model",
-      "status": "available",
-      "to_node_id": "ml_model:random_forest"
-    },
-    {
-      "agent_annotation": null,
-      "from_node_id": "CARRY_BASIS_PERP",
-      "gap_type": null,
-      "readiness": "backtest-only",
-      "reason": "signals funding_rate \u2192 targets funding_rate (defi)",
-      "relation": "uses_model",
-      "status": "available",
-      "to_node_id": "ml_model:ridge"
-    },
-    {
-      "agent_annotation": null,
-      "from_node_id": "CARRY_BASIS_PERP",
-      "gap_type": null,
-      "readiness": "backtest-only",
-      "reason": "signals funding_rate \u2192 targets funding_rate (defi)",
-      "relation": "uses_model",
-      "status": "available",
-      "to_node_id": "ml_model:xgboost"
-    },
-    {
-      "agent_annotation": null,
-      "from_node_id": "CARRY_BASIS_PERP",
-      "gap_type": null,
-      "readiness": "backtest-only",
       "reason": null,
       "relation": "supports",
       "status": "available",
@@ -2869,86 +2709,6 @@
       "relation": "has_leg",
       "status": "available",
       "to_node_id": "leg:CARRY_BASIS_PERP_INV:spot"
-    },
-    {
-      "agent_annotation": null,
-      "from_node_id": "CARRY_BASIS_PERP_INV",
-      "gap_type": null,
-      "readiness": "backtest-only",
-      "reason": "signals funding_rate \u2192 targets funding_rate (defi)",
-      "relation": "uses_model",
-      "status": "available",
-      "to_node_id": "ml_model:catboost"
-    },
-    {
-      "agent_annotation": null,
-      "from_node_id": "CARRY_BASIS_PERP_INV",
-      "gap_type": null,
-      "readiness": "backtest-only",
-      "reason": "signals funding_rate \u2192 targets funding_rate (defi)",
-      "relation": "uses_model",
-      "status": "available",
-      "to_node_id": "ml_model:ensemble"
-    },
-    {
-      "agent_annotation": null,
-      "from_node_id": "CARRY_BASIS_PERP_INV",
-      "gap_type": null,
-      "readiness": "backtest-only",
-      "reason": "signals funding_rate \u2192 targets funding_rate (defi)",
-      "relation": "uses_model",
-      "status": "available",
-      "to_node_id": "ml_model:huber"
-    },
-    {
-      "agent_annotation": null,
-      "from_node_id": "CARRY_BASIS_PERP_INV",
-      "gap_type": null,
-      "readiness": "backtest-only",
-      "reason": "signals funding_rate \u2192 targets funding_rate (defi)",
-      "relation": "uses_model",
-      "status": "available",
-      "to_node_id": "ml_model:lightgbm"
-    },
-    {
-      "agent_annotation": null,
-      "from_node_id": "CARRY_BASIS_PERP_INV",
-      "gap_type": null,
-      "readiness": "backtest-only",
-      "reason": "signals funding_rate \u2192 targets funding_rate (defi)",
-      "relation": "uses_model",
-      "status": "available",
-      "to_node_id": "ml_model:poisson_glm"
-    },
-    {
-      "agent_annotation": null,
-      "from_node_id": "CARRY_BASIS_PERP_INV",
-      "gap_type": null,
-      "readiness": "backtest-only",
-      "reason": "signals funding_rate \u2192 targets funding_rate (defi)",
-      "relation": "uses_model",
-      "status": "available",
-      "to_node_id": "ml_model:random_forest"
-    },
-    {
-      "agent_annotation": null,
-      "from_node_id": "CARRY_BASIS_PERP_INV",
-      "gap_type": null,
-      "readiness": "backtest-only",
-      "reason": "signals funding_rate \u2192 targets funding_rate (defi)",
-      "relation": "uses_model",
-      "status": "available",
-      "to_node_id": "ml_model:ridge"
-    },
-    {
-      "agent_annotation": null,
-      "from_node_id": "CARRY_BASIS_PERP_INV",
-      "gap_type": null,
-      "readiness": "backtest-only",
-      "reason": "signals funding_rate \u2192 targets funding_rate (defi)",
-      "relation": "uses_model",
-      "status": "available",
-      "to_node_id": "ml_model:xgboost"
     },
     {
       "agent_annotation": null,
@@ -3959,86 +3719,6 @@
       "relation": "has_leg",
       "status": "available",
       "to_node_id": "leg:CARRY_STAKED_BASIS:stake"
-    },
-    {
-      "agent_annotation": null,
-      "from_node_id": "CARRY_STAKED_BASIS",
-      "gap_type": null,
-      "readiness": "live-proven",
-      "reason": "signals funding_rate \u2192 targets funding_rate (defi)",
-      "relation": "uses_model",
-      "status": "available",
-      "to_node_id": "ml_model:catboost"
-    },
-    {
-      "agent_annotation": null,
-      "from_node_id": "CARRY_STAKED_BASIS",
-      "gap_type": null,
-      "readiness": "live-proven",
-      "reason": "signals funding_rate \u2192 targets funding_rate (defi)",
-      "relation": "uses_model",
-      "status": "available",
-      "to_node_id": "ml_model:ensemble"
-    },
-    {
-      "agent_annotation": null,
-      "from_node_id": "CARRY_STAKED_BASIS",
-      "gap_type": null,
-      "readiness": "live-proven",
-      "reason": "signals funding_rate \u2192 targets funding_rate (defi)",
-      "relation": "uses_model",
-      "status": "available",
-      "to_node_id": "ml_model:huber"
-    },
-    {
-      "agent_annotation": null,
-      "from_node_id": "CARRY_STAKED_BASIS",
-      "gap_type": null,
-      "readiness": "live-proven",
-      "reason": "signals funding_rate \u2192 targets funding_rate (defi)",
-      "relation": "uses_model",
-      "status": "available",
-      "to_node_id": "ml_model:lightgbm"
-    },
-    {
-      "agent_annotation": null,
-      "from_node_id": "CARRY_STAKED_BASIS",
-      "gap_type": null,
-      "readiness": "live-proven",
-      "reason": "signals funding_rate \u2192 targets funding_rate (defi)",
-      "relation": "uses_model",
-      "status": "available",
-      "to_node_id": "ml_model:poisson_glm"
-    },
-    {
-      "agent_annotation": null,
-      "from_node_id": "CARRY_STAKED_BASIS",
-      "gap_type": null,
-      "readiness": "live-proven",
-      "reason": "signals funding_rate \u2192 targets funding_rate (defi)",
-      "relation": "uses_model",
-      "status": "available",
-      "to_node_id": "ml_model:random_forest"
-    },
-    {
-      "agent_annotation": null,
-      "from_node_id": "CARRY_STAKED_BASIS",
-      "gap_type": null,
-      "readiness": "live-proven",
-      "reason": "signals funding_rate \u2192 targets funding_rate (defi)",
-      "relation": "uses_model",
-      "status": "available",
-      "to_node_id": "ml_model:ridge"
-    },
-    {
-      "agent_annotation": null,
-      "from_node_id": "CARRY_STAKED_BASIS",
-      "gap_type": null,
-      "readiness": "live-proven",
-      "reason": "signals funding_rate \u2192 targets funding_rate (defi)",
-      "relation": "uses_model",
-      "status": "available",
-      "to_node_id": "ml_model:xgboost"
     },
     {
       "agent_annotation": null,
@@ -5405,86 +5085,6 @@
       "from_node_id": "EVENT_DRIVEN",
       "gap_type": null,
       "readiness": "backtest-only",
-      "reason": "signals iv_dispersion \u2192 targets volatility (cefi,tradfi)",
-      "relation": "uses_model",
-      "status": "partial",
-      "to_node_id": "ml_model:catboost"
-    },
-    {
-      "agent_annotation": null,
-      "from_node_id": "EVENT_DRIVEN",
-      "gap_type": null,
-      "readiness": "backtest-only",
-      "reason": "signals iv_dispersion \u2192 targets volatility (cefi,tradfi)",
-      "relation": "uses_model",
-      "status": "partial",
-      "to_node_id": "ml_model:ensemble"
-    },
-    {
-      "agent_annotation": null,
-      "from_node_id": "EVENT_DRIVEN",
-      "gap_type": null,
-      "readiness": "backtest-only",
-      "reason": "signals iv_dispersion \u2192 targets volatility (cefi,tradfi)",
-      "relation": "uses_model",
-      "status": "partial",
-      "to_node_id": "ml_model:huber"
-    },
-    {
-      "agent_annotation": null,
-      "from_node_id": "EVENT_DRIVEN",
-      "gap_type": null,
-      "readiness": "backtest-only",
-      "reason": "signals iv_dispersion \u2192 targets volatility (cefi,tradfi)",
-      "relation": "uses_model",
-      "status": "partial",
-      "to_node_id": "ml_model:lightgbm"
-    },
-    {
-      "agent_annotation": null,
-      "from_node_id": "EVENT_DRIVEN",
-      "gap_type": null,
-      "readiness": "backtest-only",
-      "reason": "signals iv_dispersion \u2192 targets volatility (cefi,tradfi)",
-      "relation": "uses_model",
-      "status": "partial",
-      "to_node_id": "ml_model:poisson_glm"
-    },
-    {
-      "agent_annotation": null,
-      "from_node_id": "EVENT_DRIVEN",
-      "gap_type": null,
-      "readiness": "backtest-only",
-      "reason": "signals iv_dispersion \u2192 targets volatility (cefi,tradfi)",
-      "relation": "uses_model",
-      "status": "partial",
-      "to_node_id": "ml_model:random_forest"
-    },
-    {
-      "agent_annotation": null,
-      "from_node_id": "EVENT_DRIVEN",
-      "gap_type": null,
-      "readiness": "backtest-only",
-      "reason": "signals iv_dispersion \u2192 targets volatility (cefi,tradfi)",
-      "relation": "uses_model",
-      "status": "partial",
-      "to_node_id": "ml_model:ridge"
-    },
-    {
-      "agent_annotation": null,
-      "from_node_id": "EVENT_DRIVEN",
-      "gap_type": null,
-      "readiness": "backtest-only",
-      "reason": "signals iv_dispersion \u2192 targets volatility (cefi,tradfi)",
-      "relation": "uses_model",
-      "status": "partial",
-      "to_node_id": "ml_model:xgboost"
-    },
-    {
-      "agent_annotation": null,
-      "from_node_id": "EVENT_DRIVEN",
-      "gap_type": null,
-      "readiness": "backtest-only",
       "reason": null,
       "relation": "supports",
       "status": "partial",
@@ -6205,86 +5805,6 @@
       "from_node_id": "MARKET_MAKING_CONTINUOUS",
       "gap_type": null,
       "readiness": "backtest-only",
-      "reason": "signals odds,spread_capture,vol_metric \u2192 targets clv,clv_meta,cross_venue_spread,ht_delta (cefi,sports,tradfi)",
-      "relation": "uses_model",
-      "status": "available",
-      "to_node_id": "ml_model:catboost"
-    },
-    {
-      "agent_annotation": null,
-      "from_node_id": "MARKET_MAKING_CONTINUOUS",
-      "gap_type": null,
-      "readiness": "backtest-only",
-      "reason": "signals spread_capture,vol_metric \u2192 targets cross_venue_spread,volatility (cefi,tradfi)",
-      "relation": "uses_model",
-      "status": "available",
-      "to_node_id": "ml_model:ensemble"
-    },
-    {
-      "agent_annotation": null,
-      "from_node_id": "MARKET_MAKING_CONTINUOUS",
-      "gap_type": null,
-      "readiness": "backtest-only",
-      "reason": "signals odds,spread_capture,vol_metric \u2192 targets clv,clv_meta,cross_venue_spread,ht_delta (cefi,sports,tradfi)",
-      "relation": "uses_model",
-      "status": "available",
-      "to_node_id": "ml_model:huber"
-    },
-    {
-      "agent_annotation": null,
-      "from_node_id": "MARKET_MAKING_CONTINUOUS",
-      "gap_type": null,
-      "readiness": "backtest-only",
-      "reason": "signals odds,spread_capture,vol_metric \u2192 targets clv,clv_meta,cross_venue_spread,ht_delta (cefi,sports,tradfi)",
-      "relation": "uses_model",
-      "status": "available",
-      "to_node_id": "ml_model:lightgbm"
-    },
-    {
-      "agent_annotation": null,
-      "from_node_id": "MARKET_MAKING_CONTINUOUS",
-      "gap_type": null,
-      "readiness": "backtest-only",
-      "reason": "signals spread_capture,vol_metric \u2192 targets cross_venue_spread,volatility (cefi,tradfi)",
-      "relation": "uses_model",
-      "status": "available",
-      "to_node_id": "ml_model:poisson_glm"
-    },
-    {
-      "agent_annotation": null,
-      "from_node_id": "MARKET_MAKING_CONTINUOUS",
-      "gap_type": null,
-      "readiness": "backtest-only",
-      "reason": "signals spread_capture,vol_metric \u2192 targets cross_venue_spread,volatility (cefi,tradfi)",
-      "relation": "uses_model",
-      "status": "available",
-      "to_node_id": "ml_model:random_forest"
-    },
-    {
-      "agent_annotation": null,
-      "from_node_id": "MARKET_MAKING_CONTINUOUS",
-      "gap_type": null,
-      "readiness": "backtest-only",
-      "reason": "signals odds,spread_capture,vol_metric \u2192 targets clv,clv_meta,cross_venue_spread,ht_delta (cefi,sports,tradfi)",
-      "relation": "uses_model",
-      "status": "available",
-      "to_node_id": "ml_model:ridge"
-    },
-    {
-      "agent_annotation": null,
-      "from_node_id": "MARKET_MAKING_CONTINUOUS",
-      "gap_type": null,
-      "readiness": "backtest-only",
-      "reason": "signals odds,spread_capture,vol_metric \u2192 targets clv,clv_meta,cross_venue_spread,ht_delta (cefi,sports,tradfi)",
-      "relation": "uses_model",
-      "status": "available",
-      "to_node_id": "ml_model:xgboost"
-    },
-    {
-      "agent_annotation": null,
-      "from_node_id": "MARKET_MAKING_CONTINUOUS",
-      "gap_type": null,
-      "readiness": "backtest-only",
       "reason": null,
       "relation": "supports",
       "status": "available",
@@ -6729,56 +6249,6 @@
       "relation": "has_leg",
       "status": "available",
       "to_node_id": "leg:MARKET_MAKING_EVENT_SETTLED:quote"
-    },
-    {
-      "agent_annotation": null,
-      "from_node_id": "MARKET_MAKING_EVENT_SETTLED",
-      "gap_type": null,
-      "readiness": "backtest-only",
-      "reason": "signals odds \u2192 targets clv,clv_meta,ht_delta,xg (sports)",
-      "relation": "uses_model",
-      "status": "available",
-      "to_node_id": "ml_model:catboost"
-    },
-    {
-      "agent_annotation": null,
-      "from_node_id": "MARKET_MAKING_EVENT_SETTLED",
-      "gap_type": null,
-      "readiness": "backtest-only",
-      "reason": "signals odds \u2192 targets clv,clv_meta,ht_delta,xg (sports)",
-      "relation": "uses_model",
-      "status": "available",
-      "to_node_id": "ml_model:huber"
-    },
-    {
-      "agent_annotation": null,
-      "from_node_id": "MARKET_MAKING_EVENT_SETTLED",
-      "gap_type": null,
-      "readiness": "backtest-only",
-      "reason": "signals odds \u2192 targets clv,clv_meta,ht_delta,xg (sports)",
-      "relation": "uses_model",
-      "status": "available",
-      "to_node_id": "ml_model:lightgbm"
-    },
-    {
-      "agent_annotation": null,
-      "from_node_id": "MARKET_MAKING_EVENT_SETTLED",
-      "gap_type": null,
-      "readiness": "backtest-only",
-      "reason": "signals odds \u2192 targets clv,clv_meta,ht_delta,xg (sports)",
-      "relation": "uses_model",
-      "status": "available",
-      "to_node_id": "ml_model:ridge"
-    },
-    {
-      "agent_annotation": null,
-      "from_node_id": "MARKET_MAKING_EVENT_SETTLED",
-      "gap_type": null,
-      "readiness": "backtest-only",
-      "reason": "signals odds \u2192 targets clv,clv_meta,ht_delta,xg (sports)",
-      "relation": "uses_model",
-      "status": "available",
-      "to_node_id": "ml_model:xgboost"
     },
     {
       "agent_annotation": null,
@@ -8665,86 +8135,6 @@
       "from_node_id": "ML_DIRECTIONAL_CONTINUOUS",
       "gap_type": null,
       "readiness": "backtest-only",
-      "reason": "signals price \u2192 targets direction,swing_high,swing_low (cefi,tradfi)",
-      "relation": "uses_model",
-      "status": "available",
-      "to_node_id": "ml_model:catboost"
-    },
-    {
-      "agent_annotation": null,
-      "from_node_id": "ML_DIRECTIONAL_CONTINUOUS",
-      "gap_type": null,
-      "readiness": "backtest-only",
-      "reason": "signals price \u2192 targets direction,swing_high,swing_low (cefi,tradfi)",
-      "relation": "uses_model",
-      "status": "available",
-      "to_node_id": "ml_model:ensemble"
-    },
-    {
-      "agent_annotation": null,
-      "from_node_id": "ML_DIRECTIONAL_CONTINUOUS",
-      "gap_type": null,
-      "readiness": "backtest-only",
-      "reason": "signals price \u2192 targets direction,swing_high,swing_low (cefi,tradfi)",
-      "relation": "uses_model",
-      "status": "available",
-      "to_node_id": "ml_model:huber"
-    },
-    {
-      "agent_annotation": null,
-      "from_node_id": "ML_DIRECTIONAL_CONTINUOUS",
-      "gap_type": null,
-      "readiness": "backtest-only",
-      "reason": "signals price \u2192 targets direction,swing_high,swing_low (cefi,tradfi)",
-      "relation": "uses_model",
-      "status": "available",
-      "to_node_id": "ml_model:lightgbm"
-    },
-    {
-      "agent_annotation": null,
-      "from_node_id": "ML_DIRECTIONAL_CONTINUOUS",
-      "gap_type": null,
-      "readiness": "backtest-only",
-      "reason": "signals price \u2192 targets direction,swing_high,swing_low (cefi,tradfi)",
-      "relation": "uses_model",
-      "status": "available",
-      "to_node_id": "ml_model:poisson_glm"
-    },
-    {
-      "agent_annotation": null,
-      "from_node_id": "ML_DIRECTIONAL_CONTINUOUS",
-      "gap_type": null,
-      "readiness": "backtest-only",
-      "reason": "signals price \u2192 targets direction,swing_high,swing_low (cefi,tradfi)",
-      "relation": "uses_model",
-      "status": "available",
-      "to_node_id": "ml_model:random_forest"
-    },
-    {
-      "agent_annotation": null,
-      "from_node_id": "ML_DIRECTIONAL_CONTINUOUS",
-      "gap_type": null,
-      "readiness": "backtest-only",
-      "reason": "signals price \u2192 targets direction,swing_high,swing_low (cefi,tradfi)",
-      "relation": "uses_model",
-      "status": "available",
-      "to_node_id": "ml_model:ridge"
-    },
-    {
-      "agent_annotation": null,
-      "from_node_id": "ML_DIRECTIONAL_CONTINUOUS",
-      "gap_type": null,
-      "readiness": "backtest-only",
-      "reason": "signals price \u2192 targets direction,swing_high,swing_low (cefi,tradfi)",
-      "relation": "uses_model",
-      "status": "available",
-      "to_node_id": "ml_model:xgboost"
-    },
-    {
-      "agent_annotation": null,
-      "from_node_id": "ML_DIRECTIONAL_CONTINUOUS",
-      "gap_type": null,
-      "readiness": "backtest-only",
       "reason": null,
       "relation": "supports",
       "status": "partial",
@@ -9149,56 +8539,6 @@
       "relation": "has_leg",
       "status": "available",
       "to_node_id": "leg:ML_DIRECTIONAL_EVENT_SETTLED:directional"
-    },
-    {
-      "agent_annotation": null,
-      "from_node_id": "ML_DIRECTIONAL_EVENT_SETTLED",
-      "gap_type": null,
-      "readiness": "backtest-only",
-      "reason": "signals odds \u2192 targets clv,clv_meta,ht_delta,xg (sports)",
-      "relation": "uses_model",
-      "status": "available",
-      "to_node_id": "ml_model:catboost"
-    },
-    {
-      "agent_annotation": null,
-      "from_node_id": "ML_DIRECTIONAL_EVENT_SETTLED",
-      "gap_type": null,
-      "readiness": "backtest-only",
-      "reason": "signals odds \u2192 targets clv,clv_meta,ht_delta,xg (sports)",
-      "relation": "uses_model",
-      "status": "available",
-      "to_node_id": "ml_model:huber"
-    },
-    {
-      "agent_annotation": null,
-      "from_node_id": "ML_DIRECTIONAL_EVENT_SETTLED",
-      "gap_type": null,
-      "readiness": "backtest-only",
-      "reason": "signals odds \u2192 targets clv,clv_meta,ht_delta,xg (sports)",
-      "relation": "uses_model",
-      "status": "available",
-      "to_node_id": "ml_model:lightgbm"
-    },
-    {
-      "agent_annotation": null,
-      "from_node_id": "ML_DIRECTIONAL_EVENT_SETTLED",
-      "gap_type": null,
-      "readiness": "backtest-only",
-      "reason": "signals odds \u2192 targets clv,clv_meta,ht_delta,xg (sports)",
-      "relation": "uses_model",
-      "status": "available",
-      "to_node_id": "ml_model:ridge"
-    },
-    {
-      "agent_annotation": null,
-      "from_node_id": "ML_DIRECTIONAL_EVENT_SETTLED",
-      "gap_type": null,
-      "readiness": "backtest-only",
-      "reason": "signals odds \u2192 targets clv,clv_meta,ht_delta,xg (sports)",
-      "relation": "uses_model",
-      "status": "available",
-      "to_node_id": "ml_model:xgboost"
     },
     {
       "agent_annotation": null,
@@ -10345,86 +9685,6 @@
       "from_node_id": "RULES_DIRECTIONAL_CONTINUOUS",
       "gap_type": null,
       "readiness": "backtest-only",
-      "reason": "signals funding_rate,price \u2192 targets direction,funding_rate,swing_high,swing_low (cefi,defi,tradfi)",
-      "relation": "uses_model",
-      "status": "available",
-      "to_node_id": "ml_model:catboost"
-    },
-    {
-      "agent_annotation": null,
-      "from_node_id": "RULES_DIRECTIONAL_CONTINUOUS",
-      "gap_type": null,
-      "readiness": "backtest-only",
-      "reason": "signals funding_rate,price \u2192 targets direction,funding_rate,swing_high,swing_low (cefi,defi,tradfi)",
-      "relation": "uses_model",
-      "status": "available",
-      "to_node_id": "ml_model:ensemble"
-    },
-    {
-      "agent_annotation": null,
-      "from_node_id": "RULES_DIRECTIONAL_CONTINUOUS",
-      "gap_type": null,
-      "readiness": "backtest-only",
-      "reason": "signals funding_rate,price \u2192 targets direction,funding_rate,swing_high,swing_low (cefi,defi,tradfi)",
-      "relation": "uses_model",
-      "status": "available",
-      "to_node_id": "ml_model:huber"
-    },
-    {
-      "agent_annotation": null,
-      "from_node_id": "RULES_DIRECTIONAL_CONTINUOUS",
-      "gap_type": null,
-      "readiness": "backtest-only",
-      "reason": "signals funding_rate,price \u2192 targets direction,funding_rate,swing_high,swing_low (cefi,defi,tradfi)",
-      "relation": "uses_model",
-      "status": "available",
-      "to_node_id": "ml_model:lightgbm"
-    },
-    {
-      "agent_annotation": null,
-      "from_node_id": "RULES_DIRECTIONAL_CONTINUOUS",
-      "gap_type": null,
-      "readiness": "backtest-only",
-      "reason": "signals funding_rate,price \u2192 targets direction,funding_rate,swing_high,swing_low (cefi,defi,tradfi)",
-      "relation": "uses_model",
-      "status": "available",
-      "to_node_id": "ml_model:poisson_glm"
-    },
-    {
-      "agent_annotation": null,
-      "from_node_id": "RULES_DIRECTIONAL_CONTINUOUS",
-      "gap_type": null,
-      "readiness": "backtest-only",
-      "reason": "signals funding_rate,price \u2192 targets direction,funding_rate,swing_high,swing_low (cefi,defi,tradfi)",
-      "relation": "uses_model",
-      "status": "available",
-      "to_node_id": "ml_model:random_forest"
-    },
-    {
-      "agent_annotation": null,
-      "from_node_id": "RULES_DIRECTIONAL_CONTINUOUS",
-      "gap_type": null,
-      "readiness": "backtest-only",
-      "reason": "signals funding_rate,price \u2192 targets direction,funding_rate,swing_high,swing_low (cefi,defi,tradfi)",
-      "relation": "uses_model",
-      "status": "available",
-      "to_node_id": "ml_model:ridge"
-    },
-    {
-      "agent_annotation": null,
-      "from_node_id": "RULES_DIRECTIONAL_CONTINUOUS",
-      "gap_type": null,
-      "readiness": "backtest-only",
-      "reason": "signals funding_rate,price \u2192 targets direction,funding_rate,swing_high,swing_low (cefi,defi,tradfi)",
-      "relation": "uses_model",
-      "status": "available",
-      "to_node_id": "ml_model:xgboost"
-    },
-    {
-      "agent_annotation": null,
-      "from_node_id": "RULES_DIRECTIONAL_CONTINUOUS",
-      "gap_type": null,
-      "readiness": "backtest-only",
       "reason": null,
       "relation": "supports",
       "status": "available",
@@ -10775,56 +10035,6 @@
       "from_node_id": "RULES_DIRECTIONAL_EVENT_SETTLED",
       "gap_type": null,
       "readiness": "backtest-only",
-      "reason": "signals odds \u2192 targets clv,clv_meta,ht_delta,xg (sports)",
-      "relation": "uses_model",
-      "status": "partial",
-      "to_node_id": "ml_model:catboost"
-    },
-    {
-      "agent_annotation": null,
-      "from_node_id": "RULES_DIRECTIONAL_EVENT_SETTLED",
-      "gap_type": null,
-      "readiness": "backtest-only",
-      "reason": "signals odds \u2192 targets clv,clv_meta,ht_delta,xg (sports)",
-      "relation": "uses_model",
-      "status": "partial",
-      "to_node_id": "ml_model:huber"
-    },
-    {
-      "agent_annotation": null,
-      "from_node_id": "RULES_DIRECTIONAL_EVENT_SETTLED",
-      "gap_type": null,
-      "readiness": "backtest-only",
-      "reason": "signals odds \u2192 targets clv,clv_meta,ht_delta,xg (sports)",
-      "relation": "uses_model",
-      "status": "partial",
-      "to_node_id": "ml_model:lightgbm"
-    },
-    {
-      "agent_annotation": null,
-      "from_node_id": "RULES_DIRECTIONAL_EVENT_SETTLED",
-      "gap_type": null,
-      "readiness": "backtest-only",
-      "reason": "signals odds \u2192 targets clv,clv_meta,ht_delta,xg (sports)",
-      "relation": "uses_model",
-      "status": "partial",
-      "to_node_id": "ml_model:ridge"
-    },
-    {
-      "agent_annotation": null,
-      "from_node_id": "RULES_DIRECTIONAL_EVENT_SETTLED",
-      "gap_type": null,
-      "readiness": "backtest-only",
-      "reason": "signals odds \u2192 targets clv,clv_meta,ht_delta,xg (sports)",
-      "relation": "uses_model",
-      "status": "partial",
-      "to_node_id": "ml_model:xgboost"
-    },
-    {
-      "agent_annotation": null,
-      "from_node_id": "RULES_DIRECTIONAL_EVENT_SETTLED",
-      "gap_type": null,
-      "readiness": "backtest-only",
       "reason": null,
       "relation": "supports",
       "status": "partial",
@@ -11109,86 +10319,6 @@
       "relation": "has_leg",
       "status": "available",
       "to_node_id": "leg:STAT_ARB_CROSS_SECTIONAL:short_basket"
-    },
-    {
-      "agent_annotation": null,
-      "from_node_id": "STAT_ARB_CROSS_SECTIONAL",
-      "gap_type": null,
-      "readiness": "backtest-only",
-      "reason": "signals momentum_ranking \u2192 targets direction,swing_high,swing_low (cefi,tradfi)",
-      "relation": "uses_model",
-      "status": "partial",
-      "to_node_id": "ml_model:catboost"
-    },
-    {
-      "agent_annotation": null,
-      "from_node_id": "STAT_ARB_CROSS_SECTIONAL",
-      "gap_type": null,
-      "readiness": "backtest-only",
-      "reason": "signals momentum_ranking \u2192 targets direction,swing_high,swing_low (cefi,tradfi)",
-      "relation": "uses_model",
-      "status": "partial",
-      "to_node_id": "ml_model:ensemble"
-    },
-    {
-      "agent_annotation": null,
-      "from_node_id": "STAT_ARB_CROSS_SECTIONAL",
-      "gap_type": null,
-      "readiness": "backtest-only",
-      "reason": "signals momentum_ranking \u2192 targets direction,swing_high,swing_low (cefi,tradfi)",
-      "relation": "uses_model",
-      "status": "partial",
-      "to_node_id": "ml_model:huber"
-    },
-    {
-      "agent_annotation": null,
-      "from_node_id": "STAT_ARB_CROSS_SECTIONAL",
-      "gap_type": null,
-      "readiness": "backtest-only",
-      "reason": "signals momentum_ranking \u2192 targets direction,swing_high,swing_low (cefi,tradfi)",
-      "relation": "uses_model",
-      "status": "partial",
-      "to_node_id": "ml_model:lightgbm"
-    },
-    {
-      "agent_annotation": null,
-      "from_node_id": "STAT_ARB_CROSS_SECTIONAL",
-      "gap_type": null,
-      "readiness": "backtest-only",
-      "reason": "signals momentum_ranking \u2192 targets direction,swing_high,swing_low (cefi,tradfi)",
-      "relation": "uses_model",
-      "status": "partial",
-      "to_node_id": "ml_model:poisson_glm"
-    },
-    {
-      "agent_annotation": null,
-      "from_node_id": "STAT_ARB_CROSS_SECTIONAL",
-      "gap_type": null,
-      "readiness": "backtest-only",
-      "reason": "signals momentum_ranking \u2192 targets direction,swing_high,swing_low (cefi,tradfi)",
-      "relation": "uses_model",
-      "status": "partial",
-      "to_node_id": "ml_model:random_forest"
-    },
-    {
-      "agent_annotation": null,
-      "from_node_id": "STAT_ARB_CROSS_SECTIONAL",
-      "gap_type": null,
-      "readiness": "backtest-only",
-      "reason": "signals momentum_ranking \u2192 targets direction,swing_high,swing_low (cefi,tradfi)",
-      "relation": "uses_model",
-      "status": "partial",
-      "to_node_id": "ml_model:ridge"
-    },
-    {
-      "agent_annotation": null,
-      "from_node_id": "STAT_ARB_CROSS_SECTIONAL",
-      "gap_type": null,
-      "readiness": "backtest-only",
-      "reason": "signals momentum_ranking \u2192 targets direction,swing_high,swing_low (cefi,tradfi)",
-      "relation": "uses_model",
-      "status": "partial",
-      "to_node_id": "ml_model:xgboost"
     },
     {
       "agent_annotation": null,
@@ -11499,86 +10629,6 @@
       "relation": "has_leg",
       "status": "available",
       "to_node_id": "leg:STAT_ARB_PAIRS_FIXED:short"
-    },
-    {
-      "agent_annotation": null,
-      "from_node_id": "STAT_ARB_PAIRS_FIXED",
-      "gap_type": null,
-      "readiness": "backtest-only",
-      "reason": "signals zscore_reversion \u2192 targets direction,swing_high,swing_low (cefi,tradfi)",
-      "relation": "uses_model",
-      "status": "available",
-      "to_node_id": "ml_model:catboost"
-    },
-    {
-      "agent_annotation": null,
-      "from_node_id": "STAT_ARB_PAIRS_FIXED",
-      "gap_type": null,
-      "readiness": "backtest-only",
-      "reason": "signals zscore_reversion \u2192 targets direction,swing_high,swing_low (cefi,tradfi)",
-      "relation": "uses_model",
-      "status": "available",
-      "to_node_id": "ml_model:ensemble"
-    },
-    {
-      "agent_annotation": null,
-      "from_node_id": "STAT_ARB_PAIRS_FIXED",
-      "gap_type": null,
-      "readiness": "backtest-only",
-      "reason": "signals zscore_reversion \u2192 targets direction,swing_high,swing_low (cefi,tradfi)",
-      "relation": "uses_model",
-      "status": "available",
-      "to_node_id": "ml_model:huber"
-    },
-    {
-      "agent_annotation": null,
-      "from_node_id": "STAT_ARB_PAIRS_FIXED",
-      "gap_type": null,
-      "readiness": "backtest-only",
-      "reason": "signals zscore_reversion \u2192 targets direction,swing_high,swing_low (cefi,tradfi)",
-      "relation": "uses_model",
-      "status": "available",
-      "to_node_id": "ml_model:lightgbm"
-    },
-    {
-      "agent_annotation": null,
-      "from_node_id": "STAT_ARB_PAIRS_FIXED",
-      "gap_type": null,
-      "readiness": "backtest-only",
-      "reason": "signals zscore_reversion \u2192 targets direction,swing_high,swing_low (cefi,tradfi)",
-      "relation": "uses_model",
-      "status": "available",
-      "to_node_id": "ml_model:poisson_glm"
-    },
-    {
-      "agent_annotation": null,
-      "from_node_id": "STAT_ARB_PAIRS_FIXED",
-      "gap_type": null,
-      "readiness": "backtest-only",
-      "reason": "signals zscore_reversion \u2192 targets direction,swing_high,swing_low (cefi,tradfi)",
-      "relation": "uses_model",
-      "status": "available",
-      "to_node_id": "ml_model:random_forest"
-    },
-    {
-      "agent_annotation": null,
-      "from_node_id": "STAT_ARB_PAIRS_FIXED",
-      "gap_type": null,
-      "readiness": "backtest-only",
-      "reason": "signals zscore_reversion \u2192 targets direction,swing_high,swing_low (cefi,tradfi)",
-      "relation": "uses_model",
-      "status": "available",
-      "to_node_id": "ml_model:ridge"
-    },
-    {
-      "agent_annotation": null,
-      "from_node_id": "STAT_ARB_PAIRS_FIXED",
-      "gap_type": null,
-      "readiness": "backtest-only",
-      "reason": "signals zscore_reversion \u2192 targets direction,swing_high,swing_low (cefi,tradfi)",
-      "relation": "uses_model",
-      "status": "available",
-      "to_node_id": "ml_model:xgboost"
     },
     {
       "agent_annotation": null,
@@ -11909,86 +10959,6 @@
       "relation": "has_leg",
       "status": "available",
       "to_node_id": "leg:TSMOM_BTC_CTA:directional"
-    },
-    {
-      "agent_annotation": null,
-      "from_node_id": "TSMOM_BTC_CTA",
-      "gap_type": null,
-      "readiness": "backtest-only",
-      "reason": "signals price \u2192 targets direction,swing_high,swing_low (cefi)",
-      "relation": "uses_model",
-      "status": "available",
-      "to_node_id": "ml_model:catboost"
-    },
-    {
-      "agent_annotation": null,
-      "from_node_id": "TSMOM_BTC_CTA",
-      "gap_type": null,
-      "readiness": "backtest-only",
-      "reason": "signals price \u2192 targets direction,swing_high,swing_low (cefi)",
-      "relation": "uses_model",
-      "status": "available",
-      "to_node_id": "ml_model:ensemble"
-    },
-    {
-      "agent_annotation": null,
-      "from_node_id": "TSMOM_BTC_CTA",
-      "gap_type": null,
-      "readiness": "backtest-only",
-      "reason": "signals price \u2192 targets direction,swing_high,swing_low (cefi)",
-      "relation": "uses_model",
-      "status": "available",
-      "to_node_id": "ml_model:huber"
-    },
-    {
-      "agent_annotation": null,
-      "from_node_id": "TSMOM_BTC_CTA",
-      "gap_type": null,
-      "readiness": "backtest-only",
-      "reason": "signals price \u2192 targets direction,swing_high,swing_low (cefi)",
-      "relation": "uses_model",
-      "status": "available",
-      "to_node_id": "ml_model:lightgbm"
-    },
-    {
-      "agent_annotation": null,
-      "from_node_id": "TSMOM_BTC_CTA",
-      "gap_type": null,
-      "readiness": "backtest-only",
-      "reason": "signals price \u2192 targets direction,swing_high,swing_low (cefi)",
-      "relation": "uses_model",
-      "status": "available",
-      "to_node_id": "ml_model:poisson_glm"
-    },
-    {
-      "agent_annotation": null,
-      "from_node_id": "TSMOM_BTC_CTA",
-      "gap_type": null,
-      "readiness": "backtest-only",
-      "reason": "signals price \u2192 targets direction,swing_high,swing_low (cefi)",
-      "relation": "uses_model",
-      "status": "available",
-      "to_node_id": "ml_model:random_forest"
-    },
-    {
-      "agent_annotation": null,
-      "from_node_id": "TSMOM_BTC_CTA",
-      "gap_type": null,
-      "readiness": "backtest-only",
-      "reason": "signals price \u2192 targets direction,swing_high,swing_low (cefi)",
-      "relation": "uses_model",
-      "status": "available",
-      "to_node_id": "ml_model:ridge"
-    },
-    {
-      "agent_annotation": null,
-      "from_node_id": "TSMOM_BTC_CTA",
-      "gap_type": null,
-      "readiness": "backtest-only",
-      "reason": "signals price \u2192 targets direction,swing_high,swing_low (cefi)",
-      "relation": "uses_model",
-      "status": "available",
-      "to_node_id": "ml_model:xgboost"
     },
     {
       "agent_annotation": null,
@@ -16535,86 +15505,6 @@
       "from_node_id": "VOL_TRADING_OPTIONS",
       "gap_type": null,
       "readiness": "backtest-only",
-      "reason": "signals iv_dispersion,vol_metric \u2192 targets volatility (cefi,tradfi)",
-      "relation": "uses_model",
-      "status": "available",
-      "to_node_id": "ml_model:catboost"
-    },
-    {
-      "agent_annotation": null,
-      "from_node_id": "VOL_TRADING_OPTIONS",
-      "gap_type": null,
-      "readiness": "backtest-only",
-      "reason": "signals iv_dispersion,vol_metric \u2192 targets volatility (cefi,tradfi)",
-      "relation": "uses_model",
-      "status": "available",
-      "to_node_id": "ml_model:ensemble"
-    },
-    {
-      "agent_annotation": null,
-      "from_node_id": "VOL_TRADING_OPTIONS",
-      "gap_type": null,
-      "readiness": "backtest-only",
-      "reason": "signals iv_dispersion,vol_metric \u2192 targets volatility (cefi,tradfi)",
-      "relation": "uses_model",
-      "status": "available",
-      "to_node_id": "ml_model:huber"
-    },
-    {
-      "agent_annotation": null,
-      "from_node_id": "VOL_TRADING_OPTIONS",
-      "gap_type": null,
-      "readiness": "backtest-only",
-      "reason": "signals iv_dispersion,vol_metric \u2192 targets volatility (cefi,tradfi)",
-      "relation": "uses_model",
-      "status": "available",
-      "to_node_id": "ml_model:lightgbm"
-    },
-    {
-      "agent_annotation": null,
-      "from_node_id": "VOL_TRADING_OPTIONS",
-      "gap_type": null,
-      "readiness": "backtest-only",
-      "reason": "signals iv_dispersion,vol_metric \u2192 targets volatility (cefi,tradfi)",
-      "relation": "uses_model",
-      "status": "available",
-      "to_node_id": "ml_model:poisson_glm"
-    },
-    {
-      "agent_annotation": null,
-      "from_node_id": "VOL_TRADING_OPTIONS",
-      "gap_type": null,
-      "readiness": "backtest-only",
-      "reason": "signals iv_dispersion,vol_metric \u2192 targets volatility (cefi,tradfi)",
-      "relation": "uses_model",
-      "status": "available",
-      "to_node_id": "ml_model:random_forest"
-    },
-    {
-      "agent_annotation": null,
-      "from_node_id": "VOL_TRADING_OPTIONS",
-      "gap_type": null,
-      "readiness": "backtest-only",
-      "reason": "signals iv_dispersion,vol_metric \u2192 targets volatility (cefi,tradfi)",
-      "relation": "uses_model",
-      "status": "available",
-      "to_node_id": "ml_model:ridge"
-    },
-    {
-      "agent_annotation": null,
-      "from_node_id": "VOL_TRADING_OPTIONS",
-      "gap_type": null,
-      "readiness": "backtest-only",
-      "reason": "signals iv_dispersion,vol_metric \u2192 targets volatility (cefi,tradfi)",
-      "relation": "uses_model",
-      "status": "available",
-      "to_node_id": "ml_model:xgboost"
-    },
-    {
-      "agent_annotation": null,
-      "from_node_id": "VOL_TRADING_OPTIONS",
-      "gap_type": null,
-      "readiness": "backtest-only",
       "reason": null,
       "relation": "supports",
       "status": "partial",
@@ -17835,7 +16725,7 @@
       "from_node_id": "data_source:aave",
       "gap_type": null,
       "readiness": null,
-      "reason": "batch is the baseline mode for every source",
+      "reason": "SOURCE_MODE_CAPABILITY[aave] includes batch",
       "relation": "supports_mode:batch",
       "status": "available",
       "to_node_id": "data_source:aave"
@@ -17843,21 +16733,21 @@
     {
       "agent_annotation": null,
       "from_node_id": "data_source:aave",
-      "gap_type": "missing_registry",
+      "gap_type": null,
       "readiness": null,
-      "reason": "live-mode capability for aave lives in the manual source-mode-capability-matrix audit, not yet codified in a UAC registry",
+      "reason": "SOURCE_MODE_CAPABILITY[aave] does not include live (ratified source_mode_capability_matrix_2026_06_07.md; honest absence, not a gap)",
       "relation": "supports_mode:live",
-      "status": "not_registered",
+      "status": "not_available",
       "to_node_id": "data_source:aave"
     },
     {
       "agent_annotation": null,
       "from_node_id": "data_source:aave",
-      "gap_type": "missing_registry",
+      "gap_type": null,
       "readiness": null,
-      "reason": "replay-mode capability for aave lives in the manual source-mode-capability-matrix audit, not yet codified in a UAC registry",
+      "reason": "SOURCE_MODE_CAPABILITY[aave] does not include replay (ratified source_mode_capability_matrix_2026_06_07.md; honest absence, not a gap)",
       "relation": "supports_mode:replay",
-      "status": "not_registered",
+      "status": "not_available",
       "to_node_id": "data_source:aave"
     },
     {
@@ -17875,7 +16765,7 @@
       "from_node_id": "data_source:api_football",
       "gap_type": null,
       "readiness": null,
-      "reason": "batch is the baseline mode for every source",
+      "reason": "SOURCE_MODE_CAPABILITY[api_football] includes batch",
       "relation": "supports_mode:batch",
       "status": "available",
       "to_node_id": "data_source:api_football"
@@ -17883,21 +16773,21 @@
     {
       "agent_annotation": null,
       "from_node_id": "data_source:api_football",
-      "gap_type": "missing_registry",
+      "gap_type": null,
       "readiness": null,
-      "reason": "live-mode capability for api_football lives in the manual source-mode-capability-matrix audit, not yet codified in a UAC registry",
+      "reason": "SOURCE_MODE_CAPABILITY[api_football] does not include live (ratified source_mode_capability_matrix_2026_06_07.md; honest absence, not a gap)",
       "relation": "supports_mode:live",
-      "status": "not_registered",
+      "status": "not_available",
       "to_node_id": "data_source:api_football"
     },
     {
       "agent_annotation": null,
       "from_node_id": "data_source:api_football",
-      "gap_type": "missing_registry",
+      "gap_type": null,
       "readiness": null,
-      "reason": "replay-mode capability for api_football lives in the manual source-mode-capability-matrix audit, not yet codified in a UAC registry",
+      "reason": "SOURCE_MODE_CAPABILITY[api_football] includes replay",
       "relation": "supports_mode:replay",
-      "status": "not_registered",
+      "status": "available",
       "to_node_id": "data_source:api_football"
     },
     {
@@ -17915,7 +16805,7 @@
       "from_node_id": "data_source:aster",
       "gap_type": null,
       "readiness": null,
-      "reason": "batch is the baseline mode for every source",
+      "reason": "SOURCE_MODE_CAPABILITY[aster] includes batch",
       "relation": "supports_mode:batch",
       "status": "available",
       "to_node_id": "data_source:aster"
@@ -17923,21 +16813,21 @@
     {
       "agent_annotation": null,
       "from_node_id": "data_source:aster",
-      "gap_type": "missing_registry",
+      "gap_type": null,
       "readiness": null,
-      "reason": "live-mode capability for aster lives in the manual source-mode-capability-matrix audit, not yet codified in a UAC registry",
+      "reason": "SOURCE_MODE_CAPABILITY[aster] includes live",
       "relation": "supports_mode:live",
-      "status": "not_registered",
+      "status": "available",
       "to_node_id": "data_source:aster"
     },
     {
       "agent_annotation": null,
       "from_node_id": "data_source:aster",
-      "gap_type": "missing_registry",
+      "gap_type": null,
       "readiness": null,
-      "reason": "replay-mode capability for aster lives in the manual source-mode-capability-matrix audit, not yet codified in a UAC registry",
+      "reason": "SOURCE_MODE_CAPABILITY[aster] includes replay",
       "relation": "supports_mode:replay",
-      "status": "not_registered",
+      "status": "available",
       "to_node_id": "data_source:aster"
     },
     {
@@ -17955,7 +16845,7 @@
       "from_node_id": "data_source:chainlink",
       "gap_type": null,
       "readiness": null,
-      "reason": "batch is the baseline mode for every source",
+      "reason": "SOURCE_MODE_CAPABILITY[chainlink] includes batch",
       "relation": "supports_mode:batch",
       "status": "available",
       "to_node_id": "data_source:chainlink"
@@ -17963,21 +16853,21 @@
     {
       "agent_annotation": null,
       "from_node_id": "data_source:chainlink",
-      "gap_type": "missing_registry",
+      "gap_type": null,
       "readiness": null,
-      "reason": "live-mode capability for chainlink lives in the manual source-mode-capability-matrix audit, not yet codified in a UAC registry",
+      "reason": "SOURCE_MODE_CAPABILITY[chainlink] includes live",
       "relation": "supports_mode:live",
-      "status": "not_registered",
+      "status": "available",
       "to_node_id": "data_source:chainlink"
     },
     {
       "agent_annotation": null,
       "from_node_id": "data_source:chainlink",
-      "gap_type": "missing_registry",
+      "gap_type": null,
       "readiness": null,
-      "reason": "replay-mode capability for chainlink lives in the manual source-mode-capability-matrix audit, not yet codified in a UAC registry",
+      "reason": "SOURCE_MODE_CAPABILITY[chainlink] includes replay",
       "relation": "supports_mode:replay",
-      "status": "not_registered",
+      "status": "available",
       "to_node_id": "data_source:chainlink"
     },
     {
@@ -17995,7 +16885,7 @@
       "from_node_id": "data_source:cross_instrument",
       "gap_type": null,
       "readiness": null,
-      "reason": "batch is the baseline mode for every source",
+      "reason": "SOURCE_MODE_CAPABILITY[cross_instrument] includes batch",
       "relation": "supports_mode:batch",
       "status": "available",
       "to_node_id": "data_source:cross_instrument"
@@ -18003,21 +16893,21 @@
     {
       "agent_annotation": null,
       "from_node_id": "data_source:cross_instrument",
-      "gap_type": "missing_registry",
+      "gap_type": null,
       "readiness": null,
-      "reason": "live-mode capability for cross_instrument lives in the manual source-mode-capability-matrix audit, not yet codified in a UAC registry",
+      "reason": "SOURCE_MODE_CAPABILITY[cross_instrument] includes live",
       "relation": "supports_mode:live",
-      "status": "not_registered",
+      "status": "available",
       "to_node_id": "data_source:cross_instrument"
     },
     {
       "agent_annotation": null,
       "from_node_id": "data_source:cross_instrument",
-      "gap_type": "missing_registry",
+      "gap_type": null,
       "readiness": null,
-      "reason": "replay-mode capability for cross_instrument lives in the manual source-mode-capability-matrix audit, not yet codified in a UAC registry",
+      "reason": "SOURCE_MODE_CAPABILITY[cross_instrument] includes replay",
       "relation": "supports_mode:replay",
-      "status": "not_registered",
+      "status": "available",
       "to_node_id": "data_source:cross_instrument"
     },
     {
@@ -18035,7 +16925,7 @@
       "from_node_id": "data_source:databento",
       "gap_type": null,
       "readiness": null,
-      "reason": "batch is the baseline mode for every source",
+      "reason": "SOURCE_MODE_CAPABILITY[databento] includes batch",
       "relation": "supports_mode:batch",
       "status": "available",
       "to_node_id": "data_source:databento"
@@ -18043,22 +16933,62 @@
     {
       "agent_annotation": null,
       "from_node_id": "data_source:databento",
-      "gap_type": "missing_registry",
+      "gap_type": null,
       "readiness": null,
-      "reason": "live-mode capability for databento lives in the manual source-mode-capability-matrix audit, not yet codified in a UAC registry",
+      "reason": "SOURCE_MODE_CAPABILITY[databento] includes live",
       "relation": "supports_mode:live",
-      "status": "not_registered",
+      "status": "available",
       "to_node_id": "data_source:databento"
     },
     {
       "agent_annotation": null,
       "from_node_id": "data_source:databento",
-      "gap_type": "missing_registry",
+      "gap_type": null,
       "readiness": null,
-      "reason": "replay-mode capability for databento lives in the manual source-mode-capability-matrix audit, not yet codified in a UAC registry",
+      "reason": "SOURCE_MODE_CAPABILITY[databento] includes replay",
       "relation": "supports_mode:replay",
-      "status": "not_registered",
+      "status": "available",
       "to_node_id": "data_source:databento"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "data_source:defillama",
+      "gap_type": null,
+      "readiness": null,
+      "reason": "default transport for defillama",
+      "relation": "over_transport:rest",
+      "status": "available",
+      "to_node_id": "data_source:defillama"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "data_source:defillama",
+      "gap_type": null,
+      "readiness": null,
+      "reason": "SOURCE_MODE_CAPABILITY[defillama] includes batch",
+      "relation": "supports_mode:batch",
+      "status": "available",
+      "to_node_id": "data_source:defillama"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "data_source:defillama",
+      "gap_type": null,
+      "readiness": null,
+      "reason": "SOURCE_MODE_CAPABILITY[defillama] does not include live (ratified source_mode_capability_matrix_2026_06_07.md; honest absence, not a gap)",
+      "relation": "supports_mode:live",
+      "status": "not_available",
+      "to_node_id": "data_source:defillama"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "data_source:defillama",
+      "gap_type": null,
+      "readiness": null,
+      "reason": "SOURCE_MODE_CAPABILITY[defillama] does not include replay (ratified source_mode_capability_matrix_2026_06_07.md; honest absence, not a gap)",
+      "relation": "supports_mode:replay",
+      "status": "not_available",
+      "to_node_id": "data_source:defillama"
     },
     {
       "agent_annotation": null,
@@ -18075,7 +17005,7 @@
       "from_node_id": "data_source:deribit",
       "gap_type": null,
       "readiness": null,
-      "reason": "batch is the baseline mode for every source",
+      "reason": "SOURCE_MODE_CAPABILITY[deribit] includes batch",
       "relation": "supports_mode:batch",
       "status": "available",
       "to_node_id": "data_source:deribit"
@@ -18083,21 +17013,21 @@
     {
       "agent_annotation": null,
       "from_node_id": "data_source:deribit",
-      "gap_type": "missing_registry",
+      "gap_type": null,
       "readiness": null,
-      "reason": "live-mode capability for deribit lives in the manual source-mode-capability-matrix audit, not yet codified in a UAC registry",
+      "reason": "SOURCE_MODE_CAPABILITY[deribit] includes live",
       "relation": "supports_mode:live",
-      "status": "not_registered",
+      "status": "available",
       "to_node_id": "data_source:deribit"
     },
     {
       "agent_annotation": null,
       "from_node_id": "data_source:deribit",
-      "gap_type": "missing_registry",
+      "gap_type": null,
       "readiness": null,
-      "reason": "replay-mode capability for deribit lives in the manual source-mode-capability-matrix audit, not yet codified in a UAC registry",
+      "reason": "SOURCE_MODE_CAPABILITY[deribit] includes replay",
       "relation": "supports_mode:replay",
-      "status": "not_registered",
+      "status": "available",
       "to_node_id": "data_source:deribit"
     },
     {
@@ -18115,7 +17045,7 @@
       "from_node_id": "data_source:eia",
       "gap_type": null,
       "readiness": null,
-      "reason": "batch is the baseline mode for every source",
+      "reason": "SOURCE_MODE_CAPABILITY[eia] includes batch",
       "relation": "supports_mode:batch",
       "status": "available",
       "to_node_id": "data_source:eia"
@@ -18123,21 +17053,21 @@
     {
       "agent_annotation": null,
       "from_node_id": "data_source:eia",
-      "gap_type": "missing_registry",
+      "gap_type": null,
       "readiness": null,
-      "reason": "live-mode capability for eia lives in the manual source-mode-capability-matrix audit, not yet codified in a UAC registry",
+      "reason": "SOURCE_MODE_CAPABILITY[eia] does not include live (ratified source_mode_capability_matrix_2026_06_07.md; honest absence, not a gap)",
       "relation": "supports_mode:live",
-      "status": "not_registered",
+      "status": "not_available",
       "to_node_id": "data_source:eia"
     },
     {
       "agent_annotation": null,
       "from_node_id": "data_source:eia",
-      "gap_type": "missing_registry",
+      "gap_type": null,
       "readiness": null,
-      "reason": "replay-mode capability for eia lives in the manual source-mode-capability-matrix audit, not yet codified in a UAC registry",
+      "reason": "SOURCE_MODE_CAPABILITY[eia] includes replay",
       "relation": "supports_mode:replay",
-      "status": "not_registered",
+      "status": "available",
       "to_node_id": "data_source:eia"
     },
     {
@@ -18155,7 +17085,7 @@
       "from_node_id": "data_source:extended",
       "gap_type": null,
       "readiness": null,
-      "reason": "batch is the baseline mode for every source",
+      "reason": "SOURCE_MODE_CAPABILITY[extended] includes batch",
       "relation": "supports_mode:batch",
       "status": "available",
       "to_node_id": "data_source:extended"
@@ -18163,21 +17093,21 @@
     {
       "agent_annotation": null,
       "from_node_id": "data_source:extended",
-      "gap_type": "missing_registry",
+      "gap_type": null,
       "readiness": null,
-      "reason": "live-mode capability for extended lives in the manual source-mode-capability-matrix audit, not yet codified in a UAC registry",
+      "reason": "SOURCE_MODE_CAPABILITY[extended] includes live",
       "relation": "supports_mode:live",
-      "status": "not_registered",
+      "status": "available",
       "to_node_id": "data_source:extended"
     },
     {
       "agent_annotation": null,
       "from_node_id": "data_source:extended",
-      "gap_type": "missing_registry",
+      "gap_type": null,
       "readiness": null,
-      "reason": "replay-mode capability for extended lives in the manual source-mode-capability-matrix audit, not yet codified in a UAC registry",
+      "reason": "SOURCE_MODE_CAPABILITY[extended] includes replay",
       "relation": "supports_mode:replay",
-      "status": "not_registered",
+      "status": "available",
       "to_node_id": "data_source:extended"
     },
     {
@@ -18195,7 +17125,7 @@
       "from_node_id": "data_source:footystats",
       "gap_type": null,
       "readiness": null,
-      "reason": "batch is the baseline mode for every source",
+      "reason": "SOURCE_MODE_CAPABILITY[footystats] includes batch",
       "relation": "supports_mode:batch",
       "status": "available",
       "to_node_id": "data_source:footystats"
@@ -18203,21 +17133,21 @@
     {
       "agent_annotation": null,
       "from_node_id": "data_source:footystats",
-      "gap_type": "missing_registry",
+      "gap_type": null,
       "readiness": null,
-      "reason": "live-mode capability for footystats lives in the manual source-mode-capability-matrix audit, not yet codified in a UAC registry",
+      "reason": "SOURCE_MODE_CAPABILITY[footystats] does not include live (ratified source_mode_capability_matrix_2026_06_07.md; honest absence, not a gap)",
       "relation": "supports_mode:live",
-      "status": "not_registered",
+      "status": "not_available",
       "to_node_id": "data_source:footystats"
     },
     {
       "agent_annotation": null,
       "from_node_id": "data_source:footystats",
-      "gap_type": "missing_registry",
+      "gap_type": null,
       "readiness": null,
-      "reason": "replay-mode capability for footystats lives in the manual source-mode-capability-matrix audit, not yet codified in a UAC registry",
+      "reason": "SOURCE_MODE_CAPABILITY[footystats] includes replay",
       "relation": "supports_mode:replay",
-      "status": "not_registered",
+      "status": "available",
       "to_node_id": "data_source:footystats"
     },
     {
@@ -18235,7 +17165,7 @@
       "from_node_id": "data_source:greeks_service",
       "gap_type": null,
       "readiness": null,
-      "reason": "batch is the baseline mode for every source",
+      "reason": "SOURCE_MODE_CAPABILITY[greeks_service] includes batch",
       "relation": "supports_mode:batch",
       "status": "available",
       "to_node_id": "data_source:greeks_service"
@@ -18243,21 +17173,21 @@
     {
       "agent_annotation": null,
       "from_node_id": "data_source:greeks_service",
-      "gap_type": "missing_registry",
+      "gap_type": null,
       "readiness": null,
-      "reason": "live-mode capability for greeks_service lives in the manual source-mode-capability-matrix audit, not yet codified in a UAC registry",
+      "reason": "SOURCE_MODE_CAPABILITY[greeks_service] includes live",
       "relation": "supports_mode:live",
-      "status": "not_registered",
+      "status": "available",
       "to_node_id": "data_source:greeks_service"
     },
     {
       "agent_annotation": null,
       "from_node_id": "data_source:greeks_service",
-      "gap_type": "missing_registry",
+      "gap_type": null,
       "readiness": null,
-      "reason": "replay-mode capability for greeks_service lives in the manual source-mode-capability-matrix audit, not yet codified in a UAC registry",
+      "reason": "SOURCE_MODE_CAPABILITY[greeks_service] includes replay",
       "relation": "supports_mode:replay",
-      "status": "not_registered",
+      "status": "available",
       "to_node_id": "data_source:greeks_service"
     },
     {
@@ -18275,7 +17205,7 @@
       "from_node_id": "data_source:helius_rpc",
       "gap_type": null,
       "readiness": null,
-      "reason": "batch is the baseline mode for every source",
+      "reason": "SOURCE_MODE_CAPABILITY[helius_rpc] includes batch",
       "relation": "supports_mode:batch",
       "status": "available",
       "to_node_id": "data_source:helius_rpc"
@@ -18283,21 +17213,21 @@
     {
       "agent_annotation": null,
       "from_node_id": "data_source:helius_rpc",
-      "gap_type": "missing_registry",
+      "gap_type": null,
       "readiness": null,
-      "reason": "live-mode capability for helius_rpc lives in the manual source-mode-capability-matrix audit, not yet codified in a UAC registry",
+      "reason": "SOURCE_MODE_CAPABILITY[helius_rpc] includes live",
       "relation": "supports_mode:live",
-      "status": "not_registered",
+      "status": "available",
       "to_node_id": "data_source:helius_rpc"
     },
     {
       "agent_annotation": null,
       "from_node_id": "data_source:helius_rpc",
-      "gap_type": "missing_registry",
+      "gap_type": null,
       "readiness": null,
-      "reason": "replay-mode capability for helius_rpc lives in the manual source-mode-capability-matrix audit, not yet codified in a UAC registry",
+      "reason": "SOURCE_MODE_CAPABILITY[helius_rpc] includes replay",
       "relation": "supports_mode:replay",
-      "status": "not_registered",
+      "status": "available",
       "to_node_id": "data_source:helius_rpc"
     },
     {
@@ -18315,7 +17245,7 @@
       "from_node_id": "data_source:hyperliquid",
       "gap_type": null,
       "readiness": null,
-      "reason": "batch is the baseline mode for every source",
+      "reason": "SOURCE_MODE_CAPABILITY[hyperliquid] includes batch",
       "relation": "supports_mode:batch",
       "status": "available",
       "to_node_id": "data_source:hyperliquid"
@@ -18323,21 +17253,21 @@
     {
       "agent_annotation": null,
       "from_node_id": "data_source:hyperliquid",
-      "gap_type": "missing_registry",
+      "gap_type": null,
       "readiness": null,
-      "reason": "live-mode capability for hyperliquid lives in the manual source-mode-capability-matrix audit, not yet codified in a UAC registry",
+      "reason": "SOURCE_MODE_CAPABILITY[hyperliquid] includes live",
       "relation": "supports_mode:live",
-      "status": "not_registered",
+      "status": "available",
       "to_node_id": "data_source:hyperliquid"
     },
     {
       "agent_annotation": null,
       "from_node_id": "data_source:hyperliquid",
-      "gap_type": "missing_registry",
+      "gap_type": null,
       "readiness": null,
-      "reason": "replay-mode capability for hyperliquid lives in the manual source-mode-capability-matrix audit, not yet codified in a UAC registry",
+      "reason": "SOURCE_MODE_CAPABILITY[hyperliquid] includes replay",
       "relation": "supports_mode:replay",
-      "status": "not_registered",
+      "status": "available",
       "to_node_id": "data_source:hyperliquid"
     },
     {
@@ -18355,7 +17285,7 @@
       "from_node_id": "data_source:kalshi",
       "gap_type": null,
       "readiness": null,
-      "reason": "batch is the baseline mode for every source",
+      "reason": "SOURCE_MODE_CAPABILITY[kalshi] includes batch",
       "relation": "supports_mode:batch",
       "status": "available",
       "to_node_id": "data_source:kalshi"
@@ -18363,21 +17293,21 @@
     {
       "agent_annotation": null,
       "from_node_id": "data_source:kalshi",
-      "gap_type": "missing_registry",
+      "gap_type": null,
       "readiness": null,
-      "reason": "live-mode capability for kalshi lives in the manual source-mode-capability-matrix audit, not yet codified in a UAC registry",
+      "reason": "SOURCE_MODE_CAPABILITY[kalshi] includes live",
       "relation": "supports_mode:live",
-      "status": "not_registered",
+      "status": "available",
       "to_node_id": "data_source:kalshi"
     },
     {
       "agent_annotation": null,
       "from_node_id": "data_source:kalshi",
-      "gap_type": "missing_registry",
+      "gap_type": null,
       "readiness": null,
-      "reason": "replay-mode capability for kalshi lives in the manual source-mode-capability-matrix audit, not yet codified in a UAC registry",
+      "reason": "SOURCE_MODE_CAPABILITY[kalshi] includes replay",
       "relation": "supports_mode:replay",
-      "status": "not_registered",
+      "status": "available",
       "to_node_id": "data_source:kalshi"
     },
     {
@@ -18395,7 +17325,7 @@
       "from_node_id": "data_source:kalshi_perp",
       "gap_type": null,
       "readiness": null,
-      "reason": "batch is the baseline mode for every source",
+      "reason": "SOURCE_MODE_CAPABILITY[kalshi_perp] includes batch",
       "relation": "supports_mode:batch",
       "status": "available",
       "to_node_id": "data_source:kalshi_perp"
@@ -18403,21 +17333,21 @@
     {
       "agent_annotation": null,
       "from_node_id": "data_source:kalshi_perp",
-      "gap_type": "missing_registry",
+      "gap_type": null,
       "readiness": null,
-      "reason": "live-mode capability for kalshi_perp lives in the manual source-mode-capability-matrix audit, not yet codified in a UAC registry",
+      "reason": "SOURCE_MODE_CAPABILITY[kalshi_perp] includes live",
       "relation": "supports_mode:live",
-      "status": "not_registered",
+      "status": "available",
       "to_node_id": "data_source:kalshi_perp"
     },
     {
       "agent_annotation": null,
       "from_node_id": "data_source:kalshi_perp",
-      "gap_type": "missing_registry",
+      "gap_type": null,
       "readiness": null,
-      "reason": "replay-mode capability for kalshi_perp lives in the manual source-mode-capability-matrix audit, not yet codified in a UAC registry",
+      "reason": "SOURCE_MODE_CAPABILITY[kalshi_perp] includes replay",
       "relation": "supports_mode:replay",
-      "status": "not_registered",
+      "status": "available",
       "to_node_id": "data_source:kalshi_perp"
     },
     {
@@ -18435,7 +17365,7 @@
       "from_node_id": "data_source:lighter_api",
       "gap_type": null,
       "readiness": null,
-      "reason": "batch is the baseline mode for every source",
+      "reason": "SOURCE_MODE_CAPABILITY[lighter_api] includes batch",
       "relation": "supports_mode:batch",
       "status": "available",
       "to_node_id": "data_source:lighter_api"
@@ -18443,21 +17373,21 @@
     {
       "agent_annotation": null,
       "from_node_id": "data_source:lighter_api",
-      "gap_type": "missing_registry",
+      "gap_type": null,
       "readiness": null,
-      "reason": "live-mode capability for lighter_api lives in the manual source-mode-capability-matrix audit, not yet codified in a UAC registry",
+      "reason": "SOURCE_MODE_CAPABILITY[lighter_api] does not include live (ratified source_mode_capability_matrix_2026_06_07.md; honest absence, not a gap)",
       "relation": "supports_mode:live",
-      "status": "not_registered",
+      "status": "not_available",
       "to_node_id": "data_source:lighter_api"
     },
     {
       "agent_annotation": null,
       "from_node_id": "data_source:lighter_api",
-      "gap_type": "missing_registry",
+      "gap_type": null,
       "readiness": null,
-      "reason": "replay-mode capability for lighter_api lives in the manual source-mode-capability-matrix audit, not yet codified in a UAC registry",
+      "reason": "SOURCE_MODE_CAPABILITY[lighter_api] does not include replay (ratified source_mode_capability_matrix_2026_06_07.md; honest absence, not a gap)",
       "relation": "supports_mode:replay",
-      "status": "not_registered",
+      "status": "not_available",
       "to_node_id": "data_source:lighter_api"
     },
     {
@@ -18475,7 +17405,7 @@
       "from_node_id": "data_source:mdps_odds_horizon_bucket",
       "gap_type": null,
       "readiness": null,
-      "reason": "batch is the baseline mode for every source",
+      "reason": "SOURCE_MODE_CAPABILITY[mdps_odds_horizon_bucket] includes batch",
       "relation": "supports_mode:batch",
       "status": "available",
       "to_node_id": "data_source:mdps_odds_horizon_bucket"
@@ -18483,21 +17413,21 @@
     {
       "agent_annotation": null,
       "from_node_id": "data_source:mdps_odds_horizon_bucket",
-      "gap_type": "missing_registry",
+      "gap_type": null,
       "readiness": null,
-      "reason": "live-mode capability for mdps_odds_horizon_bucket lives in the manual source-mode-capability-matrix audit, not yet codified in a UAC registry",
+      "reason": "SOURCE_MODE_CAPABILITY[mdps_odds_horizon_bucket] includes live",
       "relation": "supports_mode:live",
-      "status": "not_registered",
+      "status": "available",
       "to_node_id": "data_source:mdps_odds_horizon_bucket"
     },
     {
       "agent_annotation": null,
       "from_node_id": "data_source:mdps_odds_horizon_bucket",
-      "gap_type": "missing_registry",
+      "gap_type": null,
       "readiness": null,
-      "reason": "replay-mode capability for mdps_odds_horizon_bucket lives in the manual source-mode-capability-matrix audit, not yet codified in a UAC registry",
+      "reason": "SOURCE_MODE_CAPABILITY[mdps_odds_horizon_bucket] includes replay",
       "relation": "supports_mode:replay",
-      "status": "not_registered",
+      "status": "available",
       "to_node_id": "data_source:mdps_odds_horizon_bucket"
     },
     {
@@ -18515,7 +17445,7 @@
       "from_node_id": "data_source:mtds_microstructure",
       "gap_type": null,
       "readiness": null,
-      "reason": "batch is the baseline mode for every source",
+      "reason": "SOURCE_MODE_CAPABILITY[mtds_microstructure] includes batch",
       "relation": "supports_mode:batch",
       "status": "available",
       "to_node_id": "data_source:mtds_microstructure"
@@ -18523,21 +17453,21 @@
     {
       "agent_annotation": null,
       "from_node_id": "data_source:mtds_microstructure",
-      "gap_type": "missing_registry",
+      "gap_type": null,
       "readiness": null,
-      "reason": "live-mode capability for mtds_microstructure lives in the manual source-mode-capability-matrix audit, not yet codified in a UAC registry",
+      "reason": "SOURCE_MODE_CAPABILITY[mtds_microstructure] includes live",
       "relation": "supports_mode:live",
-      "status": "not_registered",
+      "status": "available",
       "to_node_id": "data_source:mtds_microstructure"
     },
     {
       "agent_annotation": null,
       "from_node_id": "data_source:mtds_microstructure",
-      "gap_type": "missing_registry",
+      "gap_type": null,
       "readiness": null,
-      "reason": "replay-mode capability for mtds_microstructure lives in the manual source-mode-capability-matrix audit, not yet codified in a UAC registry",
+      "reason": "SOURCE_MODE_CAPABILITY[mtds_microstructure] includes replay",
       "relation": "supports_mode:replay",
-      "status": "not_registered",
+      "status": "available",
       "to_node_id": "data_source:mtds_microstructure"
     },
     {
@@ -18555,7 +17485,7 @@
       "from_node_id": "data_source:odds_api",
       "gap_type": null,
       "readiness": null,
-      "reason": "batch is the baseline mode for every source",
+      "reason": "SOURCE_MODE_CAPABILITY[odds_api] includes batch",
       "relation": "supports_mode:batch",
       "status": "available",
       "to_node_id": "data_source:odds_api"
@@ -18563,21 +17493,21 @@
     {
       "agent_annotation": null,
       "from_node_id": "data_source:odds_api",
-      "gap_type": "missing_registry",
+      "gap_type": null,
       "readiness": null,
-      "reason": "live-mode capability for odds_api lives in the manual source-mode-capability-matrix audit, not yet codified in a UAC registry",
+      "reason": "SOURCE_MODE_CAPABILITY[odds_api] includes live",
       "relation": "supports_mode:live",
-      "status": "not_registered",
+      "status": "available",
       "to_node_id": "data_source:odds_api"
     },
     {
       "agent_annotation": null,
       "from_node_id": "data_source:odds_api",
-      "gap_type": "missing_registry",
+      "gap_type": null,
       "readiness": null,
-      "reason": "replay-mode capability for odds_api lives in the manual source-mode-capability-matrix audit, not yet codified in a UAC registry",
+      "reason": "SOURCE_MODE_CAPABILITY[odds_api] includes replay",
       "relation": "supports_mode:replay",
-      "status": "not_registered",
+      "status": "available",
       "to_node_id": "data_source:odds_api"
     },
     {
@@ -18595,7 +17525,7 @@
       "from_node_id": "data_source:onchain_rpc",
       "gap_type": null,
       "readiness": null,
-      "reason": "batch is the baseline mode for every source",
+      "reason": "SOURCE_MODE_CAPABILITY[onchain_rpc] includes batch",
       "relation": "supports_mode:batch",
       "status": "available",
       "to_node_id": "data_source:onchain_rpc"
@@ -18603,21 +17533,21 @@
     {
       "agent_annotation": null,
       "from_node_id": "data_source:onchain_rpc",
-      "gap_type": "missing_registry",
+      "gap_type": null,
       "readiness": null,
-      "reason": "live-mode capability for onchain_rpc lives in the manual source-mode-capability-matrix audit, not yet codified in a UAC registry",
+      "reason": "SOURCE_MODE_CAPABILITY[onchain_rpc] includes live",
       "relation": "supports_mode:live",
-      "status": "not_registered",
+      "status": "available",
       "to_node_id": "data_source:onchain_rpc"
     },
     {
       "agent_annotation": null,
       "from_node_id": "data_source:onchain_rpc",
-      "gap_type": "missing_registry",
+      "gap_type": null,
       "readiness": null,
-      "reason": "replay-mode capability for onchain_rpc lives in the manual source-mode-capability-matrix audit, not yet codified in a UAC registry",
+      "reason": "SOURCE_MODE_CAPABILITY[onchain_rpc] includes replay",
       "relation": "supports_mode:replay",
-      "status": "not_registered",
+      "status": "available",
       "to_node_id": "data_source:onchain_rpc"
     },
     {
@@ -18635,7 +17565,7 @@
       "from_node_id": "data_source:onchain_subgraph",
       "gap_type": null,
       "readiness": null,
-      "reason": "batch is the baseline mode for every source",
+      "reason": "SOURCE_MODE_CAPABILITY[onchain_subgraph] includes batch",
       "relation": "supports_mode:batch",
       "status": "available",
       "to_node_id": "data_source:onchain_subgraph"
@@ -18643,21 +17573,21 @@
     {
       "agent_annotation": null,
       "from_node_id": "data_source:onchain_subgraph",
-      "gap_type": "missing_registry",
+      "gap_type": null,
       "readiness": null,
-      "reason": "live-mode capability for onchain_subgraph lives in the manual source-mode-capability-matrix audit, not yet codified in a UAC registry",
+      "reason": "SOURCE_MODE_CAPABILITY[onchain_subgraph] includes live",
       "relation": "supports_mode:live",
-      "status": "not_registered",
+      "status": "available",
       "to_node_id": "data_source:onchain_subgraph"
     },
     {
       "agent_annotation": null,
       "from_node_id": "data_source:onchain_subgraph",
-      "gap_type": "missing_registry",
+      "gap_type": null,
       "readiness": null,
-      "reason": "replay-mode capability for onchain_subgraph lives in the manual source-mode-capability-matrix audit, not yet codified in a UAC registry",
+      "reason": "SOURCE_MODE_CAPABILITY[onchain_subgraph] includes replay",
       "relation": "supports_mode:replay",
-      "status": "not_registered",
+      "status": "available",
       "to_node_id": "data_source:onchain_subgraph"
     },
     {
@@ -18675,7 +17605,7 @@
       "from_node_id": "data_source:open_meteo",
       "gap_type": null,
       "readiness": null,
-      "reason": "batch is the baseline mode for every source",
+      "reason": "SOURCE_MODE_CAPABILITY[open_meteo] includes batch",
       "relation": "supports_mode:batch",
       "status": "available",
       "to_node_id": "data_source:open_meteo"
@@ -18683,21 +17613,21 @@
     {
       "agent_annotation": null,
       "from_node_id": "data_source:open_meteo",
-      "gap_type": "missing_registry",
+      "gap_type": null,
       "readiness": null,
-      "reason": "live-mode capability for open_meteo lives in the manual source-mode-capability-matrix audit, not yet codified in a UAC registry",
+      "reason": "SOURCE_MODE_CAPABILITY[open_meteo] does not include live (ratified source_mode_capability_matrix_2026_06_07.md; honest absence, not a gap)",
       "relation": "supports_mode:live",
-      "status": "not_registered",
+      "status": "not_available",
       "to_node_id": "data_source:open_meteo"
     },
     {
       "agent_annotation": null,
       "from_node_id": "data_source:open_meteo",
-      "gap_type": "missing_registry",
+      "gap_type": null,
       "readiness": null,
-      "reason": "replay-mode capability for open_meteo lives in the manual source-mode-capability-matrix audit, not yet codified in a UAC registry",
+      "reason": "SOURCE_MODE_CAPABILITY[open_meteo] includes replay",
       "relation": "supports_mode:replay",
-      "status": "not_registered",
+      "status": "available",
       "to_node_id": "data_source:open_meteo"
     },
     {
@@ -18715,7 +17645,7 @@
       "from_node_id": "data_source:polymarket_clob",
       "gap_type": null,
       "readiness": null,
-      "reason": "batch is the baseline mode for every source",
+      "reason": "SOURCE_MODE_CAPABILITY[polymarket_clob] includes batch",
       "relation": "supports_mode:batch",
       "status": "available",
       "to_node_id": "data_source:polymarket_clob"
@@ -18723,21 +17653,21 @@
     {
       "agent_annotation": null,
       "from_node_id": "data_source:polymarket_clob",
-      "gap_type": "missing_registry",
+      "gap_type": null,
       "readiness": null,
-      "reason": "live-mode capability for polymarket_clob lives in the manual source-mode-capability-matrix audit, not yet codified in a UAC registry",
+      "reason": "SOURCE_MODE_CAPABILITY[polymarket_clob] includes live",
       "relation": "supports_mode:live",
-      "status": "not_registered",
+      "status": "available",
       "to_node_id": "data_source:polymarket_clob"
     },
     {
       "agent_annotation": null,
       "from_node_id": "data_source:polymarket_clob",
-      "gap_type": "missing_registry",
+      "gap_type": null,
       "readiness": null,
-      "reason": "replay-mode capability for polymarket_clob lives in the manual source-mode-capability-matrix audit, not yet codified in a UAC registry",
+      "reason": "SOURCE_MODE_CAPABILITY[polymarket_clob] includes replay",
       "relation": "supports_mode:replay",
-      "status": "not_registered",
+      "status": "available",
       "to_node_id": "data_source:polymarket_clob"
     },
     {
@@ -18755,7 +17685,7 @@
       "from_node_id": "data_source:polymarket_gamma_api",
       "gap_type": null,
       "readiness": null,
-      "reason": "batch is the baseline mode for every source",
+      "reason": "SOURCE_MODE_CAPABILITY[polymarket_gamma_api] includes batch",
       "relation": "supports_mode:batch",
       "status": "available",
       "to_node_id": "data_source:polymarket_gamma_api"
@@ -18763,21 +17693,21 @@
     {
       "agent_annotation": null,
       "from_node_id": "data_source:polymarket_gamma_api",
-      "gap_type": "missing_registry",
+      "gap_type": null,
       "readiness": null,
-      "reason": "live-mode capability for polymarket_gamma_api lives in the manual source-mode-capability-matrix audit, not yet codified in a UAC registry",
+      "reason": "SOURCE_MODE_CAPABILITY[polymarket_gamma_api] does not include live (ratified source_mode_capability_matrix_2026_06_07.md; honest absence, not a gap)",
       "relation": "supports_mode:live",
-      "status": "not_registered",
+      "status": "not_available",
       "to_node_id": "data_source:polymarket_gamma_api"
     },
     {
       "agent_annotation": null,
       "from_node_id": "data_source:polymarket_gamma_api",
-      "gap_type": "missing_registry",
+      "gap_type": null,
       "readiness": null,
-      "reason": "replay-mode capability for polymarket_gamma_api lives in the manual source-mode-capability-matrix audit, not yet codified in a UAC registry",
+      "reason": "SOURCE_MODE_CAPABILITY[polymarket_gamma_api] does not include replay (ratified source_mode_capability_matrix_2026_06_07.md; honest absence, not a gap)",
       "relation": "supports_mode:replay",
-      "status": "not_registered",
+      "status": "not_available",
       "to_node_id": "data_source:polymarket_gamma_api"
     },
     {
@@ -18795,7 +17725,7 @@
       "from_node_id": "data_source:polymarket_perp",
       "gap_type": null,
       "readiness": null,
-      "reason": "batch is the baseline mode for every source",
+      "reason": "SOURCE_MODE_CAPABILITY[polymarket_perp] includes batch",
       "relation": "supports_mode:batch",
       "status": "available",
       "to_node_id": "data_source:polymarket_perp"
@@ -18803,21 +17733,21 @@
     {
       "agent_annotation": null,
       "from_node_id": "data_source:polymarket_perp",
-      "gap_type": "missing_registry",
+      "gap_type": null,
       "readiness": null,
-      "reason": "live-mode capability for polymarket_perp lives in the manual source-mode-capability-matrix audit, not yet codified in a UAC registry",
+      "reason": "SOURCE_MODE_CAPABILITY[polymarket_perp] includes live",
       "relation": "supports_mode:live",
-      "status": "not_registered",
+      "status": "available",
       "to_node_id": "data_source:polymarket_perp"
     },
     {
       "agent_annotation": null,
       "from_node_id": "data_source:polymarket_perp",
-      "gap_type": "missing_registry",
+      "gap_type": null,
       "readiness": null,
-      "reason": "replay-mode capability for polymarket_perp lives in the manual source-mode-capability-matrix audit, not yet codified in a UAC registry",
+      "reason": "SOURCE_MODE_CAPABILITY[polymarket_perp] does not include replay (ratified source_mode_capability_matrix_2026_06_07.md; honest absence, not a gap)",
       "relation": "supports_mode:replay",
-      "status": "not_registered",
+      "status": "not_available",
       "to_node_id": "data_source:polymarket_perp"
     },
     {
@@ -18835,7 +17765,7 @@
       "from_node_id": "data_source:pyth_hermes",
       "gap_type": null,
       "readiness": null,
-      "reason": "batch is the baseline mode for every source",
+      "reason": "SOURCE_MODE_CAPABILITY[pyth_hermes] includes batch",
       "relation": "supports_mode:batch",
       "status": "available",
       "to_node_id": "data_source:pyth_hermes"
@@ -18843,21 +17773,21 @@
     {
       "agent_annotation": null,
       "from_node_id": "data_source:pyth_hermes",
-      "gap_type": "missing_registry",
+      "gap_type": null,
       "readiness": null,
-      "reason": "live-mode capability for pyth_hermes lives in the manual source-mode-capability-matrix audit, not yet codified in a UAC registry",
+      "reason": "SOURCE_MODE_CAPABILITY[pyth_hermes] includes live",
       "relation": "supports_mode:live",
-      "status": "not_registered",
+      "status": "available",
       "to_node_id": "data_source:pyth_hermes"
     },
     {
       "agent_annotation": null,
       "from_node_id": "data_source:pyth_hermes",
-      "gap_type": "missing_registry",
+      "gap_type": null,
       "readiness": null,
-      "reason": "replay-mode capability for pyth_hermes lives in the manual source-mode-capability-matrix audit, not yet codified in a UAC registry",
+      "reason": "SOURCE_MODE_CAPABILITY[pyth_hermes] includes replay",
       "relation": "supports_mode:replay",
-      "status": "not_registered",
+      "status": "available",
       "to_node_id": "data_source:pyth_hermes"
     },
     {
@@ -18875,7 +17805,7 @@
       "from_node_id": "data_source:soccer_football_info",
       "gap_type": null,
       "readiness": null,
-      "reason": "batch is the baseline mode for every source",
+      "reason": "SOURCE_MODE_CAPABILITY[soccer_football_info] includes batch",
       "relation": "supports_mode:batch",
       "status": "available",
       "to_node_id": "data_source:soccer_football_info"
@@ -18883,21 +17813,21 @@
     {
       "agent_annotation": null,
       "from_node_id": "data_source:soccer_football_info",
-      "gap_type": "missing_registry",
+      "gap_type": null,
       "readiness": null,
-      "reason": "live-mode capability for soccer_football_info lives in the manual source-mode-capability-matrix audit, not yet codified in a UAC registry",
+      "reason": "SOURCE_MODE_CAPABILITY[soccer_football_info] does not include live (ratified source_mode_capability_matrix_2026_06_07.md; honest absence, not a gap)",
       "relation": "supports_mode:live",
-      "status": "not_registered",
+      "status": "not_available",
       "to_node_id": "data_source:soccer_football_info"
     },
     {
       "agent_annotation": null,
       "from_node_id": "data_source:soccer_football_info",
-      "gap_type": "missing_registry",
+      "gap_type": null,
       "readiness": null,
-      "reason": "replay-mode capability for soccer_football_info lives in the manual source-mode-capability-matrix audit, not yet codified in a UAC registry",
+      "reason": "SOURCE_MODE_CAPABILITY[soccer_football_info] includes replay",
       "relation": "supports_mode:replay",
-      "status": "not_registered",
+      "status": "available",
       "to_node_id": "data_source:soccer_football_info"
     },
     {
@@ -18915,7 +17845,7 @@
       "from_node_id": "data_source:solana_rpc",
       "gap_type": null,
       "readiness": null,
-      "reason": "batch is the baseline mode for every source",
+      "reason": "SOURCE_MODE_CAPABILITY[solana_rpc] includes batch",
       "relation": "supports_mode:batch",
       "status": "available",
       "to_node_id": "data_source:solana_rpc"
@@ -18923,21 +17853,21 @@
     {
       "agent_annotation": null,
       "from_node_id": "data_source:solana_rpc",
-      "gap_type": "missing_registry",
+      "gap_type": null,
       "readiness": null,
-      "reason": "live-mode capability for solana_rpc lives in the manual source-mode-capability-matrix audit, not yet codified in a UAC registry",
+      "reason": "SOURCE_MODE_CAPABILITY[solana_rpc] includes live",
       "relation": "supports_mode:live",
-      "status": "not_registered",
+      "status": "available",
       "to_node_id": "data_source:solana_rpc"
     },
     {
       "agent_annotation": null,
       "from_node_id": "data_source:solana_rpc",
-      "gap_type": "missing_registry",
+      "gap_type": null,
       "readiness": null,
-      "reason": "replay-mode capability for solana_rpc lives in the manual source-mode-capability-matrix audit, not yet codified in a UAC registry",
+      "reason": "SOURCE_MODE_CAPABILITY[solana_rpc] includes replay",
       "relation": "supports_mode:replay",
-      "status": "not_registered",
+      "status": "available",
       "to_node_id": "data_source:solana_rpc"
     },
     {
@@ -18955,7 +17885,7 @@
       "from_node_id": "data_source:tardis",
       "gap_type": null,
       "readiness": null,
-      "reason": "batch is the baseline mode for every source",
+      "reason": "SOURCE_MODE_CAPABILITY[tardis] includes batch",
       "relation": "supports_mode:batch",
       "status": "available",
       "to_node_id": "data_source:tardis"
@@ -18963,21 +17893,21 @@
     {
       "agent_annotation": null,
       "from_node_id": "data_source:tardis",
-      "gap_type": "missing_registry",
+      "gap_type": null,
       "readiness": null,
-      "reason": "live-mode capability for tardis lives in the manual source-mode-capability-matrix audit, not yet codified in a UAC registry",
+      "reason": "SOURCE_MODE_CAPABILITY[tardis] does not include live (ratified source_mode_capability_matrix_2026_06_07.md; honest absence, not a gap)",
       "relation": "supports_mode:live",
-      "status": "not_registered",
+      "status": "not_available",
       "to_node_id": "data_source:tardis"
     },
     {
       "agent_annotation": null,
       "from_node_id": "data_source:tardis",
-      "gap_type": "missing_registry",
+      "gap_type": null,
       "readiness": null,
-      "reason": "replay-mode capability for tardis lives in the manual source-mode-capability-matrix audit, not yet codified in a UAC registry",
+      "reason": "SOURCE_MODE_CAPABILITY[tardis] does not include replay (ratified source_mode_capability_matrix_2026_06_07.md; honest absence, not a gap)",
       "relation": "supports_mode:replay",
-      "status": "not_registered",
+      "status": "not_available",
       "to_node_id": "data_source:tardis"
     },
     {
@@ -18995,7 +17925,7 @@
       "from_node_id": "data_source:transfermarkt",
       "gap_type": null,
       "readiness": null,
-      "reason": "batch is the baseline mode for every source",
+      "reason": "SOURCE_MODE_CAPABILITY[transfermarkt] includes batch",
       "relation": "supports_mode:batch",
       "status": "available",
       "to_node_id": "data_source:transfermarkt"
@@ -19003,21 +17933,21 @@
     {
       "agent_annotation": null,
       "from_node_id": "data_source:transfermarkt",
-      "gap_type": "missing_registry",
+      "gap_type": null,
       "readiness": null,
-      "reason": "live-mode capability for transfermarkt lives in the manual source-mode-capability-matrix audit, not yet codified in a UAC registry",
+      "reason": "SOURCE_MODE_CAPABILITY[transfermarkt] does not include live (ratified source_mode_capability_matrix_2026_06_07.md; honest absence, not a gap)",
       "relation": "supports_mode:live",
-      "status": "not_registered",
+      "status": "not_available",
       "to_node_id": "data_source:transfermarkt"
     },
     {
       "agent_annotation": null,
       "from_node_id": "data_source:transfermarkt",
-      "gap_type": "missing_registry",
+      "gap_type": null,
       "readiness": null,
-      "reason": "replay-mode capability for transfermarkt lives in the manual source-mode-capability-matrix audit, not yet codified in a UAC registry",
+      "reason": "SOURCE_MODE_CAPABILITY[transfermarkt] includes replay",
       "relation": "supports_mode:replay",
-      "status": "not_registered",
+      "status": "available",
       "to_node_id": "data_source:transfermarkt"
     },
     {
@@ -19035,7 +17965,7 @@
       "from_node_id": "data_source:understat",
       "gap_type": null,
       "readiness": null,
-      "reason": "batch is the baseline mode for every source",
+      "reason": "SOURCE_MODE_CAPABILITY[understat] includes batch",
       "relation": "supports_mode:batch",
       "status": "available",
       "to_node_id": "data_source:understat"
@@ -19043,21 +17973,21 @@
     {
       "agent_annotation": null,
       "from_node_id": "data_source:understat",
-      "gap_type": "missing_registry",
+      "gap_type": null,
       "readiness": null,
-      "reason": "live-mode capability for understat lives in the manual source-mode-capability-matrix audit, not yet codified in a UAC registry",
+      "reason": "SOURCE_MODE_CAPABILITY[understat] does not include live (ratified source_mode_capability_matrix_2026_06_07.md; honest absence, not a gap)",
       "relation": "supports_mode:live",
-      "status": "not_registered",
+      "status": "not_available",
       "to_node_id": "data_source:understat"
     },
     {
       "agent_annotation": null,
       "from_node_id": "data_source:understat",
-      "gap_type": "missing_registry",
+      "gap_type": null,
       "readiness": null,
-      "reason": "replay-mode capability for understat lives in the manual source-mode-capability-matrix audit, not yet codified in a UAC registry",
+      "reason": "SOURCE_MODE_CAPABILITY[understat] includes replay",
       "relation": "supports_mode:replay",
-      "status": "not_registered",
+      "status": "available",
       "to_node_id": "data_source:understat"
     },
     {
@@ -19075,7 +18005,7 @@
       "from_node_id": "data_source:yahoo",
       "gap_type": null,
       "readiness": null,
-      "reason": "batch is the baseline mode for every source",
+      "reason": "SOURCE_MODE_CAPABILITY[yahoo] includes batch",
       "relation": "supports_mode:batch",
       "status": "available",
       "to_node_id": "data_source:yahoo"
@@ -19083,21 +18013,21 @@
     {
       "agent_annotation": null,
       "from_node_id": "data_source:yahoo",
-      "gap_type": "missing_registry",
+      "gap_type": null,
       "readiness": null,
-      "reason": "live-mode capability for yahoo lives in the manual source-mode-capability-matrix audit, not yet codified in a UAC registry",
+      "reason": "SOURCE_MODE_CAPABILITY[yahoo] does not include live (ratified source_mode_capability_matrix_2026_06_07.md; honest absence, not a gap)",
       "relation": "supports_mode:live",
-      "status": "not_registered",
+      "status": "not_available",
       "to_node_id": "data_source:yahoo"
     },
     {
       "agent_annotation": null,
       "from_node_id": "data_source:yahoo",
-      "gap_type": "missing_registry",
+      "gap_type": null,
       "readiness": null,
-      "reason": "replay-mode capability for yahoo lives in the manual source-mode-capability-matrix audit, not yet codified in a UAC registry",
+      "reason": "SOURCE_MODE_CAPABILITY[yahoo] does not include replay (ratified source_mode_capability_matrix_2026_06_07.md; honest absence, not a gap)",
       "relation": "supports_mode:replay",
-      "status": "not_registered",
+      "status": "not_available",
       "to_node_id": "data_source:yahoo"
     },
     {
@@ -26742,6 +25672,26 @@
     },
     {
       "agent_annotation": null,
+      "from_node_id": "service_registry:execution_algos",
+      "gap_type": "missing_extraction",
+      "readiness": null,
+      "reason": "execution_algos: no .venv at /home/ubuntu/unified-trading-system-repos/.tabs/6/execution-service/.venv/bin/python",
+      "relation": "registry_gap",
+      "status": "not_registered",
+      "to_node_id": "service_registry:execution_algos"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "service_registry:ml_models",
+      "gap_type": "missing_extraction",
+      "readiness": null,
+      "reason": "ml_models: no .venv at /home/ubuntu/unified-trading-system-repos/.tabs/6/ml-service/.venv/bin/python",
+      "relation": "registry_gap",
+      "status": "not_registered",
+      "to_node_id": "service_registry:ml_models"
+    },
+    {
+      "agent_annotation": null,
       "from_node_id": "signing_surface:CLOUD_KMS_ENCRYPTED",
       "gap_type": null,
       "readiness": null,
@@ -26958,7 +25908,7 @@
       "reason": null,
       "relation": "trades_instrument",
       "status": "available",
-      "to_node_id": "instrument_type:EXCHANGE_ODDS"
+      "to_node_id": "instrument_type:FIXED_ODDS"
     },
     {
       "agent_annotation": null,
@@ -28716,14 +27666,14 @@
     "broker_classed_venues": 0,
     "logical_dead_end": 467,
     "logical_dead_ends": 16,
-    "missing_extraction": 1,
-    "missing_registry": 166,
+    "missing_extraction": 3,
+    "missing_registry": 102,
     "needs_code_scan": 1,
-    "not_registered_total": 167,
+    "not_registered_total": 105,
     "orphan_nodes": 82,
     "unbuilt_dead_ends": 168
   },
-  "generated_from_commit": "344a73f193f2dc84063d07593f2a7edb1c64e82a",
+  "generated_from_commit": "8903683a9def858667e6cd624faee95850be33ce",
   "manifest_version": "1.0.0",
   "nodes": [
     {
@@ -29499,6 +28449,12 @@
     },
     {
       "kind": "data_source",
+      "label": "Defillama",
+      "metadata": {},
+      "node_id": "data_source:defillama"
+    },
+    {
+      "kind": "data_source",
       "label": "Deribit",
       "metadata": {},
       "node_id": "data_source:deribit"
@@ -30261,6 +29217,22 @@
         "registry": "trading_agent"
       },
       "node_id": "gap_registry:trading_agent"
+    },
+    {
+      "kind": "gap_registry",
+      "label": "Execution algorithms",
+      "metadata": {
+        "registry": "execution_algos"
+      },
+      "node_id": "service_registry:execution_algos"
+    },
+    {
+      "kind": "gap_registry",
+      "label": "ML model registry",
+      "metadata": {
+        "registry": "ml_models"
+      },
+      "node_id": "service_registry:ml_models"
     },
     {
       "kind": "instrument_type",
@@ -31858,94 +30830,6 @@
         "role": "stake"
       },
       "node_id": "leg:YIELD_STAKING_SIMPLE:stake"
-    },
-    {
-      "kind": "ml_model",
-      "label": "ML Model: Catboost",
-      "metadata": {
-        "model_type": "catboost",
-        "serves_asset_groups": "cefi,defi,sports,tradfi",
-        "target_types": "clv,clv_meta,cross_venue_spread,direction,ht_delta,swing_high,swing_low,volatility,xg,xg_meta",
-        "variant_fields": "instrument_id,target_params,target_type,timeframe"
-      },
-      "node_id": "ml_model:catboost"
-    },
-    {
-      "kind": "ml_model",
-      "label": "ML Model: Ensemble",
-      "metadata": {
-        "model_type": "ensemble",
-        "serves_asset_groups": "cefi,defi,tradfi",
-        "target_types": "clv,clv_meta,cross_venue_spread,direction,ht_delta,swing_high,swing_low,volatility,xg,xg_meta",
-        "variant_fields": "instrument_id,target_params,target_type,timeframe"
-      },
-      "node_id": "ml_model:ensemble"
-    },
-    {
-      "kind": "ml_model",
-      "label": "ML Model: Huber",
-      "metadata": {
-        "model_type": "huber",
-        "serves_asset_groups": "cefi,defi,sports,tradfi",
-        "target_types": "clv,clv_meta,cross_venue_spread,direction,ht_delta,swing_high,swing_low,volatility,xg,xg_meta",
-        "variant_fields": "instrument_id,target_params,target_type,timeframe"
-      },
-      "node_id": "ml_model:huber"
-    },
-    {
-      "kind": "ml_model",
-      "label": "ML Model: Lightgbm",
-      "metadata": {
-        "model_type": "lightgbm",
-        "serves_asset_groups": "cefi,defi,sports,tradfi",
-        "target_types": "clv,clv_meta,cross_venue_spread,direction,ht_delta,swing_high,swing_low,volatility,xg,xg_meta",
-        "variant_fields": "instrument_id,target_params,target_type,timeframe"
-      },
-      "node_id": "ml_model:lightgbm"
-    },
-    {
-      "kind": "ml_model",
-      "label": "ML Model: Poisson Glm",
-      "metadata": {
-        "model_type": "poisson_glm",
-        "serves_asset_groups": "cefi,defi,tradfi",
-        "target_types": "clv,clv_meta,cross_venue_spread,direction,ht_delta,swing_high,swing_low,volatility,xg,xg_meta",
-        "variant_fields": "instrument_id,target_params,target_type,timeframe"
-      },
-      "node_id": "ml_model:poisson_glm"
-    },
-    {
-      "kind": "ml_model",
-      "label": "ML Model: Random Forest",
-      "metadata": {
-        "model_type": "random_forest",
-        "serves_asset_groups": "cefi,defi,tradfi",
-        "target_types": "clv,clv_meta,cross_venue_spread,direction,ht_delta,swing_high,swing_low,volatility,xg,xg_meta",
-        "variant_fields": "instrument_id,target_params,target_type,timeframe"
-      },
-      "node_id": "ml_model:random_forest"
-    },
-    {
-      "kind": "ml_model",
-      "label": "ML Model: Ridge",
-      "metadata": {
-        "model_type": "ridge",
-        "serves_asset_groups": "cefi,defi,sports,tradfi",
-        "target_types": "clv,clv_meta,cross_venue_spread,direction,ht_delta,swing_high,swing_low,volatility,xg,xg_meta",
-        "variant_fields": "instrument_id,target_params,target_type,timeframe"
-      },
-      "node_id": "ml_model:ridge"
-    },
-    {
-      "kind": "ml_model",
-      "label": "ML Model: Xgboost",
-      "metadata": {
-        "model_type": "xgboost",
-        "serves_asset_groups": "cefi,defi,sports,tradfi",
-        "target_types": "clv,clv_meta,cross_venue_spread,direction,ht_delta,swing_high,swing_low,volatility,xg,xg_meta",
-        "variant_fields": "instrument_id,target_params,target_type,timeframe"
-      },
-      "node_id": "ml_model:xgboost"
     },
     {
       "kind": "risk_gate_layer",

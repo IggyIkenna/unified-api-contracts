@@ -273,13 +273,30 @@ class VenueMapping:
             # CEFI - Tardis exchanges (Tier 1)
             # Start dates = earliest manifest data, NOT exchange founding dates
             "BINANCE-SPOT": "2020-01-01",
-            "BINANCE-FUTURES": "2019-11-17",
+            # Corrected 2026-07-27 (coverage_floor_registries_no_cross_
+            # propagation_2026_07_17.md [DATA] P1) — was "2019-11-17";
+            # read_availability_index(cefi bucket) shows ZERO rows of any
+            # capture_status before 2020-01-01 (a clean boundary, no
+            # unbackfilled-gap nuance like BITFINEX-FUTURES below), so the
+            # prior value was an unverified seed, not measured reality.
+            "BINANCE-FUTURES": "2020-01-01",
             # Binance COIN-M (inverse/delivery) — Tardis ``binance-delivery``
             # availableSince 2020-01-01 (Binance COIN-M launched 2019-09-13;
             # Tardis archive starts 2020-01-01 for this endpoint).
             "BINANCE-DELIVERY": "2020-01-01",
-            "DERIBIT": "2019-03-30",
-            "BYBIT": "2020-01-01",
+            # Corrected 2026-07-27 (same issue doc) — was "2019-03-30".
+            # Measured min(captured) = 2019-05-08 (real `trades` rows,
+            # thousands-to-hundreds-of-thousands instrument_count/day; the
+            # 2019-05..2019-12 window is sparse — a likely-partial historical
+            # backfill, but a genuine confirmed lower bound: zero rows of any
+            # status before 2019-05-08). book_snapshot_5/derivative_ticker
+            # both start cleanly at 2020-01-01; `trades` alone reaches back
+            # to 2019-05-08.
+            "DERIBIT": "2019-05-08",
+            # Corrected 2026-07-27 (same issue doc) — was "2020-01-01", a
+            # full year earlier than measured reality. Zero rows of any
+            # capture_status before 2021-01-01 (clean boundary).
+            "BYBIT": "2021-01-01",
             # Bybit spot — Tardis ``bybit-spot`` availableSince 2021-12-04.
             "BYBIT-SPOT": "2021-12-04",
             # Coinbase Derivatives (perps) — Tardis ``coinbase-international``

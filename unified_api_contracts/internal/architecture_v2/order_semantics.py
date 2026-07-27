@@ -1,9 +1,13 @@
 """Order-semantics gap registry — per-venue TIF, post-only, make/take,
 ref-pricing modes, multi-leg delta ownership, and auth-wiring status.
 
-STATUS: schema shipped; ``VENUE_ORDER_SEMANTICS`` is intentionally empty.
-Per-venue TIF honor matrices and ref-pricing mode support are not derivable
-from existing UAC constants without reading per-venue adapter code.
+STATUS (2026-06-13): ``VENUE_ORDER_SEMANTICS`` BACKFILLED from a code-scan of
+the execution-service venue adapters — every entry cites its source file:line
+in ``notes``, nothing invented. Covers hyperliquid/deribit (CeFi perp +
+options, fully wired), binance/bybit/okx (CeFi perp, ``NotImplementedError``
+scaffolds — BLOCKED-CREDENTIALS), and aave_v3/kamino (DeFi lending, no
+CLOB/TIF semantics). See ``tests/unit/test_order_semantics_sim_backfill.py``
+for the full coverage assertions.
 
 NOTE on ``TimeInForce``:
   A workspace-wide grep of UAC source confirmed NO existing ``TimeInForce``

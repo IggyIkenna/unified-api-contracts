@@ -362,7 +362,7 @@
     }
   ],
   "evidence_model": "live_cluster_registry (PROD\u2192live-proven, STAGING\u2192staging-proven); absent evidence \u2192 backtest-only (honest default); shadow-observed only via committed override (none on-host today)",
-  "manifest_commit": "344a73f193f2dc84063d07593f2a7edb1c64e82a",
+  "manifest_commit": "8903683a9def858667e6cd624faee95850be33ce",
   "readiness_tiers": [
     "backtest-only",
     "shadow-observed",

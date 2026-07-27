@@ -132,6 +132,19 @@ def test_cefi_spot_pair_candles(tf: str) -> None:
     assert book5.symbol_column == "symbol"
 
 
+@pytest.mark.parametrize("tf", MDPS_TIMEFRAMES_CEFI)
+def test_cefi_future_trades_candles(tf: str) -> None:
+    """Standalone dated future (e.g. DERIBIT BTC-USD@INV-20260627), not chain-bundled.
+
+    Regression for cefi_future_instrument_type_no_candle_schema_contract_2026_07_21:
+    every CEFI FUTURE candle write failed "No SchemaContract registered" because this
+    instrument_type had no contract at all (CEFI's perpetual/spot_pair loop never
+    covered it, unlike TradFi's `future`, which already registers the same shape).
+    """
+    contract = lookup_contract(asset_group="cefi", instrument_type="future", data_type=MDPS_KEY_TRADES(tf))
+    assert contract.symbol_column == "symbol"
+
+
 @pytest.mark.parametrize("tf", MDPS_TIMEFRAMES_OPTIONS)
 def test_cefi_options_chain_candles_key_on_underlying(tf: str) -> None:
     contract = lookup_contract(asset_group="cefi", instrument_type="options_chain", data_type=MDPS_KEY_TRADES(tf))

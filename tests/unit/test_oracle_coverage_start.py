@@ -58,9 +58,16 @@ def test_get_oracle_coverage_start_unknown_returns_none() -> None:
     assert get_oracle_coverage_start("") is None
 
 
-# Facade re-export wiring deferred — initial SSOT lands as the deep-path module
-# only; consumers reach in via
-# ``from unified_api_contracts.registry.capability_declarations._defi_oracle_coverage
-# import ORACLE_COVERAGE_START``. Follow-up commit will wire the facade
-# (mirrors LST_TOKEN_GENESIS pattern) once the parallel-agent prek stash race
-# stops eating untracked file edits during QG runs.
+def test_facade_reexport_from_registry() -> None:
+    """Facade wired 2026-07-27 (mirrors LST_TOKEN_GENESIS pattern): the shallow
+    ``unified_api_contracts.registry`` path now re-exports this SSOT, not just
+    the deep ``_defi_oracle_coverage`` module path used by the tests above."""
+    from unified_api_contracts.registry import (
+        ORACLE_COVERAGE_START as registry_start,
+    )
+    from unified_api_contracts.registry import (
+        get_oracle_coverage_start as registry_getter,
+    )
+
+    assert registry_start is ORACLE_COVERAGE_START
+    assert registry_getter is get_oracle_coverage_start
