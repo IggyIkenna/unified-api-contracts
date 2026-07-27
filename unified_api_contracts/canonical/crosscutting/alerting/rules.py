@@ -1353,7 +1353,20 @@ DATA_PIPELINE_ALERT_RULES: Final[tuple[DataPipelineAlertRule, ...]] = (
     _dp_rule("DP-CATALOG-002", _C.CATALOG, "CATALOGUE_SHRINK_BLOCKED", _S.CRITICAL, _E.PAGE_OPERATOR),
     _dp_rule("DP-WATCHER-001", _C.WATCHER, "DP_ZOMBIE_WATCHDOG_DOWN", _S.CRITICAL, _E.PAGE_OPERATOR),
     _dp_rule("DP-WATCHER-002", _C.WATCHER, "DP_CRON_DID_NOT_FIRE", _S.CRITICAL, _E.PAGE_OPERATOR),
+    # dp-fleet-monitor's OWN run_lifecycle() terminal-failure event (deployment-service
+    # data_pipeline_monitors/cli.py, service_name="dp-fleet-monitor") — the monitor
+    # itself crashing is meta (like the watcher-down siblings above), not a routine
+    # per-run telemetry event, so it pages same as DP_ZOMBIE_WATCHDOG_DOWN.
+    _dp_rule("DP-WATCHER-003", _C.WATCHER, "DP_FLEET_MONITOR_RUN_FAILED", _S.CRITICAL, _E.PAGE_OPERATOR),
     # ── DP-DIGEST (daily summaries, INFO) ───────────────────────────────────
     _dp_rule("DP-DIGEST-001", _C.DIGEST, "DP_DAILY_DIGEST", _S.INFO, _E.FILE_ISSUE),
     _dp_rule("DP-DIGEST-002", _C.DIGEST, "DP_HYGIENE_SUMMARY", _S.INFO, _E.FILE_ISSUE),
+    # dp-fleet-monitor's routine run_lifecycle() STARTED/COMPLETED events (same
+    # service_name as DP-WATCHER-003 above) — without these two entries the router's
+    # DP_* short-circuit (data_pipeline_rule_for()) misses on an exact-match lookup and
+    # every sweep's routine telemetry falls through to the generic catch-all rule
+    # (LIVE_ALERT_RULES event_pattern="*"), paging the #uts-live-alerts incident
+    # channel instead of the batch #data-pipeline-alerts mirror.
+    _dp_rule("DP-DIGEST-003", _C.DIGEST, "DP_FLEET_MONITOR_RUN_STARTED", _S.INFO, _E.FILE_ISSUE),
+    _dp_rule("DP-DIGEST-004", _C.DIGEST, "DP_FLEET_MONITOR_RUN_COMPLETED", _S.INFO, _E.FILE_ISSUE),
 )
