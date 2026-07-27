@@ -522,19 +522,25 @@ for _tf in _TIMEFRAMES_SPORTS:
 
 
 # ---------------------------------------------------------------------------
-# Sports derived candles — odds_movement, odds_horizon_bucket,
+# Sports derived candles — odds_movement, odds_snapshot, odds_horizon_bucket,
 #                           arbitrage_opportunity  (1m / 15m / 1h)
 #
 # These adapters all produce standard CandleOutput (OHLCV + trade_count) with
 # ``symbol`` as the instrument anchor.  Unlike the base ``odds_ohlcv`` shape
 # they do NOT emit ``quote_count``/``source_count``.
-# base granularity for all three is 15m (UAC BASE_GRANULARITY_BY_DATA_TYPE) so
+# base granularity for all four is 15m (UAC BASE_GRANULARITY_BY_DATA_TYPE) so
 # the MDPS timeframe loop skips 1m at runtime — registering 1m here is harmless
 # and keeps the sports timeframe catalogue consistent.
+#
+# ``odds_snapshot`` was missing from this loop until 2026-07-27 (it registers
+# a CandleAdapterRegistry adapter — SportsOddsSnapshotAdapter — identically to
+# its 3 siblings, but had no corresponding SchemaContract entry, so every
+# odds_snapshot_{tf} write hard-failed with SchemaContractNotFoundError). See
+# plans/active/issues/mdps_t1_recon_job_oom_failing_7_days_2026_07_26.md Update 5.
 # ---------------------------------------------------------------------------
 
 for _tf in _TIMEFRAMES_SPORTS:
-    for _sports_derived_dt in ("odds_movement", "odds_horizon_bucket", "arbitrage_opportunity"):
+    for _sports_derived_dt in ("odds_movement", "odds_snapshot", "odds_horizon_bucket", "arbitrage_opportunity"):
         _register(
             _build(
                 "sports",

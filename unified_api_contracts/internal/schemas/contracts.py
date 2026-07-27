@@ -1134,6 +1134,33 @@ class SchemaContractNotFoundError(LookupError):
         }
 
 
+# Sports odds-derived-candle data_type PREFIXES whose instrument_type axis is
+# unbounded at the CALLER (MDPS `_infer_instrument_type` extracts the raw
+# per-market token — MATCH_ODDS, MATCH_ODDS_LAY, ASIAN_HANDICAP_0_25,
+# OVER_UNDER_2_5, ... — from the canonical instrument_id; market/handicap
+# combinations are continuously parameterised by `build_instrument_id`'s
+# `point` float, so no finite instrument_type enumeration is ever complete)
+# but whose CandleOutput column shape is IDENTICAL for every market, venue,
+# and timeframe — verified against all four adapter sources
+# (market_data_processing_service/app/adapters/sports/{odds_movement,
+# odds_snapshot,bucket_assignment,arbitrage}_adapter.py all return the same
+# OHLC+trade_count CandleOutput regardless of which market they were fed).
+# The contracts themselves are registered once under the generic
+# ("sports", "odds", data_type) key (_candle_contracts.py); this fallback
+# widens which LOOKUP KEYS route to that already-correct, already-registered
+# contract — it never changes what gets validated. Root-caused + fixed
+# 2026-07-27: plans/active/issues/mdps_t1_recon_job_oom_failing_7_days_2026_07_26.md
+# Update 5 (registering ~20 venues x per-market instrument_type was considered
+# and rejected — the missing axis is instrument_type, not venue, and it is
+# unbounded, so a finite venue x instrument_type list would recur indefinitely).
+_SPORTS_ODDS_DERIVED_CANDLE_PREFIXES: tuple[str, ...] = (
+    "odds_movement_",
+    "odds_snapshot_",
+    "odds_horizon_bucket_",
+    "arbitrage_opportunity_",
+)
+
+
 def lookup_contract(
     *,
     asset_group: str,
@@ -1154,6 +1181,16 @@ def lookup_contract(
            ``XG_SHOTS``); the registry uses lowercase for both (``pool``,
            ``xg_shots``).  The fallback ensures every case combination resolves
            without requiring a schema-version migration.
+        4. For ``asset_group == "sports"`` and a ``data_type`` prefixed by one
+           of :data:`_SPORTS_ODDS_DERIVED_CANDLE_PREFIXES` (odds_movement /
+           odds_snapshot / odds_horizon_bucket / arbitrage_opportunity candles),
+           fall back to ``CONTRACT_REGISTRY[(asset_group, "odds", data_type)]``
+           regardless of ``instrument_type``. These candle writers key
+           ``instrument_type`` off the per-market token embedded in the
+           canonical instrument_id (``MATCH_ODDS``, ``ASIAN_HANDICAP_0_25``,
+           ``OVER_UNDER_2_5``, ...) — an open-ended vocabulary — but every
+           market produces the identical column shape, so the single generic
+           ``"odds"``-keyed contract is correct for all of them.
 
     Raises:
         SchemaContractNotFoundError: If no lookup resolves. Callers are
@@ -1188,6 +1225,8 @@ def lookup_contract(
             contract = CONTRACT_REGISTRY.get((asset_group, cand_it, cand_dt))
             if contract is not None:
                 break
+    if contract is None and asset_group == "sports" and data_type.startswith(_SPORTS_ODDS_DERIVED_CANDLE_PREFIXES):
+        contract = CONTRACT_REGISTRY.get((asset_group, "odds", data_type))
     if contract is None:
         raise SchemaContractNotFoundError(
             asset_group=asset_group,
