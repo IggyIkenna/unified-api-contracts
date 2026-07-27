@@ -12,13 +12,16 @@ from __future__ import annotations
 from datetime import UTC, datetime
 
 import pandas as pd
+import pytest
 
 from unified_api_contracts.internal.schemas.contracts import (
     CONTRACT_REGISTRY,
     PREDICTION_PREDICTION_MARKET_TRADES,
     SPORTS_EXCHANGE_ODDS_TRADES,
     SPORTS_FIXED_ODDS_TRADES,
+    SPORTS_ODDS_SNAPSHOT,
     SPORTS_ODDS_TRADES,
+    SchemaContractNotFoundError,
     lookup_contract,
     validate_dataframe,
 )
@@ -210,6 +213,55 @@ def test_sports_fixed_odds_trades_validates_sample_dataframe() -> None:
     )
     violations = validate_dataframe(df, SPORTS_FIXED_ODDS_TRADES)
     assert violations == [], f"expected no violations, got {violations}"
+
+
+# ---------------------------------------------------------------------------
+# lookup_contract dual-read: legacy "odds" + EXCHANGE_ODDS/FIXED_ODDS
+# (sports_closeout_exchange_fixed_odds_fork_2026_07_25.md todo 4). Only
+# ("sports", "exchange_odds"/"fixed_odds", "trades") has its own
+# CONTRACT_REGISTRY entry (todo 3) -- every other odds data_type
+# (sports_odds_snapshot / sports_odds_movement / sports_arbitrage) is not yet
+# forked, so a lookup for the new instrument_types against one of those
+# data_types must fall back to the legacy "odds" contract during the
+# migration window.
+# ---------------------------------------------------------------------------
+
+
+def test_lookup_contract_legacy_odds_path_still_resolves_directly() -> None:
+    """The legacy path is untouched by the dual-read fallback."""
+    contract = lookup_contract(asset_group="sports", instrument_type="odds", data_type="trades")
+    assert contract is SPORTS_ODDS_TRADES
+
+
+def test_lookup_contract_new_instrument_types_resolve_their_own_forked_entry() -> None:
+    """Where a fork-specific entry exists (trades), it wins over the odds fallback."""
+    exchange = lookup_contract(asset_group="sports", instrument_type="exchange_odds", data_type="trades")
+    fixed = lookup_contract(asset_group="sports", instrument_type="fixed_odds", data_type="trades")
+    assert exchange is SPORTS_EXCHANGE_ODDS_TRADES
+    assert fixed is SPORTS_FIXED_ODDS_TRADES
+
+
+def test_lookup_contract_dual_reads_unforked_odds_data_type_via_exchange_odds() -> None:
+    """sports_odds_snapshot has no ("sports","exchange_odds",...) entry yet --
+    the dual-read fallback must resolve it to the legacy odds contract.
+    """
+    contract = lookup_contract(asset_group="sports", instrument_type="exchange_odds", data_type="sports_odds_snapshot")
+    assert contract is SPORTS_ODDS_SNAPSHOT
+    assert contract is CONTRACT_REGISTRY[("sports", "odds", "sports_odds_snapshot")]
+
+
+def test_lookup_contract_dual_reads_unforked_odds_data_type_via_fixed_odds() -> None:
+    contract = lookup_contract(asset_group="sports", instrument_type="fixed_odds", data_type="sports_odds_snapshot")
+    assert contract is SPORTS_ODDS_SNAPSHOT
+
+
+def test_lookup_contract_dual_read_fallback_is_sports_only() -> None:
+    """The exchange_odds/fixed_odds fallback must not leak to other asset_groups
+    -- an unregistered (asset_group, instrument_type, data_type) combo must
+    still raise, not silently resolve to an unrelated contract.
+    """
+    with pytest.raises(SchemaContractNotFoundError):
+        lookup_contract(asset_group="cefi", instrument_type="exchange_odds", data_type="sports_odds_snapshot")
 
 
 # ---------------------------------------------------------------------------
