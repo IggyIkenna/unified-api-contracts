@@ -568,6 +568,31 @@ DEFI_DEX_POOL_DEX_POOL_STATE = SchemaContract(
     required_row_count_min=1,
 )
 
+# Concentrated-liquidity tick-array state (Orca Whirlpool — G7, per-snapshot
+# alongside DEFI_DEX_POOL_DEX_POOL_STATE). Only INITIALIZED ticks are written —
+# an uninitialized tick always carries liquidity_net=0 and is never a boundary
+# a slippage walk crosses, so persisting the ~9800 empty slots per fetched
+# tick-array trio would be pure storage waste with zero downstream value.
+# ``tick_array_start_index`` groups rows back to the on-chain account they came
+# from (3 nearest arrays around the pool's ``tick_current_index`` each sample).
+DEFI_DEX_POOL_DEX_POOL_TICK_ARRAY = SchemaContract(
+    asset_group="defi",
+    instrument_type="pool",
+    data_type="dex_pool_tick_array",
+    columns=[
+        _INSTRUMENT_ID,
+        _VENUE,
+        _CHAIN,
+        _TS_EVENT,
+        ColumnSpec(name="tick_array_start_index", dtype="int64", nullable=False),
+        ColumnSpec(name="tick_index", dtype="int64", nullable=False),
+        ColumnSpec(name="liquidity_net", dtype="float64", nullable=False),
+        ColumnSpec(name="liquidity_gross", dtype="float64", nullable=False),
+    ],
+    symbol_column="symbol",
+    required_row_count_min=1,
+)
+
 DEFI_DEX_POOL_DEX_POOL_SWAPS = SchemaContract(
     asset_group="defi",
     instrument_type="dex_pool",
@@ -1034,6 +1059,7 @@ CONTRACT_REGISTRY: dict[tuple[str, str, str], SchemaContract] = {
     ("defi", "solana_vault", "dex_pools"): DEFI_SOLANA_VAULT_DEX_POOLS,
     ("defi", "solana_amm_pool", "dex_pools"): DEFI_SOLANA_AMM_POOL_DEX_POOLS,
     ("defi", "pool", "dex_pool_state"): DEFI_DEX_POOL_DEX_POOL_STATE,
+    ("defi", "pool", "dex_pool_tick_array"): DEFI_DEX_POOL_DEX_POOL_TICK_ARRAY,
     ("defi", "pool", "dex_pool_swaps"): DEFI_POOL_DEX_POOL_SWAPS,
     ("defi", "dex_pool", "dex_pool_swaps"): DEFI_DEX_POOL_DEX_POOL_SWAPS,
     ("defi", "lst", "lst_rates"): DEFI_LST_LST_RATES,
@@ -1358,6 +1384,7 @@ __all__ = [
     "DEFI_DEBT_TOKEN_LENDING_INDICES",
     "DEFI_DEX_POOL_DEX_POOL_STATE",
     "DEFI_DEX_POOL_DEX_POOL_SWAPS",
+    "DEFI_DEX_POOL_DEX_POOL_TICK_ARRAY",
     "DEFI_LENDING_FLASH_LOAN_EVENTS",
     "DEFI_LENDING_INDICES_MARKET_ID",
     "DEFI_LENDING_LIQUIDATIONS",
