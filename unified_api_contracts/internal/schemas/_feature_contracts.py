@@ -42,11 +42,10 @@ Enumeration source (as of 2026-04-18):
                                gamma_exposure, variance_risk_premium,
                                second_order_greeks, tradfi_vol_surface,
                                vol_surface_term_structure
-    features-onchain           aave_lending_rates, aave_utilization,
-                               aave_risk_params, defillama_tvl,
-                               lst_staking_yields, macro_sentiment,
-                               eigen_rewards, protocol_rewards,
-                               flash_loan_availability, aave_rate_impact
+    features-onchain           lending_rates, utilization,
+                               risk_params, lst_yields, macro_sentiment,
+                               rewards, flash_loan_availability,
+                               rate_impact
     features-sports            team_form, team_goals, team_xg, team_derived,
                                h2h, league, advanced_stats, venue_context,
                                weather, season_context, halftime,
@@ -228,15 +227,13 @@ VOLATILITY_FEATURE_GROUPS: tuple[str, ...] = (
 )
 
 ONCHAIN_FEATURE_GROUPS: tuple[str, ...] = (
-    "aave_lending_rates",
-    "aave_utilization",
-    "aave_risk_params",
-    "aave_rate_impact",
-    "defillama_tvl",
-    "lst_staking_yields",
+    "lending_rates",
+    "utilization",
+    "risk_params",
+    "rate_impact",
+    "lst_yields",
     "macro_sentiment",
-    "eigen_rewards",
-    "protocol_rewards",
+    "rewards",
     "flash_loan_availability",
 )
 
@@ -383,25 +380,20 @@ for _cat, _itype, _symcol in _VOL_TARGETS:
 # that the feature group actually consumes.
 _ONCHAIN_AAVE_TARGETS = ("a_token", "lending")
 _ONCHAIN_LST_TARGETS = ("lst",)
-_ONCHAIN_POOL_TARGETS = ("pool",)
 _ONCHAIN_SPOT_TARGETS = ("spot_asset",)
 _ONCHAIN_STAKING_TARGETS = ("staking",)
 
 _ONCHAIN_ROUTE: dict[str, tuple[str, ...]] = {
     # Aave-specific groups
-    "aave_lending_rates": _ONCHAIN_AAVE_TARGETS,
-    "aave_utilization": _ONCHAIN_AAVE_TARGETS,
-    "aave_risk_params": _ONCHAIN_AAVE_TARGETS,
-    "aave_rate_impact": _ONCHAIN_AAVE_TARGETS,
+    "lending_rates": _ONCHAIN_AAVE_TARGETS,
+    "utilization": _ONCHAIN_AAVE_TARGETS,
+    "risk_params": _ONCHAIN_AAVE_TARGETS,
+    "rate_impact": _ONCHAIN_AAVE_TARGETS,
     # Morpho / flash-loan availability also scoped to lending
     "flash_loan_availability": _ONCHAIN_AAVE_TARGETS,
-    # Protocol TVL / rewards — cross-protocol, scoped under lending_position
-    # for manifest bundling.
-    "defillama_tvl": _ONCHAIN_POOL_TARGETS + _ONCHAIN_AAVE_TARGETS,
-    "protocol_rewards": _ONCHAIN_STAKING_TARGETS + _ONCHAIN_LST_TARGETS,
-    "eigen_rewards": _ONCHAIN_STAKING_TARGETS,
+    "rewards": _ONCHAIN_STAKING_TARGETS,
     # LST staking yields
-    "lst_staking_yields": _ONCHAIN_LST_TARGETS,
+    "lst_yields": _ONCHAIN_LST_TARGETS,
     # Macro / sentiment cross-asset — scoped at spot_asset + pool.
     "macro_sentiment": _ONCHAIN_SPOT_TARGETS,
 }

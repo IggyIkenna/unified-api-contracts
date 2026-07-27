@@ -90,7 +90,7 @@ FEATURE_REQUIRED_INPUTS: Final[dict[str, list[InputReq]]] = {
     # calculator reads on the next pipeline stage. The remaining 2 are
     # genuine external API live-reads that bypass the manifest entirely
     # (see Temporary states section in the feature_dag plan).
-    "lst_staking_yields": [
+    "lst_yields": [
         InputReq(
             asset_group="defi",
             data_type="lst_yields",
@@ -98,15 +98,7 @@ FEATURE_REQUIRED_INPUTS: Final[dict[str, list[InputReq]]] = {
             source=None,  # multi-source: lido_api + etherfi_contract + jito_solana
         ),
     ],
-    "defillama_tvl": [
-        InputReq(
-            asset_group="defi",
-            data_type="dex_pool_state",
-            available_at_rule="tick_timestamp",
-            source="defillama_api",
-        ),
-    ],
-    "aave_lending_rates": [
+    "lending_rates": [
         InputReq(
             asset_group="defi",
             data_type="lending_indices",
@@ -114,7 +106,7 @@ FEATURE_REQUIRED_INPUTS: Final[dict[str, list[InputReq]]] = {
             source="aave_v3_subgraph",
         ),
     ],
-    "aave_utilization": [
+    "utilization": [
         InputReq(
             asset_group="defi",
             data_type="lending_indices",
@@ -122,7 +114,7 @@ FEATURE_REQUIRED_INPUTS: Final[dict[str, list[InputReq]]] = {
             source="aave_v3_subgraph",
         ),
     ],
-    "aave_risk_params": [
+    "risk_params": [
         InputReq(
             asset_group="defi",
             data_type="risk_params",
@@ -130,20 +122,12 @@ FEATURE_REQUIRED_INPUTS: Final[dict[str, list[InputReq]]] = {
             source="aave_v3_rpc",
         ),
     ],
-    "eigen_rewards": [
+    "rewards": [
         InputReq(
             asset_group="defi",
             data_type="eigenlayer_rewards",
             available_at_rule="tick_timestamp",
             source="eigenlayer_api",
-        ),
-    ],
-    "protocol_rewards": [
-        InputReq(
-            asset_group="defi",
-            data_type="rewards",
-            available_at_rule="tick_timestamp",
-            source=None,  # multi-source per protocol_apis aggregator
         ),
     ],
     "flash_loan_availability": [
@@ -154,8 +138,8 @@ FEATURE_REQUIRED_INPUTS: Final[dict[str, list[InputReq]]] = {
             source="morpho_subgraph",
         ),
     ],
-    "aave_rate_impact": [
-        # Phase 1 calculator — depends on aave_lending_rates + aave_utilization
+    "rate_impact": [
+        # Phase 1 calculator — depends on lending_rates + utilization
         # outputs, which both consume lending_indices upstream. Lookahead-bias
         # enforcement walks the dependency graph; declaring the leaf data_type
         # here is sufficient.
@@ -164,23 +148,6 @@ FEATURE_REQUIRED_INPUTS: Final[dict[str, list[InputReq]]] = {
             data_type="lending_indices",
             available_at_rule="tick_timestamp",
             source="aave_v3_subgraph",
-        ),
-    ],
-    "onchain_regime": [
-        # Phase 2 calculator — depends on aave_utilization + defillama_tvl +
-        # aave_lending_rates outputs. Leaf data_types: lending_indices (for
-        # the two aave_* deps) + liquidity (for defillama_tvl).
-        InputReq(
-            asset_group="defi",
-            data_type="lending_indices",
-            available_at_rule="tick_timestamp",
-            source="aave_v3_subgraph",
-        ),
-        InputReq(
-            asset_group="defi",
-            data_type="dex_pool_state",
-            available_at_rule="tick_timestamp",
-            source="defillama_api",
         ),
     ],
     # NOT lifted (and intentionally so):
@@ -591,8 +558,8 @@ whose upstream ``(asset_group, data_type)`` is not yet in
 than asserting against an unregistered semantic. See module docstring +
 the named successor plan.
 
-Derived feature groups (e.g. ``aave_rate_impact``, ``onchain_regime``,
-``confluence``, ``risk_reward``) declare the TRANSITIVE upstream inputs
+Derived feature groups (e.g. ``rate_impact``, ``confluence``,
+``risk_reward``) declare the TRANSITIVE upstream inputs
 as if they were leaf inputs — the orchestrator's topological sort handles
 the inter-feature_group dependency separately. This keeps lookahead-bias
 checks simple: every feature_group's input list is the closure over
@@ -609,7 +576,7 @@ def get_required_inputs(feature_group: str) -> list[InputReq]:
     """Return the list of upstream inputs declared for ``feature_group``.
 
     Args:
-        feature_group: A feature_group name (e.g. ``"lst_staking_yields"``,
+        feature_group: A feature_group name (e.g. ``"lst_yields"``,
             ``"technical_indicators"``).
 
     Returns:
