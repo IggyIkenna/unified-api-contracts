@@ -73,10 +73,10 @@ def test_volatility_registered_for_tradfi_options(fg: str) -> None:
 @pytest.mark.parametrize(
     "fg",
     [
-        "aave_lending_rates",
-        "aave_utilization",
-        "aave_risk_params",
-        "aave_rate_impact",
+        "lending_rates",
+        "utilization",
+        "risk_params",
+        "rate_impact",
         "flash_loan_availability",
     ],
 )
@@ -86,8 +86,8 @@ def test_onchain_aave_registered_for_a_token(fg: str) -> None:
     assert "chain" in {c.name for c in contract.columns}
 
 
-def test_onchain_lst_staking_yields_registered_for_lst() -> None:
-    contract = lookup_contract(asset_group="defi", instrument_type="lst", data_type="lst_staking_yields")
+def test_onchain_lst_yields_registered_for_lst() -> None:
+    contract = lookup_contract(asset_group="defi", instrument_type="lst", data_type="lst_yields")
     assert "chain" in {c.name for c in contract.columns}
 
 

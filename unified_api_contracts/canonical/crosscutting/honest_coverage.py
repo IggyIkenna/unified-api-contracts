@@ -209,6 +209,25 @@ class RecordFailedReason(StrEnum):
     when MTDS auto-backfills the window on ``CONNECTIVITY_RECOVERED``.
     SSOT: ``plans/active/mdps_streaming_and_backpressure_2026_05_07.md`` § item 524."""
 
+    NO_RAW_TICK_DATA_FOR_SHARD = "NO_RAW_TICK_DATA_FOR_SHARD"
+    """MDPS batch-mode candle derivation read zero raw ticks for this (venue, instrument, day) —
+    distinct from ``UPSTREAM_LIVE_GAP`` (which requires a specific MTDS ``CONNECTIVITY_GAP_DETECTED``
+    classification): this fires whenever the raw tick input is simply empty/absent with NO upstream
+    gap classification checked or found. Per the CLAUDE.md asset-group rule, cefi/defi/tradfi cannot
+    legitimately have ``empty_confirmed`` at instrument-day grain (only venue-level calendar rules —
+    HOLIDAY/WEEKEND/PRE_VENUE_LAUNCH — make ``empty_confirmed`` legit), so an instrument-day with zero
+    raw ticks is classified ``attempted_failed`` with this reason rather than a bare
+    ``SOURCE_RETURNED_ZERO`` empty-confirmed write (which additionally now hard-requires
+    ``FetchEvidence`` this derivation-layer caller cannot supply, since no live fetch occurred here —
+    only a read of already-captured raw tick parquet). ``attempted_failed`` rows are retried by
+    default, which is the INTERIM-conservative choice until a catalog-aware writer-side guard (the
+    still-unbuilt "Wave 3" split referenced in ``batch_workers.py``'s empty-tick handler) can
+    distinguish a genuinely-certified absence (delisted/not-yet-listed instrument) from a real gap
+    needing re-investigation.
+    Used by: market-data-processing-service ``batch_workers``'s empty-tick handler (non-SPORTS
+    asset_groups).
+    Plan: ``issues/mdps_tradfi_ohlcv_15m_24h_conversion_still_zero_2026_07_27.md``."""
+
     INCOMPLETE_PAYLOAD_PRE_FLATTENING = "INCOMPLETE_PAYLOAD_PRE_FLATTENING"
     """Historical shard written before the normalizer flattened nested sub-objects.
     The parquet exists but carries only stub pass-through columns (e.g. ``**raw``),

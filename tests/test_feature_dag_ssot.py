@@ -120,8 +120,8 @@ def test_feature_dag_has_no_cycles() -> None:
     ``FEATURE_REQUIRED_INPUTS`` declares only external ``(asset_group,
     data_type)`` inputs — there are no feature_group → feature_group
     edges in the dict's current shape. The DAG of inter-feature_group
-    dependencies (e.g. ``aave_rate_impact`` depending on
-    ``aave_lending_rates``) lives in each service's local
+    dependencies (e.g. ``rate_impact`` depending on
+    ``lending_rates``) lives in each service's local
     ``feature_builder_registry.py`` ``BuilderEntry.depends_on`` and is
     Kahn-sorted there.
 
@@ -166,28 +166,30 @@ def test_get_required_inputs_unknown_returns_empty() -> None:
 
 def test_has_required_inputs_true_for_seeded_groups() -> None:
     """Seeded groups report has_required_inputs=True."""
-    assert has_required_inputs("lst_staking_yields") is True
+    assert has_required_inputs("lst_yields") is True
     assert has_required_inputs("technical_indicators") is True
 
 
-def test_phase_1a_2_lift_8_onchain_feature_groups_seeded() -> None:
-    """Phase 1A.2 follow-up shipped 2026-05-07 — 8 of the 10 deferred onchain
-    feature_groups now in FEATURE_REQUIRED_INPUTS after the
-    AVAILABILITY_AT_SEMANTICS defi vocabulary gap closed (UAC@2f40c9d).
+def test_phase_1a_2_lift_onchain_feature_groups_seeded() -> None:
+    """Phase 1A.2 follow-up shipped 2026-05-07 — onchain feature_groups
+    lifted into FEATURE_REQUIRED_INPUTS after the AVAILABILITY_AT_SEMANTICS
+    defi vocabulary gap closed (UAC@2f40c9d). Renamed to the ratified
+    writer/CLI vocabulary + ``onchain_regime``/``defillama_tvl``/
+    ``protocol_rewards`` dropped (no writer dispatch) per the 2026-07-21
+    reconciliation — see
+    ``issues/features_onchain_featureless_shards_and_vocabulary_split_2026_07_20.md``.
 
     Plan: ``feature_dag_uac_ssot_and_features_coverage_2026_05_06.md``
     § "Temporary states" — Half 2 of the AVAILABILITY_AT_SEMANTICS defi
     vocabulary gap.
     """
     expected_lifted = {
-        "aave_lending_rates": ("defi", "lending_indices"),
-        "aave_utilization": ("defi", "lending_indices"),
-        "aave_risk_params": ("defi", "risk_params"),
-        "eigen_rewards": ("defi", "eigenlayer_rewards"),
-        "protocol_rewards": ("defi", "rewards"),
+        "lending_rates": ("defi", "lending_indices"),
+        "utilization": ("defi", "lending_indices"),
+        "risk_params": ("defi", "risk_params"),
+        "rewards": ("defi", "eigenlayer_rewards"),
         "flash_loan_availability": ("defi", "flash_loan_events"),
-        "aave_rate_impact": ("defi", "lending_indices"),
-        # onchain_regime checked separately — has TWO inputs.
+        "rate_impact": ("defi", "lending_indices"),
     }
     for fg, (asset_group, data_type) in expected_lifted.items():
         assert has_required_inputs(fg), f"{fg} missing from FEATURE_REQUIRED_INPUTS"
@@ -198,17 +200,6 @@ def test_phase_1a_2_lift_8_onchain_feature_groups_seeded() -> None:
         assert inputs[0].available_at_rule == "tick_timestamp", (
             f"{fg} expected tick_timestamp, got {inputs[0].available_at_rule}"
         )
-
-
-def test_onchain_regime_has_two_inputs() -> None:
-    """``onchain_regime`` is a Phase 2 derived calculator depending on two
-    leaf data_types: lending_indices (via aave_*) + dex_pool_state (via
-    defillama_tvl)."""
-    inputs = get_required_inputs("onchain_regime")
-    assert len(inputs) == 2
-    pairs = {(i.asset_group, i.data_type) for i in inputs}
-    assert pairs == {("defi", "lending_indices"), ("defi", "dex_pool_state")}
-    assert all(i.available_at_rule == "tick_timestamp" for i in inputs)
 
 
 def test_macro_sentiment_intentionally_not_seeded() -> None:
