@@ -301,3 +301,50 @@ class TestSouthAmericanClubAliases:
         assert validate_team_resolution("Universidad Catolica (CHI)") == "UNIVERSIDAD_CATOLICA"
         # The bare Chilean rendering still resolves (no regression).
         assert validate_team_resolution("Universidad Catolica") == "UNIVERSIDAD_CATOLICA"
+
+
+# (rendering, expected canonical_team_id). Closes
+# sports_odds_team_name_alias_gap_south_america_2026_07_09.md: a full re-measurement of
+# validate_team_resolution() against every real captured batch_odds_api CHILE_PRIMERA day
+# (411 days in market-data-tick-sports-prd, not just the original 4-day sample) found 9
+# distinct UNRESOLVED_TEAM_NAME strings -- the 4 the issue doc originally cited plus 5 more
+# the fuller date range surfaced. Each (odds_api, af_fixtures) rendering pair below is the
+# EXACT string pair the two real providers emit for the same team (verified against
+# af_home_name/af_away_name in the captured CHILE_PRIMERA FIXTURES parquet); every canonical
+# id already existed in unified_api_contracts/canonical/domain/sports/data/team_mapping.csv
+# (additive alias only -- no new canonical_team_id minted, no live API-Football pull).
+_CHILE_PRIMERA_ODDS_ALIAS_GAP_RENDERINGS = [
+    ("Coquimbo Unido", "COQUIMBO_UNIDO"),
+    ("Deportes Concepción", "CONCEPCION"),
+    ("Concepción", "CONCEPCION"),
+    ("Deportes Limache", "DEPORTES_LIMACHE"),
+    ("Universidad de Concepción", "UNIVERSIDAD_DE_CONCEPCION"),
+    ("Universidad de Concepcion", "UNIVERSIDAD_DE_CONCEPCION"),
+    # Genuinely new entries the fuller-date-range re-measurement surfaced (not in the
+    # original 4-name sample) -- one existing-canonical short-form gap (Cobreloa) plus
+    # 4 clubs that had no alias-dict entry at all.
+    ("CD Cobreloa", "COBRELOA"),
+    ("Deportes Copiapó", "DEPORTES_COPIAPO"),
+    ("Deportes Copiapo", "DEPORTES_COPIAPO"),
+    ("La Serena", "D_LA_SERENA"),
+    ("D. La Serena", "D_LA_SERENA"),
+    ("Magallanes", "MAGALLANES"),
+    ("Antofagasta", "ANTOFAGASTA"),
+]
+
+
+class TestChilePrimeraOddsApiAliasGap:
+    """Closes the PRIMERA_DIVISION (Chile Primera, af_league_id 265) Odds-API team-name
+    alias gap: UNRESOLVED_TEAM_NAME on the odds-tick side dragged the league's real
+    af_fixture_id join match rate to 57-64%, entirely on this one league."""
+
+    @pytest.mark.parametrize(("rendering", "expected"), _CHILE_PRIMERA_ODDS_ALIAS_GAP_RENDERINGS)
+    def test_chile_primera_rendering_resolves(self, rendering: str, expected: str) -> None:
+        assert validate_team_resolution(rendering, provider="odds_api") == expected
+
+    def test_cobreloa_short_and_full_forms_both_resolve(self) -> None:
+        # The pre-existing full-name alias must keep resolving alongside the new
+        # Odds-API short form -- no regression on the already-covered rendering.
+        assert validate_team_resolution("Club de Deportes Cobreloa") == "COBRELOA"
+        assert validate_team_resolution("CD Cobreloa") == "COBRELOA"
+        assert validate_team_resolution("Cobreloa") == "COBRELOA"

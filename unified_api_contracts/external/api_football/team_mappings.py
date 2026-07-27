@@ -845,7 +845,10 @@ CHILE_PRIMERA_TEAM_ALIASES: dict[str, list[str]] = {
         "U. Catolica",
         "Universidad Católica (CHI)",
     ],
-    "COBRELOA": ["COBRELOA", "Club de Deportes Cobreloa"],
+    # "CD Cobreloa": Odds-API short form, added alongside the pre-existing
+    # "Club de Deportes Cobreloa" full form (2026-07-09 odds-join gap re-measurement,
+    # 2026-07-27 fix). AF FIXTURES render this club bare as "Cobreloa" (already covered).
+    "COBRELOA": ["COBRELOA", "Club de Deportes Cobreloa", "CD Cobreloa"],
     "HUACHIPATO": ["HUACHIPATO", "CD Huachipato"],
     "UNION_ESPANOLA": ["UNION ESPANOLA", "Union Espanola"],
     "COBRESAL": ["COBRESAL", "CD Cobresal"],
@@ -861,6 +864,41 @@ CHILE_PRIMERA_TEAM_ALIASES: dict[str, list[str]] = {
     "NUBLENSE": ["NUBLENSE", "Nublense"],
     "IQUIQUE": ["IQUIQUE", "Deportes Iquique"],
     "LA_CALERA": ["LA CALERA", "Union La Calera"],
+    # ------------------------------------------------------------------
+    # Odds-API team-name alias gap (issue
+    # sports_odds_team_name_alias_gap_south_america_2026_07_09.md), closed
+    # 2026-07-27. A full re-measurement of validate_team_resolution() against
+    # every real captured batch_odds_api CHILE_PRIMERA day (411 days, not just
+    # the original 4-day sample) found 9 distinct unresolved team-name strings:
+    # the 4 the issue doc originally cited, plus 5 more the fuller date range
+    # surfaced (a Cobreloa short-form variant, above, and 4 genuinely new
+    # canonical entries below). Each name's AF-verified spelling + existing
+    # canonical_team_id came from the checked-in crosswalk
+    # unified_api_contracts/canonical/domain/sports/data/team_mapping.csv
+    # (no live API-Football pull or new canonical-id minting needed — every
+    # team below already has a canonical_team_id row there), cross-checked
+    # against the real af_home_name/af_away_name fields in the captured
+    # CHILE_PRIMERA FIXTURES parquet for fixtures involving each team.
+    "COQUIMBO_UNIDO": ["COQUIMBO UNIDO", "Coquimbo Unido"],
+    # AF FIXTURES render this bare accented "Concepción"; Odds-API renders it
+    # "Deportes Concepción" (both forms listed; accent is stripped either way).
+    "CONCEPCION": ["CONCEPCION", "Concepcion", "Concepción", "Deportes Concepcion", "Deportes Concepción"],
+    "DEPORTES_LIMACHE": ["DEPORTES LIMACHE", "Deportes Limache"],
+    # AF FIXTURES render this "Universidad de Concepcion" (no accent); Odds-API
+    # renders it "Universidad de Concepción" (with accent) -- both listed.
+    "UNIVERSIDAD_DE_CONCEPCION": [
+        "UNIVERSIDAD DE CONCEPCION",
+        "Universidad de Concepcion",
+        "Universidad de Concepción",
+    ],
+    # AF FIXTURES render this "Deportes Copiapo" (no accent); Odds-API renders
+    # it "Deportes Copiapó" (with accent) -- both listed.
+    "DEPORTES_COPIAPO": ["DEPORTES COPIAPO", "Deportes Copiapo", "Deportes Copiapó"],
+    # AF FIXTURES render this short "D. La Serena"; Odds-API renders it bare
+    # "La Serena" -- both listed.
+    "D_LA_SERENA": ["D LA SERENA", "D. La Serena", "La Serena"],
+    "MAGALLANES": ["MAGALLANES", "Magallanes"],
+    "ANTOFAGASTA": ["ANTOFAGASTA", "Antofagasta"],
 }
 
 # ---------------------------------------------------------------------------
