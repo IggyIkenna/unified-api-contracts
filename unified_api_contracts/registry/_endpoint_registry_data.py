@@ -418,6 +418,124 @@ ENDPOINT_REGISTRY: list[EndpointSpec] = [
         requires_auth=True,
         cassette_status=CassetteStatus.AUTH_BLOCKED,
     ),
+    # F42: the futures/mix endpoint below is the "suffixed form" missing entry — bitget_native.py:291
+    # uses this exact path for BITGET-FUTURES orders (productType=USDT-FUTURES) via the same
+    # venue="bitget" key as the spot entries above (ENDPOINT_REGISTRY does not suffix venue strings
+    # by spot/futures anywhere else — see okx/binance/bybit/deribit/coinbase, which distinguish
+    # spot vs futures/options by endpoint_path + notes, not by venue key).
+    EndpointSpec(
+        venue="bitget",
+        endpoint_path="https://api.bitget.com/api/v2/mix/order/place-order",
+        http_method="POST",
+        schema_class="BitgetOrder",
+        access_mode=AccessMode.REST_POLLING,
+        data_availability=DataAvailability.LIVE_ONLY,
+        version="v2",
+        notes=(
+            "Private USDT-margined futures order (productType=USDT-FUTURES). Serves the "
+            "BITGET-FUTURES venue label. Auth: ACCESS-KEY + HMAC-SHA256 signature + PASSPHRASE. "
+            "Secret Manager key: bitget-api-credentials."
+        ),
+        requires_auth=True,
+        cassette_status=CassetteStatus.AUTH_BLOCKED,
+    ),
+    # --- Bitfinex --- (F42: adapter-backed venue absent from ENDPOINT_REGISTRY — bitfinex_native.py)
+    EndpointSpec(
+        venue="bitfinex",
+        endpoint_path="https://api-pub.bitfinex.com/v2/tickers",
+        http_method="GET",
+        schema_class="BitfinexTicker",
+        access_mode=AccessMode.REST_POLLING,
+        data_availability=DataAvailability.LIVE_ONLY,
+        version="v2",
+        notes="Public tickers (?symbols=tBTCUSD,...). No auth required.",
+        requires_auth=False,
+        cassette_status=CassetteStatus.PENDING,
+    ),
+    EndpointSpec(
+        venue="bitfinex",
+        endpoint_path="https://api.bitfinex.com/v2/auth/w/order/submit",
+        http_method="POST",
+        schema_class="BitfinexOrder",
+        access_mode=AccessMode.REST_POLLING,
+        data_availability=DataAvailability.LIVE_ONLY,
+        version="v2",
+        notes=(
+            "Private order submit (type=EXCHANGE MARKET/LIMIT for spot, MARKET/LIMIT for margin). "
+            "Serves the BITFINEX-SPOT venue label — bitfinex_native.py:363. Auth: bfx-apikey + "
+            "bfx-signature (HMAC-SHA384) + bfx-nonce headers. Secret Manager key: bitfinex-api-credentials."
+        ),
+        requires_auth=True,
+        cassette_status=CassetteStatus.AUTH_BLOCKED,
+    ),
+    # --- Kraken --- (F42: adapter-backed venue absent from ENDPOINT_REGISTRY — kraken_rest_adapter.py)
+    EndpointSpec(
+        venue="kraken",
+        endpoint_path="https://api.kraken.com/0/public/Ticker",
+        http_method="GET",
+        schema_class="KrakenTickerResponse",
+        access_mode=AccessMode.REST_POLLING,
+        data_availability=DataAvailability.LIVE_ONLY,
+        version="0",
+        notes=(
+            "Public spot ticker (?pair=...). Serves KRAKEN-SPOT. No auth required. "
+            "kraken_rest_adapter.py:191; schema at external/kraken/schemas.py."
+        ),
+        requires_auth=False,
+        cassette_status=CassetteStatus.RECORDED,
+    ),
+    EndpointSpec(
+        venue="kraken",
+        endpoint_path="https://api.kraken.com/0/private/AddOrder",
+        http_method="POST",
+        schema_class="KrakenOrder",
+        access_mode=AccessMode.REST_POLLING,
+        data_availability=DataAvailability.LIVE_ONLY,
+        version="0",
+        notes=(
+            "Private spot order placement. Serves KRAKEN-SPOT — kraken_rest_adapter.py:290. Auth: "
+            "API-Key + API-Sign (HMAC-SHA512) headers. Secret Manager key: kraken-api-credentials."
+        ),
+        requires_auth=True,
+        cassette_status=CassetteStatus.AUTH_BLOCKED,
+    ),
+    # --- Kraken Futures --- (F42: adapter-backed venue absent from ENDPOINT_REGISTRY. Distinct
+    # base URL/module from spot Kraken — matches the existing external/kraken_futures/ scaffold,
+    # which already has its own schemas.py + mocks/ separate from external/kraken/. Today
+    # KrakenCeFiAdapter(futures=True) only changes venue_name for labeling — kraken_rest_adapter.py
+    # does not yet route order placement to this distinct Futures base URL (kraken_rest_adapter.py:
+    # 143-159, 290); this entry documents the real target endpoint for that wiring.)
+    EndpointSpec(
+        venue="kraken_futures",
+        endpoint_path="https://futures.kraken.com/derivatives/api/v3/tickers",
+        http_method="GET",
+        schema_class="KrakenFuturesTickersResponse",
+        access_mode=AccessMode.REST_POLLING,
+        data_availability=DataAvailability.LIVE_ONLY,
+        version="v3",
+        notes=(
+            "Public futures tickers. Serves KRAKEN-FUTURES. No auth required. Schema at "
+            "external/kraken_futures/schemas.py."
+        ),
+        requires_auth=False,
+        cassette_status=CassetteStatus.RECORDED,
+    ),
+    EndpointSpec(
+        venue="kraken_futures",
+        endpoint_path="https://futures.kraken.com/derivatives/api/v3/sendorder",
+        http_method="POST",
+        schema_class="KrakenFuturesOrder",
+        access_mode=AccessMode.REST_POLLING,
+        data_availability=DataAvailability.LIVE_ONLY,
+        version="v3",
+        notes=(
+            "Private futures order placement (officially documented Kraken Futures endpoint; not "
+            "yet called by kraken_rest_adapter.py — see module note above). Auth: APIKey + "
+            "Authent (HMAC-SHA512) headers. Secret Manager key: kraken-api-credentials."
+        ),
+        requires_auth=True,
+        cassette_status=CassetteStatus.AUTH_BLOCKED,
+    ),
     # --- KuCoin ---
     EndpointSpec(
         venue="kucoin",
@@ -607,6 +725,28 @@ ENDPOINT_REGISTRY: list[EndpointSpec] = [
             "secType=BAG is IBKR's combination/spread contract type. All spread strategies "
             "(straddles, butterflies, calendar spreads, EFPs) use this. comboLegs define the legs. "
             "Auth via TWS Gateway API key. Secret Manager key: ibkr-api-credentials."
+        ),
+        requires_auth=True,
+        cassette_status=CassetteStatus.NOT_APPLICABLE,
+    ),
+    # --- FX --- (F42: adapter-backed venue absent from ENDPOINT_REGISTRY — fx_adapter.py)
+    # FXAdapter routes through IbkrTradFiAdapter's IDEALPRO exchange (ibkr_tradfi.py:45,223-228)
+    # using secType="CASH" contracts only (OTC spot forex, no FUT/OPT) — a distinct venue label
+    # from "ibkr" (the broker key above), matching NASDAQ/NYSE's own-venue-under-ibkr-routing
+    # pattern (F38/F43).
+    EndpointSpec(
+        venue="fx",
+        endpoint_path="reqContractDetails(secType=CASH, exchange=IDEALPRO)",
+        http_method="TWS",
+        schema_class="IBKRCashContract",
+        access_mode=AccessMode.STREAMING_WEBSOCKET,
+        data_availability=DataAvailability.LIVE_ONLY,
+        version="tws-api",
+        notes=(
+            "OTC spot forex via IBKR IDEALPRO (secType=CASH). Execution only — market data via "
+            "Yahoo Finance (e.g. KRW/USD kimchi premium), not this endpoint. Routed through the "
+            "same TWS Gateway session as the broker-level ibkr entry above. Auth via TWS Gateway "
+            "API key. Secret Manager key: ibkr-api-credentials."
         ),
         requires_auth=True,
         cassette_status=CassetteStatus.NOT_APPLICABLE,

@@ -467,6 +467,10 @@ INSTRUMENT_TYPES_BY_VENUE: dict[str, set[str]] = {
     # deregistration rationale + data-safety verification.
     NASDAQ: {"EQUITY", "ETF", "INDEX"},
     NYSE: {"EQUITY", "ETF", "INDEX"},
+    # F42: OTC spot forex via IBKR IDEALPRO (secType=CASH) — fx_adapter.py. The other 5
+    # adapter-backed F42 venues (BITFINEX-SPOT/-FUTURES, BITGET-SPOT/-FUTURES, KRAKEN-SPOT/
+    # -FUTURES) already had entries here; FX was the one gap.
+    "FX": {"CURRENCY"},
     CME: {"FUTURE", "OPTION", "INDEX", "BOND", "EVENT_CONTRACT"},
     CBOT: {"FUTURE", "OPTION", "BOND"},
     NYMEX: {"FUTURE", "OPTION", "COMMODITY"},
