@@ -161,6 +161,23 @@ _TIMEFRAMES_TRADFI: tuple[str, ...] = ("1m", "5m", "15m", "1h", "4h", "1d")
 _TIMEFRAMES_DEFI: tuple[str, ...] = ("15s", "1m", "5m", "15m", "1h", "4h", "1d")
 _TIMEFRAMES_OPTIONS: tuple[str, ...] = ("1m", "15m", "1h", "1d")
 _TIMEFRAMES_SPORTS: tuple[str, ...] = ("1m", "15m", "1h")
+# Derived-candle-only superset: MDPS's batch handler drives every adapter
+# through its GLOBAL default timeframe list (_DEFAULT_TIMEFRAMES in
+# market_data_processing_service/app/batch_handler.py: 15s/1m/5m/15m/1h/4h/1d),
+# then narrows per-adapter via BaseCandleAdapter.get_valid_output_timeframes()
+# — which filters PURELY by TIMEFRAME_SECONDS >= the adapter's base
+# granularity, NOT by the adapter's declared `supported_timeframes`. The 4
+# sports-derived products' base granularity is 15m (BASE_GRANULARITY_BY_DATA_TYPE
+# below), so 15m/1h/4h all clear that filter and reach a SchemaContract lookup
+# — but _TIMEFRAMES_SPORTS (used by the base "odds" trades candle above, which
+# has no such reachable-4h evidence) never included "4h", so every
+# odds_movement_4h/odds_snapshot_4h/odds_horizon_bucket_4h/arbitrage_opportunity_4h
+# write hard-failed with SchemaContractNotFoundError in production (confirmed
+# live via uts-prod-market-data-processing-service-t1-recon-mzx7h, 2026-07-27:
+# 837 odds_snapshot_4h + 153 odds_horizon_bucket_4h + 10 odds_movement_4h
+# failures in a single execution). See
+# plans/active/issues/mdps_t1_recon_job_oom_failing_7_days_2026_07_26.md.
+_TIMEFRAMES_SPORTS_DERIVED: tuple[str, ...] = ("1m", "15m", "1h", "4h")
 _TIMEFRAMES_PREDICTION: tuple[str, ...] = ("1m", "15m", "1h")
 _TIMEFRAMES_INDEX: tuple[str, ...] = ("1m", "5m", "15m", "1h", "1d")
 
@@ -523,7 +540,7 @@ for _tf in _TIMEFRAMES_SPORTS:
 
 # ---------------------------------------------------------------------------
 # Sports derived candles — odds_movement, odds_snapshot, odds_horizon_bucket,
-#                           arbitrage_opportunity  (1m / 15m / 1h)
+#                           arbitrage_opportunity  (1m / 15m / 1h / 4h)
 #
 # These adapters all produce standard CandleOutput (OHLCV + trade_count) with
 # ``symbol`` as the instrument anchor.  Unlike the base ``odds_ohlcv`` shape
@@ -537,9 +554,16 @@ for _tf in _TIMEFRAMES_SPORTS:
 # its 3 siblings, but had no corresponding SchemaContract entry, so every
 # odds_snapshot_{tf} write hard-failed with SchemaContractNotFoundError). See
 # plans/active/issues/mdps_t1_recon_job_oom_failing_7_days_2026_07_26.md Update 5.
+#
+# ``4h`` was missing from this loop's timeframe set until 2026-07-27 (used
+# ``_TIMEFRAMES_SPORTS`` — 1m/15m/1h only — even though MDPS's per-adapter
+# timeframe filter (``get_valid_output_timeframes``, granularity-seconds only,
+# not ``supported_timeframes``-aware) genuinely reaches "4h" for these 4
+# products given their 15m base granularity; see ``_TIMEFRAMES_SPORTS_DERIVED``
+# above for the live production evidence.
 # ---------------------------------------------------------------------------
 
-for _tf in _TIMEFRAMES_SPORTS:
+for _tf in _TIMEFRAMES_SPORTS_DERIVED:
     for _sports_derived_dt in ("odds_movement", "odds_snapshot", "odds_horizon_bucket", "arbitrage_opportunity"):
         _register(
             _build(
@@ -638,6 +662,7 @@ MDPS_TIMEFRAMES_TRADFI_RE_AGGREGATED = _TIMEFRAMES_TRADFI_RE_AGGREGATED
 MDPS_TIMEFRAMES_DEFI = _TIMEFRAMES_DEFI
 MDPS_TIMEFRAMES_OPTIONS = _TIMEFRAMES_OPTIONS
 MDPS_TIMEFRAMES_SPORTS = _TIMEFRAMES_SPORTS
+MDPS_TIMEFRAMES_SPORTS_DERIVED = _TIMEFRAMES_SPORTS_DERIVED
 MDPS_TIMEFRAMES_PREDICTION = _TIMEFRAMES_PREDICTION
 MDPS_TIMEFRAMES_PREDICTION_TRADES = _TIMEFRAMES_PREDICTION_TRADES
 MDPS_TIMEFRAMES_INDEX = _TIMEFRAMES_INDEX
@@ -676,6 +701,7 @@ __all__ = [
     "MDPS_TIMEFRAMES_PREDICTION",
     "MDPS_TIMEFRAMES_PREDICTION_TRADES",
     "MDPS_TIMEFRAMES_SPORTS",
+    "MDPS_TIMEFRAMES_SPORTS_DERIVED",
     "MDPS_TIMEFRAMES_TRADFI",
     "MDPS_TIMEFRAMES_TRADFI_RE_AGGREGATED",
 ]

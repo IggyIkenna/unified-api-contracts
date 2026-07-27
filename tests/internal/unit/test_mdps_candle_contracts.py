@@ -34,6 +34,7 @@ from unified_api_contracts.internal.schemas._candle_contracts import (
     MDPS_TIMEFRAMES_PREDICTION,
     MDPS_TIMEFRAMES_PREDICTION_TRADES,
     MDPS_TIMEFRAMES_SPORTS,
+    MDPS_TIMEFRAMES_SPORTS_DERIVED,
     MDPS_TIMEFRAMES_TRADFI_RE_AGGREGATED,
 )
 from unified_api_contracts.internal.schemas.contracts import (
@@ -292,13 +293,20 @@ def test_prediction_unknown_fallback_candles(tf: str) -> None:
     "source_dt",
     ("odds_movement", "odds_snapshot", "odds_horizon_bucket", "arbitrage_opportunity"),
 )
-@pytest.mark.parametrize("tf", MDPS_TIMEFRAMES_SPORTS)
+@pytest.mark.parametrize("tf", MDPS_TIMEFRAMES_SPORTS_DERIVED)
 def test_sports_derived_candles_registered(tf: str, source_dt: str) -> None:
     """§6E P1: odds_movement / odds_snapshot / odds_horizon_bucket /
     arbitrage_opportunity contracts exist. ``odds_snapshot`` was missing from
     the registration loop until 2026-07-27 — its CandleAdapterRegistry
     adapter (SportsOddsSnapshotAdapter) existed but had no SchemaContract,
-    so every write hard-failed. Regression:
+    so every write hard-failed. ``4h`` was missing from the loop's timeframe
+    set (parametrized over ``MDPS_TIMEFRAMES_SPORTS`` = 1m/15m/1h) until
+    2026-07-27, even though MDPS's per-adapter timeframe filter genuinely
+    reaches "4h" for these 4 products (15m base granularity) — confirmed live
+    via production execution
+    uts-prod-market-data-processing-service-t1-recon-mzx7h (837
+    odds_snapshot_4h + 153 odds_horizon_bucket_4h + 10 odds_movement_4h
+    SchemaContractNotFoundError failures). Regression:
     plans/active/issues/mdps_t1_recon_job_oom_failing_7_days_2026_07_26.md
     Update 5."""
     contract = lookup_contract(
@@ -320,7 +328,7 @@ def test_sports_derived_candles_registered(tf: str, source_dt: str) -> None:
     "source_dt",
     ("odds_movement", "odds_snapshot", "odds_horizon_bucket", "arbitrage_opportunity"),
 )
-@pytest.mark.parametrize("tf", MDPS_TIMEFRAMES_SPORTS)
+@pytest.mark.parametrize("tf", MDPS_TIMEFRAMES_SPORTS_DERIVED)
 @pytest.mark.parametrize(
     "market_instrument_type",
     (
