@@ -620,10 +620,29 @@ CEFI_VENUE_ACCEPTED_NONCANONICAL_ALIASES: frozenset[str] = frozenset(CEFI_VENUE_
 # they now live as their own accepted, non-canonical, non-folded bookmaker entries instead
 # (mirroring BETMGM/BETONLINEAG/... exactly). UNIBET_EU treated the same way on the strength
 # of the identical UK-vs-EU sub-brand pattern (0 shared dates with bare UNIBET to compare
-# directly, but no basis to assume it's an alias when its UK sibling demonstrably isn't).
+# directly, but no basis to assume it's an alias when its UK sibling demonstrably isn't). NOTE:
+# `_odds_api_maps.ODDS_API_KEY_MAP["UNIBET"]` (unused dead code -- zero real consumers in any
+# capture/manifest path, grep-confirmed) lists "unibet_uk" as folding to UNIBET; that entry
+# predates this finding and was never validated against real captured data -- the vendor's own
+# `bookmakers[]` response structurally lists "unibet"/"unibet_uk" as separate entries each with
+# an independent `bookmaker_key`/`bookmaker_title`/`last_update`, which is the stronger, more
+# direct signal. Flagged, not silently fixed here (out of this fold's scope) -- see the plan's
+# issue-doc finding for the other untouched regional variants that reverse-map may also
+# mis-declare (ladbrokes_au, sport888_se, unibet_fr/it/nl/se, betfair_ex_au, bet365_au, ...).
+#
+# KEYS ARE THE VENDOR'S RAW LOWERCASE WIRE SPELLING, NOT the uppercase canonical form
+# (confirmed via `_odds_api_maps.ODDS_API_KEY_MAP["LADBROKES"]`/["BET888SPORT"]`: the real
+# `OddsApiBookmaker.key` values are "ladbrokes_uk"/"sport888", never "LADBROKES_UK"/"SPORT888"
+# — those uppercase forms only ever appear in the GCS PATH segment and `instrument_id`, which
+# get separately uppercased downstream (`venue_fetch.py`'s local `bm_str = bm_raw.upper()` for
+# the path; `build_instrument_id`'s internal `_slug().upper()` for the id) regardless of this
+# dict's casing. A dict keyed on the uppercase form is a SILENT NO-OP: `.get()` never matches
+# the real lowercase `bm.key`, so `odds_api_adapter.py`'s call site looked correct but folded
+# nothing -- caught 2026-07-27 by testing the fold against a real captured object's `venue`
+# COLUMN value (lowercase "ladbrokes_uk"), not just its GCS path/instrument_id (uppercase).
 SPORTS_VENUE_FOLD: dict[str, str] = {
-    "LADBROKES_UK": "LADBROKES",
-    "SPORT888": "BET888SPORT",
+    "ladbrokes_uk": "LADBROKES",
+    "sport888": "BET888SPORT",
 }
 
 # Bundle-grain "chain snapshot" instrument_type tokens (audit follow-up 2026-07-22,
