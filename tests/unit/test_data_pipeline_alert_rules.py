@@ -77,3 +77,28 @@ def test_keystone_fetch_001_present_and_critical() -> None:
 def test_all_registry_categories_represented() -> None:
     seen = {r.category for r in DATA_PIPELINE_ALERT_RULES}
     assert seen == set(DataPipelineAlertCategory)
+
+
+def test_dp_fleet_monitor_lifecycle_events_registered() -> None:
+    """dp-fleet-monitor's run_lifecycle() events must be exact-match registered.
+
+    Regression test (2026-07-27): without these entries, DP_FLEET_MONITOR_RUN_STARTED
+    / _COMPLETED / _FAILED miss alerting-service's data_pipeline_rule_for() exact-match
+    lookup and fall through to the generic catch-all routing rule, paging the incident
+    channel instead of the batch #data-pipeline-alerts mirror (or, for _FAILED, silently
+    routing as if it were routine INFO with no incident page at all).
+    """
+    by_event = {r.event: r for r in DATA_PIPELINE_ALERT_RULES}
+
+    started = by_event["DP_FLEET_MONITOR_RUN_STARTED"]
+    completed = by_event["DP_FLEET_MONITOR_RUN_COMPLETED"]
+    failed = by_event["DP_FLEET_MONITOR_RUN_FAILED"]
+
+    assert started.severity is AlertSeverity.INFO
+    assert completed.severity is AlertSeverity.INFO
+    assert AlertChannel.PAGERDUTY not in started.channels
+    assert AlertChannel.PAGERDUTY not in completed.channels
+
+    assert failed.severity is AlertSeverity.CRITICAL
+    assert AlertChannel.PAGERDUTY in failed.channels
+    assert AlertChannel.TELEGRAM in failed.channels
