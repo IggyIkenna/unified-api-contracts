@@ -406,4 +406,43 @@ def _check_record(rec: InstrumentRecord, as_of_date: date | None = None) -> str 
     if not is_tick_exempt and (rec.tick_size is None or rec.tick_size <= 0):
         return f"tick_size must be positive (venue={rec.venue}, symbol={rec.raw_symbol}, tick_size={rec.tick_size})"
 
+    # *-PERP venue write-time guardrail (prediction_satellite_ao_dispatch_batch1_2026_07_25.md):
+    # closes the class of bug that let the KALSHI-PERP adapter's category-filter gap
+    # contaminate cefi with 25,473 fake PERPETUAL rows — the events host returns
+    # binary event contracts (KXMVESPORTSMULTIGAMEEXTENDED / KXMVECROSSCATEGORY*)
+    # with category=null, and an earlier client-side filter treated empty-category
+    # as a PASS. Applies to any *-PERP venue (KALSHI-PERP, POLYMARKET-PERP, future
+    # additions), not just the one that broke — the failure class (adapter mis-
+    # filters, writer silently accepts) is generic. Two independent checks: the
+    # declared type must genuinely be PERPETUAL, AND the ticker itself must not
+    # match a known event-contract naming pattern (defense against a record that
+    # is mislabeled PERPETUAL but is still, by ticker shape, an event contract).
+    if rec.venue.upper().endswith("-PERP"):
+        if inst_type != InstrumentType.PERPETUAL:
+            return (
+                f"*-PERP venue record must be instrument_type=PERPETUAL, got {inst_type!r} "
+                f"(venue={rec.venue}, symbol={rec.raw_symbol})"
+            )
+        ticker = rec.instrument_key or rec.raw_symbol or ""
+        if _looks_like_event_contract(ticker):
+            return (
+                f"*-PERP venue record ticker matches a known event-contract naming pattern, "
+                f"not a genuine perpetual future (venue={rec.venue}, ticker={ticker})"
+            )
+
     return None
+
+
+# Event-contract ticker prefixes observed contaminating *-PERP venues (Kalshi's
+# binary-event-market naming family). Real Kalshi crypto-perp tickers use a
+# DIFFERENT "KX<ASSET>" shape (e.g. "KXBTCUSD-PERP") that does NOT start with
+# "KXMVE" — matching the broader "KX" prefix would incorrectly reject genuine
+# perp tickers, so this stays scoped to the specific event-contract family.
+# Extend this tuple if a new event-contract prefix family is observed.
+_EVENT_CONTRACT_TICKER_PREFIXES: tuple[str, ...] = ("KXMVE",)
+
+
+def _looks_like_event_contract(ticker: str) -> bool:
+    """Return True if `ticker` matches a known binary-event-contract naming pattern."""
+    upper = ticker.upper()
+    return any(upper.startswith(prefix) for prefix in _EVENT_CONTRACT_TICKER_PREFIXES)
