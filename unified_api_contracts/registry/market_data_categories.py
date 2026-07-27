@@ -1047,7 +1047,7 @@ VALID_DATA_TYPES_BY_AG_AND_INSTRUMENT_TYPE: dict[tuple[str, str], frozenset[str]
         {"odds", "odds_snapshot", "odds_movement", "trades"}
     ),
     ("sports", "fixed_odds"): frozenset(  # UNCERTAIN — sports-owner verify
-        {"odds", "odds_snapshot", "odds_movement", "markets", "outcomes", "settlements"}
+        {"odds", "odds_snapshot", "odds_movement", "markets", "outcomes", "settlements", "trades"}
     ),
     ("sports", "prop"): frozenset(  # UNCERTAIN — sports-owner verify
         {"odds", "odds_snapshot", "odds_movement"}
