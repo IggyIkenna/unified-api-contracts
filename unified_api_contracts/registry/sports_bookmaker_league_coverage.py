@@ -38,6 +38,10 @@ import json
 from pathlib import Path
 from typing import Final, cast
 
+from unified_api_contracts.canonical.domain.sports.provider_league_ids import (
+    canonicalize_odds_api_league_id,
+)
+
 # ---------------------------------------------------------------------------
 # Part 0 — the REQUEST scope (Phase 6d prerequisite for MTDS venue-injection)
 # ---------------------------------------------------------------------------
@@ -134,8 +138,17 @@ def is_prediction_market_venue(venue: str) -> bool:
 _DATA_PATH = Path(__file__).parent / "data" / "sports_bookmaker_league_coverage.json"
 
 # Canonical observed map: ``{BOOKMAKER_UPPER: [LEAGUE_ID_UPPER, ...]}``.
+#
+# The committed JSON is derived straight from the manifest's raw ``league_id``
+# column (``refresh_sports_bookmaker_league_coverage_2026_06_21.py``), which is NOT
+# always canonical — some historical captures recorded the raw Odds-API
+# ``sport_key`` (e.g. ``SOCCER_EPL``) instead of the UAC canonical id (``EPL``).
+# Canonicalising HERE, at load time, keeps this registry correct for a
+# canonical-id caller (the sports v2 sentinel) regardless of whether every future
+# ``--write`` refresh remembers to canonicalize first — a book captured under
+# BOTH the raw and canonical spelling of the same league merges into one entry.
 BOOKMAKER_LEAGUE_COVERAGE: dict[str, frozenset[str]] = {
-    str(book).upper(): frozenset(str(lg).upper() for lg in leagues)
+    str(book).upper(): frozenset(canonicalize_odds_api_league_id(str(lg)) for lg in leagues)
     for book, leagues in cast(dict[str, list[str]], json.loads(_DATA_PATH.read_text())).items()
 }
 
