@@ -320,6 +320,13 @@ class _ProtocolCapability:
 
 # Instrument type shorthands
 _LENDING = [_IT.LENDING.value]
+# A_TOKEN/DEBT_TOKEN retrofit (canonical_id_p0_defi_adapter_type_filter_bug_2026_07_08.md
+# fix wave, 2026-07-09 through 2026-07-13): aave_v3/spark/compound_v3/morpho/venus/benqi/
+# solend's adapters emit the real, narrower A_TOKEN (supply leg) / DEBT_TOKEN (borrow leg)
+# pair as their instrument_key/instrument_type instead of the generic LENDING value — this
+# shorthand mirrors what those adapters actually stamp today (defi_lending_protocol_
+# capabilities_instrument_types_stale_atoken_debttoken_2026_07_27.md).
+_LENDING_ATOKEN_DEBTTOKEN = [_IT.A_TOKEN.value, _IT.DEBT_TOKEN.value]
 _POOL = [_IT.POOL.value]
 # Solana-specific pool/vault instrument_types. The IS reference adapters
 # (raydium/orca → SOLANA_AMM_POOL, kamino → SOLANA_VAULT) stamp these, and the
@@ -366,7 +373,7 @@ PROTOCOL_CAPABILITIES: dict[str, _ProtocolCapability] = {
     "aave_v3": _ProtocolCapability(
         venue_prefix="AAVE_V3",
         protocol_class=ProtocolClass.LENDING,
-        instrument_types=_LENDING,
+        instrument_types=_LENDING_ATOKEN_DEBTTOKEN,
         data_types=[
             *_LENDING_DATA,
             "liquidation_events",  # LiquidationCall events via subgraph (AAVE_V3-ETHEREUM/ARBITRUM/POLYGON)
@@ -402,7 +409,7 @@ PROTOCOL_CAPABILITIES: dict[str, _ProtocolCapability] = {
     "spark": _ProtocolCapability(
         venue_prefix="SPARK",
         protocol_class=ProtocolClass.LENDING,
-        instrument_types=_LENDING,
+        instrument_types=_LENDING_ATOKEN_DEBTTOKEN,
         data_types=[*_LENDING_DATA],
         mtds_operations=["collect-lending-indices", "collect-liquidations"],
         required_tokens=frozenset({"MKR", "DAI"}),
@@ -410,7 +417,7 @@ PROTOCOL_CAPABILITIES: dict[str, _ProtocolCapability] = {
     "compound_v3": _ProtocolCapability(
         venue_prefix="COMPOUND_V3",
         protocol_class=ProtocolClass.LENDING,
-        instrument_types=_LENDING,
+        instrument_types=_LENDING_ATOKEN_DEBTTOKEN,
         data_types=[*_LENDING_DATA],
         mtds_operations=["collect-lending-indices", "collect-liquidations"],
         required_tokens=frozenset({"COMP"}),
@@ -418,7 +425,7 @@ PROTOCOL_CAPABILITIES: dict[str, _ProtocolCapability] = {
     "morpho": _ProtocolCapability(
         venue_prefix="MORPHO",
         protocol_class=ProtocolClass.LENDING,
-        instrument_types=_LENDING,
+        instrument_types=_LENDING_ATOKEN_DEBTTOKEN,
         data_types=[
             *_LENDING_DATA,
             "liquidation_events",  # LiquidationCall events (MORPHO-ETHEREUM 2024-01-08)
@@ -444,7 +451,7 @@ PROTOCOL_CAPABILITIES: dict[str, _ProtocolCapability] = {
     "venus": _ProtocolCapability(
         venue_prefix="VENUS",
         protocol_class=ProtocolClass.LENDING,
-        instrument_types=_LENDING,
+        instrument_types=_LENDING_ATOKEN_DEBTTOKEN,
         data_types=["lending_indices"],
         mtds_operations=["collect-lending-indices"],
         required_tokens=frozenset({"XVS"}),
@@ -452,7 +459,7 @@ PROTOCOL_CAPABILITIES: dict[str, _ProtocolCapability] = {
     "benqi": _ProtocolCapability(
         venue_prefix="BENQI",
         protocol_class=ProtocolClass.LENDING,
-        instrument_types=_LENDING,
+        instrument_types=_LENDING_ATOKEN_DEBTTOKEN,
         data_types=["lending_indices"],
         mtds_operations=["collect-lending-indices"],
         required_tokens=frozenset({"QI"}),
@@ -791,7 +798,7 @@ PROTOCOL_CAPABILITIES: dict[str, _ProtocolCapability] = {
     "solend": _ProtocolCapability(
         venue_prefix="SOLEND",
         protocol_class=ProtocolClass.LENDING,
-        instrument_types=_LENDING,
+        instrument_types=_LENDING_ATOKEN_DEBTTOKEN,
         data_types=["lending_indices"],
         mtds_operations=["collect-lending-indices"],
     ),
