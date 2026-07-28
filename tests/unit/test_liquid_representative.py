@@ -15,9 +15,12 @@ import pytest
 
 # Public import surface — must reach the top-level facade.
 from unified_api_contracts import (
+    MarginType,
+    MarginVolumeObservation,
     VenueVolumeObservation,
     execution_spot_representative,
     feature_perp_representative,
+    margin_type_representative,
 )
 
 
@@ -35,6 +38,15 @@ def _obs(
         base=base,
         volume=volume,
     )
+
+
+def _margin_obs(
+    venue: str,
+    base: str,
+    margin_type: MarginType,
+    volume: float,
+) -> MarginVolumeObservation:
+    return MarginVolumeObservation(venue=venue, base=base, margin_type=margin_type, volume=volume)
 
 
 class TestPublicSurface:
@@ -593,3 +605,121 @@ class TestFiveAssetGroupDeltaOneMatrix:
             venue,
             "AAAA",
         )
+
+
+# ---------------------------------------------------------------------------
+# margin_type_representative — cefi_universe_capture_rule margin-side
+# selection. Per (venue, base), which MarginType (linear vs inverse) is more
+# liquid — generalizes the operator's "default linear, capture inverse where
+# more liquid" rule via measured volume.
+# ---------------------------------------------------------------------------
+
+
+class TestMarginPublicSurface:
+    def test_importable_from_package_root(self) -> None:
+        import unified_api_contracts
+
+        assert hasattr(unified_api_contracts, "margin_type_representative")
+        assert hasattr(unified_api_contracts, "MarginVolumeObservation")
+        assert "margin_type_representative" in unified_api_contracts.__all__
+        assert "MarginVolumeObservation" in unified_api_contracts.__all__
+
+    def test_observation_is_frozen(self) -> None:
+        from dataclasses import FrozenInstanceError
+
+        obs = _margin_obs("BYBIT", "BTC", MarginType.LINEAR, 1.0)
+        with pytest.raises(FrozenInstanceError):
+            obs.volume = 2.0  # pyright: ignore[reportAttributeAccessIssue]  # frozen dataclass — assignment forbidden
+
+
+class TestMarginSelectionBasic:
+    def test_linear_wins_on_higher_volume(self) -> None:
+        observations = [
+            _margin_obs("BYBIT", "BTC", MarginType.LINEAR, 4_200_000_000.0),
+            _margin_obs("BYBIT", "BTC", MarginType.INVERSE, 180_000_000.0),
+        ]
+        assert margin_type_representative("BYBIT", "BTC", observations) == MarginType.LINEAR
+
+    def test_inverse_wins_on_higher_volume(self) -> None:
+        """Historically BTC/ETH inverse leads on some venues — the selector
+        must follow the measured volume, not hardcode linear."""
+        observations = [
+            _margin_obs("BYBIT", "BTC", MarginType.LINEAR, 100_000_000.0),
+            _margin_obs("BYBIT", "BTC", MarginType.INVERSE, 900_000_000.0),
+        ]
+        assert margin_type_representative("BYBIT", "BTC", observations) == MarginType.INVERSE
+
+    def test_defaults_linear_when_no_observations(self) -> None:
+        """No measured volume for this (venue, base) yet — LINEAR is the
+        documented safe default (operator: 'default linear — more liquid for
+        ~all alts')."""
+        assert margin_type_representative("BYBIT", "BTC", []) == MarginType.LINEAR
+
+    def test_defaults_linear_on_tie(self) -> None:
+        observations = [
+            _margin_obs("BYBIT", "BTC", MarginType.LINEAR, 500.0),
+            _margin_obs("BYBIT", "BTC", MarginType.INVERSE, 500.0),
+        ]
+        assert margin_type_representative("BYBIT", "BTC", observations) == MarginType.LINEAR
+
+    def test_defaults_linear_when_only_inverse_observation_absent(self) -> None:
+        observations = [
+            _margin_obs("BYBIT", "BTC", MarginType.LINEAR, 1.0),
+        ]
+        assert margin_type_representative("BYBIT", "BTC", observations) == MarginType.LINEAR
+
+
+class TestMarginFiltering:
+    def test_filters_other_venues_out(self) -> None:
+        observations = [
+            _margin_obs("OKX-SWAP", "BTC", MarginType.INVERSE, 999_999_999.0),
+            _margin_obs("BYBIT", "BTC", MarginType.LINEAR, 1.0),
+        ]
+        assert margin_type_representative("BYBIT", "BTC", observations) == MarginType.LINEAR
+
+    def test_filters_other_bases_out(self) -> None:
+        observations = [
+            _margin_obs("BYBIT", "ETH", MarginType.INVERSE, 999_999_999.0),
+            _margin_obs("BYBIT", "BTC", MarginType.LINEAR, 1.0),
+        ]
+        assert margin_type_representative("BYBIT", "BTC", observations) == MarginType.LINEAR
+
+    def test_ignores_quanto_observations(self) -> None:
+        """QUANTO is never a candidate — only linear vs inverse are compared,
+        so a dominant QUANTO volume must not change the outcome."""
+        observations = [
+            _margin_obs("DERIBIT", "BTC", MarginType.QUANTO, 999_999_999.0),
+            _margin_obs("DERIBIT", "BTC", MarginType.INVERSE, 10.0),
+        ]
+        assert margin_type_representative("DERIBIT", "BTC", observations) == MarginType.INVERSE
+
+    def test_sums_multiple_observations_per_margin_type(self) -> None:
+        """A base can have >1 observation per margin type (e.g. a perp AND a
+        dated future sharing the same settlement leg) — volumes sum."""
+        observations = [
+            _margin_obs("BYBIT", "BTC", MarginType.INVERSE, 300.0),
+            _margin_obs("BYBIT", "BTC", MarginType.INVERSE, 300.0),
+            _margin_obs("BYBIT", "BTC", MarginType.LINEAR, 500.0),
+        ]
+        # INVERSE total (600) > LINEAR (500) — inverse wins only because summed.
+        assert margin_type_representative("BYBIT", "BTC", observations) == MarginType.INVERSE
+
+
+class TestMarginPurity:
+    def test_does_not_mutate_input(self) -> None:
+        observations = [
+            _margin_obs("BYBIT", "BTC", MarginType.LINEAR, 1.0),
+            _margin_obs("BYBIT", "BTC", MarginType.INVERSE, 2.0),
+        ]
+        snapshot = list(observations)
+        margin_type_representative("BYBIT", "BTC", observations)
+        assert observations == snapshot
+
+    def test_accepts_generator(self) -> None:
+        from collections.abc import Iterator
+
+        def gen() -> Iterator[MarginVolumeObservation]:
+            yield _margin_obs("BYBIT", "BTC", MarginType.LINEAR, 1.0)
+            yield _margin_obs("BYBIT", "BTC", MarginType.INVERSE, 2.0)
+
+        assert margin_type_representative("BYBIT", "BTC", gen()) == MarginType.INVERSE

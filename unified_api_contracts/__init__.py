@@ -183,9 +183,11 @@ from .canonical.crosscutting.ledger import (
 )
 from .canonical.crosscutting.ledger._enums import AssetClass as LedgerAssetClass
 from .canonical.crosscutting.liquid_representative import (
+    MarginVolumeObservation,
     VenueVolumeObservation,
     execution_spot_representative,
     feature_perp_representative,
+    margin_type_representative,
 )
 from .canonical.crosscutting.live_cluster_registry import (
     LIVE_CLUSTER_REGISTRY,
@@ -2545,6 +2547,9 @@ __all__ = [
     "VenueVolumeObservation",
     "execution_spot_representative",
     "feature_perp_representative",
+    # Margin-side (linear vs inverse) selector — cefi_universe_capture_rule.
+    "MarginVolumeObservation",
+    "margin_type_representative",
     # Execution fidelity capability — UAC SSOT for the matcher-tier selection
     # consumed by execution-service.
     "ExecutionFidelityTier",
