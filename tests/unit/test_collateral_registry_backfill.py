@@ -20,6 +20,7 @@ from unified_api_contracts.internal.architecture_v2.collateral_registry import (
     CollateralPolicy,
     VenueCollateralKind,
 )
+from unified_api_contracts.registry import get_collateral_haircut, venue_accepts_collateral
 
 # MVP venue universe from archetype_leg_spec.py eligible venues.
 # "drift" (Solana perp DEX) removed 2026-07-16 (operator ruling: all Solana perp DEXes dropped
@@ -171,3 +172,29 @@ def test_kamino_partial_ltv_none_but_haircut_sourced() -> None:
 
 def test_brokers_remain_honest_gap() -> None:
     assert BROKER_REGISTRY == []
+
+
+# ---------------------------------------------------------------------------
+# Dual-SSOT regression guard (F28-class drift) — 2026-07-28
+# ---------------------------------------------------------------------------
+
+
+def test_perp_cex_haircuts_derived_from_venue_collateral_live() -> None:
+    """Perp-CEX AssetHaircuts are LIVE-DERIVED from venue_collateral.py, not a
+    hand-transcribed copy (see collateral_registry.py's 2026-07-28 UPDATE note).
+
+    This pins the derivation itself: if a future edit reverts a row to a
+    hardcoded literal that happens to disagree with venue_collateral.py (the
+    exact F28 failure mode — two registries drifting because one is a manual
+    copy), this test fails immediately instead of the drift going unnoticed
+    until it reaches a runtime consumer.
+    """
+    for venue_id in _PERP_VENUES:
+        policy = _by_id(venue_id)
+        for ah in policy.accepted_collateral:
+            assert ah.accepted == venue_accepts_collateral(venue_id, ah.asset), f"{venue_id}/{ah.asset}: accepted"
+            live_haircut = get_collateral_haircut(venue_id, ah.asset)
+            if live_haircut is None:
+                assert ah.haircut_pct == Decimal("0"), f"{venue_id}/{ah.asset}: haircut_pct"
+            else:
+                assert ah.haircut_pct == live_haircut * Decimal("100"), f"{venue_id}/{ah.asset}: haircut_pct"
