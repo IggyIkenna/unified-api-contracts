@@ -624,15 +624,15 @@ class TestSportsMvp:
         assert is_mvp("sports", "ODDS_API", "FIXED_ODDS", "odds", league="EPL")
 
     def test_mls_odds_snapshot_is_mvp(self) -> None:
-        """MLS (a football league in the 94) odds_snapshot → MVP (decision #1)."""
+        """MLS (a football league in the 96) odds_snapshot → MVP (decision #1)."""
         assert is_mvp("sports", "ODDS_API", "FIXED_ODDS", "odds_snapshot", league="MLS")
 
     def test_eng_championship_is_mvp(self) -> None:
-        """ENG_CHAMPIONSHIP (football) IS MVP — the 94-league universe is ALL football
+        """ENG_CHAMPIONSHIP (football) IS MVP — the 96-league universe is ALL football
         leagues, not just the top tier (decision #1 BUG FIX)."""
         assert is_mvp("sports", "ODDS_API", "FIXED_ODDS", "markets", league="ENG_CHAMPIONSHIP")
 
-    def test_full_94_football_universe_is_mvp(self) -> None:
+    def test_full_96_football_universe_is_mvp(self) -> None:
         """Every ``in_mvp_scope`` football league (the 96) is MVP; non-football are not.
 
         Was ``sport == "FOOTBALL"`` before the curated-universe expansion
@@ -704,15 +704,25 @@ class TestGetMvpFootballLeagueIds:
         assert non_mvp_widened.league_id not in mvp
 
     def test_entity_league_coverage_enrichment_entities_match_mvp(self) -> None:
-        """FIXTURE_STATS/FIXTURE_EVENTS/FIXTURE_LINEUPS/PLAYER_STATS coverage
-        must equal the MVP set, not the wider could-exist FIXTURES universe —
-        otherwise per-fixture enrichment fan-out silently follows the 383-league
-        curated-universe denominator instead of the 96-league MVP scope."""
+        """FIXTURE_EVENTS/PLAYER_STATS coverage must equal the MVP set, not the
+        wider could-exist FIXTURES universe — otherwise this per-event/
+        per-player enrichment fan-out silently follows the 383-league
+        curated-universe denominator instead of the 96-league MVP scope.
+        FIXTURE_STATS/FIXTURE_LINEUPS moved to all-leagues 2026-07-28 (operator
+        ruling) — see the sibling assertion below."""
         from unified_api_contracts.sports import get_entity_league_coverage, get_mvp_football_league_ids
 
         mvp = get_mvp_football_league_ids()
-        for entity in ("FIXTURE_STATS", "FIXTURE_EVENTS", "FIXTURE_LINEUPS", "PLAYER_STATS"):
+        for entity in ("FIXTURE_EVENTS", "PLAYER_STATS"):
             assert get_entity_league_coverage(entity) == mvp, f"{entity} coverage drifted from MVP scope"
+
+    def test_entity_league_coverage_fixture_stats_and_lineups_all_leagues(self) -> None:
+        """FIXTURE_STATS (game results) / FIXTURE_LINEUPS cover all leagues
+        (``None``), not the MVP subset — operator ruling 2026-07-28."""
+        from unified_api_contracts.sports import get_entity_league_coverage
+
+        for entity in ("FIXTURE_STATS", "FIXTURE_LINEUPS"):
+            assert get_entity_league_coverage(entity) is None, f"{entity} should cover all leagues"
 
 
 # ---------------------------------------------------------------------------

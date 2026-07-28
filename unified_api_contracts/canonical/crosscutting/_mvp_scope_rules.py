@@ -251,12 +251,12 @@ class FeaturesModelsMvpStub:
 
 
 # ---------------------------------------------------------------------------
-# Sports MVP league universe — the canonical 94-league football set.
+# Sports MVP league universe — the canonical 96-league football set.
 # ---------------------------------------------------------------------------
 # operator 2026-06-27 decision #1 (BUG FIX): the sports MVP universe is the
-# **94-league football universe** — EVERY league in ``LEAGUE_REGISTRY`` whose
-# ``sport == "FOOTBALL"`` (33 Prediction + 22 Features + 39 Reference football
-# = 94; the 7 non-football leagues NFL/NBA/MLB/NHL/ATP/WTA/EUROLEAGUE are
+# **96-league football universe** — EVERY league in ``LEAGUE_REGISTRY`` whose
+# ``sport == "FOOTBALL"`` (33 Prediction + 24 Features + 39 Reference football
+# = 96; the 7 non-football leagues NFL/NBA/MLB/NHL/ATP/WTA/EUROLEAGUE are
 # EXCLUDED). The previous rule MVP-tagged only 2 leagues (EPL + LA_LIGA) — a
 # drift the audit caught. Derived (not a hand-written literal) from the league
 # registry so a future football-league addition is automatically MVP.
@@ -763,9 +763,9 @@ MVP_SCOPE: Final[dict[str, object]] = {
     # The MVP sports coverage targets odds arbitrage (arbitrage_price_dispersion)
     # and fixture results (reference data for prediction-market settlement).
     #
-    # Leagues: the canonical 94-league FOOTBALL universe (operator 2026-06-27
+    # Leagues: the canonical 96-league FOOTBALL universe (operator 2026-06-27
     #   decision #1 — BUG FIX). EVERY ``LEAGUE_REGISTRY`` league with
-    #   ``sport == "FOOTBALL"`` (33 Prediction + 22 Features + 39 Reference = 94);
+    #   ``sport == "FOOTBALL"`` (33 Prediction + 24 Features + 39 Reference = 96);
     #   the 7 non-football leagues (NFL/NBA/MLB/NHL/ATP/WTA/EUROLEAGUE) are
     #   EXCLUDED. Derived via ``_mvp_football_league_ids()`` so a future
     #   football-league addition is automatically MVP — never a hand-written 2-

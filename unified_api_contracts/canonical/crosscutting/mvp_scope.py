@@ -289,7 +289,7 @@ reduction, no depth features derived from Coinbase):
 
 v10 (2026-06-27): operator's CANONICAL MVP definition (7 decisions reconciling
 the prior audit's drifts):
-  1. SPORTS 94-league FIX — sports MVP leagues = the 94 ``sport == "FOOTBALL"``
+  1. SPORTS 96-league FIX — sports MVP leagues = the 96 ``sport == "FOOTBALL"``
      leagues (``_mvp_football_league_ids()``), not the 2-league EPL+LA_LIGA
      literal. The 7 non-football leagues (NFL/NBA/MLB/NHL/ATP/WTA/EUROLEAGUE)
      are no longer MVP.
