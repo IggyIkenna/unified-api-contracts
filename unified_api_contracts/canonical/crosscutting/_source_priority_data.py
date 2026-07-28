@@ -151,7 +151,18 @@ SOURCE_PRIORITY: Final[dict[tuple[str, str], list[str]]] = {
     # (uac@3652f99f "ASTER book_snapshot_5 + liquidations live-wire capability";
     # HYPERLIQUID book_snapshot_5 S3-archived since 2023-04-15) — removing them
     # would reopen bug#8 (MissingSourceError) for real live traffic.
+    # "book_snapshot" (bare, no "_5") is a LEGACY alias — the live connectors
+    # (coinbase_book_ws.py, binance_futures_ws.py, etc.) + the canonical cefi
+    # data_type catalogue (DATA_TYPES_BY_ASSET_GROUP["cefi"]) both use
+    # "book_snapshot_5". The bare key is retained (CEFI_LEGACY_KEY exclusion in
+    # test_validity_matrix_completeness.py) only for the closed-set
+    # pipeline_mode round-trip; it is never a real manifest data_type value, so
+    # has_source_priority("cefi","book_snapshot_5") was False and book_snapshot_5
+    # writes were source-EXEMPT (no MissingSourceError, but also no source
+    # validation — fleet_data_acquisition_health_2026_06_21.md follow-up
+    # finding). Registered here (additive, same source list) to close the gap.
     ("cefi", "book_snapshot"): ["tardis", "aster", "hyperliquid", "extended"],
+    ("cefi", "book_snapshot_5"): ["tardis", "aster", "hyperliquid", "extended"],
     ("cefi", "liquidations"): ["tardis", "aster", "extended"],  # hyperliquid removed 2026-07-13 (no real feed)
     # derivative_ticker (perp mark/index/OI/funding). tardis is the multi-venue T+1
     # archive BATCH primary for every Tardis-covered CeFi perp venue (binance/okx/

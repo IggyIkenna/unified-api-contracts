@@ -140,6 +140,18 @@ def test_cefi_book_liq_pairs_kept_by_finding77_narrowed_ruling() -> None:
     assert "aster" in get_source_priority("cefi", "liquidations")
 
 
+def test_cefi_book_snapshot_5_source_priority_registered_fleet_health_2026_06_21() -> None:
+    """fleet_data_acquisition_health_2026_06_21.md follow-up finding: live
+    connectors emit data_type="book_snapshot_5" but SOURCE_PRIORITY only keyed
+    the legacy bare "book_snapshot" alias, so book_snapshot_5 writes were
+    source-EXEMPT (has_source_priority returned False — no MissingSourceError,
+    but also no source validation enforced). Registered additively, mirroring
+    the legacy key's source list.
+    """
+    assert has_source_priority("cefi", "book_snapshot_5") is True
+    assert get_source_priority("cefi", "book_snapshot_5") == get_source_priority("cefi", "book_snapshot")
+
+
 # ---------------------------------------------------------------------------
 # source_required — registry-driven multi-source gate
 # (data_source_provenance_all_asset_groups_2026_06_01.md Phase 1)
