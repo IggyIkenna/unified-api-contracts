@@ -418,6 +418,7 @@ from .tradfi_symbology import (
     get_bindings_for_symbol,
     get_primary_binding,
     is_recognized_tradfi_underlying,
+    resolve_tradfi_underlying_to_root,
 )
 from .tradfi_ticker_universe import (
     ETF_TICKERS,
@@ -1195,6 +1196,7 @@ __all__ = [
     "resolve_data_type_for_feature_group",
     "resolve_rpc_url",
     "resolve_solana_mint",
+    "resolve_tradfi_underlying_to_root",
     "resolve_venue_context",
     "time_budget_to_block_offset",
     "to_canonical_venue",

@@ -14,7 +14,7 @@ from __future__ import annotations
 
 import pytest
 
-from unified_api_contracts import is_recognized_tradfi_underlying
+from unified_api_contracts import is_recognized_tradfi_underlying, resolve_tradfi_underlying_to_root
 from unified_api_contracts.internal.reference.ticker_registry import (
     UNDERLYING_NORMALIZATION,
     normalize_underlying,
@@ -104,3 +104,56 @@ class TestIsRecognizedTradfiUnderlying:
     def test_case_insensitive(self) -> None:
         assert is_recognized_tradfi_underlying("sp500") is True
         assert is_recognized_tradfi_underlying("mes") is True
+
+
+class TestResolveTradfiUnderlyingToRoot:
+    """Reverse (spelled-name -> short root) half of the fix, added for
+    tradfi_combo_underlying_naming_mismatch_blocks_g1_enum_present_rollup_2026_07_28.md
+    — real captured tradfi COMBO/futures_chain/options_chain manifest rows carry an
+    ``underlying`` VALUE spelled out ("HEATING-OIL", "PLATINUM", "CRUDE") instead of
+    the catalog's short-root convention ("HO", "PL", "CL")."""
+
+    @pytest.mark.parametrize(
+        ("spelled", "root"),
+        [
+            ("HEATING-OIL", "HO"),
+            ("HEATINGOIL", "HO"),
+            ("HEATING_OIL", "HO"),
+            ("PLATINUM", "PL"),
+            ("CRUDE", "CL"),
+            ("GOLD", "GC"),
+            ("SILVER", "SI"),
+            ("COPPER", "HG"),
+            ("NATGAS", "NG"),
+            ("NAT-GAS", "NG"),
+        ],
+    )
+    def test_spelled_name_resolves_to_root(self, spelled: str, root: str) -> None:
+        assert resolve_tradfi_underlying_to_root(spelled) == root
+
+    def test_henry_hub_basis_suffix_trims_to_root(self) -> None:
+        # "NAT-GAS-HH" is a real recognised named-spread (Henry Hub basis on NG) —
+        # is_recognized_tradfi_underlying already accepts it; the reverse-lookup
+        # must resolve the ROOT by progressively trimming the trailing "-HH" token.
+        assert resolve_tradfi_underlying_to_root("NAT-GAS-HH") == "NG"
+
+    def test_already_a_root_resolves_to_itself(self) -> None:
+        assert resolve_tradfi_underlying_to_root("HO") == "HO"
+        assert resolve_tradfi_underlying_to_root("cl") == "CL"
+
+    def test_case_insensitive(self) -> None:
+        assert resolve_tradfi_underlying_to_root("heating-oil") == "HO"
+        assert resolve_tradfi_underlying_to_root("platinum") == "PL"
+
+    def test_empty_returns_none(self) -> None:
+        assert resolve_tradfi_underlying_to_root("") is None
+        assert resolve_tradfi_underlying_to_root("   ") is None
+
+    @pytest.mark.parametrize("garbage", ["12", "13", "GN", "VT", "3W"])
+    def test_opaque_garbage_returns_none(self, garbage: str) -> None:
+        assert resolve_tradfi_underlying_to_root(garbage) is None
+
+    def test_unresolvable_multi_root_spread_returns_none(self) -> None:
+        # WTI-BZ is a genuine 2-leg spread with no single resolvable root — the
+        # reverse-lookup must not guess; caller keeps the original value unchanged.
+        assert resolve_tradfi_underlying_to_root("WTI-BZ") is None
