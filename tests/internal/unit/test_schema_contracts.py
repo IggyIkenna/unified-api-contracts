@@ -274,6 +274,19 @@ def test_valid_dataframes_for_every_contract_return_no_violations() -> None:
         )
 
 
+def test_book_snapshot_5_thin_book_missing_deep_level_reports_no_violation() -> None:
+    # Real order books routinely have fewer than 5 levels on one side at a
+    # given snapshot instant (verified against a real captured GCS shard --
+    # DP-FETCH-009 fresh-regression follow-up, 2026-07-28). A null at a deep
+    # level is honest thin-liquidity absence, not a data defect, and must not
+    # fail write-time validation.
+    df = _df_cefi_perp_book_5()
+    df.loc[0, "asks[4].price"] = None
+    df.loc[0, "asks[4].amount"] = None
+    violations = validate_dataframe(df, CEFI_PERPETUAL_BOOK_SNAPSHOT_5)
+    assert violations == []
+
+
 def test_missing_instrument_id_column_reports_missing_column() -> None:
     df = _df_cefi_perp_trades().drop(columns=["instrument_id"])
     violations = validate_dataframe(df, CEFI_PERPETUAL_TRADES)

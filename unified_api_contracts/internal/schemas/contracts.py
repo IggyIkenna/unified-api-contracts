@@ -232,12 +232,28 @@ CEFI_PERPETUAL_TRADES = SchemaContract(
 # levels_mismatch_2026_07_28.md). Replaces the aspirational single-string
 # ColumnSpec pair that was never implemented, exposed the moment validate=True
 # was flipped on for every CeFi Tardis write site (2026-07-27).
+#
+# nullable=True (corrected 2026-07-28, DP-FETCH-009 fresh-regression follow-up
+# to the fix above): a real order book routinely has FEWER than 5 levels on
+# one or both sides at a given snapshot instant -- verified against a real
+# captured GCS shard (BITFINEX-FUTURES:PERPETUAL:APE-USDT@LIN, day=2026-07-24,
+# 1,237,624 rows, pre-dates write-time validation): 22-85 genuine null rows at
+# level>=2 (asks[2]=22, asks[3]=52, bids[3]=60, asks[4]=79, bids[4]=85 nulls),
+# zero nulls at levels 0-1. This is honest thin-liquidity absence, not a data
+# defect -- nullable=False rejected these real rows as `attempted_failed`
+# forever (reproduced directly: `non-nullable column 'asks[4].price' has 1
+# null value(s)`), the exact silent-failure class this contract exists to
+# prevent, just now self-inflicted by an over-strict constraint rather than a
+# missing rename/derive step. Applying to ALL 10 levels-per-side (not just the
+# empirically-null ones) since a thinner book on a different/less-liquid venue
+# could legitimately be missing even shallower levels -- this column's honest
+# semantics is "this level of depth, if any, was captured," not "must exist."
 _BOOK_SNAPSHOT_5_LEVEL_COLUMNS = [
     ColumnSpec(
         name=f"{side}[{level}].{field}",
         dtype="float64",
-        nullable=False,
-        description=f"Level-{level} {side[:-1]} {field} (top-5 book_snapshot_5 depth).",
+        nullable=True,
+        description=f"Level-{level} {side[:-1]} {field} (top-5 book_snapshot_5 depth; absent on a thin book).",
     )
     for side in ("bids", "asks")
     for level in range(5)
