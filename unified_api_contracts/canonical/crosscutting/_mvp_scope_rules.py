@@ -21,6 +21,13 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Final
 
+# ModelsMvpRule lives in its OWN leaf module (900-line file-size QG split,
+# 2026-07-28 — this file hit 949 lines with the class inline). Re-exported
+# here so ``MVP_SCOPE["models"] = ModelsMvpRule()`` below reads unchanged.
+from unified_api_contracts.canonical.crosscutting._mvp_scope_models import (
+    ModelsMvpRule,
+)
+
 # The CeFi base-currency universe is the curated capture SSOT
 # ``CEFI_BASE_ASSET_UNIVERSE`` (operator-confirmed 2026-06-23 — no longer the
 # 44-coin MVP cap; now the survivorship-bias-free union of legacy-44 +
@@ -225,7 +232,7 @@ class PredictionMvpRule:
 
 @dataclass(frozen=True)
 class FeaturesModelsMvpStub:
-    """Stub placeholder for features/strategy/models MVP scope (Phase 2+).
+    """Stub placeholder for features/strategy MVP scope (Phase 2+).
 
     These sections are declared as named keys in :data:`MVP_SCOPE` so
     that Phase 2 implementations can populate them without a structural
@@ -234,7 +241,10 @@ class FeaturesModelsMvpStub:
     phase ships.
 
     TODO(mvp-scope): populate in Phase 2 (features-scope) and Phase 3
-        (strategy/model-scope) plans.
+        (strategy-scope) plans. ``models`` graduated from this stub to
+        :class:`~unified_api_contracts.canonical.crosscutting._mvp_scope_models.ModelsMvpRule`
+        (its own leaf module, split out to keep this file under the 900-line
+        QG cap) — see that class's docstring.
     """
 
     description: str = "stub — Phase 2+ scope; not yet populated"
@@ -864,8 +874,14 @@ MVP_SCOPE: Final[dict[str, object]] = {
         description="MVP strategy scope — Phase 3; not yet populated. "
         "TODO(mvp-scope): define per-archetype strategy scope."
     ),
-    "models": FeaturesModelsMvpStub(
-        description="MVP model scope — Phase 3; not yet populated. "
-        "TODO(mvp-scope): define per-archetype model membership."
-    ),
+    # ------------------------------------------------------------------
+    # models — P2b (mvp_scope_catalogue_tagging_2026_06_08.md, corrected
+    # 2026-07-27): graduated from FeaturesModelsMvpStub to the typed
+    # ModelsMvpRule (identity-axis grain — see that class's docstring for the
+    # full rationale). Conservative EMPTY default pending operator sign-off on
+    # concrete membership — is_model_mvp() returns False for every model_id
+    # today; populating any of the frozensets below activates matching with no
+    # code change.
+    # ------------------------------------------------------------------
+    "models": ModelsMvpRule(),
 }

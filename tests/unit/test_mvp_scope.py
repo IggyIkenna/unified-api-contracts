@@ -20,7 +20,7 @@ from __future__ import annotations
 import pytest
 
 # Public import surface — must be importable from the top-level facade
-from unified_api_contracts import MVP_SCOPE, is_mvp
+from unified_api_contracts import MVP_SCOPE, is_model_mvp, is_mvp
 from unified_api_contracts.canonical.crosscutting._mvp_scope_rules import (
     _mvp_defi_data_types,
 )
@@ -28,6 +28,7 @@ from unified_api_contracts.canonical.crosscutting.mvp_scope import (
     CeFiMvpRule,
     DeFiMvpRule,
     FeaturesModelsMvpStub,
+    ModelsMvpRule,
     PredictionMvpRule,
     SportsMvpRule,
     TradFiMvpRule,
@@ -47,10 +48,19 @@ class TestMvpScopeStructure:
             assert ag in MVP_SCOPE, f"missing asset_group in MVP_SCOPE: {ag}"
 
     def test_stub_sections_present(self) -> None:
-        """Phase-2+ stub sections are declared."""
-        for key in ("features", "strategy", "models"):
+        """Phase-2+ stub sections are declared (features/strategy — P2a, a
+        separate dispatch). ``models`` graduated to ``ModelsMvpRule`` (P2b) —
+        see ``test_rule_types`` / ``TestModelsMvp`` below."""
+        for key in ("features", "strategy"):
             assert key in MVP_SCOPE
             assert isinstance(MVP_SCOPE[key], FeaturesModelsMvpStub)
+
+    def test_models_is_no_longer_a_stub(self) -> None:
+        """P2b: ``models`` graduated from ``FeaturesModelsMvpStub`` to the
+        typed ``ModelsMvpRule`` — regression guard for the stub→rule flip."""
+        assert "models" in MVP_SCOPE
+        assert isinstance(MVP_SCOPE["models"], ModelsMvpRule)
+        assert not isinstance(MVP_SCOPE["models"], FeaturesModelsMvpStub)
 
     def test_rule_types(self) -> None:
         """Each asset_group maps to the correct typed rule dataclass."""
@@ -59,6 +69,7 @@ class TestMvpScopeStructure:
         assert isinstance(MVP_SCOPE["tradfi"], TradFiMvpRule)
         assert isinstance(MVP_SCOPE["sports"], SportsMvpRule)
         assert isinstance(MVP_SCOPE["prediction"], PredictionMvpRule)
+        assert isinstance(MVP_SCOPE["models"], ModelsMvpRule)
 
     def test_all_rules_are_frozen(self) -> None:
         """Rule dataclasses are frozen (immutable)."""
@@ -443,15 +454,17 @@ class TestTradFiOptionUnderlierNarrowingV14:
         assert frozenset({"ES"}) == TRADFI_MVP_OPTION_UNDERLYING_ROOTS
 
     def test_config_version_is_latest(self) -> None:
-        """MVP_SCOPE_CONFIG_VERSION == 20 exactly (v20 = DERIBIT-COMBO fully
-        deregistered, reverting v12's venues/venue_data_types + v16's COMBO
-        instrument_type; v19 = tradfi MVP-set expansion: CME BTC/ETH/MBT/MET
-        futures + CBOE VIX futures + CBOE Treasury-yield INDEX tenors + FX
-        KRW-USD; v18 = book_snapshot_5 added to PredictionMvpRule.data_types;
-        v17 = 26 LST/restaking/vault DeFi venues onboarded to P → live → MVP)."""
+        """MVP_SCOPE_CONFIG_VERSION == 21 exactly (v21 = ``models`` graduated
+        from ``FeaturesModelsMvpStub`` to ``ModelsMvpRule``, P2b; v20 =
+        DERIBIT-COMBO fully deregistered, reverting v12's venues/
+        venue_data_types + v16's COMBO instrument_type; v19 = tradfi MVP-set
+        expansion: CME BTC/ETH/MBT/MET futures + CBOE VIX futures + CBOE
+        Treasury-yield INDEX tenors + FX KRW-USD; v18 = book_snapshot_5 added
+        to PredictionMvpRule.data_types; v17 = 26 LST/restaking/vault DeFi
+        venues onboarded to P → live → MVP)."""
         from unified_api_contracts.canonical.crosscutting.mvp_scope import MVP_SCOPE_CONFIG_VERSION
 
-        assert MVP_SCOPE_CONFIG_VERSION == 20
+        assert MVP_SCOPE_CONFIG_VERSION == 21
 
 
 # ---------------------------------------------------------------------------
@@ -1784,12 +1797,23 @@ class TestMdpsMvpUniverse:
             mdps_mvp_universe("not-an-asset-group")
 
     def test_phase2_stub_returns_empty(self) -> None:
-        """Phase-2+ stubs (features/strategy/models) have no rule yet — empty set."""
+        """Phase-2+ stubs (features/strategy) have no rule yet — empty set.
+        ``models`` graduated to ``ModelsMvpRule`` (P2b) — see
+        ``test_models_has_no_mdps_axis`` below (it now raises, same as
+        sports/prediction, since it's a real rule with no MDPS-relevant axis)."""
         from unified_api_contracts import mdps_mvp_universe
 
         assert mdps_mvp_universe("features") == frozenset()
         assert mdps_mvp_universe("strategy") == frozenset()
-        assert mdps_mvp_universe("models") == frozenset()
+
+    def test_models_has_no_mdps_axis(self) -> None:
+        """``models`` (P2b, a real ModelsMvpRule) has no (venue, instrument_type)
+        axis — mdps_mvp_universe raises, same as sports/prediction, NOT an
+        empty-stub return (that path is only for features/strategy)."""
+        from unified_api_contracts import mdps_mvp_universe
+
+        with pytest.raises(ValueError, match="no \\(venue, instrument_type\\) axis"):
+            mdps_mvp_universe("models")
 
     def test_return_type_is_frozenset_of_tuples(self) -> None:
         """Return type is a frozenset of (venue, instrument_type) tuples — both strings."""
@@ -1895,3 +1919,254 @@ class TestLiquidationsPerpetualMvpV15:
 
         assert hasattr(unified_api_contracts, "get_mvp_data_types_for_cefi_venue_itype")
         assert "get_mvp_data_types_for_cefi_venue_itype" in unified_api_contracts.__all__
+
+
+# ---------------------------------------------------------------------------
+# Models MVP (P2b — mvp_scope_catalogue_tagging_2026_06_08.md, corrected
+# 2026-07-27). ``ModelsMvpRule`` + ``is_model_mvp`` match on the ml-service
+# ``generate_model_id``/``parse_model_id`` identity axes (asset_group/asset/
+# target_type/model_type/timeframe) — a SEPARATE grain from every other rule
+# in this module (no venue/instrument_type/data_type). UAC never imports
+# ml-service; these tests hand-compute model_id-shaped values the same way
+# ``generate_model_id`` would (upper asset_group/asset/model_type, target_type
+# hyphen<->underscore round-trip, timeframe passed through) rather than
+# importing ml-service's function (that import direction would invert the T4
+# service -> shared-lib dependency architecture).
+# ---------------------------------------------------------------------------
+
+
+class TestModelsMvp:
+    """ModelsMvpRule / is_model_mvp — structure, conservative default, mechanism."""
+
+    def test_conservative_empty_default_matches_nothing(self) -> None:
+        """Today's live MVP_SCOPE["models"] is the conservative empty default
+        (TODO(mvp-scope): operator sign-off pending) — is_model_mvp must
+        return False for any candidate model identity until membership axes
+        are populated."""
+        rule = MVP_SCOPE["models"]
+        assert isinstance(rule, ModelsMvpRule)
+        assert rule.asset_groups == frozenset()
+        assert rule.target_types == frozenset()
+        assert rule.model_types == frozenset()
+        assert rule.assets == frozenset()
+        assert rule.timeframes == frozenset()
+        assert not is_model_mvp("cefi", "BTC", "swing_high", "lightgbm", "1h")
+        assert not is_model_mvp("tradfi", "SPY", "swing_low", "ensemble", "4h")
+
+    def test_rule_is_frozen(self) -> None:
+        """ModelsMvpRule is immutable, like every other MVP rule dataclass."""
+        rule = MVP_SCOPE["models"]
+        assert isinstance(rule, ModelsMvpRule)
+        with pytest.raises(Exception):
+            ModelsMvpRule.__setattr__(rule, "asset_groups", frozenset({"CEFI"}))
+
+    def test_fields_are_frozensets(self) -> None:
+        rule = ModelsMvpRule(
+            asset_groups=frozenset({"CEFI"}),
+            target_types=frozenset({"swing_high"}),
+            model_types=frozenset({"LIGHTGBM"}),
+        )
+        assert isinstance(rule.asset_groups, frozenset)
+        assert isinstance(rule.target_types, frozenset)
+        assert isinstance(rule.model_types, frozenset)
+        assert isinstance(rule.assets, frozenset)
+        assert isinstance(rule.timeframes, frozenset)
+
+    def test_return_type_is_bool(self) -> None:
+        assert isinstance(is_model_mvp("cefi", "BTC", "swing_high", "lightgbm"), bool)
+
+    def test_stub_untouched_asset_group_predicate_unaffected(self) -> None:
+        """Grafting ModelsMvpRule onto MVP_SCOPE["models"] must not perturb
+        is_mvp()'s per-cell asset_group predicates (models is a SEPARATE grain
+        — never asset_group="models" through is_mvp)."""
+        assert not is_mvp("models", "ANY_VENUE", "ANY_TYPE", "ANY_DT")
+
+    def test_positive_match_all_axes_declared(self, monkeypatch: pytest.MonkeyPatch) -> None:
+        """A model_id whose decomposed axes are ALL declared in the rule → MVP."""
+        rule = ModelsMvpRule(
+            asset_groups=frozenset({"CEFI"}),
+            target_types=frozenset({"swing_high"}),
+            model_types=frozenset({"LIGHTGBM"}),
+            assets=frozenset({"BTC"}),
+            timeframes=frozenset({"1h"}),
+        )
+        monkeypatch.setitem(MVP_SCOPE, "models", rule)
+        assert is_model_mvp("cefi", "BTC", "swing_high", "lightgbm", "1h")
+        # Case-insensitivity mirrors generate_model_id's own upper()-ing.
+        assert is_model_mvp("CEFI", "btc", "swing_high", "LightGBM", "1H")
+
+    def test_negative_asset_group_not_declared(self, monkeypatch: pytest.MonkeyPatch) -> None:
+        rule = ModelsMvpRule(
+            asset_groups=frozenset({"CEFI"}),
+            target_types=frozenset({"swing_high"}),
+            model_types=frozenset({"LIGHTGBM"}),
+        )
+        monkeypatch.setitem(MVP_SCOPE, "models", rule)
+        assert not is_model_mvp("tradfi", "SPY", "swing_high", "lightgbm")
+
+    def test_negative_target_type_not_declared(self, monkeypatch: pytest.MonkeyPatch) -> None:
+        rule = ModelsMvpRule(
+            asset_groups=frozenset({"CEFI"}),
+            target_types=frozenset({"swing_high"}),
+            model_types=frozenset({"LIGHTGBM"}),
+        )
+        monkeypatch.setitem(MVP_SCOPE, "models", rule)
+        assert not is_model_mvp("cefi", "BTC", "swing_low", "lightgbm")
+
+    def test_negative_model_type_not_declared(self, monkeypatch: pytest.MonkeyPatch) -> None:
+        rule = ModelsMvpRule(
+            asset_groups=frozenset({"CEFI"}),
+            target_types=frozenset({"swing_high"}),
+            model_types=frozenset({"LIGHTGBM"}),
+        )
+        monkeypatch.setitem(MVP_SCOPE, "models", rule)
+        assert not is_model_mvp("cefi", "BTC", "swing_high", "xgboost")
+
+    def test_asset_axis_narrows_when_declared(self, monkeypatch: pytest.MonkeyPatch) -> None:
+        """A non-empty ``assets`` set gates membership; an undeclared asset is excluded."""
+        rule = ModelsMvpRule(
+            asset_groups=frozenset({"CEFI"}),
+            target_types=frozenset({"swing_high"}),
+            model_types=frozenset({"LIGHTGBM"}),
+            assets=frozenset({"BTC", "ETH"}),
+        )
+        monkeypatch.setitem(MVP_SCOPE, "models", rule)
+        assert is_model_mvp("cefi", "BTC", "swing_high", "lightgbm")
+        assert is_model_mvp("cefi", "ETH", "swing_high", "lightgbm")
+        assert not is_model_mvp("cefi", "SOL", "swing_high", "lightgbm")
+
+    def test_empty_assets_means_every_asset_in_scope(self, monkeypatch: pytest.MonkeyPatch) -> None:
+        """Empty ``assets`` (the default) -> every asset passes for an otherwise
+        in-scope (asset_group, target_type, model_type) triple."""
+        rule = ModelsMvpRule(
+            asset_groups=frozenset({"CEFI"}),
+            target_types=frozenset({"swing_high"}),
+            model_types=frozenset({"LIGHTGBM"}),
+        )
+        monkeypatch.setitem(MVP_SCOPE, "models", rule)
+        for asset in ("BTC", "ETH", "SOL", "DOGE"):
+            assert is_model_mvp("cefi", asset, "swing_high", "lightgbm")
+
+    def test_timeframe_axis_narrows_when_declared(self, monkeypatch: pytest.MonkeyPatch) -> None:
+        rule = ModelsMvpRule(
+            asset_groups=frozenset({"CEFI"}),
+            target_types=frozenset({"swing_high"}),
+            model_types=frozenset({"LIGHTGBM"}),
+            timeframes=frozenset({"1h", "4h"}),
+        )
+        monkeypatch.setitem(MVP_SCOPE, "models", rule)
+        assert is_model_mvp("cefi", "BTC", "swing_high", "lightgbm", "1h")
+        assert is_model_mvp("cefi", "BTC", "swing_high", "lightgbm", "4h")
+        assert not is_model_mvp("cefi", "BTC", "swing_high", "lightgbm", "1d")
+
+    def test_unbound_timeframe_matches_when_declared(self, monkeypatch: pytest.MonkeyPatch) -> None:
+        """A blank/None timeframe means "any MVP timeframe" — mirrors the
+        unbound data_type convention in is_mvp()."""
+        rule = ModelsMvpRule(
+            asset_groups=frozenset({"CEFI"}),
+            target_types=frozenset({"swing_high"}),
+            model_types=frozenset({"LIGHTGBM"}),
+            timeframes=frozenset({"1h"}),
+        )
+        monkeypatch.setitem(MVP_SCOPE, "models", rule)
+        assert is_model_mvp("cefi", "BTC", "swing_high", "lightgbm", None)
+        assert is_model_mvp("cefi", "BTC", "swing_high", "lightgbm", "")
+
+    def test_parsed_generate_model_id_shaped_call(self, monkeypatch: pytest.MonkeyPatch) -> None:
+        """End-to-end shape check: a model_id built the SAME way ml-service's
+        generate_model_id would build it, decomposed the same way
+        parse_model_id would decompose it, round-trips correctly through
+        is_model_mvp. UAC does not import ml-service — this hand-computes the
+        documented format (asset_group/asset/model_type upper, target_type
+        hyphen<->underscore, timeframe passed through) rather than importing
+        it, to prove the CASING CONVENTION documented on ModelsMvpRule matches
+        what ml-service's own scheme actually produces."""
+        asset_group, asset, target_type, model_type, timeframe, version = (
+            "cefi",
+            "BTC",
+            "swing_high",
+            "lightgbm",
+            "1h",
+            1,
+        )
+        # generate_model_id's exact transform (config_schema.py):
+        model_id = (
+            f"{asset_group.upper()}_{asset.upper()}_{target_type.replace('_', '-')}_"
+            f"{model_type.upper()}_{timeframe}_V{version}"
+        )
+        assert model_id == "CEFI_BTC_swing-high_LIGHTGBM_1h_V1"
+        # parse_model_id's exact transform:
+        parts = model_id.split("_")
+        parsed = {
+            "asset_group": parts[0].lower(),
+            "asset": parts[1],
+            "target_type": parts[2].replace("-", "_"),
+            "model_type": parts[3].lower(),
+            "timeframe": parts[4],
+        }
+        assert parsed == {
+            "asset_group": "cefi",
+            "asset": "BTC",
+            "target_type": "swing_high",
+            "model_type": "lightgbm",
+            "timeframe": "1h",
+        }
+        rule = ModelsMvpRule(
+            asset_groups=frozenset({"CEFI"}),
+            target_types=frozenset({"swing_high"}),
+            model_types=frozenset({"LIGHTGBM"}),
+            assets=frozenset({"BTC"}),
+            timeframes=frozenset({"1h"}),
+        )
+        monkeypatch.setitem(MVP_SCOPE, "models", rule)
+        assert is_model_mvp(**parsed)
+
+    def test_monotonicity_narrowing_rule_never_grows_mvp_set(self, monkeypatch: pytest.MonkeyPatch) -> None:
+        """mvp <= could_exist <= all, expressed at the rule-mechanism level (no
+        models data-status consumer exists yet to test scope=mvp|could_exist|all
+        directly — see mvp_scope_catalogue_tagging_2026_06_08.md P2b's follow-up
+        note). For a fixed candidate universe of model identities (the
+        could-exist/all set), the MVP-matching subset can only ever be a SUBSET
+        — narrowing (or emptying) the rule's declared axes can only shrink or
+        preserve that subset, never grow it. Mirrors the monotonicity property
+        deployment-api@3390c98's test_route_venue_year_coverage_scope.py
+        asserts for instruments coverage."""
+        candidates = [
+            ("cefi", "BTC", "swing_high", "lightgbm", "1h"),
+            ("cefi", "ETH", "swing_high", "lightgbm", "1h"),
+            ("cefi", "BTC", "swing_low", "lightgbm", "1h"),
+            ("tradfi", "SPY", "swing_high", "ensemble", "4h"),
+        ]
+        wide_rule = ModelsMvpRule(
+            asset_groups=frozenset({"CEFI", "TRADFI"}),
+            target_types=frozenset({"swing_high", "swing_low"}),
+            model_types=frozenset({"LIGHTGBM", "ENSEMBLE"}),
+        )
+        narrow_rule = ModelsMvpRule(
+            asset_groups=frozenset({"CEFI"}),
+            target_types=frozenset({"swing_high"}),
+            model_types=frozenset({"LIGHTGBM"}),
+        )
+        empty_rule = ModelsMvpRule()
+
+        def _mvp_subset(rule: ModelsMvpRule) -> set[tuple[str, str, str, str, str]]:
+            monkeypatch.setitem(MVP_SCOPE, "models", rule)
+            return {c for c in candidates if is_model_mvp(*c)}
+
+        could_exist = set(candidates)  # the "all"/"could-exist" universe
+        wide_mvp = _mvp_subset(wide_rule)
+        narrow_mvp = _mvp_subset(narrow_rule)
+        empty_mvp = _mvp_subset(empty_rule)
+
+        # mvp <= could_exist for every rule width.
+        assert wide_mvp <= could_exist
+        assert narrow_mvp <= could_exist
+        assert empty_mvp <= could_exist
+        # Narrowing the rule only ever shrinks (or preserves) the MVP set.
+        assert empty_mvp <= narrow_mvp <= wide_mvp
+        assert empty_mvp == set()
+        assert narrow_mvp == {
+            ("cefi", "BTC", "swing_high", "lightgbm", "1h"),
+            ("cefi", "ETH", "swing_high", "lightgbm", "1h"),
+        }
+        assert wide_mvp == could_exist  # every candidate declared -> full coverage

@@ -64,15 +64,20 @@ def _df_cefi_perp_trades() -> pd.DataFrame:
 
 
 def _df_cefi_perp_book_5() -> pd.DataFrame:
-    return pd.DataFrame(
-        {
-            "instrument_id": pd.Series(["BINANCE:PERPETUAL:BTCUSDT"], dtype="string"),
-            "symbol": pd.Series(["BTCUSDT"], dtype="string"),
-            "ts_event": _ts_series(1),
-            "bids": pd.Series(["[[65000.0,1.0]]"], dtype="string"),
-            "asks": pd.Series(["[[65010.0,1.0]]"], dtype="string"),
-        }
-    )
+    # Real Tardis book_snapshot_5 wire shape: 5 flat per-level columns per
+    # side (never a serialised bids/asks string -- see
+    # cefi_book_snapshot5_schema_contract_ts_event_levels_mismatch_2026_07_28.md).
+    data: dict[str, pd.Series] = {
+        "instrument_id": pd.Series(["BINANCE:PERPETUAL:BTCUSDT"], dtype="string"),
+        "symbol": pd.Series(["BTCUSDT"], dtype="string"),
+        "ts_event": _ts_series(1),
+    }
+    for level in range(5):
+        data[f"bids[{level}].price"] = pd.Series([65000.0 - level], dtype="float64")
+        data[f"bids[{level}].amount"] = pd.Series([1.0 + level], dtype="float64")
+        data[f"asks[{level}].price"] = pd.Series([65010.0 + level], dtype="float64")
+        data[f"asks[{level}].amount"] = pd.Series([1.0 + level], dtype="float64")
+    return pd.DataFrame(data)
 
 
 def _df_cefi_options_chain_trades() -> pd.DataFrame:
