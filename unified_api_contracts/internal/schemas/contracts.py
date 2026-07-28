@@ -222,6 +222,28 @@ CEFI_PERPETUAL_TRADES = SchemaContract(
     required_row_count_min=1,
 )
 
+# The real Tardis book_snapshot_5 wire/write format (verified against
+# tardis_csv_transport.py's own pyarrow ConvertOptions and the ONLY real
+# consumer, market-data-processing-service's book_snapshot_adapter.py, which
+# maps these exact column names to ask_price_i/ask_volume_i/bid_price_i/
+# bid_volume_i) is 5 flat per-level columns per side, never a single
+# serialised "bids"/"asks" string -- no writer ever produced that shape and
+# no reader ever consumed it (cefi_book_snapshot5_schema_contract_ts_event_
+# levels_mismatch_2026_07_28.md). Replaces the aspirational single-string
+# ColumnSpec pair that was never implemented, exposed the moment validate=True
+# was flipped on for every CeFi Tardis write site (2026-07-27).
+_BOOK_SNAPSHOT_5_LEVEL_COLUMNS = [
+    ColumnSpec(
+        name=f"{side}[{level}].{field}",
+        dtype="float64",
+        nullable=False,
+        description=f"Level-{level} {side[:-1]} {field} (top-5 book_snapshot_5 depth).",
+    )
+    for side in ("bids", "asks")
+    for level in range(5)
+    for field in ("price", "amount")
+]
+
 CEFI_PERPETUAL_BOOK_SNAPSHOT_5 = SchemaContract(
     asset_group="cefi",
     instrument_type="perpetual",
@@ -230,18 +252,7 @@ CEFI_PERPETUAL_BOOK_SNAPSHOT_5 = SchemaContract(
         _INSTRUMENT_ID,
         _SYMBOL,
         _TS_EVENT,
-        ColumnSpec(
-            name="bids",
-            dtype="string",
-            nullable=False,
-            description="Serialised list of top-5 bid (price, size) levels.",
-        ),
-        ColumnSpec(
-            name="asks",
-            dtype="string",
-            nullable=False,
-            description="Serialised list of top-5 ask (price, size) levels.",
-        ),
+        *_BOOK_SNAPSHOT_5_LEVEL_COLUMNS,
     ],
     symbol_column="symbol",
     required_row_count_min=1,
@@ -307,8 +318,7 @@ CEFI_SPOT_PAIR_BOOK_SNAPSHOT_5 = SchemaContract(
         _INSTRUMENT_ID,
         _SYMBOL,
         _TS_EVENT,
-        ColumnSpec(name="bids", dtype="string", nullable=False),
-        ColumnSpec(name="asks", dtype="string", nullable=False),
+        *_BOOK_SNAPSHOT_5_LEVEL_COLUMNS,
     ],
     symbol_column="symbol",
     required_row_count_min=1,
