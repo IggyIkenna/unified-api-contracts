@@ -390,6 +390,40 @@ ENDPOINT_REGISTRY: list[EndpointSpec] = [
         requires_auth=True,
         cassette_status=CassetteStatus.AUTH_BLOCKED,
     ),
+    # --- Bitfinex ---
+    # F42: BitfinexCeFiAdapter (execution-service bitfinex_native.py) covers both
+    # spot ("EXCHANGE" order type) and margin trading against the same base URL/
+    # endpoint (no separate futures product/domain) — single venue key, like OKX.
+    EndpointSpec(
+        venue="bitfinex",
+        endpoint_path="https://api.bitfinex.com/v2/ticker/{Symbol}",
+        http_method="GET",
+        schema_class="BitfinexTicker",
+        access_mode=AccessMode.REST_POLLING,
+        data_availability=DataAvailability.LIVE_ONLY,
+        version="v2",
+        notes="Public trading pair ticker. No auth required.",
+        requires_auth=False,
+        cassette_status=CassetteStatus.PENDING,
+    ),
+    EndpointSpec(
+        venue="bitfinex",
+        endpoint_path="https://api.bitfinex.com/v2/auth/w/order/submit",
+        http_method="POST",
+        schema_class="BitfinexOrderRequest",
+        access_mode=AccessMode.REST_POLLING,
+        data_availability=DataAvailability.LIVE_ONLY,
+        version="v2",
+        notes=(
+            "Private order submission (spot EXCHANGE + margin, same endpoint). "
+            "Auth: bfx-apikey header + HMAC-SHA384 signature. "
+            "Secret Manager key: bitfinex-api-credentials. "
+            "BitfinexCeFiAdapter.place_order raises NotImplementedError today (HTTP client "
+            "not injected, BLOCKED-CREDENTIALS) — signing is implemented, no order reaches the venue."
+        ),
+        requires_auth=True,
+        cassette_status=CassetteStatus.AUTH_BLOCKED,
+    ),
     # --- Bitget ---
     EndpointSpec(
         venue="bitget",
@@ -470,6 +504,51 @@ ENDPOINT_REGISTRY: list[EndpointSpec] = [
         notes=("Private order. Auth: X-MEXC-APIKEY + HMAC-SHA256 signature. Secret Manager key: mexc-api-credentials."),
         requires_auth=True,
         cassette_status=CassetteStatus.AUTH_BLOCKED,
+    ),
+    # --- Kraken ---
+    # F42: Kraken spot (api.kraken.com) and futures (futures.kraken.com) are separate
+    # domains/API surfaces with their own schemas modules (external/kraken,
+    # external/kraken_futures) — kept as distinct venue keys, unlike OKX's unified API.
+    EndpointSpec(
+        venue="kraken",
+        endpoint_path="https://api.kraken.com/0/public/Ticker",
+        http_method="GET",
+        schema_class="KrakenTickerData",
+        access_mode=AccessMode.REST_POLLING,
+        data_availability=DataAvailability.LIVE_ONLY,
+        version="0",
+        notes="Public spot ticker. No auth required.",
+        requires_auth=False,
+        cassette_status=CassetteStatus.RECORDED,
+    ),
+    EndpointSpec(
+        venue="kraken",
+        endpoint_path="https://api.kraken.com/0/private/AddOrder",
+        http_method="POST",
+        schema_class="KrakenOrderRequest",
+        access_mode=AccessMode.REST_POLLING,
+        data_availability=DataAvailability.LIVE_ONLY,
+        version="0",
+        notes=(
+            "Private spot/margin order submission. Auth: API-Key header + HMAC-SHA512 "
+            "signature (nonce-based). Secret Manager key: kraken-api-credentials. "
+            "KrakenCeFiAdapter.place_order genuinely POSTs (real implementation, not a "
+            "credentials-blocked scaffold)."
+        ),
+        requires_auth=True,
+        cassette_status=CassetteStatus.AUTH_BLOCKED,
+    ),
+    EndpointSpec(
+        venue="kraken_futures",
+        endpoint_path="https://futures.kraken.com/derivatives/api/v3/tickers",
+        http_method="GET",
+        schema_class="KrakenFuturesTicker",
+        access_mode=AccessMode.REST_POLLING,
+        data_availability=DataAvailability.LIVE_ONLY,
+        version="v3",
+        notes="Public futures ticker. No auth required.",
+        requires_auth=False,
+        cassette_status=CassetteStatus.RECORDED,
     ),
     # --- Odds API (v4 endpoint, but data fidelity varies by era) ---
     #
@@ -607,6 +686,25 @@ ENDPOINT_REGISTRY: list[EndpointSpec] = [
             "secType=BAG is IBKR's combination/spread contract type. All spread strategies "
             "(straddles, butterflies, calendar spreads, EFPs) use this. comboLegs define the legs. "
             "Auth via TWS Gateway API key. Secret Manager key: ibkr-api-credentials."
+        ),
+        requires_auth=True,
+        cassette_status=CassetteStatus.NOT_APPLICABLE,
+    ),
+    # --- FX ---
+    # F42: FXAdapter (execution-service fx_adapter.py) is IbkrTradFiAdapter with
+    # venue_name="FX" — OTC forex execution via IBKR IDEALPRO (secType="CASH"), no
+    # dedicated FX vendor endpoint. Market data is Yahoo Finance (separate venue).
+    EndpointSpec(
+        venue="fx",
+        endpoint_path="reqContractDetails(secType=CASH,exchange=IDEALPRO)",
+        http_method="TWS",
+        schema_class="IBKRCashContract",
+        access_mode=AccessMode.STREAMING_WEBSOCKET,
+        data_availability=DataAvailability.LIVE_ONLY,
+        version="tws-api",
+        notes=(
+            "OTC forex spot pairs (e.g. EUR.USD) via IBKR IDEALPRO, secType=CASH — no FUT/OPT "
+            "contracts. Auth via TWS Gateway API key. Secret Manager key: ibkr-api-credentials."
         ),
         requires_auth=True,
         cassette_status=CassetteStatus.NOT_APPLICABLE,

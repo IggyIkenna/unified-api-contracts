@@ -467,6 +467,11 @@ INSTRUMENT_TYPES_BY_VENUE: dict[str, set[str]] = {
     # deregistration rationale + data-safety verification.
     NASDAQ: {"EQUITY", "ETF", "INDEX"},
     NYSE: {"EQUITY", "ETF", "INDEX"},
+    # F42: FX (OTC forex, execution via IBKR IDEALPRO secType=CASH) was in
+    # VENUE_CATEGORY_MAP but missing here. CURRENCY matches the
+    # TRADFI_CASH_TYPE_VALUES cash-instrument convention (tradfi_id_canonicalizer.py)
+    # and the "FX:CURRENCY:KRW"-style ids already persisted for FX rows.
+    "FX": {"CURRENCY"},
     CME: {"FUTURE", "OPTION", "INDEX", "BOND", "EVENT_CONTRACT"},
     CBOT: {"FUTURE", "OPTION", "BOND"},
     NYMEX: {"FUTURE", "OPTION", "COMMODITY"},
