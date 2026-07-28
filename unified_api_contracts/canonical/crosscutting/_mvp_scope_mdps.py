@@ -42,6 +42,7 @@ from unified_api_contracts.canonical.crosscutting._mvp_scope_rules import (
     CeFiMvpRule,
     DeFiMvpRule,
     FeaturesModelsMvpStub,
+    ModelsMvpRule,
     TradFiMvpRule,
 )
 
@@ -83,9 +84,12 @@ def mdps_mvp_universe(asset_group: str) -> frozenset[tuple[str, str]]:
       carve-out cells :data:`_TRADFI_EQUITY_BASIS_VENUES` x
       :data:`_TRADFI_EQUITY_BASIS_TYPES` (the cash equity twins of Binance
       tradfi-perp underliers, hardcoded in ``is_mvp``'s tradfi branch).
-    * **sports / prediction** — no ``instrument_type`` axis at the MDPS grain
-      (sports keys on ``league``; prediction on ``venue x market_group``); MDPS
-      handles market-data AGs only.  Raises :class:`ValueError`.
+    * **sports / prediction / models** — no ``instrument_type`` axis at the
+      MDPS grain (sports keys on ``league``; prediction on
+      ``venue x market_group``; models on the ``generate_model_id`` identity
+      axes — asset_group/asset/target_type/model_type/timeframe, no venue or
+      instrument_type at all). MDPS handles market-data AGs only. Raises
+      :class:`ValueError`.
 
     Args:
         asset_group: Lowercase asset-group key.  Must be one of
@@ -94,11 +98,17 @@ def mdps_mvp_universe(asset_group: str) -> frozenset[tuple[str, str]]:
     Returns:
         Frozenset of canonical ``(venue, instrument_type)`` pairs.  Empty
         frozenset only if *asset_group* names a Phase-2+ stub
-        (``features`` / ``strategy`` / ``models``) that has no rule yet.
+        (``features`` / ``strategy``) that has no rule yet.
 
     Raises:
         ValueError: *asset_group* is unknown, or is ``sports`` / ``prediction``
-            (no ``instrument_type`` axis — MDPS handles market-data AGs only).
+            / ``models`` (no ``instrument_type`` axis — MDPS handles
+            market-data AGs only; ``models`` graduated from the stub to
+            :class:`~unified_api_contracts.canonical.crosscutting._mvp_scope_rules.ModelsMvpRule`
+            in P2b, but that rule's grain is the model_id identity axes, not
+            ``(venue, instrument_type)``, so it is NOT a Phase-2+-stub empty
+            return anymore — it is a real rule with no MDPS-relevant axis,
+            same as sports/prediction).
 
     Example::
 
@@ -121,8 +131,19 @@ def mdps_mvp_universe(asset_group: str) -> frozenset[tuple[str, str]]:
         cells: set[tuple[str, str]] = {(v, it) for v in rule.venues for it in rule.instrument_types}
         cells.update((v, it) for v in _TRADFI_EQUITY_BASIS_VENUES for it in _TRADFI_EQUITY_BASIS_TYPES)
         return frozenset(cells)
-    # SportsMvpRule / PredictionMvpRule — no (venue, instrument_type) axis at
-    # the MDPS grain. MDPS handles market-data AGs only.
+    # SportsMvpRule / PredictionMvpRule / ModelsMvpRule — no
+    # (venue, instrument_type) axis at the MDPS grain. MDPS handles
+    # market-data AGs only. ModelsMvpRule (P2b) is a REAL rule (not a stub)
+    # but its grain is the model_id identity axes, not venue/instrument_type —
+    # same "no MDPS-relevant axis" reasoning as sports/prediction, so it is
+    # explicitly checked here (not just falling through) for a clear error
+    # message rather than relying on isinstance-exclusion silently catching it.
+    if isinstance(rule, ModelsMvpRule):
+        raise ValueError(
+            f"mdps_mvp_universe: asset_group {asset_group!r} has no (venue, instrument_type) axis — "
+            "models are keyed by the generate_model_id identity axes, not venue/instrument_type. "
+            "MDPS handles market-data AGs (cefi/defi/tradfi) only."
+        )
     raise ValueError(
         f"mdps_mvp_universe: asset_group {asset_group!r} has no (venue, instrument_type) axis — "
         "MDPS handles market-data AGs (cefi/defi/tradfi) only."

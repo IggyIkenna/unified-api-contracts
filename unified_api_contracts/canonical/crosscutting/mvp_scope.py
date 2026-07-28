@@ -61,6 +61,7 @@ from unified_api_contracts.canonical.crosscutting._mvp_scope_mdps import (
 from unified_api_contracts.canonical.crosscutting._mvp_scope_predicate import (
     get_mvp_data_types_for_cefi_venue,
     get_mvp_data_types_for_cefi_venue_itype,
+    is_model_mvp,
     is_mvp,
 )
 from unified_api_contracts.canonical.crosscutting._mvp_scope_rules import (
@@ -69,6 +70,7 @@ from unified_api_contracts.canonical.crosscutting._mvp_scope_rules import (
     CeFiMvpRule,
     DeFiMvpRule,
     FeaturesModelsMvpStub,
+    ModelsMvpRule,
     PredictionMvpRule,
     SportsMvpRule,
     TradFiMvpRule,
@@ -88,12 +90,14 @@ __all__ = [
     "ConfigDescriptor",
     "DeFiMvpRule",
     "FeaturesModelsMvpStub",
+    "ModelsMvpRule",
     "PredictionMvpRule",
     "SportsMvpRule",
     "TradFiMvpRule",
     "get_mvp_data_types_for_cefi_venue",
     "get_mvp_data_types_for_cefi_venue_itype",
     "is_in_mvp_capture_universe",
+    "is_model_mvp",
     "is_mvp",
     "mdps_mvp_universe",
     "mvp_scope_config_descriptor",
@@ -115,8 +119,30 @@ _canonical_repr = canonical_config_repr
 # ---------------------------------------------------------------------------
 
 
-MVP_SCOPE_CONFIG_VERSION: Final[int] = 20
+MVP_SCOPE_CONFIG_VERSION: Final[int] = 21
 """Monotonic version of :data:`MVP_SCOPE`. Bump on any content change.
+
+v21 (2026-07-28): ``MVP_SCOPE["models"]`` graduated from the ``FeaturesModelsMvpStub``
+placeholder to a typed :class:`ModelsMvpRule` (P2b —
+mvp_scope_catalogue_tagging_2026_06_08.md, corrected 2026-07-27: the "no stable
+model_id MVP taxonomy" blocker was stale — ``generate_model_id``/``parse_model_id``
+in ``ml-service/ml_service/training/ml/config_schema.py`` already provide a
+stable, versioned identity scheme). New :func:`is_model_mvp` predicate matches on
+the decomposed ``{ASSET_GROUP}_{ASSET}_{TARGET_TYPE}_{MODEL_TYPE}_{TIMEFRAME}_V{N}``
+identity axes — a SEPARATE grain from every other rule above (no venue/
+instrument_type/data_type; UAC never imports ml-service, so callers parse a raw
+model_id string locally and pass the components in). Ships with a CONSERVATIVE
+EMPTY default (every axis frozenset empty, so ``is_model_mvp`` returns ``False``
+for every model_id today) — there is no existing ml-service model-OUTPUT
+tracking/manifest surface to derive an objective default from (unlike DeFi's
+v13 "everything we currently produce" derivation), and concrete membership is a
+genuine Phase-3 operator-policy call, not part of this identity-axis wiring.
+``features``/``strategy`` are UNCHANGED (still ``FeaturesModelsMvpStub`` — P2a,
+a separate dispatch). The data-status coverage CONSUMER for ml-service model
+output (extending the ``scope=mvp|could_exist|all`` pattern from
+``deployment-api@3390c98`` to models) is NOT part of this version bump — no
+model-output manifest/tracking surface exists yet to build a coverage endpoint
+against; tracked as a follow-up in the P2b plan todo, not guessed at here.
 
 v20 (2026-07-21): DERIBIT-COMBO fully deregistered from ``CeFiMvpRule`` (operator
 decision, verbatim: "delete everything to do with deribit combo since it is [a]

@@ -25,6 +25,7 @@ from unified_api_contracts.canonical.crosscutting._mvp_scope_rules import (
     CeFiMvpRule,
     DeFiMvpRule,
     FeaturesModelsMvpStub,
+    ModelsMvpRule,
     PredictionMvpRule,
     SportsMvpRule,
     TradFiMvpRule,
@@ -424,3 +425,91 @@ def is_mvp(
 
     # Unknown rule type — conservative default: not MVP
     return False  # pragma: no cover
+
+
+# ---------------------------------------------------------------------------
+# Models MVP predicate (P2b — mvp_scope_catalogue_tagging_2026_06_08.md)
+# ---------------------------------------------------------------------------
+
+
+def is_model_mvp(
+    asset_group: str,
+    asset: str,
+    target_type: str,
+    model_type: str,
+    timeframe: str | None = None,
+) -> bool:
+    """Return ``True`` iff an ml-service model's identity axes are MVP scope.
+
+    Mirrors :func:`is_mvp`'s per-cell everything-or-nothing pattern, but keyed
+    by the ml-service ``generate_model_id``/``parse_model_id`` identity axes
+    (``asset_group``/``asset``/``target_type``/``model_type``/``timeframe``)
+    instead of the ``(venue, instrument_type, data_type)`` catalogue grain — a
+    model has no venue/instrument_type/data_type axis. See
+    :class:`~unified_api_contracts.canonical.crosscutting._mvp_scope_rules.ModelsMvpRule`
+    for the full grain/casing-convention rationale and why UAC never imports
+    ml-service's ``parse_model_id`` directly (callers parse a raw ``model_id``
+    string LOCALLY and pass the decomposed components here).
+
+    A model identity is MVP iff ALL of the following hold:
+
+    1. ``models`` is declared in :data:`MVP_SCOPE` as a :class:`ModelsMvpRule`
+       (never a :class:`FeaturesModelsMvpStub` — the pre-graduation state).
+    2. ``asset_group`` (UPPERCASE-normalised) is in ``rule.asset_groups``.
+    3. ``target_type`` (lowercase-normalised) is in ``rule.target_types``.
+    4. ``model_type`` (UPPERCASE-normalised) is in ``rule.model_types``.
+    5. If ``rule.assets`` is non-empty, ``asset`` (UPPERCASE-normalised) must
+       be a member. Empty ``rule.assets`` → every asset passes.
+    6. If ``rule.timeframes`` is non-empty, ``timeframe`` (lowercase-
+       normalised) must be a member. Empty ``rule.timeframes`` → every
+       timeframe passes (also true when ``timeframe`` is blank/``None``, the
+       unbound-axis convention mirroring :func:`_data_type_in_rule`).
+
+    Args:
+        asset_group: The model_id's ``ASSET_GROUP`` segment (e.g. ``"cefi"``).
+        asset: The model_id's ``ASSET`` segment (e.g. ``"BTC"``).
+        target_type: The model_id's ``TARGET_TYPE`` segment, underscore form
+            (e.g. ``"swing_high"`` — as returned by ml-service's
+            ``parse_model_id()``, not the hyphenated id-string form).
+        model_type: The model_id's ``MODEL_TYPE`` segment (e.g. ``"lightgbm"``).
+        timeframe: The model_id's ``TIMEFRAME`` segment (e.g. ``"1h"``).
+            Optional — blank/``None`` means "any MVP timeframe" for a caller
+            that only knows the model family, not a specific timeframe.
+
+    Returns:
+        ``True`` if the model identity is within MVP scope; ``False``
+        otherwise (including the current conservative-empty-default state —
+        see :class:`ModelsMvpRule`'s ``TODO(mvp-scope)`` note).
+
+    Example::
+
+        from unified_api_contracts import is_model_mvp
+
+        # Conservative empty default (today): nothing is MVP yet.
+        assert not is_model_mvp("cefi", "BTC", "swing_high", "lightgbm", "1h")
+    """
+    rule = MVP_SCOPE.get("models")
+    if not isinstance(rule, ModelsMvpRule):
+        return False
+    ag = (asset_group or "").strip().upper()
+    if ag not in rule.asset_groups:
+        return False
+    tt = (target_type or "").strip().lower()
+    if tt not in rule.target_types:
+        return False
+    mt = (model_type or "").strip().upper()
+    if mt not in rule.model_types:
+        return False
+    if rule.assets:
+        a = (asset or "").strip().upper()
+        if a not in rule.assets:
+            return False
+    if rule.timeframes:
+        # Unbound-axis convention (mirrors _data_type_in_rule): a blank/None
+        # timeframe means "any MVP timeframe" for a caller that only knows the
+        # model family, not a specific timeframe. Only a NON-blank timeframe
+        # is gated against the declared set.
+        tf = (timeframe or "").strip().lower()
+        if tf and tf not in rule.timeframes:
+            return False
+    return True
