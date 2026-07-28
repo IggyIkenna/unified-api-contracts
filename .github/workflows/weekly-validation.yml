@@ -9,7 +9,7 @@ on:
 jobs:
   validate-schemas:
     name: Validate API schemas against live responses
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, glue]
     timeout-minutes: 15
 
     permissions:
@@ -147,7 +147,7 @@ jobs:
 
   check-footystats-season-drift:
     name: Check FootyStats season ID drift
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, glue]
     timeout-minutes: 10
 
     permissions:
