@@ -335,6 +335,115 @@ def is_recognized_tradfi_underlying(underlying: str) -> bool:
 
 
 # ---------------------------------------------------------------------------
+# Spelled-name -> short-root reverse lookup (naming-convention reconciliation)
+# ---------------------------------------------------------------------------
+# The forward direction (root -> human name) is scattered across three
+# registries with three different punctuation conventions for the SAME root
+# (``HO`` -> ``HEATINGOIL`` in ``EXCHANGE_CODE_TO_NAME``, ``HEATING-OIL`` in
+# ``UNDERLYING_NORMALIZATION``, ``HEATING_OIL`` in ``TRADFI_ROOTS``, and
+# ``HEATINGOIL``/``HO`` as alias keys in ``DATABENTO_VALID_PARENT_SYMBOLS``).
+# TradFi COMBO/futures_chain/options_chain manifest captures sometimes carry
+# an ALREADY-POPULATED ``underlying`` column in one of these spelled-out
+# conventions instead of the catalog's short-root convention — a naming
+# mismatch (not a grain mismatch) that defeats the G1-ENUM present-set
+# rollup's set-difference key match (SSOT:
+# tradfi_combo_underlying_naming_mismatch_blocks_g1_enum_present_rollup_
+# 2026_07_28.md). :func:`resolve_tradfi_underlying_to_root` is the reverse of
+# all three registries, punctuation-normalised so every spelled variant
+# resolves to the same short root code.
+
+_ALIAS_PUNCTUATION_RE: Final[re.Pattern[str]] = re.compile(r"[-_\s]")
+
+
+def _normalize_alias(value: str) -> str:
+    """Upper-case + strip every ``-``/``_``/whitespace so punctuation variants
+    of the same human name (``HEATING-OIL``/``HEATING_OIL``/``HEATINGOIL``)
+    compare equal."""
+    return _ALIAS_PUNCTUATION_RE.sub("", (value or "").strip().upper())
+
+
+@lru_cache(maxsize=1)
+def _underlying_alias_to_root() -> dict[str, str]:
+    """Normalised spelled-name/alias -> short TradFi root code.
+
+    Built from the union of every registry that pairs a root with a
+    human-readable name: ``DATABENTO_VALID_PARENT_SYMBOLS`` (keys are both
+    roots and Databento-validated aliases like ``CRUDE``/``PLATINUM``/
+    ``GOLD``/``SILVER``/``COPPER``; the root is recovered by stripping the
+    ``.FUT``/``.OPT`` suffix off the mapped parent symbol), the reverse of
+    ``EXCHANGE_CODE_TO_NAME``, and the reverse of ``UNDERLYING_NORMALIZATION``
+    (hyphenated forms, e.g. ``HO`` -> ``HEATING-OIL``, ``NG`` -> ``NAT-GAS``).
+    Lazily imports ``UNDERLYING_NORMALIZATION`` to avoid the same import-time
+    cycle :func:`_recognized_tradfi_roots` avoids.
+    """
+    from unified_api_contracts.internal.reference.ticker_registry import UNDERLYING_NORMALIZATION
+
+    mapping: dict[str, str] = {}
+
+    def _add(alias: str, root: str) -> None:
+        key = _normalize_alias(alias)
+        if key:
+            mapping.setdefault(key, root)
+
+    for alias, (parent_symbol, _dataset) in DATABENTO_VALID_PARENT_SYMBOLS.items():
+        root = parent_symbol.split(".", 1)[0]
+        _add(alias, root)
+        _add(root, root)
+    for code, name in EXCHANGE_CODE_TO_NAME.items():
+        _add(code, code)
+        _add(name, code)
+    for code, name in UNDERLYING_NORMALIZATION.items():
+        _add(code, code)
+        _add(name, code)
+    return mapping
+
+
+def resolve_tradfi_underlying_to_root(underlying: str) -> str | None:
+    """Reverse-lookup a spelled-out TradFi ``underlying`` VALUE to its short
+    root code (``"HEATING-OIL"`` -> ``"HO"``, ``"PLATINUM"`` -> ``"PL"``,
+    ``"CRUDE"`` -> ``"CL"``, ``"NAT-GAS-HH"`` -> ``"NG"``).
+
+    Tries, in order:
+
+    1. The whole (punctuation-normalised) string against the union alias map
+       (:func:`_underlying_alias_to_root`) — resolves every plain spelled name
+       (``GOLD``/``SILVER``/``COPPER``/``HEATING-OIL``/``PLATINUM``/``CRUDE``)
+       regardless of which of the three registries' punctuation convention it
+       was written in.
+    2. A progressive right-trim of ``-``-joined tokens, restricted to
+       candidates that still retain AT LEAST 2 tokens — a location/basis
+       suffix (Henry Hub ``-HH``) can be appended to a recognised MULTI-WORD
+       compound name (``NAT-GAS-HH`` -> drop ``HH`` -> ``NAT-GAS``, which
+       normalises to the same key as ``NG``'s ``UNDERLYING_NORMALIZATION``
+       entry). The >=2-token floor deliberately mirrors
+       :func:`is_recognized_tradfi_underlying`'s own restriction of its
+       substring fallback to hyphenated human names: it stops a genuine 2-leg
+       spread (``WTI-BZ`` — a real single-token root ``WTI`` plus a second,
+       unrelated leg ``BZ``) from being misread as "``WTI`` + a droppable
+       suffix" and mis-resolved to a single root.
+
+    Returns ``None`` if neither resolves (an opaque/garbage underlying, or a
+    genuine multi-root spread like ``WTI-BZ`` with no single root) — callers
+    must treat ``None`` as "could not reconcile", never silently drop the
+    original value.
+    """
+    u = (underlying or "").strip().upper()
+    if not u:
+        return None
+    alias_map = _underlying_alias_to_root()
+    key = _normalize_alias(u)
+    if key in alias_map:
+        return alias_map[key]
+    if "-" in u:
+        tokens = u.split("-")
+        for end in range(len(tokens) - 1, 1, -1):
+            candidate = _normalize_alias("-".join(tokens[:end]))
+            if candidate in alias_map:
+                return alias_map[candidate]
+    return None
+
+
+# ---------------------------------------------------------------------------
 # Instrument identity / data-source binding types
 # ---------------------------------------------------------------------------
 

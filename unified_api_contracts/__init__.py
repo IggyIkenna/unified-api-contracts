@@ -1412,6 +1412,9 @@ from .registry import (
 from .registry import (
     is_recognized_tradfi_underlying as is_recognized_tradfi_underlying,
 )
+from .registry import (
+    resolve_tradfi_underlying_to_root as resolve_tradfi_underlying_to_root,
+)
 from .signal_broadcast import (
     COUNTERPARTY_ENTITLEMENTS as COUNTERPARTY_ENTITLEMENTS,
 )
@@ -2392,6 +2395,7 @@ __all__ = [
     "is_replay",
     "linked_question_group",
     "lookup_contract",
+    "resolve_tradfi_underlying_to_root",
     "tracks_equity",
     "matrix_cell_count",
     "next_state",
