@@ -7,10 +7,13 @@ from decimal import Decimal
 import pytest
 
 from unified_api_contracts.registry.perp_funding_cadence import (
+    FUNDING_ACCRUAL_MODEL,
     FUNDING_CADENCE_SECONDS,
     SECONDS_PER_YEAR,
+    FundingAccrualModel,
     annualise_funding_rate_bps,
     cadence_seconds,
+    funding_accrual_model,
     fundings_per_day,
     fundings_per_year,
     is_supported_venue,
@@ -190,6 +193,49 @@ class TestAnnualisation:
         # Forward verification: 0.0001005 x 1095 x 10000 = 1100.475 bps ~= 11.00% APY
         result = annualise_funding_rate_bps(Decimal("0.0001005"), "binance")
         assert Decimal("1100") < result < Decimal("1101")
+
+
+class TestFundingAccrualModel:
+    """Per-venue funding SETTLEMENT MECHANICS classification (DISCRETE vs
+    CONTINUOUS_TIME_WEIGHTED) — see
+    plans/active/issues/perp_funding_data_semantics_and_cadence_2026_06_16.md
+    Finding 4 (DERIBIT) + Finding 5 (EXTENDED-STARKNET) for the evidence trail.
+    """
+
+    def test_every_cadence_venue_has_a_classification(self) -> None:
+        # A venue with a registered cadence but no accrual-model classification
+        # would be a registry bug (the model is meaningless without a cadence,
+        # and every registered cadence venue should be classified one way or
+        # the other — no silent gaps).
+        missing = FUNDING_CADENCE_SECONDS.keys() - FUNDING_ACCRUAL_MODEL.keys()
+        assert not missing, f"Venues with a cadence but no FundingAccrualModel: {missing}"
+
+    def test_deribit_is_the_sole_continuous_time_weighted_venue(self) -> None:
+        # DERIBIT is the confirmed exception (Finding 4): no discrete
+        # fundingTime/nextFundingTime charge instant exists — funding is
+        # computed and transferred continuously. Every OTHER registered venue
+        # is DISCRETE (a genuine charge instant, whether TWAP-then-settled at
+        # 8h/4h like Binance/Bybit/OKX/Aster/Bitget/Bitfinex/Kraken, or
+        # computed-then-settled hourly like Hyperliquid/Lighter/Coinbase/
+        # EXTENDED-STARKNET).
+        continuous = {v for v, m in FUNDING_ACCRUAL_MODEL.items() if m is FundingAccrualModel.CONTINUOUS_TIME_WEIGHTED}
+        assert continuous == {"deribit"}
+
+    def test_funding_accrual_model_deribit(self) -> None:
+        assert funding_accrual_model("deribit") == FundingAccrualModel.CONTINUOUS_TIME_WEIGHTED
+        assert funding_accrual_model("DERIBIT") == FundingAccrualModel.CONTINUOUS_TIME_WEIGHTED
+
+    def test_funding_accrual_model_discrete_venues(self) -> None:
+        for venue in ("binance", "bybit", "okx", "aster", "kraken", "hyperliquid", "coinbase"):
+            assert funding_accrual_model(venue) == FundingAccrualModel.DISCRETE, venue
+
+    def test_gcs_venue_dir_form_resolves(self) -> None:
+        assert funding_accrual_model("BINANCE-FUTURES") == FundingAccrualModel.DISCRETE
+        assert funding_accrual_model("EXTENDED-STARKNET") == FundingAccrualModel.DISCRETE
+
+    def test_unknown_venue_raises(self) -> None:
+        with pytest.raises(KeyError):
+            funding_accrual_model("ftx-rip")
 
 
 class TestIsSupportedVenue:

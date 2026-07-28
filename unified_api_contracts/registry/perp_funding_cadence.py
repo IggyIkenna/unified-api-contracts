@@ -111,6 +111,7 @@ Refs:
 from __future__ import annotations
 
 from decimal import Decimal
+from enum import StrEnum
 from typing import Final
 
 # ── Per-venue funding cadence in seconds ─────────────────────────────────────
@@ -251,11 +252,119 @@ def cadence_seconds(venue: str) -> int:
     return FUNDING_CADENCE_SECONDS[_canonical_venue(venue)]
 
 
+class FundingAccrualModel(StrEnum):
+    """Per-venue perp-funding SETTLEMENT MECHANICS classification — closed set.
+
+    * ``DISCRETE`` — the venue charges funding as a discrete lump-sum event at a
+      fixed settlement instant (its own ``fundingTime``/``nextFundingTime``
+      boundary, whether TWAP-computed over the cadence window like Binance/
+      Bybit/OKX/Aster/Bitget/Bitfinex/Kraken, or computed-then-settled hourly
+      like Hyperliquid/Lighter/Coinbase/EXTENDED-STARKNET). The economically
+      correct accrual over a holding interval is the SUM, over each discrete
+      settlement instant that falls inside the interval, of
+      ``position_size_at_that_instant x rate_at_that_instant``.
+    * ``CONTINUOUS_TIME_WEIGHTED`` — the venue computes AND transfers funding
+      continuously; there is no discrete charge instant to sum over. The
+      economically correct accrual is a TIME-WEIGHTED AVERAGE (integral) of the
+      continuously-observed rate over the actual holding interval:
+      ``integral[entry,exit] position_size(t) x rate(t) dt`` (or, for constant
+      position size, ``position_size x time_weighted_average(rate)``).
+
+    **Evidence-based per venue, not a default assumption** — see
+    ``plans/active/issues/perp_funding_data_semantics_and_cadence_2026_06_16.md``
+    Finding 2 (every ``DISCRETE`` venue's own API exposes a genuine
+    ``fundingTime``/``nextFundingTime`` field Tardis relays) + Finding 4
+    (DERIBIT is the confirmed sole ``CONTINUOUS_TIME_WEIGHTED`` exception: its
+    ticker API exposes only two scalars — ``current_funding``/``funding_8h`` —
+    no next-funding-time field of any kind; its own education docs state
+    funding is "calculated in real time and transferred every few seconds";
+    its ``get_funding_rate_history`` endpoint returns a continuously-evolving
+    rolling figure with no reset pattern at 00:00/08:00/16:00 UTC or any other
+    boundary; a real 55,291-row production sample shows ``funding_rate``
+    changing ~1,454 times across a single day with no discontinuity
+    detectable at any settlement boundary) + Finding 5 (EXTENDED-STARKNET
+    reverse-engineered as ``DISCRETE``: official docs + a real
+    cross-instrument/cross-date production sample confirm a genuine hourly
+    discrete settlement, <=0.95s jitter around exactly 3600s).
+
+    **INFORMATIONAL/documentation-grade today — NOT a computation branch.**
+    The shared, live-wired FUNDING-leg mechanism
+    (:class:`~strategy_service.engine.core.
+    canonical_derivative_ticker_funding_provider.
+    CanonicalDerivativeTickerFundingProvider.day_funding_fraction` ->
+    ``strategy_service.engine.backtest.paper_run_passive.
+    build_paper_run_passive`` / ``paper_run_attribution.
+    build_paper_run_attribution``) already computes a per-day TICK-LEVEL MEAN
+    of the raw captured ``funding_rate`` column and scales it by
+    :func:`fundings_per_day` — this is a discrete Riemann-sum approximation of
+    the time integral that is mathematically correct for BOTH models at the
+    day-accrual granularity the paper/batch determinism spine currently uses:
+    a tick-mean over a ``DISCRETE`` venue's piecewise-constant series
+    approximates the time-weighted average of its (up to N) distinct
+    settlement-cycle levels that day; a tick-mean over a
+    ``CONTINUOUS_TIME_WEIGHTED`` venue's series approximates the true
+    continuous integral directly. So no venue-conditional branch exists (or
+    is needed) in the accrual formula itself today — this classification is a
+    documented SEMANTIC TAG for downstream consumers (reporting/UI, or a
+    future finer-than-day-granularity accrual engine that would need to
+    treat entry/exit mid-cycle differently per model) that want to know which
+    settlement mechanics a venue follows without re-deriving it from cadence +
+    vendor docs each time. See ``codex/09-strategy/architecture-v2/
+    cross-cutting/pnl-attribution.md`` § "Funding Accrual Model" for the full
+    write-up.
+    """
+
+    DISCRETE = "discrete"
+    CONTINUOUS_TIME_WEIGHTED = "continuous_time_weighted"
+
+
+# Evidence-based per-venue classification — see FundingAccrualModel's docstring
+# for the citation trail. Every entry here MUST also exist in
+# FUNDING_CADENCE_SECONDS (a venue's accrual model is meaningless without a
+# registered cadence) — a mismatch would be a registry bug, guarded by a unit
+# test (test_perp_funding_cadence.py::TestFundingAccrualModel).
+#
+# "lighter" is provisionally DISCRETE (grouped with the other confirmed-hourly
+# perp DEXes at registration time) but — unlike deribit/coinbase/
+# extended-starknet — has NOT yet had a dedicated evidence-gathering pass
+# (official docs + real production timestamp analysis) the way those three
+# did; re-verify with the same rigor before leaning on this entry for a
+# high-stakes decision.
+FUNDING_ACCRUAL_MODEL: Final[dict[str, FundingAccrualModel]] = {
+    "binance": FundingAccrualModel.DISCRETE,
+    "bybit": FundingAccrualModel.DISCRETE,
+    "okx": FundingAccrualModel.DISCRETE,
+    "aster": FundingAccrualModel.DISCRETE,
+    "bitget": FundingAccrualModel.DISCRETE,
+    "bitfinex": FundingAccrualModel.DISCRETE,
+    "kraken": FundingAccrualModel.DISCRETE,
+    "deribit": FundingAccrualModel.CONTINUOUS_TIME_WEIGHTED,
+    "coinbase": FundingAccrualModel.DISCRETE,
+    "extended-starknet": FundingAccrualModel.DISCRETE,
+    "hyperliquid": FundingAccrualModel.DISCRETE,
+    "lighter": FundingAccrualModel.DISCRETE,  # provisional — see comment above
+}
+
+
+def funding_accrual_model(venue: str) -> FundingAccrualModel:
+    """The venue's :class:`FundingAccrualModel` (``DISCRETE`` or
+    ``CONTINUOUS_TIME_WEIGHTED``).
+
+    Accepts the bare venue name or the GCS venue-dir form (``BINANCE-FUTURES``).
+    Raises ``KeyError`` if the venue isn't in the registry — caller should have
+    validated venue against :func:`is_supported_venue` already.
+    """
+    return FUNDING_ACCRUAL_MODEL[_canonical_venue(venue)]
+
+
 __all__ = [
+    "FUNDING_ACCRUAL_MODEL",
     "FUNDING_CADENCE_SECONDS",
     "SECONDS_PER_YEAR",
+    "FundingAccrualModel",
     "annualise_funding_rate_bps",
     "cadence_seconds",
+    "funding_accrual_model",
     "fundings_per_day",
     "fundings_per_year",
     "is_supported_venue",
