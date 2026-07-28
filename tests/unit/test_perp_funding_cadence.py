@@ -10,6 +10,7 @@ from unified_api_contracts.registry.perp_funding_cadence import (
     FUNDING_CADENCE_SECONDS,
     SECONDS_PER_YEAR,
     annualise_funding_rate_bps,
+    cadence_seconds,
     fundings_per_day,
     fundings_per_year,
     is_supported_venue,
@@ -70,12 +71,41 @@ class TestFundingsPerYear:
         assert FUNDING_CADENCE_SECONDS["deribit"] == 8 * 3600
         assert fundings_per_year("deribit") == Decimal("1095")
 
+    def test_coinbase_one_hour(self) -> None:
+        # Coinbase (COINBASE-FUTURES / Coinbase International Exchange) funds every
+        # 1h -- confirmed both via official docs (help.coinbase.com/en/derivatives/
+        # perpetual-style-futures/funding-rate) AND empirically 2026-07-28 against
+        # real captured `derivative_ticker.funding_timestamp` (24 distinct values/day,
+        # spaced exactly 3600s apart across 6 spot-checked shards). 1h cadence ->
+        # 24/day x 365 = 8760/year, like Hyperliquid/Lighter.
+        assert FUNDING_CADENCE_SECONDS["coinbase"] == 1 * 3600
+        assert fundings_per_year("coinbase") == Decimal("8760")
+
+    def test_extended_starknet_one_hour(self) -> None:
+        # EXTENDED-STARKNET (StarkNet perp DEX) funds every 1h -- confirmed both
+        # via official docs (docs.extended.exchange/extended-resources/trading/
+        # funding-payments: "charged every hour") AND empirically 2026-07-28
+        # against real captured derivative_ticker shards (24 distinct
+        # settlements/day, cross-instrument-identical timestamps, minute=0 UTC
+        # anchor, <=0.95s jitter). Key form is the FULL compound venue string
+        # ("extended-starknet"), not a bare "extended" -- see module docstring.
+        assert FUNDING_CADENCE_SECONDS["extended-starknet"] == 1 * 3600
+        assert fundings_per_year("EXTENDED-STARKNET") == Decimal("8760")
+        assert is_supported_venue("EXTENDED-STARKNET")
+        # Regression guard for the key-form gotcha: a bare "extended" key would
+        # NOT be found by real callers, which always pass the compound venue
+        # string. Confirm the SHORT form is deliberately absent (never silently
+        # re-added as a second, redundant key that could drift from this one).
+        assert "extended" not in FUNDING_CADENCE_SECONDS
+
     def test_fundings_per_day(self) -> None:
         # SSOT replacement for the deleted UTL FUNDING_PERIODS_PER_DAY dict.
         assert fundings_per_day("binance") == Decimal("3")
         assert fundings_per_day("aster") == Decimal("3")  # 8h, NOT 24
         assert fundings_per_day("deribit") == Decimal("3")  # 8h figure, NOT 24
         assert fundings_per_day("hyperliquid") == Decimal("24")
+        assert fundings_per_day("coinbase") == Decimal("24")  # 1h, like Hyperliquid
+        assert fundings_per_day("EXTENDED-STARKNET") == Decimal("24")  # 1h
         assert fundings_per_day("kraken") == Decimal("6")
 
     def test_case_insensitive_lookup(self) -> None:
@@ -91,10 +121,35 @@ class TestFundingsPerYear:
         assert fundings_per_day("BINANCE-FUTURES") == Decimal("3")
         assert is_supported_venue("OKX-SWAP")
         assert annualise_funding_rate_bps(Decimal("0.0001"), "OKX-SWAP") == Decimal("1095.0000")
+        assert fundings_per_year("COINBASE-FUTURES") == fundings_per_year("coinbase")
+        assert is_supported_venue("COINBASE-FUTURES")
+        # EXTENDED-STARKNET is the key-form exception: its "GCS venue-dir form"
+        # IS its bare canonical venue value (no instrument-type suffix to
+        # strip) -- the registry key must already be the full compound string.
+        assert is_supported_venue("EXTENDED-STARKNET")
+        assert fundings_per_day("EXTENDED-STARKNET") == Decimal("24")
 
     def test_unknown_venue_raises(self) -> None:
         with pytest.raises(KeyError):
             fundings_per_year("ftx-rip")
+
+
+class TestCadenceSeconds:
+    def test_matches_registry_value(self) -> None:
+        assert cadence_seconds("binance") == 8 * 3600
+        assert cadence_seconds("hyperliquid") == 1 * 3600
+        assert cadence_seconds("kraken") == 4 * 3600
+        assert cadence_seconds("deribit") == 8 * 3600
+
+    def test_extended_starknet_gcs_venue_dir_form(self) -> None:
+        assert cadence_seconds("EXTENDED-STARKNET") == 1 * 3600
+
+    def test_case_and_dir_form_insensitive(self) -> None:
+        assert cadence_seconds("BINANCE-FUTURES") == cadence_seconds("binance")
+
+    def test_unknown_venue_raises(self) -> None:
+        with pytest.raises(KeyError):
+            cadence_seconds("ftx-rip")
 
 
 class TestAnnualisation:

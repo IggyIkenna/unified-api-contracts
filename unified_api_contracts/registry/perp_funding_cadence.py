@@ -8,7 +8,61 @@ funding interval:
 
 * 8h period (3 figures/day): Binance, Bybit, OKX, Aster (perp-CCXT), Bitget, Bitfinex
 * 4h period (6 figures/day): Kraken Pro derivatives
-* 1h period (24 figures/day): Hyperliquid, Lighter
+* 1h period (24 figures/day): Hyperliquid, Lighter, Coinbase (COINBASE-FUTURES /
+  Coinbase International Exchange -- official docs confirm hourly settlement;
+  empirically confirmed 2026-07-28 against real captured shards), EXTENDED-STARKNET
+  (see below -- also 1h, confirmed both ways 2026-07-28)
+
+**EXTENDED-STARKNET key form is the FULL compound venue string, not a bare
+short name (codified 2026-07-28).** Every other entry here is either the bare
+exchange name (``binance``, ``deribit``, ``aster``) or resolves to one after
+``_canonical_venue`` strips a registered *instrument-type* suffix
+(``-futures``/``-swap``/``-perpetual``/``-perp``, e.g. ``BINANCE-FUTURES`` ->
+``binance``). EXTENDED-STARKNET's canonical ``venue`` value is ALWAYS the
+compound ``"EXTENDED-STARKNET"`` (GCS venue-dir, ``instrument_id``, the
+adapter's own ``venue`` field literal -- never a bare ``"EXTENDED"`` anywhere
+in the codebase), and ``-STARKNET`` is a CHAIN suffix, not an instrument-type
+one (parallel to LIGHTER-ZKSYNC / PACIFICA-SOLANA's ``<VENUE>-<CHAIN>``
+naming) -- adding it to ``_VENUE_SUFFIXES`` would be semantically wrong (that
+list documents instrument-shape markers, not chain identity). So the registry
+key here is the full lowercased compound string ``"extended-starknet"``;
+registering a bare ``"extended"`` instead would silently make
+``is_supported_venue("EXTENDED-STARKNET")`` return ``False`` for every real
+caller (``perp_funding_rates.py`` / ``perp_funding_rates_defi.py`` /
+``canonical_derivative_ticker_funding_provider.py`` all pass the parsed GCS
+venue-dir string straight through) -- confirmed live in-session
+(``_canonical_venue("EXTENDED-STARKNET") == "extended-starknet"``, no suffix
+stripped). Cadence + mechanism evidence:
+
+* **Official docs** (fetched live 2026-07-28): ``docs.extended.exchange/
+  extended-resources/trading/funding-payments`` -- "funding payments are
+  charged every hour and are applied to all users with open positions at
+  that time"; ``api.docs.extended.exchange`` ``GET /info/{market}/funding``
+  -- "the funding rate is calculated every minute; it is only applied once
+  per hour", and its ``T`` timestamp field is documented as "the timestamp
+  (in epoch milliseconds) when the funding rate was calculated and applied"
+  -- i.e. Extended's own raw ``T`` field IS the charge instant already (no
+  forward-looking-vs-charge-instant offset exists for this venue the way it
+  did for the Tardis bulk-CSV venues -- see
+  ``plans/active/issues/perp_funding_data_semantics_and_cadence_2026_06_16.md``
+  Finding 2 / the ``reprocess_bulk_tardis_derivative_ticker_funding_timestamp_
+  2026_07_28.py`` script this venue was explicitly a no-op case for).
+* **Empirical** (real captured ``derivative_ticker`` shards, both the
+  ``batch_extended`` and the currently-mislabelled ``batch_tardis`` lane --
+  see ``plans/active/issues/onchain_venues_mislabeled_batch_tardis_lane_
+  2026_07_20.md``): every sampled shard carries exactly 24 rows/day; on
+  2026-06-03 every one of AAVE-USD/BTC-USD/ETH-USD/SOL-USD/XRP-USD's 24
+  ``timestamp`` values is IDENTICAL across instruments (a single system-wide
+  settlement batch, not a per-market async job) and lands at ``minute=0`` of
+  every UTC hour with sub-second jitter only (deltas between consecutive
+  settlements cluster tightly around exactly 3600s: observed range
+  [3599.09s, 3600.94s], i.e. <=0.95s jitter -- consistent with "calculated
+  every minute, applied once per hour"). Cross-checked across 2025-07-18
+  (venue funding genesis), 2025-07-20, 2025-08-01, 2026-01-15, 2026-02-15,
+  2026-06-03 -- same 24-rows/day, minute=0 pattern throughout; 2025-07-17
+  (one day pre-genesis) has ZERO objects (honest absence, not a flat/
+  fabricated placeholder). See
+  ``plans/active/issues/perp_funding_data_semantics_and_cadence_2026_06_16.md``.
 
 **Deribit is the one figure-vs-charge exception (codified 2026-06-17).** Deribit
 *charges* funding hourly, but the canonical ``derivative_ticker.funding_rate`` we
@@ -39,7 +93,12 @@ constant — call ``annualise_funding_rate_bps(rate, venue)`` (or
 
 Adding a new venue: pick the period in seconds = the span the venue's PUBLISHED
 funding figure represents (Binance: 8h; Hyperliquid: 1h; Deribit: 8h figure even
-though it charges hourly — see above). Then add a row + a unit test.
+though it charges hourly — see above). Then add a row + a unit test. **Key
+form**: use the bare exchange name UNLESS the venue's canonical ``venue``
+value is itself a compound ``<VENUE>-<CHAIN>`` string that ``_canonical_venue``
+does not otherwise reduce (e.g. EXTENDED-STARKNET, see above) — in that case
+the registry key is the full lowercased compound string, verified via
+``_canonical_venue(<real venue value>)`` BEFORE assuming a short key resolves.
 
 Refs:
 * plans/active/phase5_features_streaming_carry_staked_basis_mvp_2026_05_19.md
@@ -69,6 +128,23 @@ FUNDING_CADENCE_SECONDS: Final[dict[str, int]] = {
     # CeFi — Deribit: CHARGES hourly, but the stored funding_rate is the 8h FIGURE
     # (verified 2026-06-16/17) -> annualise at 8h. Using 1h over-states 8x. See module docstring.
     "deribit": 8 * 3600,
+    # CeFi — Coinbase (COINBASE-FUTURES / Coinbase International Exchange): 1h figure
+    # (24/day). Confirmed BOTH via official docs (help.coinbase.com/en/derivatives/
+    # perpetual-style-futures/funding-rate: "Settlements of Funding happens every hour")
+    # AND empirically against real captured production data (2026-07-28): the
+    # `derivative_ticker.funding_timestamp` column for venue=COINBASE-FUTURES,
+    # day=2026-07-24 shows exactly 24 distinct funding_timestamp values per shard,
+    # each spaced precisely 3600s apart (verified across 6 real shards incl. PENGU-USD,
+    # RED-USD, XRP-USD, POPCAT-USD, SKHY-USD, QQQ-USD -- see
+    # plans/active/issues/perp_funding_data_semantics_and_cadence_2026_06_16.md).
+    "coinbase": 1 * 3600,
+    # EXTENDED-STARKNET (StarkNet perp DEX): 1h figure (24/day). Key is the FULL
+    # compound venue string (not "extended") -- see module docstring for why.
+    # Confirmed via official docs (docs.extended.exchange/extended-resources/
+    # trading/funding-payments: "charged every hour") AND empirically 2026-07-28
+    # (24 distinct settlements/day, cross-instrument-identical, minute=0 UTC
+    # anchor, <=0.95s jitter -- see module docstring for the full evidence).
+    "extended-starknet": 1 * 3600,
     # DeFi — 1h figure (24/day)
     "hyperliquid": 1 * 3600,
     "lighter": 1 * 3600,
@@ -158,10 +234,28 @@ def is_supported_venue(venue: str) -> bool:
     return _canonical_venue(venue) in FUNDING_CADENCE_SECONDS
 
 
+def cadence_seconds(venue: str) -> int:
+    """Whole-second funding cadence for ``venue`` — the single derivation point
+    for "shift a raw timestamp by one cadence period" style corrections (e.g.
+    deriving ``next_funding_timestamp = funding_timestamp + cadence_seconds``,
+    or the Tardis-wire-forward-looking-value fix in
+    ``market-tick-data-service/scripts/one_offs/
+    reprocess_bulk_tardis_derivative_ticker_funding_timestamp_2026_07_28.py``).
+    Every entry in ``FUNDING_CADENCE_SECONDS`` is already a whole number of
+    seconds by construction, so this is just the dict lookup through
+    ``_canonical_venue`` — call it instead of reaching into the dict directly
+    so a future non-integer entry would be a type error at the boundary, not a
+    silent float downstream. Raises ``KeyError`` for an unregistered venue —
+    validate against :func:`is_supported_venue` first.
+    """
+    return FUNDING_CADENCE_SECONDS[_canonical_venue(venue)]
+
+
 __all__ = [
     "FUNDING_CADENCE_SECONDS",
     "SECONDS_PER_YEAR",
     "annualise_funding_rate_bps",
+    "cadence_seconds",
     "fundings_per_day",
     "fundings_per_year",
     "is_supported_venue",
