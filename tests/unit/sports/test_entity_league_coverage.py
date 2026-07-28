@@ -19,9 +19,14 @@ from unified_api_contracts.sports import get_mvp_football_league_ids
 
 class TestAllLeagueEntities:
     """Entities with ``None`` coverage are expected on every fixture date,
-    regardless of league."""
+    regardless of league. FIXTURE_STATS (game results) / FIXTURE_LINEUPS joined
+    this set 2026-07-28 (operator ruling) — results and lineups are needed
+    across the full curated universe, not just MVP/prediction scope, same as
+    INJURIES."""
 
-    @pytest.mark.parametrize("entity", ["FIXTURES", "TEAMS", "STANDINGS", "INJURIES", "MATCHES"])
+    @pytest.mark.parametrize(
+        "entity", ["FIXTURES", "TEAMS", "STANDINGS", "INJURIES", "MATCHES", "FIXTURE_STATS", "FIXTURE_LINEUPS"]
+    )
     def test_none_means_all_leagues_covered(self, entity: str) -> None:
         assert get_entity_league_coverage(entity) is None
 
@@ -32,20 +37,21 @@ class TestAllLeagueEntities:
 
 
 class TestPerFixtureEnrichmentEntitiesMvpScoped:
-    """FIXTURE_STATS/FIXTURE_EVENTS/FIXTURE_LINEUPS/PLAYER_STATS coverage is
-    the MVP league set (96), NOT ``None`` (all leagues) — per-fixture
-    enrichment must not follow the much wider FIXTURES curated-universe
-    denominator (383 leagues) out past MVP/prediction scope. Distinct from
-    TEAMS/STANDINGS/INJURIES above, which are a deliberate all-leagues
-    decision (2026-07-13 fix, see ``sports_reference_core.py`` docstring)."""
+    """FIXTURE_EVENTS/PLAYER_STATS coverage is the MVP league set (96), NOT
+    ``None`` (all leagues) — this per-event/per-player-granularity enrichment
+    must not follow the much wider FIXTURES curated-universe denominator (383
+    leagues) out past MVP/prediction scope. Distinct from FIXTURE_STATS/
+    FIXTURE_LINEUPS (moved to ``TestAllLeagueEntities`` 2026-07-28) and from
+    TEAMS/STANDINGS/INJURIES, which are a deliberate all-leagues decision
+    (2026-07-13 fix, see ``sports_reference_core.py`` docstring)."""
 
-    @pytest.mark.parametrize("entity", ["FIXTURE_STATS", "FIXTURE_EVENTS", "FIXTURE_LINEUPS", "PLAYER_STATS"])
+    @pytest.mark.parametrize("entity", ["FIXTURE_EVENTS", "PLAYER_STATS"])
     def test_coverage_equals_mvp_leagues_not_none(self, entity: str) -> None:
         cov = get_entity_league_coverage(entity)
         assert cov is not None
         assert cov == get_mvp_football_league_ids()
 
-    @pytest.mark.parametrize("entity", ["FIXTURE_STATS", "FIXTURE_EVENTS", "FIXTURE_LINEUPS", "PLAYER_STATS"])
+    @pytest.mark.parametrize("entity", ["FIXTURE_EVENTS", "PLAYER_STATS"])
     def test_widened_curated_universe_only_league_not_covered(self, entity: str) -> None:
         """A league that's in the wider FIXTURES curated universe but NOT
         ``in_mvp_scope`` must be absent from enrichment coverage."""

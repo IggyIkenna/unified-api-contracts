@@ -826,12 +826,16 @@ SPORTS_ENTITY_LEAGUE_COVERAGE: dict[str, frozenset[str] | None] = {
     "TEAMS": None,
     "STANDINGS": None,
     "INJURIES": None,
-    # Per-fixture ENRICHMENT entities — MVP-scoped (operator ruling: enrichment
-    # fan-out must not follow the wider FIXTURES curated-universe expansion,
-    # 96 leagues not 383 — see get_mvp_football_league_ids() docstring).
-    "FIXTURE_STATS": get_mvp_football_league_ids(),
+    # FIXTURE_STATS (game results) / FIXTURE_LINEUPS — all leagues (operator
+    # ruling 2026-07-28): match results and lineups are needed across the full
+    # curated universe, not just MVP/prediction scope, same as INJURIES above.
+    "FIXTURE_STATS": None,
+    "FIXTURE_LINEUPS": None,
+    # FIXTURE_EVENTS / PLAYER_STATS — MVP-scoped (operator ruling: this
+    # per-event/per-player-granularity enrichment fan-out must not follow the
+    # wider FIXTURES curated-universe expansion, 96 leagues not 383 — see
+    # get_mvp_football_league_ids() docstring).
     "FIXTURE_EVENTS": get_mvp_football_league_ids(),
-    "FIXTURE_LINEUPS": get_mvp_football_league_ids(),
     "PLAYER_STATS": get_mvp_football_league_ids(),
     # Enrichment entities — coverage varies by source
     "XG": _UNDERSTAT_LEAGUE_COVERAGE,  # Understat: 5 European leagues

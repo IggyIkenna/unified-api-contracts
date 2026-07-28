@@ -1,7 +1,7 @@
 """League classification raw data - assembler and default registry.
 
 Merges LEAGUE_CLASSIFICATION_DATA_A and LEAGUE_CLASSIFICATION_DATA_B
-into a single LEAGUE_CLASSIFICATION_DATA dict (94 leagues total) and
+into a single LEAGUE_CLASSIFICATION_DATA dict (96 leagues total) and
 builds the DEFAULT_CLASSIFICATION_REGISTRY singleton.
 
 Source: Ported from instruments-service/instruments_service/sports/
