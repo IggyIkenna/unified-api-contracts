@@ -500,7 +500,8 @@ DEFI_VENUE_PHASE: dict[str, str] = {
     #    deliberately left un-enumerated until the curated addresses land) ──
     "IDLE-ARBITRUM": "pipeline",
     # ── Pipeline (Arbitrum lending — not IS-producible) ──
-    # EULER_V2-ARBITRUM + FLUID-ARBITRUM: no UAC subgraph_id registered → 0 captured rows.
+    # EULER_V2-ARBITRUM: euler_v2.py's reference-data adapter is Ethereum-only.
+    # FLUID-ARBITRUM: no UAC subgraph_id registered → 0 captured rows.
     # MORPHO-ARBITRUM: not in IS-producible set despite having rows (not in _build_defi_venues()).
     "EULER_V2-ARBITRUM": "pipeline",
     "MORPHO-ARBITRUM": "pipeline",
