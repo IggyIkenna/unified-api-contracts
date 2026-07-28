@@ -1335,6 +1335,18 @@ class TestAliasHygiene:
         carried = carried_column_names(spec)
         assert {"condition_id", "conditionId", "outcome_index", "outcomeIndex"} <= carried
 
+    def test_prediction_trades_carries_market_question_metadata(self) -> None:
+        """title/slug/event_slug added 2026-07-28 (operator ruling 2026-07-25,
+        prediction_polymarket_legacy_dual_write_trees_metadata_loss_2026_07_24.md)
+        — market-question metadata with no surviving copy elsewhere. Trader-PII
+        fields (proxy_wallet/name/pseudonym/bio/profile_image) stay excluded."""
+        spec = find_schema("prediction", "trades")
+        assert spec is not None
+        carried = carried_column_names(spec)
+        assert {"title", "slug", "event_slug", "eventSlug"} <= carried
+        pii_fields = {"proxy_wallet", "name", "pseudonym", "bio", "profile_image"}
+        assert pii_fields.isdisjoint(carried)
+
 
 class TestSourceColumnCompleteness:
     @pytest.mark.parametrize(
