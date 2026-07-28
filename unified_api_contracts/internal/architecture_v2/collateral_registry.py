@@ -12,6 +12,17 @@ TREASURY_SPLIT_POLICIES are sourced from
 CeFi 0/100, Sports no split). BROKER_REGISTRY remains an honest gap (no TradFi
 broker in the DeFi/CeFi MVP set).
 
+UPDATE (2026-07-28): the 5 perp-CEX venues' ``accepted``/``haircut_pct`` fields
+are no longer a hand-transcribed copy of ``venue_collateral.py`` — they are
+LIVE-DERIVED from it at import time (``_ah_from_venue_collateral``, mirroring
+the fix already shipped for execution-service's ``lst_collateral_resolver.py``
+in the F28 consolidation). This closes the F28-class dual-SSOT risk for good:
+a future ``venue_collateral.py`` haircut change (e.g. a live-probe update) now
+propagates here automatically instead of requiring a second, easy-to-forget
+manual sync commit. Aave/Kamino (LENDING) numerics stay hand-sourced —
+``venue_collateral.py`` carries no LENDING rows for them, so there is no
+duplicate to derive from.
+
 Codex SSOT:
   ``codex/04-architecture/wallet-hierarchy-and-capital-flow.md``
   ``codex/09-strategy/architecture-v2/capability-wizard.md``
@@ -29,6 +40,7 @@ from typing import Final
 from pydantic import BaseModel, ConfigDict, Field
 
 from unified_api_contracts.internal.architecture_v2.enums import MarginMode
+from unified_api_contracts.registry import get_collateral_haircut, venue_accepts_collateral
 
 # ---------------------------------------------------------------------------
 # Enums
@@ -401,10 +413,12 @@ TREASURY_SPLIT_POLICIES: Final[list[TreasurySplitPolicy]] = [
 # COLLATERAL_REGISTRY backfill — MVP venue universe (2026-06-12)
 # ---------------------------------------------------------------------------
 # SOURCE PRIORITY (per the backfill task):
-#   1. IN-REPO SSOTs (transcribed, never re-derived):
-#      - perp haircuts + accept/reject rows:
+#   1. IN-REPO SSOTs:
+#      - perp haircuts + accept/reject rows: LIVE-DERIVED (2026-07-28, see the
+#        module UPDATE note above) from
 #        ``unified_api_contracts/registry/venue_collateral.py`` VENUE_COLLATERAL_MATRIX
-#        (Stream A audit 2026-05-07/08).
+#        (Stream A audit 2026-05-07/08) via ``_ah_from_venue_collateral`` — no longer
+#        a hand-transcribed copy.
 #      - CeFi/on-chain-perp maintenance margin (tier-1 MMR at max leverage):
 #        ``unified_api_contracts/registry/cefi_margin_tiers.py`` CEFI_MARGIN_TIERS
 #        (last revalidated 2026-05-15). maintenance_margin = the tier-1
@@ -453,8 +467,11 @@ _SRC_DERIBIT_DOC = (
     "(stETH 7.5%, eff. 2026-01-13; as_of 2026-06-12)"
 )
 _SRC_KAMINO = (
-    "execution-service execution_service/services/lst_collateral_resolver.py _LST_REGISTRY (KAMINO LST haircut) "
-    "+ https://risk.kamino.finance (per-asset LTV on live dashboard; as_of 2026-06-12)"
+    "Kamino risk dashboard https://risk.kamino.finance (mSOL/JitoSOL 15% haircut, per-asset LTV on live "
+    "dashboard; as_of 2026-06-12). NOTE: originally cross-cited to execution-service's "
+    "lst_collateral_resolver.py _LST_REGISTRY, which was DELETED in the F28 consolidation (2026-06-15) — "
+    "that resolver now derives everything from venue_collateral.py, which carries no Kamino/LENDING rows, so "
+    "this Kamino haircut has no other in-repo source and is NOT auto-derivable like the perp-CEX rows below."
 )
 
 
@@ -480,6 +497,32 @@ def _ah(
     )
 
 
+def _ah_from_venue_collateral(venue_id: str, asset: str, *, src: str = "") -> AssetHaircut:
+    """AssetHaircut LIVE-DERIVED from ``venue_collateral.VENUE_COLLATERAL_MATRIX``.
+
+    Perp-CEX rows used to hand-transcribe this number (see the "TWO-SIDED-AUDIT
+    FINDINGS" note above) — a second, independently-edited copy of the same
+    haircut, kept in sync only by a human remembering to update both files in
+    the same commit. Deriving it here instead closes that F28-class dual-SSOT
+    risk permanently: there is only one number, read fresh at import time, so a
+    future ``venue_collateral.py`` update (e.g. a live-probe haircut change)
+    can never leave this registry silently stale. Mirrors the same fix already
+    shipped for ``execution-service``'s ``lst_collateral_resolver.py``.
+
+    ``get_collateral_haircut`` returns a FRACTION (``0.075`` = 7.5%); this
+    registry's ``AssetHaircut.haircut_pct`` is a WHOLE PERCENT (``7.5``) — the
+    boundary conversion (``* 100``) happens once, here.
+    """
+    accepted = venue_accepts_collateral(venue_id, asset)
+    haircut_fraction = get_collateral_haircut(venue_id, asset) if accepted else None
+    return AssetHaircut(
+        asset=asset,
+        haircut_pct=(haircut_fraction * Decimal("100")) if haircut_fraction is not None else Decimal("0"),
+        accepted=accepted,
+        source_note=src,
+    )
+
+
 #: Per-venue collateral policies. Sourced from the in-repo SSOTs + official
 #: venue/protocol docs cited above. Do NOT invent numbers — any unsourceable
 #: field stays ``None`` with a ``collateral_notes`` line.
@@ -490,12 +533,12 @@ COLLATERAL_REGISTRY: Final[list[CollateralPolicy]] = [
         venue_id="hyperliquid",
         venue_kind=VenueCollateralKind.PERP_CEX,
         accepted_collateral=[
-            _ah("USDC", "0", src=_SRC_VC),
-            _ah("ETH", "0", accepted=False, src=_SRC_VC),
-            _ah("stETH", "0", accepted=False, src=_SRC_VC),
-            _ah("wstETH", "0", accepted=False, src=_SRC_VC),
-            _ah("JitoSOL", "0", accepted=False, src=_SRC_VC),
-            _ah("mSOL", "0", accepted=False, src=_SRC_VC),
+            _ah_from_venue_collateral("hyperliquid", "USDC", src=_SRC_VC),
+            _ah_from_venue_collateral("hyperliquid", "ETH", src=_SRC_VC),
+            _ah_from_venue_collateral("hyperliquid", "stETH", src=_SRC_VC),
+            _ah_from_venue_collateral("hyperliquid", "wstETH", src=_SRC_VC),
+            _ah_from_venue_collateral("hyperliquid", "JitoSOL", src=_SRC_VC),
+            _ah_from_venue_collateral("hyperliquid", "mSOL", src=_SRC_VC),
         ],
         maintenance_margin=Decimal("0.01"),  # tier-1 MMR @ 50x BTC/ETH
         margin_modes=[MarginMode.CROSS, MarginMode.ISOLATED],
@@ -520,11 +563,11 @@ COLLATERAL_REGISTRY: Final[list[CollateralPolicy]] = [
         venue_id="binance",
         venue_kind=VenueCollateralKind.PERP_CEX,
         accepted_collateral=[
-            _ah("USDT", "0", src=_SRC_VC),
-            _ah("BTC", "5", src=_SRC_VC),
-            _ah("ETH", "5", src=_SRC_VC),
-            _ah("stETH", "0", accepted=False, src=_SRC_VC),
-            _ah("wstETH", "0", accepted=False, src=_SRC_VC),
+            _ah_from_venue_collateral("binance", "USDT", src=_SRC_VC),
+            _ah_from_venue_collateral("binance", "BTC", src=_SRC_VC),
+            _ah_from_venue_collateral("binance", "ETH", src=_SRC_VC),
+            _ah_from_venue_collateral("binance", "stETH", src=_SRC_VC),
+            _ah_from_venue_collateral("binance", "wstETH", src=_SRC_VC),
         ],
         maintenance_margin=Decimal("0.004"),  # tier-1 MMR BTC @125x
         margin_modes=[MarginMode.CROSS, MarginMode.ISOLATED],
@@ -541,12 +584,12 @@ COLLATERAL_REGISTRY: Final[list[CollateralPolicy]] = [
         venue_id="bybit",
         venue_kind=VenueCollateralKind.PERP_CEX,
         accepted_collateral=[
-            _ah("USDT", "0", src=_SRC_VC),
-            _ah("BTC", "5", src=_SRC_VC),
-            _ah("stETH", "10", src=_SRC_VC),
-            _ah("wstETH", "10", src=_SRC_VC),
-            _ah("USDe", "5", src=_SRC_VC),
-            _ah("sUSDe", "7", src=_SRC_VC),
+            _ah_from_venue_collateral("bybit", "USDT", src=_SRC_VC),
+            _ah_from_venue_collateral("bybit", "BTC", src=_SRC_VC),
+            _ah_from_venue_collateral("bybit", "stETH", src=_SRC_VC),
+            _ah_from_venue_collateral("bybit", "wstETH", src=_SRC_VC),
+            _ah_from_venue_collateral("bybit", "USDe", src=_SRC_VC),
+            _ah_from_venue_collateral("bybit", "sUSDe", src=_SRC_VC),
         ],
         maintenance_margin=Decimal("0.005"),  # tier-1 MMR BTC @100x
         margin_modes=[MarginMode.CROSS, MarginMode.PORTFOLIO],
@@ -564,13 +607,13 @@ COLLATERAL_REGISTRY: Final[list[CollateralPolicy]] = [
         venue_id="deribit",
         venue_kind=VenueCollateralKind.PERP_CEX,
         accepted_collateral=[
-            _ah("BTC", "0", src=_SRC_VC),
-            _ah("ETH", "0", src=_SRC_VC),
-            _ah("USDC", "2", src=_SRC_VC),
-            _ah("stETH", "7.5", src=_SRC_DERIBIT_DOC),
-            _ah("wstETH", "0", accepted=False, src=_SRC_VC),
-            _ah("weETH", "0", accepted=False, src=_SRC_VC),
-            _ah("rETH", "0", accepted=False, src=_SRC_VC),
+            _ah_from_venue_collateral("deribit", "BTC", src=_SRC_VC),
+            _ah_from_venue_collateral("deribit", "ETH", src=_SRC_VC),
+            _ah_from_venue_collateral("deribit", "USDC", src=_SRC_VC),
+            _ah_from_venue_collateral("deribit", "stETH", src=_SRC_DERIBIT_DOC),
+            _ah_from_venue_collateral("deribit", "wstETH", src=_SRC_VC),
+            _ah_from_venue_collateral("deribit", "weETH", src=_SRC_VC),
+            _ah_from_venue_collateral("deribit", "rETH", src=_SRC_VC),
         ],
         maintenance_margin=Decimal("0.01"),  # tier-1 MMR BTC/ETH @50x
         margin_modes=[MarginMode.PORTFOLIO, MarginMode.CROSS],
@@ -587,12 +630,12 @@ COLLATERAL_REGISTRY: Final[list[CollateralPolicy]] = [
         venue_id="okx",
         venue_kind=VenueCollateralKind.PERP_CEX,
         accepted_collateral=[
-            _ah("USDT", "0", src=_SRC_VC),
-            _ah("BTC", "5", src=_SRC_VC),
-            _ah("ETH", "5", src=_SRC_VC),
-            _ah("wstETH", "10", src=_SRC_VC),
-            _ah("stETH", "0", accepted=False, src=_SRC_VC),
-            _ah("weETH", "0", accepted=False, src=_SRC_VC),
+            _ah_from_venue_collateral("okx", "USDT", src=_SRC_VC),
+            _ah_from_venue_collateral("okx", "BTC", src=_SRC_VC),
+            _ah_from_venue_collateral("okx", "ETH", src=_SRC_VC),
+            _ah_from_venue_collateral("okx", "wstETH", src=_SRC_VC),
+            _ah_from_venue_collateral("okx", "stETH", src=_SRC_VC),
+            _ah_from_venue_collateral("okx", "weETH", src=_SRC_VC),
         ],
         maintenance_margin=Decimal("0.005"),  # tier-1 MMR BTC @100x
         margin_modes=[MarginMode.CROSS, MarginMode.PORTFOLIO],
