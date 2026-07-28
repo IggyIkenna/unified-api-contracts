@@ -262,48 +262,68 @@ VENUE_ORDER_SEMANTICS: Final[list[VenueOrderSemantics]] = [
     # SSOT: unified-trading-pm/codex/04-architecture/solana-defi-coverage.md.
     VenueOrderSemantics(
         venue_id="binance",
-        honored_tif=[],
+        honored_tif=[TimeInForce.GTC, TimeInForce.IOC, TimeInForce.FOK],
         post_only=False,
-        make_take_modes=[],
-        ref_pricing_modes=[],
+        make_take_modes=["make", "take"],
+        ref_pricing_modes=[RefPricingMode.FIXED],
         multi_leg_delta_owner=None,
         atomic_execution_modes=[],
-        auth_wired=CapabilityEdgeStatus.NOT_REGISTERED,
+        auth_wired=CapabilityEdgeStatus.AVAILABLE,
         notes=(
-            "SCAFFOLD — place_order raises NotImplementedError "
-            "(trade_execution/adapters/binance_native.py:326). HMAC-SHA256 signing implemented; "
-            "TIF built into the param body but never sent (HTTP client not injected). "
-            "BLOCKED-CREDENTIALS for live wiring."
+            "FULLY WIRED via CCXT (trade_execution/adapters/binance_ccxt.py:79-113 — real "
+            "exchange.create_market_order/create_limit_order calls, same TIF-sent-only-when-!=GTC "
+            "shape as hyperliquid_ccxt.py; live-routed by factory.py's CCXT_VENUES dispatch). "
+            "CORRECTION 2026-07-28 (cefi_consolidated_native_ao_extract_2026_07_25.md todo 1): this "
+            "entry previously read auth_wired=not_registered / SCAFFOLD, but that described "
+            "binance_native.py (a separate, NOT live-routed direct-REST scaffold — HMAC-SHA256 "
+            "signing implemented, place_order raises NotImplementedError at binance_native.py:326, "
+            "referenced only by its own contract tests, BLOCKED-CREDENTIALS, kept as a parked future "
+            "migration mirroring kraken_rest_adapter.py's live bypass-CCXT pattern) — it never "
+            "described the actually-live CCXT adapter this venue_id resolves to."
         ),
     ),
     VenueOrderSemantics(
         venue_id="bybit",
-        honored_tif=[],
+        honored_tif=[TimeInForce.GTC, TimeInForce.IOC, TimeInForce.FOK],
         post_only=False,
-        make_take_modes=[],
-        ref_pricing_modes=[],
+        make_take_modes=["make", "take"],
+        ref_pricing_modes=[RefPricingMode.FIXED],
         multi_leg_delta_owner=None,
         atomic_execution_modes=[],
-        auth_wired=CapabilityEdgeStatus.NOT_REGISTERED,
+        auth_wired=CapabilityEdgeStatus.AVAILABLE,
         notes=(
-            "SCAFFOLD — all methods raise NotImplementedError "
-            "(trade_execution/adapters/bybit_native.py:318). v5 API signing implemented; "
-            "TIF in request body but not sent. BLOCKED-CREDENTIALS."
+            "FULLY WIRED via CCXT (trade_execution/adapters/bybit_ccxt.py:88-98 — real "
+            "exchange.create_market_order/create_limit_order calls, same TIF-sent-only-when-!=GTC "
+            "shape as hyperliquid_ccxt.py; live-routed by factory.py's CCXT_VENUES dispatch). "
+            "CORRECTION 2026-07-28 (cefi_consolidated_native_ao_extract_2026_07_25.md todo 1): this "
+            "entry previously read auth_wired=not_registered / SCAFFOLD, but that described "
+            "bybit_native.py (a separate, NOT live-routed direct-REST scaffold — v5 API signing "
+            "implemented, all methods raise NotImplementedError at bybit_native.py:318, referenced "
+            "only by its own contract tests, BLOCKED-CREDENTIALS, kept as a parked future migration "
+            "mirroring kraken_rest_adapter.py's live bypass-CCXT pattern) — it never described the "
+            "actually-live CCXT adapter this venue_id resolves to."
         ),
     ),
     VenueOrderSemantics(
         venue_id="okx",
-        honored_tif=[],
+        honored_tif=[TimeInForce.GTC, TimeInForce.IOC, TimeInForce.FOK],
         post_only=False,
-        make_take_modes=[],
-        ref_pricing_modes=[],
+        make_take_modes=["make", "take"],
+        ref_pricing_modes=[RefPricingMode.FIXED],
         multi_leg_delta_owner=None,
         atomic_execution_modes=[],
-        auth_wired=CapabilityEdgeStatus.NOT_REGISTERED,
+        auth_wired=CapabilityEdgeStatus.AVAILABLE,
         notes=(
-            "SCAFFOLD — place_order raises NotImplementedError "
-            "(trade_execution/adapters/okx_native.py:329). TIF passed through but HTTP client "
-            "not injected. BLOCKED-CREDENTIALS."
+            "FULLY WIRED via CCXT (trade_execution/adapters/okx_ccxt.py:75-81 — real "
+            "exchange.create_market_order/create_limit_order calls, same TIF-sent-only-when-!=GTC "
+            "shape as hyperliquid_ccxt.py; live-routed by factory.py's CCXT_VENUES dispatch). "
+            "CORRECTION 2026-07-28 (cefi_consolidated_native_ao_extract_2026_07_25.md todo 1): this "
+            "entry previously read auth_wired=not_registered / SCAFFOLD, but that described "
+            "okx_native.py (a separate, NOT live-routed direct-REST scaffold — signing implemented, "
+            "place_order raises NotImplementedError at okx_native.py:329, referenced only by its own "
+            "contract tests, BLOCKED-CREDENTIALS, kept as a parked future migration mirroring "
+            "kraken_rest_adapter.py's live bypass-CCXT pattern) — it never described the actually-live "
+            "CCXT adapter this venue_id resolves to."
         ),
     ),
     # gmx_v2 VenueOrderSemantics entry removed 2026-07-25 (unreliable historical

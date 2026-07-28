@@ -29,8 +29,13 @@ from unified_api_contracts.internal.architecture_v2.simulation_assumptions impor
 # VENUE_ORDER_SEMANTICS
 # ---------------------------------------------------------------------------
 
-_WIRED_VENUES = {"hyperliquid", "deribit", "aave_v3", "kamino"}  # drift removed 2026-07-16 (Solana perp DEX cull)
-_SCAFFOLD_VENUES = {"binance", "bybit", "okx"}  # gmx_v2 removed 2026-07-25 (unreliable historical funding data)
+# binance/bybit/okx moved SCAFFOLD -> WIRED 2026-07-28 (cefi_consolidated_native_ao_extract_2026_07_25.md
+# todo 1): the prior "not_registered" verdict cited only the parked *_native.py direct-REST scaffolds
+# (BLOCKED-CREDENTIALS, never imported by factory.py) and never checked the actually-live-routed
+# *_ccxt.py adapters, which place real orders via ccxt.create_market_order/create_limit_order — the
+# same wiring shape already declared AVAILABLE for hyperliquid. drift removed 2026-07-16 (Solana perp
+# DEX cull); gmx_v2 removed 2026-07-25 (unreliable historical funding data).
+_WIRED_VENUES = {"hyperliquid", "deribit", "aave_v3", "kamino", "binance", "bybit", "okx"}
 
 
 def _os(venue_id: str):
@@ -48,7 +53,6 @@ def test_order_semantics_is_backfilled_not_empty() -> None:
 def test_order_semantics_covers_mvp_venue_universe() -> None:
     ids = {v.venue_id for v in VENUE_ORDER_SEMANTICS}
     assert _WIRED_VENUES.issubset(ids)
-    assert _SCAFFOLD_VENUES.issubset(ids)
 
 
 def test_every_order_semantics_entry_cites_source() -> None:
@@ -65,23 +69,11 @@ def test_wired_venues_have_available_auth() -> None:
         assert _os(vid).auth_wired == CapabilityEdgeStatus.AVAILABLE
 
 
-def test_scaffold_venues_are_not_registered() -> None:
-    """Scaffold adapters (NotImplementedError) honestly report not_registered auth."""
-    for vid in _SCAFFOLD_VENUES:
-        assert _os(vid).auth_wired == CapabilityEdgeStatus.NOT_REGISTERED
-
-
 def test_wired_clob_venues_honor_tif() -> None:
     """The CLOB perp/options venues that are wired send at least GTC + IOC."""
-    for vid in ("hyperliquid", "deribit"):  # drift removed 2026-07-16 (Solana perp DEX cull)
+    for vid in ("hyperliquid", "deribit", "binance", "bybit", "okx"):  # drift removed 2026-07-16 (Solana perp DEX cull)
         tif = set(_os(vid).honored_tif)
         assert {TimeInForce.GTC, TimeInForce.IOC} <= tif
-
-
-def test_scaffold_venues_honor_no_tif() -> None:
-    """Scaffold adapters never sent TIF (NotImplementedError) → empty honored_tif."""
-    for vid in _SCAFFOLD_VENUES:
-        assert _os(vid).honored_tif == []
 
 
 def test_no_venue_claims_multi_leg_delta_ownership() -> None:
