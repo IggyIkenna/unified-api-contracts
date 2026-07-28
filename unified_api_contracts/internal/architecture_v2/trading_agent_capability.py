@@ -2,9 +2,17 @@
 agent-driven instruction generation, what models are allowed, and what
 parameter-guidance scope the agent has.
 
-STATUS: schema shipped; ``TRADING_AGENT_CAPABILITIES`` is intentionally empty.
-The trading-agent-service ↔ strategy registry link is currently absent — this
-is a ``missing_registry`` gap. The schema is the forcing function.
+STATUS (2026-06-13): ``TRADING_AGENT_CAPABILITIES`` BACKFILLED from a code-scan
+of trading-agent-service — every entry cites its source file:line, nothing
+invented. The service is currently a STUB
+(``core/allocation_directive_loop.py`` emits a no-op
+``ArchetypeAllocationDirective``, source="trading-agent-service-stub") for the
+lead-pair archetypes (``CARRY_STAKED_BASIS``, ``ARBITRAGE_PRICE_DISPERSION``)
+plus ``VOL_TRADING_OPTIONS`` — every entry is honestly ``enabled=False``
+(declared surface, no live agent-driven instruction generation yet). All other
+archetypes are honestly absent (no agent surface). See
+``tests/unit/test_capability_manifest.py::test_trading_agent_capabilities_backfilled``
+for the coverage assertion.
 
 ``StrategyArchetype`` is REUSED from ``architecture_v2.enums``.
 No duplicate definition.
@@ -15,7 +23,7 @@ trading-agent LLM over features (which models permitted, what parameter scope)?"
 Codex SSOT:
   ``codex/09-strategy/architecture-v2/capability-wizard.md``
 Plan:
-  ``plans/active/capability_wizard_and_manifest_2026_06_11.md``
+  ``plans/archive/2026_07/capability_wizard_and_manifest_2026_06_11.md``
   Phase 2 [SPEC] P2.
 """
 
@@ -82,7 +90,7 @@ class TradingAgentCapability(BaseModel):
 
 
 # ---------------------------------------------------------------------------
-# Registry — intentionally empty (honest gap, missing_registry)
+# Registry — backfilled from trading-agent-service code-scan (see STATUS above)
 # ---------------------------------------------------------------------------
 
 #: Per-archetype trading-agent / LLM capability declarations.
