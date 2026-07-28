@@ -40,7 +40,7 @@ Timeframes per category (decided by strategy need):
 
     CeFi       {15s, 1m, 5m, 15m, 1h, 4h, 1d}
     TradFi     {1m, 5m, 15m, 1h, 4h, 1d}              (1m native from Databento)
-    DeFi       {15s, 1m, 5m, 15m, 1h, 1d}
+    DeFi       {15s, 1m, 5m, 15m, 1h, 4h, 1d}
     Sports     {1m, 15m, 1h}
     Prediction {1m, 15m, 1h}
 
