@@ -1,208 +1,50 @@
-# Batch-Live Symmetry Contract
+# Batch-Live Symmetry Contract — unified-api-contracts
 
-**SSOT:** `docs/UAC_FULL_GAP_ANALYSIS_AND_BATCH_LIVE_SYMMETRY.md` §2 + workspace CLAUDE.md `§ Live = batch — same data, same fields, same timing semantics, different sources OK` (codified 2026-05-06).
-**Date:** 2026-03-05; updated 2026-05-06 with post-plan additions.
+> **Canonical SSOT:** [batch-live-architecture.md](../../unified-trading-pm/codex/04-architecture/batch-live-architecture.md).
+> This file carries only the **unified-api-contracts**-specific normalizer/venue mapping. The cross-cutting invariant —
+> live and batch are operational modes of the SAME pipeline (identical schemas, identical `data_types`, identical fields;
+> only the SOURCE per `(asset_group, data_type)` may differ), normalizers are pure functions with no `mode`/`source`
+> branching, and `available_at` is stamped from the `SOURCE_PRIORITY` top entry's live emission time — lives in the codex
+> SSOT above. **Do not duplicate those rules here; if this file disagrees with codex, codex wins.**
 
-**Cross-references**: [`unified-trading-pm/codex/05-infrastructure/deployment-clusters-live-vs-batch.md`](../../unified-trading-pm/codex/05-infrastructure/deployment-clusters-live-vs-batch.md) (taxonomy of live cluster vs batch cluster), [`unified-trading-pm/codex/02-data/availability-manifest-and-data-status.md`](../../unified-trading-pm/codex/02-data/availability-manifest-and-data-status.md) (manifest semantics), [`unified-trading-pm/codex/POST_PLAN_REALITY_2026_05_06.md`](../../unified-trading-pm/codex/POST_PLAN_REALITY_2026_05_06.md).
+## UAC-specific normalizer + symmetry surface
 
----
+### Symmetry helpers (all `symbol`/`side`-setting normalizers MUST use these)
 
-## Core Contract
+| Helper                         | Module                       | Purpose                                                      |
+| ------------------------------ | ---------------------------- | ------------------------------------------------------------ |
+| `normalize_symbol(venue, raw)` | `normalize_utils/symbols.py` | Venue-native symbol → `BASE-QUOTE[-PERP\|-EXPIRY]` canonical |
+| `normalize_side(raw)`          | `normalize_utils/sides.py`   | Any side string/int → `"buy"` or `"sell"`                    |
 
-> **If two raw records represent the same logical event, their normalized canonical output MUST be equal for all shared fields.**
+### Per-venue source mapping (live source ↔ batch source ↔ UAC normalizer)
 
-Normalizers are **pure functions**. No `if mode == "batch"` or `if source == "live"` branching is allowed inside any `normalize/*.py` file. Aggregation, routing, and fan-out are the caller's responsibility.
+| Venue           | Live source                            | Batch source                   | Normalizers                                                                                                           |
+| --------------- | -------------------------------------- | ------------------------------ | --------------------------------------------------------------------------------------------------------------------- |
+| **Binance**     | WebSocket (`@trade`/`@depth`/`@kline`) | Tardis GCS / Databento (OHLCV) | `normalize_binance_{trade,orderbook,ticker,kline}`                                                                    |
+| **Bybit**       | WebSocket (`v5/public`)                | Tardis GCS                     | `normalize_bybit_{trade,orderbook,ticker,kline}`                                                                      |
+| **OKX**         | WebSocket (`ws/v5/public`)             | Tardis GCS                     | `normalize_okx_{trade,orderbook,ticker,kline}`                                                                        |
+| **Deribit**     | WebSocket (`ws/api/v2`)                | Tardis GCS + option quotes     | `normalize_deribit_{trade,orderbook,option_ticker}`, `normalize_tardis_option_quote`                                  |
+| **Coinbase**    | WebSocket (`advanced-trade-ws`)        | — (live-only)                  | `normalize_coinbase_{trade,orderbook,ticker}`                                                                         |
+| **Hyperliquid** | WebSocket (`api.hyperliquid.xyz/ws`)   | — (live-only)                  | `normalize_hyperliquid_{order,fill,ticker,derivative_ticker,orderbook}`                                               |
+| **Tardis**      | — (batch aggregator)                   | replays venue-native format    | `normalize_tardis_{trade,orderbook,option_quote,ws_subscription}` (symbols pass through uppercase, unchanged)         |
+| **Databento**   | — (batch aggregator)                   | CME/CBOT/NYMEX, prices ÷ 1e9   | `normalize_databento_{trade,mbp1_orderbook,mbp10_orderbook,bbo1s_orderbook,ohlcv_bar,option_quote,definition,symbol}` |
 
-**Codified workspace rule (2026-05-06)**: Live and batch are operational modes of the SAME pipeline. They produce identical schemas + identical `data_types` + identical fields. The ONLY thing that legitimately differs is which SOURCE serves a given `(asset_group, data_type)`. Banned anti-patterns:
+Live-only venues (Coinbase, Hyperliquid) have no batch source — parity tests skip them.
 
-- Separate live-only data_types like `LINEUPS_PRE_MATCH` vs `LINEUPS_POST_MATCH` (different temporal envelopes for the same logical event).
-- Distinct field sets between live + batch parquets.
-- Deriving `available_at` at read-time from the live-batch mode flag.
+### Fields allowed to differ live↔batch for the same logical event
 
-Per workspace CLAUDE.md `§ Live = batch`: historical writes MUST be timestamped with the `available_at` we'd actually have in live mode (the `unified_api_contracts.canonical.crosscutting.source_priority.SOURCE_PRIORITY` top entry's emission time, NOT the canonical historical archive's slower archive time).
+`received_at` (ingestion wall-clock — never assert equal), `sequence` (WS-only; batch may be 0/None — skip if None),
+`raw` (not in canonical output), `venue` (case may differ, e.g. live `"binance"` vs Tardis `"BINANCE"` — compare
+lowercase). All other canonical fields (`trade_id`, `price`, `quantity`, `side`, `symbol`, `timestamp`) MUST be equal.
 
----
+### Timestamp handling (UAC normalizers)
 
-## SSOT registries that drive symmetry (post-2026-05-06)
+Nanosecond ts (Databento) ÷ `1_000_000_000`; millisecond ts (Binance/Bybit/OKX) ÷ `1_000`; ISO-8601 via
+`datetime.fromisoformat()`. Always construct with `tzinfo=timezone.utc`; use `datetime.now(timezone.utc)` **only** when
+the raw record carries no timestamp.
 
-These UAC registries enforce the live=batch contract at runtime — consumed by every data-pipeline service:
+### Parity test contract
 
-| Registry                                                                         | Purpose                                                                                                                                                                                                    |
-| -------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `canonical/crosscutting/source_priority.SOURCE_PRIORITY`                         | `(asset_group, data_type) → list[source_key]` — top-entry per pair drives `available_at` stamping latency. Same priority list applies whether the deployment cluster is live or batch.                     |
-| `canonical/crosscutting/availability_semantics.AVAILABILITY_AT_SEMANTICS`        | `(asset_group, data_type)` → semantic enum — drives UTL `availability_stamping.stamp_available_at_*` per row. Same semantic per row in live + batch.                                                       |
-| `canonical/crosscutting/honest_coverage.BUNDLED_DATA_TYPES` + cluster registries | Cluster validation MANDATORY at `ManifestWriter.record_captured` for bundled data*types (options_chain / futures_chain / prediction_canonical_question_group / ODDS*\*). Same enforcement in live + batch. |
-| `canonical/domain/predictions/{canonical_groups,classifiers,lifecycle}`          | Predictions canonical_question_group + lifecycle. Same shape in live + batch.                                                                                                                              |
-| `canonical/domain/sports/MATCH_END_TIME_DETECTORS`                               | Detection cascade for sports `match_end_time`. Same cascade in live + batch.                                                                                                                               |
-
-**Multi-source merge** (Plan D, deferred): when multiple sources serve the same `(asset_group, data_type)`, `SOURCE_PRIORITY` ranks them; per-field provenance tracking via `field_to_source` audit columns; tie-breakers (timestamp-availability > coverage > info-richness > merge-different-fields per user direction 2026-05-06).
-
----
-
-## Per-Venue Source Mapping
-
-### Binance
-
-| Data Type  | Live Source                                                 | Batch Source                   |
-| ---------- | ----------------------------------------------------------- | ------------------------------ |
-| Trades     | WebSocket `wss://stream.binance.com:9443/ws/<symbol>@trade` | Tardis GCS (`tardis/binance/`) |
-| Order Book | WebSocket `@depth` stream                                   | Tardis GCS (`tardis/binance/`) |
-| Ticker     | WebSocket `@ticker` stream                                  | —                              |
-| OHLCV      | WebSocket `@kline_<interval>`                               | Databento / Tardis             |
-
-**Normalizers:** `normalize_binance_trade`, `normalize_binance_orderbook`, `normalize_binance_ticker`, `normalize_binance_kline`
-**Fields that may differ by source:** `received_at` (ingestion timestamp), `sequence` (WS-only); all trade/price/qty/side fields MUST match.
-
----
-
-### Bybit
-
-| Data Type  | Live Source                                       | Batch Source                 |
-| ---------- | ------------------------------------------------- | ---------------------------- |
-| Trades     | WebSocket `wss://stream.bybit.com/v5/public/spot` | Tardis GCS (`tardis/bybit/`) |
-| Order Book | WebSocket `orderbook.<depth>.<symbol>`            | Tardis                       |
-
-**Normalizers:** `normalize_bybit_trade`, `normalize_bybit_orderbook`, `normalize_bybit_ticker`, `normalize_bybit_kline`
-
----
-
-### OKX
-
-| Data Type  | Live Source                                    | Batch Source               |
-| ---------- | ---------------------------------------------- | -------------------------- |
-| Trades     | WebSocket `wss://ws.okx.com:8443/ws/v5/public` | Tardis GCS (`tardis/okx/`) |
-| Order Book | WebSocket `books` channel                      | Tardis                     |
-
-**Normalizers:** `normalize_okx_trade`, `normalize_okx_orderbook`, `normalize_okx_ticker`, `normalize_okx_kline`
-
----
-
-### Deribit
-
-| Data Type  | Live Source                                     | Batch Source                   |
-| ---------- | ----------------------------------------------- | ------------------------------ |
-| Trades     | WebSocket `wss://www.deribit.com/ws/api/v2`     | Tardis GCS (`tardis/deribit/`) |
-| Order Book | WebSocket `book.<instrument_name>.<interval>`   | Tardis                         |
-| Options    | WebSocket `ticker.<instrument_name>.<interval>` | Tardis option quotes           |
-
-**Normalizers:** `normalize_deribit_trade`, `normalize_deribit_orderbook`, `normalize_deribit_option_ticker`, `normalize_tardis_option_quote`
-
----
-
-### Coinbase
-
-| Data Type  | Live Source                                      | Batch Source |
-| ---------- | ------------------------------------------------ | ------------ |
-| Trades     | WebSocket `wss://advanced-trade-ws.coinbase.com` | —            |
-| Order Book | WebSocket `level2` channel                       | —            |
-
-**Normalizers:** `normalize_coinbase_trade`, `normalize_coinbase_orderbook`, `normalize_coinbase_ticker`
-
----
-
-### Hyperliquid
-
-| Data Type | Live Source                                                      | Batch Source |
-| --------- | ---------------------------------------------------------------- | ------------ |
-| Trades    | WebSocket `wss://api.hyperliquid.xyz/ws` (`trades` subscription) | —            |
-| Ticker    | WebSocket `allMids` / `webData2`                                 | —            |
-
-**Normalizers:** `normalize_hyperliquid_order`, `normalize_hyperliquid_fill`, `normalize_hyperliquid_ticker`, `normalize_hyperliquid_derivative_ticker`, `normalize_hyperliquid_orderbook`
-**Gap:** No batch source available for Hyperliquid (live-only venue).
-
----
-
-### Tardis (batch aggregator)
-
-Tardis is a **batch-only** source that replays normalized venue data in original format. Symbol format is venue-native (uppercase, passed through unchanged by `normalize_symbol("tardis", raw)`).
-
-| Data Type       | Schema                 | Normalizer                         |
-| --------------- | ---------------------- | ---------------------------------- |
-| Trade           | `TardisTrade`          | `normalize_tardis_trade`           |
-| Order Book      | `TardisOrderBook`      | `normalize_tardis_orderbook`       |
-| Option Quote    | `TardisOptionQuote`    | `normalize_tardis_option_quote`    |
-| WS Subscription | `TardisWSSubscription` | `normalize_tardis_ws_subscription` |
-
----
-
-### Databento (batch aggregator)
-
-Databento provides normalized CME/CBOT/NYMEX data with fixed-point prices (divide by 1e9).
-
-| Data Type             | Schema                    | Normalizer                                                       |
-| --------------------- | ------------------------- | ---------------------------------------------------------------- |
-| Trade (MBO)           | `DatabentoTrade`          | `normalize_databento_trade` / `normalize_databento_mbo_to_trade` |
-| Order Book (MBP-1)    | `DatabentoMBP1`           | `normalize_databento_mbp1_orderbook`                             |
-| Order Book (MBP-10)   | `DatabentoMBP10`          | `normalize_databento_mbp10_orderbook`                            |
-| Order Book (BBO-1s)   | `DatabentoBBO1s`          | `normalize_databento_bbo1s_orderbook`                            |
-| Order Book (BBO-1m)   | `DatabentoBBO1m`          | `normalize_databento_bbo1m_orderbook`                            |
-| Order Book (TBBO)     | `DatabentoTBBO`           | `normalize_databento_tbbo_orderbook`                             |
-| Order Book (CMBP-1)   | `DatabentoCMBP1`          | `normalize_databento_cmbp1_orderbook`                            |
-| OHLCV Bar             | `DatabentoOHLCVBar`       | `normalize_databento_ohlcv_bar`                                  |
-| Option Quote          | `DatabentoOptionQuote`    | `normalize_databento_option_quote`                               |
-| CME Option Quote      | `DatabentoCMEOptionQuote` | `normalize_databento_cme_option_quote`                           |
-| Instrument Definition | `DatabentoDefinition`     | `normalize_databento_definition`                                 |
-| Symbol Mapping        | `DatabentoSymbolMapping`  | `normalize_databento_symbol`                                     |
-
----
-
-## Per-Normalizer Field Variance
-
-The following fields are **allowed** to differ between live and batch sources for the same logical event:
-
-| Field         | Reason                                                   | Guidance                                |
-| ------------- | -------------------------------------------------------- | --------------------------------------- |
-| `received_at` | Ingestion wall-clock time                                | Never assert equal in parity tests      |
-| `sequence`    | WS-only; batch may be 0 or None                          | Skip if None                            |
-| `raw`         | Original raw payload (optional)                          | Not in canonical output                 |
-| `venue`       | May differ: live=`"binance"`, batch=`"BINANCE"` (Tardis) | Normalize to lowercase before comparing |
-
-All other canonical fields (`trade_id`, `price`, `quantity`, `side`, `symbol`, `timestamp`) MUST be equal for matching logical events.
-
----
-
-## Symmetry Helpers (Phase A)
-
-| Helper                         | Module                 | Purpose                                            |
-| ------------------------------ | ---------------------- | -------------------------------------------------- | --------- |
-| `normalize_symbol(venue, raw)` | `normalize/symbols.py` | Convert venue-native symbol to `BASE-QUOTE[-PERP   | -EXPIRY]` |
-| `normalize_side(raw)`          | `normalize/sides.py`   | Convert any side string/int to `"buy"` or `"sell"` |
-
-All normalizers that set `symbol` or `side` MUST use these helpers. See audit checklist in `UAC_FULL_GAP_ANALYSIS_AND_BATCH_LIVE_SYMMETRY.md` §2.A–C.
-
----
-
-## Timestamp Contract
-
-All normalizers MUST:
-
-1. Accept `timestamp_ms: int | None` or `timestamp_iso: str | None` as override.
-2. Convert the raw timestamp to `datetime` with `tzinfo=timezone.utc`.
-3. Use `datetime.now(timezone.utc)` **only** when the raw record has no timestamp.
-
-Nanosecond timestamps (Databento): divide by `1_000_000_000` to get seconds, then construct UTC datetime.
-Millisecond timestamps (Binance, Bybit, OKX): divide by `1_000`.
-ISO-8601 strings: parse with `datetime.fromisoformat()`, ensure UTC.
-
----
-
-## Parity Test Contract
-
-**File:** `tests/test_batch_live_parity.py`
-
-For each venue pair (live source + batch/Tardis source) with overlapping trade data:
-
-1. Construct equivalent raw records for the same logical event.
-2. Normalize both independently.
-3. Assert equality on: `trade_id`, `price`, `quantity`, `side`, `symbol` (after symbol normalization).
-4. Skip: `received_at`, `sequence`, `venue` (case-insensitive compare allowed).
-
----
-
-## References
-
-- `docs/UAC_FULL_GAP_ANALYSIS_AND_BATCH_LIVE_SYMMETRY.md`
-- `normalize/symbols.py` — symbol normalization SSOT
-- `normalize/sides.py` — side normalization SSOT
-- `tests/test_batch_live_parity.py` — parity tests
-- `unified-trading-codex/04-architecture/batch-live-symmetry.md`
+`tests/test_batch_live_parity.py` — per venue pair with overlapping data: construct equivalent raw records for the same
+logical event, normalize both independently, assert equality on `trade_id`/`price`/`quantity`/`side`/`symbol` (after
+symbol normalization), skip `received_at`/`sequence`/`venue`.
