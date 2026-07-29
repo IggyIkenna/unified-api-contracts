@@ -110,9 +110,10 @@ Refs:
 
 from __future__ import annotations
 
+from datetime import date
 from decimal import Decimal
 from enum import StrEnum
-from typing import Final
+from typing import Final, NamedTuple
 
 # ── Per-venue funding cadence in seconds ─────────────────────────────────────
 # Single SSOT — update here, not in any consumer.
@@ -252,6 +253,79 @@ def cadence_seconds(venue: str) -> int:
     return FUNDING_CADENCE_SECONDS[_canonical_venue(venue)]
 
 
+# ── Historical (versioned-over-time) cadence tracker ─────────────────────────
+# FUNDING_CADENCE_SECONDS above is the CURRENT cadence per venue — it has no
+# memory of a past cadence change (Finding 3,
+# plans/active/issues/perp_funding_data_semantics_and_cadence_2026_06_16.md):
+# a venue that ever shifted its funding interval (e.g. 8h -> 4h) would silently
+# mis-annualise every historical window before the shift, since the static dict
+# only ever reflects "today's" value. FUNDING_CADENCE_HISTORY is the canonical
+# (docs-sourced) fix: one or more ERAS per venue, each with the cadence that
+# applied FROM a given date. The companion GCS-persisted OBSERVED-cadence audit
+# (market-tick-data-service scripts/analysis/measure_perp_funding_cadence_drift)
+# is the INFERRED complement named in the same Finding — it counts real
+# distinct funding_timestamp settlements/day per shard and flags disagreement
+# against whichever era this table says should apply on that date, so a
+# cadence change nobody documented here still gets caught.
+
+
+class FundingCadenceEra(NamedTuple):
+    """One period during which ``cadence_seconds`` applied for a venue.
+
+    ``effective_from=None`` means "since the venue's own funding genesis" (no
+    earlier era exists) — every venue registered today has exactly one such
+    open-started era because none has EVER been observed/documented to change
+    cadence; this is the seed shape a future cadence-change entry would extend.
+    """
+
+    cadence_seconds: int
+    effective_from: date | None
+    source: str
+
+
+# Seeded 1:1 from FUNDING_CADENCE_SECONDS: every currently-registered venue has
+# exactly one open-started era at today's value (no venue has a documented or
+# observed historical cadence change yet). A future change adds a SECOND era
+# with a real ``effective_from`` and keeps the array chronologically ordered;
+# the guard test (test_perp_funding_cadence.py) enforces the invariant that
+# the LATEST era always matches FUNDING_CADENCE_SECONDS[venue].
+FUNDING_CADENCE_HISTORY: Final[dict[str, tuple[FundingCadenceEra, ...]]] = {
+    venue: (FundingCadenceEra(cadence_seconds=seconds, effective_from=None, source="docs"),)
+    for venue, seconds in FUNDING_CADENCE_SECONDS.items()
+}
+
+
+def cadence_seconds_as_of(venue: str, as_of: date) -> int:
+    """Whole-second funding cadence for ``venue`` that applied on ``as_of``.
+
+    Walks ``FUNDING_CADENCE_HISTORY[venue]`` (chronologically ordered) and
+    returns the cadence of the LAST era whose ``effective_from`` is ``None``
+    (open-started) or ``<= as_of``. Use this instead of :func:`cadence_seconds`
+    when annualising a HISTORICAL window rather than "now" — for any venue
+    that has never changed cadence the two are identical by construction.
+    Raises ``KeyError`` for an unregistered venue.
+    """
+    eras = FUNDING_CADENCE_HISTORY[_canonical_venue(venue)]
+    applicable = eras[0].cadence_seconds
+    for era in eras:
+        if era.effective_from is None or era.effective_from <= as_of:
+            applicable = era.cadence_seconds
+        else:
+            break
+    return applicable
+
+
+def fundings_per_day_as_of(venue: str, as_of: date) -> Decimal:
+    """``fundings_per_day`` using the cadence that applied on ``as_of``."""
+    return Decimal(86400) / Decimal(cadence_seconds_as_of(venue, as_of))
+
+
+def annualise_funding_rate_bps_as_of(rate: Decimal, venue: str, as_of: date) -> Decimal:
+    """``annualise_funding_rate_bps`` using the cadence that applied on ``as_of``."""
+    fundings_per_year = Decimal(SECONDS_PER_YEAR) / Decimal(cadence_seconds_as_of(venue, as_of))
+    return rate * fundings_per_year * _BPS_PER_RATE
+
+
 class FundingAccrualModel(StrEnum):
     """Per-venue perp-funding SETTLEMENT MECHANICS classification — closed set.
 
@@ -359,13 +433,18 @@ def funding_accrual_model(venue: str) -> FundingAccrualModel:
 
 __all__ = [
     "FUNDING_ACCRUAL_MODEL",
+    "FUNDING_CADENCE_HISTORY",
     "FUNDING_CADENCE_SECONDS",
     "SECONDS_PER_YEAR",
     "FundingAccrualModel",
+    "FundingCadenceEra",
     "annualise_funding_rate_bps",
+    "annualise_funding_rate_bps_as_of",
     "cadence_seconds",
+    "cadence_seconds_as_of",
     "funding_accrual_model",
     "fundings_per_day",
+    "fundings_per_day_as_of",
     "fundings_per_year",
     "is_supported_venue",
 ]

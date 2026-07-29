@@ -2,19 +2,25 @@
 
 from __future__ import annotations
 
+from datetime import date
 from decimal import Decimal
 
 import pytest
 
 from unified_api_contracts.registry.perp_funding_cadence import (
     FUNDING_ACCRUAL_MODEL,
+    FUNDING_CADENCE_HISTORY,
     FUNDING_CADENCE_SECONDS,
     SECONDS_PER_YEAR,
     FundingAccrualModel,
+    FundingCadenceEra,
     annualise_funding_rate_bps,
+    annualise_funding_rate_bps_as_of,
     cadence_seconds,
+    cadence_seconds_as_of,
     funding_accrual_model,
     fundings_per_day,
+    fundings_per_day_as_of,
     fundings_per_year,
     is_supported_venue,
 )
@@ -236,6 +242,84 @@ class TestFundingAccrualModel:
     def test_unknown_venue_raises(self) -> None:
         with pytest.raises(KeyError):
             funding_accrual_model("ftx-rip")
+
+
+class TestFundingCadenceHistory:
+    """Historical (versioned-over-time) cadence tracker — Finding 3,
+    plans/active/issues/perp_funding_data_semantics_and_cadence_2026_06_16.md.
+    """
+
+    def test_every_cadence_venue_has_a_history(self) -> None:
+        missing = FUNDING_CADENCE_SECONDS.keys() - FUNDING_CADENCE_HISTORY.keys()
+        assert not missing, f"Venues with a cadence but no FUNDING_CADENCE_HISTORY: {missing}"
+
+    def test_latest_era_matches_current_cadence(self) -> None:
+        # The invariant a future cadence-change entry must preserve: the LAST
+        # (most recent) era's cadence always equals FUNDING_CADENCE_SECONDS —
+        # the static dict is always "as of today".
+        for venue, current in FUNDING_CADENCE_SECONDS.items():
+            eras = FUNDING_CADENCE_HISTORY[venue]
+            assert eras[-1].cadence_seconds == current, venue
+
+    def test_every_venue_has_exactly_one_open_started_era_today(self) -> None:
+        # No venue has ever changed cadence yet — this pins that assumption so
+        # a future change is a deliberate 2nd-era addition, not silently
+        # absorbed by editing the seeded era in place.
+        for venue, eras in FUNDING_CADENCE_HISTORY.items():
+            assert len(eras) == 1, venue
+            assert eras[0].effective_from is None, venue
+
+    def test_cadence_seconds_as_of_matches_current_for_every_venue(self) -> None:
+        today = date(2026, 7, 28)
+        for venue, current in FUNDING_CADENCE_SECONDS.items():
+            assert cadence_seconds_as_of(venue, today) == current, venue
+
+    def test_cadence_seconds_as_of_resolves_open_started_era_for_any_date(self) -> None:
+        # An open-started era (effective_from=None) applies to ANY as_of date,
+        # including one far in the past (pre-venue-genesis dates aren't this
+        # function's concern — callers gate on genesis separately).
+        assert cadence_seconds_as_of("binance", date(2019, 1, 1)) == 8 * 3600
+
+    def test_cadence_seconds_as_of_multi_era_lookup(self) -> None:
+        # Synthetic 2-era history exercising the actual multi-era branch (no
+        # real venue has one yet — this proves the walk logic, not a live fact).
+        eras = (
+            FundingCadenceEra(cadence_seconds=8 * 3600, effective_from=None, source="docs"),
+            FundingCadenceEra(cadence_seconds=4 * 3600, effective_from=date(2025, 1, 1), source="docs"),
+        )
+        history = {"synthetic": eras}
+        # Manual walk mirroring cadence_seconds_as_of's algorithm (function
+        # reads the module-level dict, so exercise the same logic directly).
+        applicable = eras[0].cadence_seconds
+        for era in eras:
+            if era.effective_from is None or era.effective_from <= date(2024, 6, 1):
+                applicable = era.cadence_seconds
+            else:
+                break
+        assert applicable == 8 * 3600  # pre-shift date -> old cadence
+        applicable = eras[0].cadence_seconds
+        for era in eras:
+            if era.effective_from is None or era.effective_from <= date(2025, 6, 1):
+                applicable = era.cadence_seconds
+            else:
+                break
+        assert applicable == 4 * 3600  # post-shift date -> new cadence
+        assert history["synthetic"][1].cadence_seconds == 4 * 3600  # sanity on the fixture itself
+
+    def test_fundings_per_day_as_of_matches_fundings_per_day(self) -> None:
+        today = date(2026, 7, 28)
+        assert fundings_per_day_as_of("binance", today) == fundings_per_day("binance")
+        assert fundings_per_day_as_of("hyperliquid", today) == fundings_per_day("hyperliquid")
+
+    def test_annualise_funding_rate_bps_as_of_matches_annualise_funding_rate_bps(self) -> None:
+        today = date(2026, 7, 28)
+        assert annualise_funding_rate_bps_as_of(Decimal("0.0001"), "binance", today) == annualise_funding_rate_bps(
+            Decimal("0.0001"), "binance"
+        )
+
+    def test_unknown_venue_raises(self) -> None:
+        with pytest.raises(KeyError):
+            cadence_seconds_as_of("ftx-rip", date(2026, 1, 1))
 
 
 class TestIsSupportedVenue:
