@@ -258,8 +258,9 @@ def test_cme_fx_future_classifies_with_third_wednesday_expiry(
 def test_calendar_spread_6ah5_6am4_classifies_combo() -> None:
     cls = classify_databento_symbol("6AH5-6AM4")
     assert cls.instrument_type is InstrumentType.COMBO
-    # Shared root (``6A``) normalised to the human-readable AUDUSD.
-    assert cls.underlying == "AUDUSD"
+    # Shared root stays the raw code (``6A``) — matches the catalog's
+    # short-root convention, no human-readable normalisation for combos.
+    assert cls.underlying == "6A"
     assert cls.is_continuous is False
     # Near-leg expiry = earliest of the two legs.
     # 6AH5 → 2025-03-19, 6AM4 → 2024-06-19 → min = 2024-06-19.
@@ -276,8 +277,8 @@ def test_calendar_spread_6ah5_6am4_classifies_combo() -> None:
 def test_calendar_spread_esm4_esu4_classifies_combo() -> None:
     cls = classify_databento_symbol("ESM4-ESU4")
     assert cls.instrument_type is InstrumentType.COMBO
-    # ES normalises to the readable SP500.
-    assert cls.underlying == "SP500"
+    # Shared root stays the raw code — no human-readable normalisation for combos.
+    assert cls.underlying == "ES"
     assert cls.leg_symbols == ("ESM4", "ESU4")
     assert cls.combo_strategy is ComboStrategyType.CALENDAR
     # ESM4 → 2024-06-21 (third Friday), ESU4 → 2024-09-20, min = June.
@@ -288,7 +289,7 @@ def test_three_leg_butterfly_from_dashes() -> None:
     # ESH5-ESM5-ESU5 — 3 legs same underlying → inferred BUTTERFLY.
     cls = classify_databento_symbol("ESH5-ESM5-ESU5")
     assert cls.instrument_type is InstrumentType.COMBO
-    assert cls.underlying == "SP500"
+    assert cls.underlying == "ES"
     assert cls.leg_symbols == ("ESH5", "ESM5", "ESU5")
     assert cls.combo_strategy is ComboStrategyType.BUTTERFLY
     assert len(cls.expiries) == 3
@@ -297,7 +298,7 @@ def test_three_leg_butterfly_from_dashes() -> None:
 def test_four_leg_iron_condor_from_dashes() -> None:
     cls = classify_databento_symbol("ESH5-ESM5-ESU5-ESZ5")
     assert cls.instrument_type is InstrumentType.COMBO
-    assert cls.underlying == "SP500"
+    assert cls.underlying == "ES"
     assert len(cls.leg_symbols or ()) == 4
     assert cls.combo_strategy is ComboStrategyType.IRON_CONDOR
 
@@ -306,7 +307,7 @@ def test_prefix_butterfly_expands_legs() -> None:
     # ``ES:BF U4-V4-X4`` — prefix + shared-root shorthand.
     cls = classify_databento_symbol("ES:BF U4-V4-X4")
     assert cls.instrument_type is InstrumentType.COMBO
-    assert cls.underlying == "SP500"
+    assert cls.underlying == "ES"
     assert cls.combo_strategy is ComboStrategyType.BUTTERFLY
     assert cls.leg_symbols == ("ESU4", "ESV4", "ESX4")
     assert len(cls.expiries) == 3
@@ -464,19 +465,22 @@ def test_cboe_user_defined_strategy_classifies_custom_combo() -> None:
 
 def test_cboe_user_defined_strategy_root_qualified_recovers_real_root() -> None:
     # Root-qualified UD (UD:ZN:/UD:ZF:/UD:ZT:) carries a RECOVERABLE real root in the
-    # qualifier — normalised (ZN → UST-10Y), NOT the opaque leg code ``TL`` (category D
-    # forward recovery — tradfi_canonical_path_migration_design_2026_07_19.md).
+    # qualifier — kept AS-IS (``ZN``, the short root code), NOT the opaque leg code
+    # ``TL`` (category D forward recovery —
+    # tradfi_canonical_path_migration_design_2026_07_19.md), and NOT normalised to a
+    # human-readable name (tradfi_combo_underlying_naming_mismatch_blocks_g1_enum_
+    # present_rollup_2026_07_28.md).
     cls = classify_databento_symbol("UD:ZN: TL 0219823765")
     assert cls.instrument_type is InstrumentType.COMBO
     assert cls.combo_strategy is ComboStrategyType.CUSTOM
-    assert cls.underlying == "UST-10Y"
+    assert cls.underlying == "ZN"
     assert cls.multileg is not None
-    assert cls.multileg.underlying == "UST-10Y"
+    assert cls.multileg.underlying == "ZN"
 
 
 def test_cboe_user_defined_strategy_root_qualified_zt() -> None:
     cls = classify_databento_symbol("UD:ZT: TL 0201003002")
-    assert cls.underlying == "UST-2Y"
+    assert cls.underlying == "ZT"
 
 
 # ---------------------------------------------------------------------------
@@ -499,10 +503,10 @@ def test_diagonal_option_spread_different_expiry() -> None:
 
 
 def test_multi_underlying_combo_joins_roots() -> None:
-    # Two futures, different underlyings → joined, normalised underlying string.
+    # Two futures, different underlyings → joined, raw (unnormalised) root string.
     cls = classify_databento_symbol("ESM4-NQM4")
     assert cls.instrument_type is InstrumentType.COMBO
-    assert "-" in cls.underlying  # SP500-NASDAQ100 form
+    assert cls.underlying == "ES-NQ"
     assert cls.combo_strategy is ComboStrategyType.SPREAD
 
 

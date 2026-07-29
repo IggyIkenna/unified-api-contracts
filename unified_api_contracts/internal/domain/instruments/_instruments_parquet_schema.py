@@ -208,6 +208,19 @@ INSTRUMENTS_PARQUET_SCHEMA: list[dict[str, str | bool]] = [
         "description": "Human-readable market question/title (prediction markets). None if adapter resolves none.",
     },
     {
+        # prediction_satellite_ao_dispatch_batch5_2026_07_26.md todo 2 ("249-b"): a
+        # write-back of the CanonicalQuestionGroup.value the adapter already computed
+        # via classify_{polymarket,kalshi}_to_canonical_group() at InstrumentRecord-
+        # construction time. Aligned 1:1 with InstrumentRecord.canonical_question_group.
+        # Additive + nullable (non-breaking) — None for every non-PREDICTION instrument.
+        "name": "canonical_question_group",
+        "type": "string",
+        "required": False,
+        "nullable": True,
+        "description": "PREDICTION-only: canonical question-group classification (already computed by the "
+        "adapter). None otherwise.",
+    },
+    {
         "name": "min_size",
         "type": "string",
         "required": False,

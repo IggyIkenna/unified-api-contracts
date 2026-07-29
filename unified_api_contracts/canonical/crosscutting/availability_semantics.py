@@ -117,7 +117,8 @@ AVAILABILITY_AT_SEMANTICS: Final[dict[tuple[str, str], AvailabilitySemantic]] = 
     ("cefi", "ohlcv_1m"): "tick_timestamp",
     # ("cefi", "ohlcv_15m") RETIRED 2026-06-09 (operator-directed): cefi has no 15m candles.
     # tradfi ohlcv_15m at line ~181 is intact.
-    ("cefi", "book_snapshot"): "tick_timestamp",
+    ("cefi", "book_snapshot"): "tick_timestamp",  # legacy bare alias, see _source_priority_data.py
+    ("cefi", "book_snapshot_5"): "tick_timestamp",  # canonical cefi depth data_type
     ("cefi", "liquidations"): "tick_timestamp",
     # derivative_ticker — perp mark/index/OI/funding tick (tardis archive + the Aster
     # self-archived shard). available_at = the tick's own settlement/observation

@@ -187,6 +187,32 @@ VENUE_TO_ADAPTER_KEY: dict[str, str] = {
     # Sports — IS-owned reference providers with URDI adapters.
     "BETFAIR": "betfair",
     "API_FOOTBALL": "api_football",
+    # Sports enrichment providers — sentineled 2026-07-29 (initially mis-registered as real
+    # keys, corrected same-day; see sports_stats_delayed_live_capture_still_dead_post_fix_
+    # 2026_07_29.md). These 5 DO have working adapter classes, but in a SEPARATE
+    # sports-only sub-factory (reference_data/adapters/sports/factory.py::_ADAPTERS,
+    # base class BaseSportsReferenceAdapter — fixture/league/team/odds-shaped methods)
+    # that is architecturally distinct from THIS registry's master factory
+    # (reference_data/factory.py::_ADAPTERS, base class BaseReferenceDataAdapter — generic
+    # get_instruments()). get_adapter_for_canonical_venue() (what a real key here resolves
+    # through) only knows the MASTER factory, so a real key pointing at e.g. "understat"
+    # would raise ValueError (unresolvable class) the moment urdi_reference_provider.py
+    # tried to instantiate it. NO_ADAPTER_YET is the honest, correct declaration: these
+    # venues are never meant to flow through the generic URDI/master-factory instrument-
+    # listing path at all — real capture happens entirely through the sports orchestrator's
+    # own per-fixture entity-scoped dispatch (sports_fixtures.py), which calls the sports
+    # sub-factory directly. NOTE: registering the sentinel here does NOT by itself silence
+    # the "No URDI adapter for N venue(s)" warning in production (both a missing key and
+    # NO_ADAPTER_YET land in the same unsupported-venue bucket in
+    # urdi_reference_provider.fetch_instruments_for_all_venues) — WHY these 5 enrichment-
+    # provider names appear in that function's venues list at all (they aren't even in
+    # VENUES_BY_ASSET_GROUP["sports"]) is a separate, still-open trace, tracked as a
+    # follow-up todo in the issue doc above.
+    "UNDERSTAT": NO_ADAPTER_YET,
+    "FOOTYSTATS": NO_ADAPTER_YET,
+    "TRANSFERMARKT": NO_ADAPTER_YET,
+    "SOCCER_FOOTBALL_INFO": NO_ADAPTER_YET,
+    "OPEN_METEO": NO_ADAPTER_YET,
     # Sports — MTDS-owned odds venues (registry-consolidation Decision C,
     # 2026-06-29: two separate registries; odds/bookmaker market data is
     # captured by MTDS, so IS has no reference adapter for them).

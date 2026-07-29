@@ -207,8 +207,10 @@ def _classify_databento_combo(symbol: str, asset_class_hint: str | None) -> Data
         globex_code = ud_match.group(2)  # opaque CBOE globex GROUP/leg code (``GN``/``TL``/``12``)
         strategy_id = ud_match.group(3)
         # Root-qualified UD (``UD:ZN: TL <id>``) carries a RECOVERABLE real product
-        # root in the qualifier — normalise it (``ZN`` → ``UST-10Y``, consistent with
-        # ``_shared_underlying``) and use it as the combo underlying so the row bundles
+        # root in the qualifier — keep it AS-IS (``ZN``, the short root code, matching
+        # ``_shared_underlying`` and the catalog's own short-root convention — see
+        # tradfi_combo_underlying_naming_mismatch_blocks_g1_enum_present_rollup_
+        # 2026_07_28.md) and use it as the combo underlying so the row bundles
         # under the real root. Version-qualified UD (``UD:1V: GN <id>``) has ONLY the
         # opaque globex GROUP code (``GN``) — an UNRECOVERABLE product root — so it
         # stays as the underlying and is quarantined downstream (the write-time guard
@@ -232,7 +234,17 @@ def _classify_databento_combo(symbol: str, asset_class_hint: str | None) -> Data
         # numeric-or-opaque underlying as defense-in-depth (mtds@f645ea02,
         # uac@7e179ae8). No new writer regresses this: a fresh combo can only reach
         # GCS with a recognized root or be dropped/quarantined.
-        recovered_root = UNDERLYING_NORMALIZATION.get(qualifier)
+        #
+        # NAMING-CONVENTION FIX (2026-07-28, tradfi_combo_underlying_naming_mismatch_
+        # blocks_g1_enum_present_rollup_2026_07_28.md): this used to resolve through
+        # ``UNDERLYING_NORMALIZATION.get(qualifier)`` and store the SPELLED-OUT human
+        # name (``UST-10Y``) as the combo underlying. That diverged from the catalog's
+        # own short-root convention (the enumerator's present-set seed expects ``ZN``,
+        # not ``UST-10Y``) and from the OTHER combo-classification branches below
+        # (prefix-annotated / continuous-contract combos), which already kept the raw
+        # root — the dict lookup here now only serves as an is-a-known-root MEMBERSHIP
+        # check; the qualifier itself (already the short root) is what gets stored.
+        recovered_root = qualifier if qualifier in UNDERLYING_NORMALIZATION else None
         ud_underlying = recovered_root if recovered_root is not None else globex_code
         leg = ComboLeg(
             instrument_id=f"CBOE:UD:{qualifier}:{globex_code}:{strategy_id}",
@@ -663,21 +675,28 @@ def _infer_combo_strategy_from_legs(leg_cls: tuple[DatabentoClassification, ...]
 def _shared_underlying(leg_cls: tuple[DatabentoClassification, ...]) -> str:
     """Return the shared underlying across legs, or ``-``-joined form.
 
-    Human-readable via :func:`normalize_underlying` when the shared root
-    is a known CME/ICE futures code (e.g. ``ES`` → ``SP500``).
+    Returns the RAW root/underlying code (e.g. ``ES``, ``HO`` — never a
+    human-readable name). This matches :class:`DatabentoClassification`'s
+    own documented contract for ``underlying`` ("the shared root across all
+    legs") and the sibling combo-classification branches (prefix-annotated /
+    continuous-contract combos, above), which already preserve the raw root.
+
+    Previously this normalised a single shared root via
+    :data:`UNDERLYING_NORMALIZATION` (``ES`` → ``SP500``) for
+    "human-readability" — that diverged from the catalog's own short-root
+    convention for COMBO captures and broke the G1-ENUM present-set seed
+    match (SSOT: tradfi_combo_underlying_naming_mismatch_blocks_g1_enum_
+    present_rollup_2026_07_28.md). Any caller that wants the human-readable
+    display form should apply :data:`UNDERLYING_NORMALIZATION` itself.
     """
     unders = {leg.underlying for leg in leg_cls}
     if len(unders) == 1:
-        raw = next(iter(unders))
-        if raw in UNDERLYING_NORMALIZATION:
-            return UNDERLYING_NORMALIZATION[raw]
-        return raw
-    # Multi-underlying combo — join unique roots, normalising known codes.
-    normalized = [UNDERLYING_NORMALIZATION.get(leg.underlying, leg.underlying) for leg in leg_cls]
+        return next(iter(unders))
+    # Multi-underlying combo — join unique raw roots in leg order.
     seen: list[str] = []
-    for name in normalized:
-        if name not in seen:
-            seen.append(name)
+    for leg in leg_cls:
+        if leg.underlying not in seen:
+            seen.append(leg.underlying)
     return "-".join(seen)
 
 

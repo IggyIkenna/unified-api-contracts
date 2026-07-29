@@ -3,8 +3,8 @@ name: publish-package
 # Per-repo workflow: triggers PM's publish-package reusable workflow on push to main.
 # Dispatches to unified-trading-pm with repo name, version, and commit SHA.
 #
-# CANONICAL SOURCE: unified-trading-pm/scripts/propagation/templates/publish-package.yml
-# Do NOT hand-edit this copy — edit the template and re-`cp` it here.
+# To install in a library repo:
+#   cp this file to .github/workflows/publish-package.yml
 #
 # Prerequisites:
 #   - GH_PAT secret with repo dispatch permissions
@@ -19,7 +19,7 @@ permissions:
 
 jobs:
   dispatch-publish:
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, glue]
     if: "!contains(github.event.head_commit.message, '[skip ci]')"
     steps:
       - name: Checkout

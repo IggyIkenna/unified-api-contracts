@@ -64,6 +64,7 @@ def test_cefi_builder_output_is_canonical() -> None:
         data_type="derivative_ticker",
         day=_DAY,
         file_name="BINANCE:PERPETUAL:BTC-USDT.parquet",
+        pipeline_mode="batch_tardis",
     )
     assert is_canonical(path), canonical_path_violations(path)
 
@@ -71,16 +72,19 @@ def test_cefi_builder_output_is_canonical() -> None:
 def test_tradfi_builder_output_is_canonical() -> None:
     # Single-instrument shard: canonical filename is the FULL instrument_id
     # (the v6 tradfi rules reject a bare-symbol / ticks.parquet single).
-    for pipeline_mode in (None, "batch_databento"):
-        single = build_tradfi_partition_path(
-            venue="NYSE",
-            instrument_type=InstrumentType.EQUITY,
-            data_type="ohlcv_1m",
-            day=_DAY,
-            file_name="NYSE:EQUITY:ABBV-USD.parquet",
-            pipeline_mode=pipeline_mode,
-        )
-        assert is_canonical(single), canonical_path_violations(single)
+    # pipeline_mode is REQUIRED as of the 2026-07-29 write-side footgun fix —
+    # the old bare (pipeline_mode=None) round-trip case is no longer
+    # producible by the builder (is_canonical() itself still ACCEPTS a bare
+    # path by default; that's a validator/reader concern, not a builder one).
+    single = build_tradfi_partition_path(
+        venue="NYSE",
+        instrument_type=InstrumentType.EQUITY,
+        data_type="ohlcv_1m",
+        day=_DAY,
+        file_name="NYSE:EQUITY:ABBV-USD.parquet",
+        pipeline_mode="batch_databento",
+    )
+    assert is_canonical(single), canonical_path_violations(single)
     # Chain bundle: canonical tail is underlying=/quote=/margin=/ticks.parquet.
     chain = build_tradfi_partition_path(
         venue="CME",
@@ -150,6 +154,7 @@ def test_cefi_hyphenated_venue_is_canonical() -> None:
             data_type="trades",
             day=_DAY,
             file_name=f"{venue}:PERPETUAL:BTC-USDT.parquet",
+            pipeline_mode="batch_tardis",
         )
         violations = canonical_path_violations(path)
         assert is_canonical(path), violations

@@ -8,7 +8,61 @@ funding interval:
 
 * 8h period (3 figures/day): Binance, Bybit, OKX, Aster (perp-CCXT), Bitget, Bitfinex
 * 4h period (6 figures/day): Kraken Pro derivatives
-* 1h period (24 figures/day): Hyperliquid, Lighter
+* 1h period (24 figures/day): Hyperliquid, Lighter, Coinbase (COINBASE-FUTURES /
+  Coinbase International Exchange -- official docs confirm hourly settlement;
+  empirically confirmed 2026-07-28 against real captured shards), EXTENDED-STARKNET
+  (see below -- also 1h, confirmed both ways 2026-07-28)
+
+**EXTENDED-STARKNET key form is the FULL compound venue string, not a bare
+short name (codified 2026-07-28).** Every other entry here is either the bare
+exchange name (``binance``, ``deribit``, ``aster``) or resolves to one after
+``_canonical_venue`` strips a registered *instrument-type* suffix
+(``-futures``/``-swap``/``-perpetual``/``-perp``, e.g. ``BINANCE-FUTURES`` ->
+``binance``). EXTENDED-STARKNET's canonical ``venue`` value is ALWAYS the
+compound ``"EXTENDED-STARKNET"`` (GCS venue-dir, ``instrument_id``, the
+adapter's own ``venue`` field literal -- never a bare ``"EXTENDED"`` anywhere
+in the codebase), and ``-STARKNET`` is a CHAIN suffix, not an instrument-type
+one (parallel to LIGHTER-ZKSYNC / PACIFICA-SOLANA's ``<VENUE>-<CHAIN>``
+naming) -- adding it to ``_VENUE_SUFFIXES`` would be semantically wrong (that
+list documents instrument-shape markers, not chain identity). So the registry
+key here is the full lowercased compound string ``"extended-starknet"``;
+registering a bare ``"extended"`` instead would silently make
+``is_supported_venue("EXTENDED-STARKNET")`` return ``False`` for every real
+caller (``perp_funding_rates.py`` / ``perp_funding_rates_defi.py`` /
+``canonical_derivative_ticker_funding_provider.py`` all pass the parsed GCS
+venue-dir string straight through) -- confirmed live in-session
+(``_canonical_venue("EXTENDED-STARKNET") == "extended-starknet"``, no suffix
+stripped). Cadence + mechanism evidence:
+
+* **Official docs** (fetched live 2026-07-28): ``docs.extended.exchange/
+  extended-resources/trading/funding-payments`` -- "funding payments are
+  charged every hour and are applied to all users with open positions at
+  that time"; ``api.docs.extended.exchange`` ``GET /info/{market}/funding``
+  -- "the funding rate is calculated every minute; it is only applied once
+  per hour", and its ``T`` timestamp field is documented as "the timestamp
+  (in epoch milliseconds) when the funding rate was calculated and applied"
+  -- i.e. Extended's own raw ``T`` field IS the charge instant already (no
+  forward-looking-vs-charge-instant offset exists for this venue the way it
+  did for the Tardis bulk-CSV venues -- see
+  ``plans/active/issues/perp_funding_data_semantics_and_cadence_2026_06_16.md``
+  Finding 2 / the ``reprocess_bulk_tardis_derivative_ticker_funding_timestamp_
+  2026_07_28.py`` script this venue was explicitly a no-op case for).
+* **Empirical** (real captured ``derivative_ticker`` shards, both the
+  ``batch_extended`` and the currently-mislabelled ``batch_tardis`` lane --
+  see ``plans/active/issues/onchain_venues_mislabeled_batch_tardis_lane_
+  2026_07_20.md``): every sampled shard carries exactly 24 rows/day; on
+  2026-06-03 every one of AAVE-USD/BTC-USD/ETH-USD/SOL-USD/XRP-USD's 24
+  ``timestamp`` values is IDENTICAL across instruments (a single system-wide
+  settlement batch, not a per-market async job) and lands at ``minute=0`` of
+  every UTC hour with sub-second jitter only (deltas between consecutive
+  settlements cluster tightly around exactly 3600s: observed range
+  [3599.09s, 3600.94s], i.e. <=0.95s jitter -- consistent with "calculated
+  every minute, applied once per hour"). Cross-checked across 2025-07-18
+  (venue funding genesis), 2025-07-20, 2025-08-01, 2026-01-15, 2026-02-15,
+  2026-06-03 -- same 24-rows/day, minute=0 pattern throughout; 2025-07-17
+  (one day pre-genesis) has ZERO objects (honest absence, not a flat/
+  fabricated placeholder). See
+  ``plans/active/issues/perp_funding_data_semantics_and_cadence_2026_06_16.md``.
 
 **Deribit is the one figure-vs-charge exception (codified 2026-06-17).** Deribit
 *charges* funding hourly, but the canonical ``derivative_ticker.funding_rate`` we
@@ -39,7 +93,12 @@ constant — call ``annualise_funding_rate_bps(rate, venue)`` (or
 
 Adding a new venue: pick the period in seconds = the span the venue's PUBLISHED
 funding figure represents (Binance: 8h; Hyperliquid: 1h; Deribit: 8h figure even
-though it charges hourly — see above). Then add a row + a unit test.
+though it charges hourly — see above). Then add a row + a unit test. **Key
+form**: use the bare exchange name UNLESS the venue's canonical ``venue``
+value is itself a compound ``<VENUE>-<CHAIN>`` string that ``_canonical_venue``
+does not otherwise reduce (e.g. EXTENDED-STARKNET, see above) — in that case
+the registry key is the full lowercased compound string, verified via
+``_canonical_venue(<real venue value>)`` BEFORE assuming a short key resolves.
 
 Refs:
 * plans/active/phase5_features_streaming_carry_staked_basis_mvp_2026_05_19.md
@@ -51,8 +110,10 @@ Refs:
 
 from __future__ import annotations
 
+from datetime import date
 from decimal import Decimal
-from typing import Final
+from enum import StrEnum
+from typing import Final, NamedTuple
 
 # ── Per-venue funding cadence in seconds ─────────────────────────────────────
 # Single SSOT — update here, not in any consumer.
@@ -69,6 +130,23 @@ FUNDING_CADENCE_SECONDS: Final[dict[str, int]] = {
     # CeFi — Deribit: CHARGES hourly, but the stored funding_rate is the 8h FIGURE
     # (verified 2026-06-16/17) -> annualise at 8h. Using 1h over-states 8x. See module docstring.
     "deribit": 8 * 3600,
+    # CeFi — Coinbase (COINBASE-FUTURES / Coinbase International Exchange): 1h figure
+    # (24/day). Confirmed BOTH via official docs (help.coinbase.com/en/derivatives/
+    # perpetual-style-futures/funding-rate: "Settlements of Funding happens every hour")
+    # AND empirically against real captured production data (2026-07-28): the
+    # `derivative_ticker.funding_timestamp` column for venue=COINBASE-FUTURES,
+    # day=2026-07-24 shows exactly 24 distinct funding_timestamp values per shard,
+    # each spaced precisely 3600s apart (verified across 6 real shards incl. PENGU-USD,
+    # RED-USD, XRP-USD, POPCAT-USD, SKHY-USD, QQQ-USD -- see
+    # plans/active/issues/perp_funding_data_semantics_and_cadence_2026_06_16.md).
+    "coinbase": 1 * 3600,
+    # EXTENDED-STARKNET (StarkNet perp DEX): 1h figure (24/day). Key is the FULL
+    # compound venue string (not "extended") -- see module docstring for why.
+    # Confirmed via official docs (docs.extended.exchange/extended-resources/
+    # trading/funding-payments: "charged every hour") AND empirically 2026-07-28
+    # (24 distinct settlements/day, cross-instrument-identical, minute=0 UTC
+    # anchor, <=0.95s jitter -- see module docstring for the full evidence).
+    "extended-starknet": 1 * 3600,
     # DeFi — 1h figure (24/day)
     "hyperliquid": 1 * 3600,
     "lighter": 1 * 3600,
@@ -158,11 +236,215 @@ def is_supported_venue(venue: str) -> bool:
     return _canonical_venue(venue) in FUNDING_CADENCE_SECONDS
 
 
+def cadence_seconds(venue: str) -> int:
+    """Whole-second funding cadence for ``venue`` — the single derivation point
+    for "shift a raw timestamp by one cadence period" style corrections (e.g.
+    deriving ``next_funding_timestamp = funding_timestamp + cadence_seconds``,
+    or the Tardis-wire-forward-looking-value fix in
+    ``market-tick-data-service/scripts/one_offs/
+    reprocess_bulk_tardis_derivative_ticker_funding_timestamp_2026_07_28.py``).
+    Every entry in ``FUNDING_CADENCE_SECONDS`` is already a whole number of
+    seconds by construction, so this is just the dict lookup through
+    ``_canonical_venue`` — call it instead of reaching into the dict directly
+    so a future non-integer entry would be a type error at the boundary, not a
+    silent float downstream. Raises ``KeyError`` for an unregistered venue —
+    validate against :func:`is_supported_venue` first.
+    """
+    return FUNDING_CADENCE_SECONDS[_canonical_venue(venue)]
+
+
+# ── Historical (versioned-over-time) cadence tracker ─────────────────────────
+# FUNDING_CADENCE_SECONDS above is the CURRENT cadence per venue — it has no
+# memory of a past cadence change (Finding 3,
+# plans/active/issues/perp_funding_data_semantics_and_cadence_2026_06_16.md):
+# a venue that ever shifted its funding interval (e.g. 8h -> 4h) would silently
+# mis-annualise every historical window before the shift, since the static dict
+# only ever reflects "today's" value. FUNDING_CADENCE_HISTORY is the canonical
+# (docs-sourced) fix: one or more ERAS per venue, each with the cadence that
+# applied FROM a given date. The companion GCS-persisted OBSERVED-cadence audit
+# (market-tick-data-service scripts/analysis/measure_perp_funding_cadence_drift)
+# is the INFERRED complement named in the same Finding — it counts real
+# distinct funding_timestamp settlements/day per shard and flags disagreement
+# against whichever era this table says should apply on that date, so a
+# cadence change nobody documented here still gets caught.
+
+
+class FundingCadenceEra(NamedTuple):
+    """One period during which ``cadence_seconds`` applied for a venue.
+
+    ``effective_from=None`` means "since the venue's own funding genesis" (no
+    earlier era exists) — every venue registered today has exactly one such
+    open-started era because none has EVER been observed/documented to change
+    cadence; this is the seed shape a future cadence-change entry would extend.
+    """
+
+    cadence_seconds: int
+    effective_from: date | None
+    source: str
+
+
+# Seeded 1:1 from FUNDING_CADENCE_SECONDS: every currently-registered venue has
+# exactly one open-started era at today's value (no venue has a documented or
+# observed historical cadence change yet). A future change adds a SECOND era
+# with a real ``effective_from`` and keeps the array chronologically ordered;
+# the guard test (test_perp_funding_cadence.py) enforces the invariant that
+# the LATEST era always matches FUNDING_CADENCE_SECONDS[venue].
+FUNDING_CADENCE_HISTORY: Final[dict[str, tuple[FundingCadenceEra, ...]]] = {
+    venue: (FundingCadenceEra(cadence_seconds=seconds, effective_from=None, source="docs"),)
+    for venue, seconds in FUNDING_CADENCE_SECONDS.items()
+}
+
+
+def cadence_seconds_as_of(venue: str, as_of: date) -> int:
+    """Whole-second funding cadence for ``venue`` that applied on ``as_of``.
+
+    Walks ``FUNDING_CADENCE_HISTORY[venue]`` (chronologically ordered) and
+    returns the cadence of the LAST era whose ``effective_from`` is ``None``
+    (open-started) or ``<= as_of``. Use this instead of :func:`cadence_seconds`
+    when annualising a HISTORICAL window rather than "now" — for any venue
+    that has never changed cadence the two are identical by construction.
+    Raises ``KeyError`` for an unregistered venue.
+    """
+    eras = FUNDING_CADENCE_HISTORY[_canonical_venue(venue)]
+    applicable = eras[0].cadence_seconds
+    for era in eras:
+        if era.effective_from is None or era.effective_from <= as_of:
+            applicable = era.cadence_seconds
+        else:
+            break
+    return applicable
+
+
+def fundings_per_day_as_of(venue: str, as_of: date) -> Decimal:
+    """``fundings_per_day`` using the cadence that applied on ``as_of``."""
+    return Decimal(86400) / Decimal(cadence_seconds_as_of(venue, as_of))
+
+
+def annualise_funding_rate_bps_as_of(rate: Decimal, venue: str, as_of: date) -> Decimal:
+    """``annualise_funding_rate_bps`` using the cadence that applied on ``as_of``."""
+    fundings_per_year = Decimal(SECONDS_PER_YEAR) / Decimal(cadence_seconds_as_of(venue, as_of))
+    return rate * fundings_per_year * _BPS_PER_RATE
+
+
+class FundingAccrualModel(StrEnum):
+    """Per-venue perp-funding SETTLEMENT MECHANICS classification — closed set.
+
+    * ``DISCRETE`` — the venue charges funding as a discrete lump-sum event at a
+      fixed settlement instant (its own ``fundingTime``/``nextFundingTime``
+      boundary, whether TWAP-computed over the cadence window like Binance/
+      Bybit/OKX/Aster/Bitget/Bitfinex/Kraken, or computed-then-settled hourly
+      like Hyperliquid/Lighter/Coinbase/EXTENDED-STARKNET). The economically
+      correct accrual over a holding interval is the SUM, over each discrete
+      settlement instant that falls inside the interval, of
+      ``position_size_at_that_instant x rate_at_that_instant``.
+    * ``CONTINUOUS_TIME_WEIGHTED`` — the venue computes AND transfers funding
+      continuously; there is no discrete charge instant to sum over. The
+      economically correct accrual is a TIME-WEIGHTED AVERAGE (integral) of the
+      continuously-observed rate over the actual holding interval:
+      ``integral[entry,exit] position_size(t) x rate(t) dt`` (or, for constant
+      position size, ``position_size x time_weighted_average(rate)``).
+
+    **Evidence-based per venue, not a default assumption** — see
+    ``plans/active/issues/perp_funding_data_semantics_and_cadence_2026_06_16.md``
+    Finding 2 (every ``DISCRETE`` venue's own API exposes a genuine
+    ``fundingTime``/``nextFundingTime`` field Tardis relays) + Finding 4
+    (DERIBIT is the confirmed sole ``CONTINUOUS_TIME_WEIGHTED`` exception: its
+    ticker API exposes only two scalars — ``current_funding``/``funding_8h`` —
+    no next-funding-time field of any kind; its own education docs state
+    funding is "calculated in real time and transferred every few seconds";
+    its ``get_funding_rate_history`` endpoint returns a continuously-evolving
+    rolling figure with no reset pattern at 00:00/08:00/16:00 UTC or any other
+    boundary; a real 55,291-row production sample shows ``funding_rate``
+    changing ~1,454 times across a single day with no discontinuity
+    detectable at any settlement boundary) + Finding 5 (EXTENDED-STARKNET
+    reverse-engineered as ``DISCRETE``: official docs + a real
+    cross-instrument/cross-date production sample confirm a genuine hourly
+    discrete settlement, <=0.95s jitter around exactly 3600s).
+
+    **INFORMATIONAL/documentation-grade today — NOT a computation branch.**
+    The shared, live-wired FUNDING-leg mechanism
+    (:class:`~strategy_service.engine.core.
+    canonical_derivative_ticker_funding_provider.
+    CanonicalDerivativeTickerFundingProvider.day_funding_fraction` ->
+    ``strategy_service.engine.backtest.paper_run_passive.
+    build_paper_run_passive`` / ``paper_run_attribution.
+    build_paper_run_attribution``) already computes a per-day TICK-LEVEL MEAN
+    of the raw captured ``funding_rate`` column and scales it by
+    :func:`fundings_per_day` — this is a discrete Riemann-sum approximation of
+    the time integral that is mathematically correct for BOTH models at the
+    day-accrual granularity the paper/batch determinism spine currently uses:
+    a tick-mean over a ``DISCRETE`` venue's piecewise-constant series
+    approximates the time-weighted average of its (up to N) distinct
+    settlement-cycle levels that day; a tick-mean over a
+    ``CONTINUOUS_TIME_WEIGHTED`` venue's series approximates the true
+    continuous integral directly. So no venue-conditional branch exists (or
+    is needed) in the accrual formula itself today — this classification is a
+    documented SEMANTIC TAG for downstream consumers (reporting/UI, or a
+    future finer-than-day-granularity accrual engine that would need to
+    treat entry/exit mid-cycle differently per model) that want to know which
+    settlement mechanics a venue follows without re-deriving it from cadence +
+    vendor docs each time. See ``codex/09-strategy/architecture-v2/
+    cross-cutting/pnl-attribution.md`` § "Funding Accrual Model" for the full
+    write-up.
+    """
+
+    DISCRETE = "discrete"
+    CONTINUOUS_TIME_WEIGHTED = "continuous_time_weighted"
+
+
+# Evidence-based per-venue classification — see FundingAccrualModel's docstring
+# for the citation trail. Every entry here MUST also exist in
+# FUNDING_CADENCE_SECONDS (a venue's accrual model is meaningless without a
+# registered cadence) — a mismatch would be a registry bug, guarded by a unit
+# test (test_perp_funding_cadence.py::TestFundingAccrualModel).
+#
+# "lighter" is provisionally DISCRETE (grouped with the other confirmed-hourly
+# perp DEXes at registration time) but — unlike deribit/coinbase/
+# extended-starknet — has NOT yet had a dedicated evidence-gathering pass
+# (official docs + real production timestamp analysis) the way those three
+# did; re-verify with the same rigor before leaning on this entry for a
+# high-stakes decision.
+FUNDING_ACCRUAL_MODEL: Final[dict[str, FundingAccrualModel]] = {
+    "binance": FundingAccrualModel.DISCRETE,
+    "bybit": FundingAccrualModel.DISCRETE,
+    "okx": FundingAccrualModel.DISCRETE,
+    "aster": FundingAccrualModel.DISCRETE,
+    "bitget": FundingAccrualModel.DISCRETE,
+    "bitfinex": FundingAccrualModel.DISCRETE,
+    "kraken": FundingAccrualModel.DISCRETE,
+    "deribit": FundingAccrualModel.CONTINUOUS_TIME_WEIGHTED,
+    "coinbase": FundingAccrualModel.DISCRETE,
+    "extended-starknet": FundingAccrualModel.DISCRETE,
+    "hyperliquid": FundingAccrualModel.DISCRETE,
+    "lighter": FundingAccrualModel.DISCRETE,  # provisional — see comment above
+}
+
+
+def funding_accrual_model(venue: str) -> FundingAccrualModel:
+    """The venue's :class:`FundingAccrualModel` (``DISCRETE`` or
+    ``CONTINUOUS_TIME_WEIGHTED``).
+
+    Accepts the bare venue name or the GCS venue-dir form (``BINANCE-FUTURES``).
+    Raises ``KeyError`` if the venue isn't in the registry — caller should have
+    validated venue against :func:`is_supported_venue` already.
+    """
+    return FUNDING_ACCRUAL_MODEL[_canonical_venue(venue)]
+
+
 __all__ = [
+    "FUNDING_ACCRUAL_MODEL",
+    "FUNDING_CADENCE_HISTORY",
     "FUNDING_CADENCE_SECONDS",
     "SECONDS_PER_YEAR",
+    "FundingAccrualModel",
+    "FundingCadenceEra",
     "annualise_funding_rate_bps",
+    "annualise_funding_rate_bps_as_of",
+    "cadence_seconds",
+    "cadence_seconds_as_of",
+    "funding_accrual_model",
     "fundings_per_day",
+    "fundings_per_day_as_of",
     "fundings_per_year",
     "is_supported_venue",
 ]

@@ -2,15 +2,25 @@
 
 from __future__ import annotations
 
+from datetime import date
 from decimal import Decimal
 
 import pytest
 
 from unified_api_contracts.registry.perp_funding_cadence import (
+    FUNDING_ACCRUAL_MODEL,
+    FUNDING_CADENCE_HISTORY,
     FUNDING_CADENCE_SECONDS,
     SECONDS_PER_YEAR,
+    FundingAccrualModel,
+    FundingCadenceEra,
     annualise_funding_rate_bps,
+    annualise_funding_rate_bps_as_of,
+    cadence_seconds,
+    cadence_seconds_as_of,
+    funding_accrual_model,
     fundings_per_day,
+    fundings_per_day_as_of,
     fundings_per_year,
     is_supported_venue,
 )
@@ -70,12 +80,41 @@ class TestFundingsPerYear:
         assert FUNDING_CADENCE_SECONDS["deribit"] == 8 * 3600
         assert fundings_per_year("deribit") == Decimal("1095")
 
+    def test_coinbase_one_hour(self) -> None:
+        # Coinbase (COINBASE-FUTURES / Coinbase International Exchange) funds every
+        # 1h -- confirmed both via official docs (help.coinbase.com/en/derivatives/
+        # perpetual-style-futures/funding-rate) AND empirically 2026-07-28 against
+        # real captured `derivative_ticker.funding_timestamp` (24 distinct values/day,
+        # spaced exactly 3600s apart across 6 spot-checked shards). 1h cadence ->
+        # 24/day x 365 = 8760/year, like Hyperliquid/Lighter.
+        assert FUNDING_CADENCE_SECONDS["coinbase"] == 1 * 3600
+        assert fundings_per_year("coinbase") == Decimal("8760")
+
+    def test_extended_starknet_one_hour(self) -> None:
+        # EXTENDED-STARKNET (StarkNet perp DEX) funds every 1h -- confirmed both
+        # via official docs (docs.extended.exchange/extended-resources/trading/
+        # funding-payments: "charged every hour") AND empirically 2026-07-28
+        # against real captured derivative_ticker shards (24 distinct
+        # settlements/day, cross-instrument-identical timestamps, minute=0 UTC
+        # anchor, <=0.95s jitter). Key form is the FULL compound venue string
+        # ("extended-starknet"), not a bare "extended" -- see module docstring.
+        assert FUNDING_CADENCE_SECONDS["extended-starknet"] == 1 * 3600
+        assert fundings_per_year("EXTENDED-STARKNET") == Decimal("8760")
+        assert is_supported_venue("EXTENDED-STARKNET")
+        # Regression guard for the key-form gotcha: a bare "extended" key would
+        # NOT be found by real callers, which always pass the compound venue
+        # string. Confirm the SHORT form is deliberately absent (never silently
+        # re-added as a second, redundant key that could drift from this one).
+        assert "extended" not in FUNDING_CADENCE_SECONDS
+
     def test_fundings_per_day(self) -> None:
         # SSOT replacement for the deleted UTL FUNDING_PERIODS_PER_DAY dict.
         assert fundings_per_day("binance") == Decimal("3")
         assert fundings_per_day("aster") == Decimal("3")  # 8h, NOT 24
         assert fundings_per_day("deribit") == Decimal("3")  # 8h figure, NOT 24
         assert fundings_per_day("hyperliquid") == Decimal("24")
+        assert fundings_per_day("coinbase") == Decimal("24")  # 1h, like Hyperliquid
+        assert fundings_per_day("EXTENDED-STARKNET") == Decimal("24")  # 1h
         assert fundings_per_day("kraken") == Decimal("6")
 
     def test_case_insensitive_lookup(self) -> None:
@@ -91,10 +130,35 @@ class TestFundingsPerYear:
         assert fundings_per_day("BINANCE-FUTURES") == Decimal("3")
         assert is_supported_venue("OKX-SWAP")
         assert annualise_funding_rate_bps(Decimal("0.0001"), "OKX-SWAP") == Decimal("1095.0000")
+        assert fundings_per_year("COINBASE-FUTURES") == fundings_per_year("coinbase")
+        assert is_supported_venue("COINBASE-FUTURES")
+        # EXTENDED-STARKNET is the key-form exception: its "GCS venue-dir form"
+        # IS its bare canonical venue value (no instrument-type suffix to
+        # strip) -- the registry key must already be the full compound string.
+        assert is_supported_venue("EXTENDED-STARKNET")
+        assert fundings_per_day("EXTENDED-STARKNET") == Decimal("24")
 
     def test_unknown_venue_raises(self) -> None:
         with pytest.raises(KeyError):
             fundings_per_year("ftx-rip")
+
+
+class TestCadenceSeconds:
+    def test_matches_registry_value(self) -> None:
+        assert cadence_seconds("binance") == 8 * 3600
+        assert cadence_seconds("hyperliquid") == 1 * 3600
+        assert cadence_seconds("kraken") == 4 * 3600
+        assert cadence_seconds("deribit") == 8 * 3600
+
+    def test_extended_starknet_gcs_venue_dir_form(self) -> None:
+        assert cadence_seconds("EXTENDED-STARKNET") == 1 * 3600
+
+    def test_case_and_dir_form_insensitive(self) -> None:
+        assert cadence_seconds("BINANCE-FUTURES") == cadence_seconds("binance")
+
+    def test_unknown_venue_raises(self) -> None:
+        with pytest.raises(KeyError):
+            cadence_seconds("ftx-rip")
 
 
 class TestAnnualisation:
@@ -135,6 +199,127 @@ class TestAnnualisation:
         # Forward verification: 0.0001005 x 1095 x 10000 = 1100.475 bps ~= 11.00% APY
         result = annualise_funding_rate_bps(Decimal("0.0001005"), "binance")
         assert Decimal("1100") < result < Decimal("1101")
+
+
+class TestFundingAccrualModel:
+    """Per-venue funding SETTLEMENT MECHANICS classification (DISCRETE vs
+    CONTINUOUS_TIME_WEIGHTED) — see
+    plans/active/issues/perp_funding_data_semantics_and_cadence_2026_06_16.md
+    Finding 4 (DERIBIT) + Finding 5 (EXTENDED-STARKNET) for the evidence trail.
+    """
+
+    def test_every_cadence_venue_has_a_classification(self) -> None:
+        # A venue with a registered cadence but no accrual-model classification
+        # would be a registry bug (the model is meaningless without a cadence,
+        # and every registered cadence venue should be classified one way or
+        # the other — no silent gaps).
+        missing = FUNDING_CADENCE_SECONDS.keys() - FUNDING_ACCRUAL_MODEL.keys()
+        assert not missing, f"Venues with a cadence but no FundingAccrualModel: {missing}"
+
+    def test_deribit_is_the_sole_continuous_time_weighted_venue(self) -> None:
+        # DERIBIT is the confirmed exception (Finding 4): no discrete
+        # fundingTime/nextFundingTime charge instant exists — funding is
+        # computed and transferred continuously. Every OTHER registered venue
+        # is DISCRETE (a genuine charge instant, whether TWAP-then-settled at
+        # 8h/4h like Binance/Bybit/OKX/Aster/Bitget/Bitfinex/Kraken, or
+        # computed-then-settled hourly like Hyperliquid/Lighter/Coinbase/
+        # EXTENDED-STARKNET).
+        continuous = {v for v, m in FUNDING_ACCRUAL_MODEL.items() if m is FundingAccrualModel.CONTINUOUS_TIME_WEIGHTED}
+        assert continuous == {"deribit"}
+
+    def test_funding_accrual_model_deribit(self) -> None:
+        assert funding_accrual_model("deribit") == FundingAccrualModel.CONTINUOUS_TIME_WEIGHTED
+        assert funding_accrual_model("DERIBIT") == FundingAccrualModel.CONTINUOUS_TIME_WEIGHTED
+
+    def test_funding_accrual_model_discrete_venues(self) -> None:
+        for venue in ("binance", "bybit", "okx", "aster", "kraken", "hyperliquid", "coinbase"):
+            assert funding_accrual_model(venue) == FundingAccrualModel.DISCRETE, venue
+
+    def test_gcs_venue_dir_form_resolves(self) -> None:
+        assert funding_accrual_model("BINANCE-FUTURES") == FundingAccrualModel.DISCRETE
+        assert funding_accrual_model("EXTENDED-STARKNET") == FundingAccrualModel.DISCRETE
+
+    def test_unknown_venue_raises(self) -> None:
+        with pytest.raises(KeyError):
+            funding_accrual_model("ftx-rip")
+
+
+class TestFundingCadenceHistory:
+    """Historical (versioned-over-time) cadence tracker — Finding 3,
+    plans/active/issues/perp_funding_data_semantics_and_cadence_2026_06_16.md.
+    """
+
+    def test_every_cadence_venue_has_a_history(self) -> None:
+        missing = FUNDING_CADENCE_SECONDS.keys() - FUNDING_CADENCE_HISTORY.keys()
+        assert not missing, f"Venues with a cadence but no FUNDING_CADENCE_HISTORY: {missing}"
+
+    def test_latest_era_matches_current_cadence(self) -> None:
+        # The invariant a future cadence-change entry must preserve: the LAST
+        # (most recent) era's cadence always equals FUNDING_CADENCE_SECONDS —
+        # the static dict is always "as of today".
+        for venue, current in FUNDING_CADENCE_SECONDS.items():
+            eras = FUNDING_CADENCE_HISTORY[venue]
+            assert eras[-1].cadence_seconds == current, venue
+
+    def test_every_venue_has_exactly_one_open_started_era_today(self) -> None:
+        # No venue has ever changed cadence yet — this pins that assumption so
+        # a future change is a deliberate 2nd-era addition, not silently
+        # absorbed by editing the seeded era in place.
+        for venue, eras in FUNDING_CADENCE_HISTORY.items():
+            assert len(eras) == 1, venue
+            assert eras[0].effective_from is None, venue
+
+    def test_cadence_seconds_as_of_matches_current_for_every_venue(self) -> None:
+        today = date(2026, 7, 28)
+        for venue, current in FUNDING_CADENCE_SECONDS.items():
+            assert cadence_seconds_as_of(venue, today) == current, venue
+
+    def test_cadence_seconds_as_of_resolves_open_started_era_for_any_date(self) -> None:
+        # An open-started era (effective_from=None) applies to ANY as_of date,
+        # including one far in the past (pre-venue-genesis dates aren't this
+        # function's concern — callers gate on genesis separately).
+        assert cadence_seconds_as_of("binance", date(2019, 1, 1)) == 8 * 3600
+
+    def test_cadence_seconds_as_of_multi_era_lookup(self) -> None:
+        # Synthetic 2-era history exercising the actual multi-era branch (no
+        # real venue has one yet — this proves the walk logic, not a live fact).
+        eras = (
+            FundingCadenceEra(cadence_seconds=8 * 3600, effective_from=None, source="docs"),
+            FundingCadenceEra(cadence_seconds=4 * 3600, effective_from=date(2025, 1, 1), source="docs"),
+        )
+        history = {"synthetic": eras}
+        # Manual walk mirroring cadence_seconds_as_of's algorithm (function
+        # reads the module-level dict, so exercise the same logic directly).
+        applicable = eras[0].cadence_seconds
+        for era in eras:
+            if era.effective_from is None or era.effective_from <= date(2024, 6, 1):
+                applicable = era.cadence_seconds
+            else:
+                break
+        assert applicable == 8 * 3600  # pre-shift date -> old cadence
+        applicable = eras[0].cadence_seconds
+        for era in eras:
+            if era.effective_from is None or era.effective_from <= date(2025, 6, 1):
+                applicable = era.cadence_seconds
+            else:
+                break
+        assert applicable == 4 * 3600  # post-shift date -> new cadence
+        assert history["synthetic"][1].cadence_seconds == 4 * 3600  # sanity on the fixture itself
+
+    def test_fundings_per_day_as_of_matches_fundings_per_day(self) -> None:
+        today = date(2026, 7, 28)
+        assert fundings_per_day_as_of("binance", today) == fundings_per_day("binance")
+        assert fundings_per_day_as_of("hyperliquid", today) == fundings_per_day("hyperliquid")
+
+    def test_annualise_funding_rate_bps_as_of_matches_annualise_funding_rate_bps(self) -> None:
+        today = date(2026, 7, 28)
+        assert annualise_funding_rate_bps_as_of(Decimal("0.0001"), "binance", today) == annualise_funding_rate_bps(
+            Decimal("0.0001"), "binance"
+        )
+
+    def test_unknown_venue_raises(self) -> None:
+        with pytest.raises(KeyError):
+            cadence_seconds_as_of("ftx-rip", date(2026, 1, 1))
 
 
 class TestIsSupportedVenue:

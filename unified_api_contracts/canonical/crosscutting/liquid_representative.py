@@ -1,8 +1,11 @@
 """Most-liquid representative selectors (volume-based) — items 002 + 003 in
-``plans/active/mvp_for_mdps_and_features_universe_uac_2026_06_28.md``.
+``plans/active/mvp_for_mdps_and_features_universe_uac_2026_06_28.md``, plus
+the margin-side selector from
+``plans/active/issues/cefi_universe_capture_rule_2026_06_23.md``.
 
-Two selectors share a single venue-volume basis (computed once by callers from
-the manifest/candle volume we already have, and passed in here as observations):
+Three selectors share a single venue-volume basis (computed once by callers
+from the manifest/candle volume we already have, and passed in here as
+observations):
 
 - :func:`execution_spot_representative` — per ``(base, asset_group)``, the
   most-liquid SPOT ``(venue, instrument)`` for EXECUTION (consumed by
@@ -12,13 +15,29 @@ the manifest/candle volume we already have, and passed in here as observations):
   computation. Shares :class:`VenueVolumeObservation` + the deterministic
   tie-break with the spot selector. TradFi has no perp → falls back to the
   most-liquid 1m FUTURE source (CME front-month is the typical winner).
+- :func:`margin_type_representative` (cefi_universe_capture_rule) — per
+  ``(venue, base)``, which :class:`~unified_api_contracts.MarginType`
+  (linear vs inverse) to CAPTURE for a venue that lists BOTH margin types of
+  the same base's perp (e.g. BYBIT, OKX-SWAP, KRAKEN-FUTURES all expose a
+  linear USDT/USDC leg AND a coin-margined inverse leg for the same base
+  under one canonical venue key — see ``_infer_margin_type`` in
+  instruments-service's tardis ``parsing.py``). Generalizes the operator's
+  "capture the more liquid margin type, default linear" rule via measured
+  volume instead of a hand-list. Does NOT apply to DERIBIT (both legs
+  captured unconditionally — not margin-gated, per the same issue doc) or to
+  BINANCE-DELIVERY (removed from cefi MVP scope entirely, mvp_scope.py v10
+  decision #3 — COIN-M delivery is not MVP, so there is no margin-side
+  choice to make for it).
 
-Both functions are pure: the caller supplies a sequence of measured
+All three functions are pure: the caller supplies a sequence of measured
 observations; the selector restricts to MVP-scope cells, picks the highest
-volume, and applies a deterministic ``(venue ASC, instrument ASC)`` tie-break.
-The volume basis (quote-currency aggregate over some window — typically the
-last 7-30 days of candle volume) is the caller's responsibility — UAC owns
-the selection contract, NOT the data layer that aggregates volume.
+volume, and applies a deterministic tie-break. The volume basis
+(quote-currency aggregate over some window — typically the last 7-30 days of
+candle volume) is the caller's responsibility — UAC owns the selection
+contract, NOT the data layer that aggregates volume. This is deliberately
+NOT a live external API call (e.g. hitting Tardis per-contract at request
+time) — "live-data" means the volume WE ALREADY CAPTURE via MDPS/MTDS,
+aggregated by the caller, same as the other two selectors.
 
 Why a pure function + caller-supplied observations:
   - UAC stays a types/contracts library with NO data-plane dependencies.
@@ -35,6 +54,7 @@ from collections.abc import Iterable
 from dataclasses import dataclass
 from typing import Final
 
+from unified_api_contracts._instrument_enums import MarginType
 from unified_api_contracts.canonical.crosscutting.mvp_scope import (
     mdps_mvp_universe,
 )
@@ -306,3 +326,110 @@ def feature_perp_representative(
     # share the contract so callers see identical determinism semantics.
     best = min(eligible, key=lambda o: (-o.volume, o.venue, o.instrument))
     return (best.venue, best.instrument)
+
+
+# ---------------------------------------------------------------------------
+# Margin-type volume observation — the basis contract for the margin selector
+# ---------------------------------------------------------------------------
+
+
+@dataclass(frozen=True)
+class MarginVolumeObservation:
+    """One margin-type leg's measured trading volume for a ``(venue, base)``
+    PERP cell — the basis contract for :func:`margin_type_representative`.
+
+    Attributes:
+        venue: Canonical venue identifier (e.g. ``"BYBIT"``, ``"OKX-SWAP"``).
+            Must match the venue spelling used in
+            :data:`unified_api_contracts.MVP_SCOPE`.
+        base: Base currency the perp trades (e.g. ``"BTC"``, ``"ETH"``).
+        margin_type: :class:`~unified_api_contracts.MarginType` of this
+            observation's leg (``LINEAR`` or ``INVERSE`` — ``QUANTO`` is
+            never a candidate; the selector ignores it).
+        volume: Aggregated trading volume over the basis window, in a
+            consistent quote currency (USD/USDT-equivalent). Larger ==
+            more liquid. Callers MUST use the same unit across all
+            observations for a single selector invocation.
+    """
+
+    venue: str
+    base: str
+    margin_type: MarginType
+    volume: float
+
+
+# ---------------------------------------------------------------------------
+# Public selector — cefi_universe_capture_rule margin-side selection
+# ---------------------------------------------------------------------------
+
+
+def margin_type_representative(
+    venue: str,
+    base: str,
+    margin_volumes: Iterable[MarginVolumeObservation],
+) -> MarginType:
+    """Return the more-liquid margin type to CAPTURE for a ``(venue, base)`` perp.
+
+    Generalizes the operator's rule (``cefi_universe_capture_rule_2026_06_23.md``
+    § "COIN-MARGIN (inverse) perps"): "capture the MORE LIQUID margin type per
+    (venue, base) — default linear (more liquid for ~all alts); capture inverse
+    instead where inverse is more liquid (historically BTC/ETH inverse on some
+    venues)." This function is the "live-data liquidity spot-check" that rule
+    called for, generalized via measured volume rather than a hand-list.
+
+    Filters *margin_volumes* down to observations matching ``(venue, base)``,
+    sums volume PER :class:`~unified_api_contracts.MarginType` (a base can have
+    more than one observation per margin type — e.g. a perp AND a dated future
+    sharing the same settlement leg), and returns whichever of
+    ``LINEAR``/``INVERSE`` has the higher aggregate. ``LINEAR`` wins both a tie
+    AND the no-observations case — the documented safe default.
+
+    NOT applicable to:
+
+    * **DERIBIT** — both legs are captured unconditionally (not margin-gated;
+      Deribit splits by settlement quote instead, see the issue doc). Calling
+      this for Deribit is a caller error (Deribit isn't the venue this
+      function exists for), though it will not raise — it simply reflects
+      whatever volumes are passed.
+    * **BINANCE-DELIVERY** — removed from the cefi MVP venues entirely
+      (``mvp_scope.py`` v10 decision #3, 2026-06-27 — COIN-M delivery is not
+      MVP), so there is no margin-side choice left to make for it; the venue
+      is no longer capturable at all.
+
+    Args:
+        venue: Canonical venue identifier (e.g. ``"BYBIT"``, ``"OKX-SWAP"``,
+            ``"KRAKEN-FUTURES"`` — any cefi venue that lists BOTH a linear and
+            an inverse leg for the same base under one canonical venue key).
+        base: Base currency (e.g. ``"BTC"``, ``"ETH"``).
+        margin_volumes: Iterable of measured per-margin-type volume
+            observations over the caller's chosen basis window.
+
+    Returns:
+        :attr:`MarginType.LINEAR` or :attr:`MarginType.INVERSE` — never
+        ``None`` (unlike the other two selectors) because the capture layer
+        always needs an answer; ``LINEAR`` is the documented fallback when no
+        observation exists yet for this ``(venue, base)``.
+
+    Example::
+
+        from unified_api_contracts import (
+            MarginType,
+            MarginVolumeObservation,
+            margin_type_representative,
+        )
+
+        observations = [
+            MarginVolumeObservation("BYBIT", "BTC", MarginType.LINEAR, 4_200_000_000.0),
+            MarginVolumeObservation("BYBIT", "BTC", MarginType.INVERSE, 180_000_000.0),
+        ]
+        assert margin_type_representative("BYBIT", "BTC", observations) == MarginType.LINEAR
+    """
+    matching = [ob for ob in margin_volumes if ob.venue == venue and ob.base == base]
+    totals: dict[MarginType, float] = {}
+    for ob in matching:
+        totals[ob.margin_type] = totals.get(ob.margin_type, 0.0) + ob.volume
+    inverse_volume = totals.get(MarginType.INVERSE, 0.0)
+    linear_volume = totals.get(MarginType.LINEAR, 0.0)
+    if inverse_volume > linear_volume:
+        return MarginType.INVERSE
+    return MarginType.LINEAR

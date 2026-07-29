@@ -35,7 +35,7 @@ concurrency:
 jobs:
   schema-health:
     name: Schema Health Validation
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, glue]
     timeout-minutes: 15
 
     permissions:

@@ -158,6 +158,27 @@ class InstrumentRecord(BaseModel):
         ),
     )
     # Additive + optional (non-breaking: added-optional-field), same pattern as
+    # question above. PREDICTION-only: a write-back of the classification the
+    # adapter has ALREADY computed via classify_polymarket_to_canonical_group() /
+    # classify_kalshi_to_canonical_group() (both in unified_api_contracts.predictions)
+    # at InstrumentRecord-construction time — reused, not re-derived, by the
+    # instruments-service catalogue-rollup cqg grain (previously always empty
+    # because the classifier's raw inputs — title/slug/event_slug/outcome for
+    # Polymarket, the full ticker for Kalshi — are not otherwise persisted onto
+    # this model, only the group's value). None for every non-PREDICTION instrument
+    # and for any PREDICTION instrument the adapter could not classify.
+    # Plan: prediction_satellite_ao_dispatch_batch5_2026_07_26.md todo 2 ("249-b").
+    canonical_question_group: str | None = Field(
+        default=None,
+        description=(
+            "PREDICTION-only: the CanonicalQuestionGroup.value already computed by the "
+            "adapter's classify_{polymarket,kalshi}_to_canonical_group() call, written "
+            "back so the instruments-service catalogue-rollup can materialise the "
+            "prediction_canonical_question_group cqg grain without re-deriving it. "
+            "None for every non-PREDICTION instrument."
+        ),
+    )
+    # Additive + optional (non-breaking: added-optional-field), same pattern as
     # canonical_instrument_id / question above. Human-readable security / issuer name
     # for instruments whose ``instrument_key`` is an opaque coded symbol — TODAY the
     # KRX (Korea Exchange) single-stock equities, whose canonical symbol is the bare

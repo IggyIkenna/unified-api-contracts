@@ -53,6 +53,22 @@ EXPECTED_SENTINEL_VENUES: frozenset[str] = frozenset(
         # too (this set only covers canonical-but-adapterless venues). See
         # `market_data_categories.SPORTS_ODDS_API_ACCEPTED_NONCANONICAL_BOOKMAKERS`
         # for where they now live instead.
+        # Sports enrichment providers (2026-07-29): each has a WORKING adapter class, but
+        # in instruments-service's separate sports-only sub-factory
+        # (reference_data/adapters/sports/factory.py, base class
+        # BaseSportsReferenceAdapter) — architecturally distinct from this registry's
+        # master factory (reference_data/factory.py, base class BaseReferenceDataAdapter).
+        # A real key here would resolve through get_adapter_for_canonical_venue(), which
+        # only knows the master factory, so it would raise ValueError. Sentineling is the
+        # honest declaration: sports/urdi_reference_provider.py never dispatches these via
+        # the generic URDI path — real capture goes through the sports orchestrator's own
+        # per-fixture entity-scoped dispatch. See
+        # sports_stats_delayed_live_capture_still_dead_post_fix_2026_07_29.md.
+        "UNDERSTAT",
+        "FOOTYSTATS",
+        "TRANSFERMARKT",
+        "SOCCER_FOOTBALL_INFO",
+        "OPEN_METEO",
     }
 )
 
