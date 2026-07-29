@@ -13,54 +13,54 @@ every roadmap row currently carries a documented placeholder `demand=0`.
 are structurally impossible (`logical_dead_end` / explicit negatives) carry NO
 distance and are listed separately — they are correct negatives, not roadmap items.
 
-Manifest commit: `c7d2b9abe967201bde7b8390a1e74cd1141d8c1f`
+Manifest commit: `3a8c845b799cd5eb3c5067d860a62dabb520eb99`
 
 ## Summary (3)
 
-- blocked edges total: **865**
-- roadmap edges (have an unlock set): **278**
-- structurally-impossible edges (excluded from ranking): **587**
+- blocked edges total: **850**
+- roadmap edges (have an unlock set): **359**
+- structurally-impossible edges (excluded from ranking): **491**
 
 ## Missing-piece counts (across roadmap edges) (10)
 
-- `needs-adapter`: 1
-- `needs-auth`: 1
+- `needs-adapter`: 6
+- `needs-auth`: 3
 - `needs-code-scan`: 1
-- `needs-config`: 200
-- `needs-data-feed`: 7
-- `needs-docs`: 2
+- `needs-config`: 26
+- `needs-data-feed`: 22
+- `needs-docs`: 7
 - `needs-extraction`: 3
-- `needs-leg-spec`: 3
-- `needs-registry-entry`: 58
-- `needs-test`: 2
+- `needs-leg-spec`: 105
+- `needs-registry-entry`: 178
+- `needs-test`: 8
 
 ## Closest-to-unlock — top 25 (highest-leverage) (25)
 
-1. `ARBITRAGE_PRICE_DISPERSION` --supports--> `venue:cboe` — status `partial`, unlock_distance **1**, missing `needs-config`, demand 0
-2. `ARBITRAGE_PRICE_DISPERSION` --supports--> `venue:cme` — status `partial`, unlock_distance **1**, missing `needs-config`, demand 0
-3. `ARBITRAGE_PRICE_DISPERSION` --supports--> `venue:deribit` — status `partial`, unlock_distance **1**, missing `needs-config`, demand 0
-4. `ARBITRAGE_PRICE_DISPERSION` --supports--> `venue:ibkr` — status `partial`, unlock_distance **1**, missing `needs-config`, demand 0
-5. `ARBITRAGE_PRICE_DISPERSION` --supports--> `venue:ice` — status `partial`, unlock_distance **1**, missing `needs-config`, demand 0
-6. `ARBITRAGE_PRICE_DISPERSION` --trades_instrument--> `instrument_type:dated_future` — status `partial`, unlock_distance **1**, missing `needs-config`, demand 0
-7. `ARBITRAGE_PRICE_DISPERSION` --trades_instrument--> `instrument_type:lp` — status `partial`, unlock_distance **1**, missing `needs-registry-entry`, demand 0
-8. `ARBITRAGE_PRICE_DISPERSION` --trades_instrument--> `instrument_type:option` — status `partial`, unlock_distance **1**, missing `needs-leg-spec`, demand 0
-9. `CARRY_BASIS_DATED` --supports--> `venue:cme` — status `partial`, unlock_distance **1**, missing `needs-config`, demand 0
-10. `CARRY_BASIS_DATED` --supports--> `venue:ibkr` — status `partial`, unlock_distance **1**, missing `needs-config`, demand 0
-11. `CARRY_BASIS_DATED` --supports--> `venue:ice` — status `partial`, unlock_distance **1**, missing `needs-config`, demand 0
-12. `CARRY_BASIS_DATED` --trades_instrument--> `instrument_type:option` — status `partial`, unlock_distance **1**, missing `needs-docs`, demand 0
-13. `CARRY_STAKED_BASIS_DATED` --supports--> `venue:aave_v3` — status `partial`, unlock_distance **1**, missing `needs-config`, demand 0
-14. `CARRY_STAKED_BASIS_DATED` --supports--> `venue:binance` — status `partial`, unlock_distance **1**, missing `needs-config`, demand 0
-15. `CARRY_STAKED_BASIS_DATED` --supports--> `venue:deribit` — status `partial`, unlock_distance **1**, missing `needs-config`, demand 0
-16. `CARRY_STAKED_BASIS_DATED` --supports--> `venue:lido` — status `partial`, unlock_distance **1**, missing `needs-config`, demand 0
-17. `CARRY_STAKED_BASIS_DATED` --supports--> `venue:rocketpool` — status `partial`, unlock_distance **1**, missing `needs-config`, demand 0
-18. `CARRY_STAKED_BASIS_DATED` --trades_instrument--> `instrument_type:dated_future` — status `partial`, unlock_distance **1**, missing `needs-registry-entry`, demand 0
-19. `CARRY_STAKED_BASIS_DATED` --trades_instrument--> `instrument_type:staking` — status `partial`, unlock_distance **1**, missing `needs-registry-entry`, demand 0
-20. `DEFI_LP_CONCENTRATED` --supports--> `venue:pancakeswap_v3` — status `partial`, unlock_distance **1**, missing `needs-config`, demand 0
-21. `DEFI_LP_CONCENTRATED` --supports--> `venue:uniswap_v3` — status `partial`, unlock_distance **1**, missing `needs-config`, demand 0
-22. `DEFI_LP_CONCENTRATED` --trades_instrument--> `instrument_type:lp` — status `partial`, unlock_distance **1**, missing `needs-registry-entry`, demand 0
-23. `DEFI_LP_POOL` --supports--> `venue:balancer` — status `partial`, unlock_distance **1**, missing `needs-config`, demand 0
-24. `DEFI_LP_POOL` --supports--> `venue:curve` — status `partial`, unlock_distance **1**, missing `needs-config`, demand 0
-25. `DEFI_LP_POOL` --supports--> `venue:maverick` — status `partial`, unlock_distance **1**, missing `needs-config`, demand 0
+1. `ARBITRAGE_MEV_SANDWICH` --has_leg:legs--> `ARBITRAGE_MEV_SANDWICH` — status `not_registered`, unlock_distance **1**, missing `needs-leg-spec`, demand 0
+2. `ARBITRAGE_MEV_SANDWICH` --uses_algo--> `execution_algo:ADAPTIVE_TWAP` — status `not_registered`, unlock_distance **1**, missing `needs-leg-spec`, demand 0
+3. `ARBITRAGE_MEV_SANDWICH` --uses_algo--> `execution_algo:ALMGREN_CHRISS` — status `not_registered`, unlock_distance **1**, missing `needs-leg-spec`, demand 0
+4. `ARBITRAGE_MEV_SANDWICH` --uses_algo--> `execution_algo:BENCHMARK_FILL` — status `not_registered`, unlock_distance **1**, missing `needs-leg-spec`, demand 0
+5. `ARBITRAGE_MEV_SANDWICH` --uses_algo--> `execution_algo:BEST_PRICE` — status `not_registered`, unlock_distance **1**, missing `needs-leg-spec`, demand 0
+6. `ARBITRAGE_MEV_SANDWICH` --uses_algo--> `execution_algo:HYBRID_OPTIMAL` — status `not_registered`, unlock_distance **1**, missing `needs-leg-spec`, demand 0
+7. `ARBITRAGE_MEV_SANDWICH` --uses_algo--> `execution_algo:KELLY_STAKE` — status `not_registered`, unlock_distance **1**, missing `needs-leg-spec`, demand 0
+8. `ARBITRAGE_MEV_SANDWICH` --uses_algo--> `execution_algo:MAX_SLIPPAGE` — status `not_registered`, unlock_distance **1**, missing `needs-leg-spec`, demand 0
+9. `ARBITRAGE_MEV_SANDWICH` --uses_algo--> `execution_algo:PASSIVE_AGGRESSIVE_HYBRID` — status `not_registered`, unlock_distance **1**, missing `needs-leg-spec`, demand 0
+10. `ARBITRAGE_MEV_SANDWICH` --uses_algo--> `execution_algo:POV_DYNAMIC` — status `not_registered`, unlock_distance **1**, missing `needs-leg-spec`, demand 0
+11. `ARBITRAGE_MEV_SANDWICH` --uses_algo--> `execution_algo:SEQUENTIAL_LEGS` — status `not_registered`, unlock_distance **1**, missing `needs-leg-spec`, demand 0
+12. `ARBITRAGE_MEV_SANDWICH` --uses_algo--> `execution_algo:SMART_ORDER_ROUTER` — status `not_registered`, unlock_distance **1**, missing `needs-leg-spec`, demand 0
+13. `ARBITRAGE_MEV_SANDWICH` --uses_algo--> `execution_algo:SOR_TWAP` — status `not_registered`, unlock_distance **1**, missing `needs-leg-spec`, demand 0
+14. `ARBITRAGE_MEV_SANDWICH` --uses_algo--> `execution_algo:SPREAD_ROLL` — status `not_registered`, unlock_distance **1**, missing `needs-leg-spec`, demand 0
+15. `ARBITRAGE_MEV_SANDWICH` --uses_algo--> `execution_algo:SWAP_TWAP` — status `not_registered`, unlock_distance **1**, missing `needs-leg-spec`, demand 0
+16. `ARBITRAGE_MEV_SANDWICH` --uses_algo--> `execution_algo:TWAP` — status `not_registered`, unlock_distance **1**, missing `needs-leg-spec`, demand 0
+17. `ARBITRAGE_MEV_SANDWICH` --uses_algo--> `execution_algo:VWAP` — status `not_registered`, unlock_distance **1**, missing `needs-leg-spec`, demand 0
+18. `ARBITRAGE_PRICE_DISPERSION` --supports--> `venue:cboe` — status `partial`, unlock_distance **1**, missing `needs-data-feed`, demand 0
+19. `ARBITRAGE_PRICE_DISPERSION` --supports--> `venue:cme` — status `partial`, unlock_distance **1**, missing `needs-registry-entry`, demand 0
+20. `ARBITRAGE_PRICE_DISPERSION` --supports--> `venue:deribit` — status `partial`, unlock_distance **1**, missing `needs-registry-entry`, demand 0
+21. `ARBITRAGE_PRICE_DISPERSION` --supports--> `venue:ibkr` — status `partial`, unlock_distance **1**, missing `needs-registry-entry`, demand 0
+22. `ARBITRAGE_PRICE_DISPERSION` --supports--> `venue:ice` — status `partial`, unlock_distance **1**, missing `needs-config`, demand 0
+23. `ARBITRAGE_PRICE_DISPERSION` --trades_instrument--> `instrument_type:dated_future` — status `partial`, unlock_distance **1**, missing `needs-config`, demand 0
+24. `ARBITRAGE_PRICE_DISPERSION` --trades_instrument--> `instrument_type:lp` — status `partial`, unlock_distance **1**, missing `needs-registry-entry`, demand 0
+25. `ARBITRAGE_PRICE_DISPERSION` --trades_instrument--> `instrument_type:option` — status `partial`, unlock_distance **1**, missing `needs-leg-spec`, demand 0
 
 ## Structurally impossible (correct negatives — not roadmap items) (26)
 
@@ -89,4 +89,4 @@ Manifest commit: `c7d2b9abe967201bde7b8390a1e74cd1141d8c1f`
 - `ARBITRAGE_MEV_BACKRUN` --uses_algo--> `execution_algo:VWAP` — VWAP is not in ALGORITHMS_BY_INSTRUCTION_TYPE for any of this archetype's instruction type(s) (SWAP, ZERO_ALPHA); the selector would raise AlgorithmNotSupportedError / fall back to a default
 - `ARBITRAGE_MEV_JIT_LIQUIDITY` --uses_algo--> `execution_algo:ADAPTIVE_TWAP` — ADAPTIVE_TWAP is not in ALGORITHMS_BY_INSTRUCTION_TYPE for any of this archetype's instruction type(s) (SWAP, ZERO_ALPHA); the selector would raise AlgorithmNotSupportedError / fall back to a default
 - `ARBITRAGE_MEV_JIT_LIQUIDITY` --uses_algo--> `execution_algo:ALMGREN_CHRISS` — ALMGREN_CHRISS is not in ALGORITHMS_BY_INSTRUCTION_TYPE for any of this archetype's instruction type(s) (SWAP, ZERO_ALPHA); the selector would raise AlgorithmNotSupportedError / fall back to a default
-- … and 562 more
+- … and 466 more
