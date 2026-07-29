@@ -103,8 +103,15 @@ class TestScanProductionReferences:
             assert name.endswith(".yaml")
             assert isinstance(consumers, set)
 
+    @pytest.mark.timeout(180)  # repo-wide filesystem scan 17-21s alone; 3x buffer for full-suite I/O load
     def test_scanning_empty_dir_returns_empty(self, tmp_path: Path) -> None:
-        """Scanning a single empty directory returns empty references."""
+        """Scanning a single empty directory returns empty references.
+
+        Even with an empty ``production_paths``, the prep step still parses
+        every real cassette + venue class file (independent of the passed-in
+        path) — the same chronic full-suite-I/O-load flake as its siblings in
+        this class, missed by 8a15e943 (2026-06-04) which fixed the other 3.
+        """
         refs = scan_production_cassette_references(production_paths=[tmp_path])
         assert refs == {}
 

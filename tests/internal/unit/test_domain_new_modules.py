@@ -53,6 +53,7 @@ UNCOVERED_MODULES = [
 ]
 
 
+@pytest.mark.timeout(120)  # trivial import; 2x buffer against xdist worker contention on the full-suite run
 @pytest.mark.parametrize("module_path", UNCOVERED_MODULES)
 def test_module_importable(module_path: str) -> None:
     mod = importlib.import_module(module_path)
