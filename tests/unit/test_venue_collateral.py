@@ -62,9 +62,10 @@ def test_accepted_collateral_haircut(venue: str, token: str, expected_haircut: D
         # BINANCE — Multi-Assets Mode excludes LSTs.
         ("BINANCE", "stETH"),
         ("BINANCE", "wstETH"),
-        # ASTER — USDC/USDT-only.
+        # ASTER — Multi-Asset Mode does not list any of these LSTs.
         ("ASTER", "stETH"),
         ("ASTER", "wstETH"),
+        ("ASTER", "weETH"),
     ],
 )
 def test_lst_explicitly_rejected(venue: str, token: str) -> None:
@@ -162,6 +163,25 @@ def test_f28_haircuts_live_probed_2026_06_17() -> None:
     assert venue_accepts_collateral("BYBIT", "stETH")
     assert get_collateral_haircut("BYBIT", "stETH") == Decimal("0.10")
     assert not PLACEHOLDER_HAIRCUTS_PENDING_GO_LIVE  # empty: no haircut remains a placeholder
+
+
+def test_aster_multi_asset_mode_live_verified_2026_07_29() -> None:
+    """ASTER re-verified LIVE 2026-07-29 against ``fapi.asterdex.com`` /exchangeInfo + docs.asterdex.com.
+
+    Confirmed our integration is the "Aster Perps" Multi-Asset Mode product (not "AstherusEX" — whose
+    docs exclude USDC entirely, while /exchangeInfo's marginAvailable list includes it). USDC/USDT
+    haircut corrected from the prior 0%/1% placeholder to the real Multi-Asset Mode ratio (99.99% ->
+    0.01% haircut); BTC/ETH added as accepted (95% ratio -> 5% haircut), previously untracked.
+    Source: plans/active/issues/aster_margining_registry_live_docs_drift_2026_07_28.md.
+    """
+    for token in ("USDC", "USDT"):
+        assert venue_accepts_collateral("ASTER", token)
+        assert get_collateral_haircut("ASTER", token) == Decimal("0.0001"), token
+    for token in ("BTC", "ETH"):
+        assert venue_accepts_collateral("ASTER", token)
+        assert get_collateral_haircut("ASTER", token) == Decimal("0.05"), token
+    perp_set = set(accepted_perp_collateral("ASTER"))
+    assert {"USDC", "USDT", "BTC", "ETH"}.issubset(perp_set), f"ASTER perp set regressed; got {perp_set}"
 
 
 def test_f27_venue_lookup_is_case_insensitive() -> None:

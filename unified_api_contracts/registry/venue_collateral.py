@@ -9,6 +9,12 @@ DRIFT (Solana) — including its on-chain spot-market collateral probe history: 
 PACIFICA (Solana) collateral rows were REMOVED 2026-07-16 (operator ruling: all Solana perp DEXes dropped except
 Jupiter, which is not integrated). SSOT: unified-trading-pm/codex/04-architecture/solana-defi-coverage.md.
 
+ASTER re-verified LIVE 2026-07-29 (`plans/active/issues/aster_margining_registry_live_docs_drift_2026_07_28.md`):
+confirmed our `fapi.asterdex.com` integration is the "Aster Perps" Multi-Asset Mode product (not "AstherusEX"), and
+its documented collateral ratios were materially different from the prior placeholder rows — USDC/USDT haircut
+corrected from 0%/1% to the real 0.01%, and BTC/ETH added as accepted (95% ratio) where they were previously
+untracked (effectively treated as not-accepted).
+
 :data:`PLACEHOLDER_HAIRCUTS_PENDING_GO_LIVE` is now empty — no haircut remains a placeholder. Re-probe on a venue
 margin-policy change (Bybit tiers).
 """
@@ -53,9 +59,17 @@ VENUE_COLLATERAL_MATRIX: list[CollateralAcceptance] = [
     CollateralAcceptance("HYPERLIQUID", "ETH", False, None, "", "Not accepted", "PERP_CEX"),
     CollateralAcceptance("HYPERLIQUID", "weETH", False, None, "", "Not accepted", "PERP_CEX"),
     CollateralAcceptance("HYPERLIQUID", "WETH", False, None, "", "Not accepted", "PERP_CEX"),
-    # Aster
-    CollateralAcceptance("ASTER", "USDC", True, Decimal("0"), "CROSS", "Primary margin", "PERP_CEX"),
-    CollateralAcceptance("ASTER", "USDT", True, Decimal("0.01"), "CROSS", "Slight haircut", "PERP_CEX"),
+    # Aster — fapi.asterdex.com is the "Aster Perps" Multi-Asset Mode product
+    # (confirmed 2026-07-29: live /fapi/v1/exchangeInfo's 39-asset marginAvailable
+    # list — incl. USDC, SLISBNB, LISUSD, WBETH, STONE — matches
+    # docs.asterdex.com's Multi-Asset Mode table across all 4 chains, NOT the
+    # narrower "AstherusEX" orderbook product, whose docs explicitly exclude
+    # USDC on both listed chains). Ratios below are Multi-Asset Mode's
+    # documented collateral ratios (haircut = 1 - ratio).
+    CollateralAcceptance("ASTER", "USDC", True, Decimal("0.0001"), "CROSS", "Multi-Asset Mode 99.99%", "PERP_CEX"),
+    CollateralAcceptance("ASTER", "USDT", True, Decimal("0.0001"), "CROSS", "Multi-Asset Mode 99.99%", "PERP_CEX"),
+    CollateralAcceptance("ASTER", "BTC", True, Decimal("0.05"), "CROSS", "Multi-Asset Mode 95%", "PERP_CEX"),
+    CollateralAcceptance("ASTER", "ETH", True, Decimal("0.05"), "CROSS", "Multi-Asset Mode 95%", "PERP_CEX"),
     # Aave V3 (referencing defi_reserve_params.py LTV values)
     CollateralAcceptance("AAVE_V3-ETHEREUM", "WETH", True, Decimal("0.175"), "ISOLATED", "LTV 82.5%", "LENDING"),
     CollateralAcceptance("AAVE_V3-ETHEREUM", "weETH", True, Decimal("0.275"), "ISOLATED", "LTV 72.5%", "LENDING"),
