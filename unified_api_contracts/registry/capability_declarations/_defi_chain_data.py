@@ -211,7 +211,14 @@ CHAIN_CONFIGS: dict[int, ChainConfig] = {
         native_gas_token="GLMR",
     ),
     5000: ChainConfig(
-        rpc_url_template="https://rpc.mantle.xyz",
+        # MANTLE: Alchemy officially supports Mantle mainnet on the same
+        # already-provisioned `alchemy-api-key` ~16 other EVM chains use here
+        # (no new signup/credential). Live-verified 2026-07-29:
+        # eth_feeHistory against mantle-mainnet.g.alchemy.com returned a real
+        # result (baseFeePerGas populated) -- the free public rpc.mantle.xyz
+        # was the actual gas-fee-collection blocker (rate-limited), not a
+        # missing credential.
+        rpc_url_template="https://mantle-mainnet.g.alchemy.com/v2/{api_key}",
         reorg_depth=30,
         avg_block_time_s=2.0,
         native_gas_token="MNT",
