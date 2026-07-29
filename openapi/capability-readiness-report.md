@@ -18,7 +18,7 @@ non-`backtest-only` stamp cites its evidence source.
 **Maturity → C/D/B gate** (`plans/PLAN_FORMAT.md` § 3-Tier Readiness Model):
 `backtest-only`→C2, `shadow-observed`→D2, `staging-proven`→D3, `live-proven`→D5.
 
-Manifest commit: `c7d2b9abe967201bde7b8390a1e74cd1141d8c1f`
+Manifest commit: `6186be5a550947d52461b686e024512de796cee1`
 
 ## Tier distribution (4)
 
