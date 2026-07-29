@@ -42,6 +42,9 @@ from unified_api_contracts.internal.schemas.contracts import (
     TRADFI_FUTURE_OHLCV_1M,
     lookup_contract,
 )
+from unified_api_contracts.registry.market_data_categories import (
+    VALID_DATA_TYPES_BY_AG_AND_INSTRUMENT_TYPE,
+)
 
 # ---------------------------------------------------------------------------
 # Pre-existing 1m contracts preserved
@@ -161,6 +164,21 @@ def test_cefi_future_liq_aggregates(tf: str) -> None:
     assert "open" not in names
 
 
+@pytest.mark.parametrize("tf", MDPS_TIMEFRAMES_CEFI)
+def test_cefi_future_book5_candles(tf: str) -> None:
+    """Dated CeFi futures (e.g. DERIBIT/OKX-FUTURES) carry their own live order book,
+    captured separately from perpetuals — regression for the follow-up audit in
+    mdps_liq_agg_contract_missing_future_instrument_type_2026_07_27 (todo 2): a scoped
+    live GCS sample (2026-07-29, DERIBIT + OKX-FUTURES, 4 days) confirmed real, ongoing
+    `instrument_type=future/data_type=book_snapshot_5` raw-tick capture with no
+    registered candle contract — the same "No SchemaContract registered" crash class as
+    the already-fixed trades/liq_agg gaps, just not yet triggered by a live VM run.
+    """
+    contract = lookup_contract(asset_group="cefi", instrument_type="future", data_type=MDPS_KEY_BOOK5(tf))
+    names = {c.name for c in contract.columns}
+    assert set(BOOK_SUMMARY_COLUMN_NAMES).issubset(names)
+
+
 @pytest.mark.parametrize("tf", MDPS_TIMEFRAMES_OPTIONS)
 def test_cefi_options_chain_candles_key_on_underlying(tf: str) -> None:
     contract = lookup_contract(asset_group="cefi", instrument_type="options_chain", data_type=MDPS_KEY_TRADES(tf))
@@ -171,6 +189,75 @@ def test_cefi_options_chain_candles_key_on_underlying(tf: str) -> None:
 def test_cefi_futures_chain_candles_key_on_underlying(tf: str) -> None:
     contract = lookup_contract(asset_group="cefi", instrument_type="futures_chain", data_type=MDPS_KEY_TRADES(tf))
     assert contract.symbol_column == "underlying"
+
+
+# ---------------------------------------------------------------------------
+# Class-of-bug regression — every CEFI raw-tick-capturable instrument_type has
+# a registered candle contract for every capturable data_type that has an MDPS
+# candle equivalent.
+#
+# Closes cefi_future_instrument_type_no_candle_schema_contract_2026_07_21 todo
+# 3 ("closes the class of bug, not just this instance") — cross-checks the
+# per-instrument_type candle coverage directly against
+# ``VALID_DATA_TYPES_BY_AG_AND_INSTRUMENT_TYPE`` (the SSOT for what a CEFI
+# instrument_type genuinely captures at the raw-tick layer) rather than
+# hand-listing an expected set, so a future raw-tick capability the registry
+# grows without a matching candle-contract addition fails THIS test instead of
+# crashing silently on the next real MDPS run.
+#
+# ``derivative_ticker`` is intentionally excluded for ``future``: a scoped live
+# GCS sample (2026-07-29, DERIBIT + OKX-FUTURES, 4 days) found ZERO real
+# objects at that (instrument_type, data_type) pair — dated futures settle on
+# expiry, not via a funding/mark-price ticker stream, so
+# ``VALID_DATA_TYPES_BY_AG_AND_INSTRUMENT_TYPE[("cefi", "future")]``'s own
+# "UNCERTAIN — cefi-owner verify" tag over-states real capture for this one
+# data_type; registering an unused contract would be speculative, not a fix for
+# an observed gap (see the `future`/book5 registration's comment in
+# ``_candle_contracts.py`` for the full evidence).
+_CEFI_RAW_DATA_TYPE_TO_CANDLE_KEY_FN = {
+    "trades": MDPS_KEY_TRADES,
+    "book_snapshot_5": MDPS_KEY_BOOK5,
+    "derivative_ticker": MDPS_KEY_DERIV,
+    "liquidations": MDPS_KEY_LIQ,
+}
+# Raw data_types with NO MDPS candle equivalent (skip, don't fail on these):
+#   - ohlcv_1m: already a pre-aggregated OHLCV capture, not MDPS-derived input.
+#   - perp_funding: settlement events, no candle-shaped rollup defined.
+_CEFI_NO_CANDLE_EQUIVALENT = frozenset({"ohlcv_1m", "perp_funding"})
+# Known, evidence-backed exclusions from the registry's raw claim (see docstring above).
+_CEFI_CANDLE_COVERAGE_EXCLUSIONS: frozenset[tuple[str, str]] = frozenset({("future", "derivative_ticker")})
+# Leaf instrument_types only — bundle grains (options_chain/futures_chain) and
+# roll-up-only leaves (option/combo, frozenset()) are covered by their own
+# dedicated tests above, not this per-raw-data_type sweep.
+_CEFI_LEAF_INSTRUMENT_TYPES = ("perpetual", "spot_pair", "future")
+
+
+def _cefi_candle_coverage_cases() -> list[tuple[str, str]]:
+    cases: list[tuple[str, str]] = []
+    for itype in _CEFI_LEAF_INSTRUMENT_TYPES:
+        raw_data_types = VALID_DATA_TYPES_BY_AG_AND_INSTRUMENT_TYPE[("cefi", itype)]
+        for raw_dt in raw_data_types:
+            if raw_dt in _CEFI_NO_CANDLE_EQUIVALENT:
+                continue
+            if (itype, raw_dt) in _CEFI_CANDLE_COVERAGE_EXCLUSIONS:
+                continue
+            assert raw_dt in _CEFI_RAW_DATA_TYPE_TO_CANDLE_KEY_FN, (
+                f"cefi/{itype}/{raw_dt} has no candle-key mapping in this test — add one "
+                "(or an explicit, evidence-backed exclusion) before this raw data_type can "
+                "be asserted covered."
+            )
+            cases.append((itype, raw_dt))
+    return cases
+
+
+@pytest.mark.parametrize("itype,raw_dt", _cefi_candle_coverage_cases())
+@pytest.mark.parametrize("tf", MDPS_TIMEFRAMES_CEFI)
+def test_cefi_every_capturable_instrument_type_has_candle_contract(tf: str, itype: str, raw_dt: str) -> None:
+    key_fn = _CEFI_RAW_DATA_TYPE_TO_CANDLE_KEY_FN[raw_dt]
+    # Must not raise — a raise here is exactly the live "No SchemaContract
+    # registered for asset_group='cefi' instrument_type=... data_type=..."
+    # crash this test class exists to catch before it reaches a real VM.
+    lookup_contract(asset_group="cefi", instrument_type=itype, data_type=key_fn(tf))
 
 
 # ---------------------------------------------------------------------------

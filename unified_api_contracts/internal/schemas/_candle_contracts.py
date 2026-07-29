@@ -358,6 +358,20 @@ for _tf in _TIMEFRAMES_CEFI:
             liq_shape=True,
         )
     )
+    # book_snapshot_5: dated futures DO have their own live order book, captured
+    # separately from perpetuals (mdps_liq_agg_contract_missing_future_instrument_type_2026_07_27
+    # todo 2's follow-up corpus audit — live GCS sampling, 2026-07-29, confirmed real,
+    # substantial, ongoing `instrument_type=future/data_type=book_snapshot_5` raw-tick
+    # capture on both DERIBIT and OKX-FUTURES, e.g. 33-104 shards/day sampled across
+    # 2026-06-15/2026-07-01/2026-07-10/2026-07-19 — the same crash class as the
+    # already-fixed trades/liq_agg gaps would hit the moment MDPS candle-processes any
+    # of this real volume). `derivative_ticker` was NOT added alongside it: the same
+    # audit found ZERO real `instrument_type=future/data_type=derivative_ticker` objects
+    # across all 4 sampled days x both venues — dated futures settle on expiry, not via
+    # a funding/mark-price ticker stream the way perpetuals do, so there is no real data
+    # this contract would ever serve; adding an unused contract would be speculative, not
+    # a fix for an observed gap.
+    _register(_build("cefi", "future", _book5_key(_tf), symbol_column="symbol", extra_cols=_BOOK5_EXT))
 
 for _tf in _TIMEFRAMES_OPTIONS:
     _register(
