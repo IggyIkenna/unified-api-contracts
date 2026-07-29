@@ -81,11 +81,38 @@ def test_cefi_partition_path_canonical() -> None:
         data_type="trades",
         day=DAY,
         file_name="BTC-USDT.parquet",
+        pipeline_mode="batch_tardis",
     )
     assert path == (
-        "raw_tick_data/by_date/day=2026-04-17/asset_group=cefi/venue=BINANCE/"
+        "raw_tick_data/by_date/day=2026-04-17/pipeline_mode=batch_tardis/asset_group=cefi/venue=BINANCE/"
         "instrument_type=perpetual/data_type=trades/BTC-USDT.parquet"
     )
+
+
+def test_cefi_partition_path_requires_pipeline_mode() -> None:
+    """pipeline_mode is now a REQUIRED kwarg (2026-07-29 write-side footgun fix) —
+    omitting it must fail loudly with Python's own required-kwarg TypeError, not
+    silently produce a non-canonical path."""
+    with pytest.raises(TypeError):
+        build_cefi_partition_path(  # pyright: ignore[reportCallIssue]
+            venue="binance",
+            instrument_type=InstrumentType.PERPETUAL,
+            data_type="trades",
+            day=DAY,
+            file_name="BTC-USDT.parquet",
+        )
+
+
+def test_cefi_partition_path_rejects_empty_pipeline_mode() -> None:
+    with pytest.raises(ValueError, match="pipeline_mode"):
+        build_cefi_partition_path(
+            venue="binance",
+            instrument_type=InstrumentType.PERPETUAL,
+            data_type="trades",
+            day=DAY,
+            file_name="BTC-USDT.parquet",
+            pipeline_mode="",
+        )
 
 
 def test_cefi_v6_chain_bundle_layout() -> None:
@@ -96,12 +123,13 @@ def test_cefi_v6_chain_bundle_layout() -> None:
         data_type="trades",
         day=DAY,
         file_name="ignored.parquet",
+        pipeline_mode="live_deribit",
         underlying="btc",
         quote_asset="usdc",
         margin_type="USDC",
     )
     assert path == (
-        "raw_tick_data/by_date/day=2026-04-17/asset_group=cefi/venue=DERIBIT/"
+        "raw_tick_data/by_date/day=2026-04-17/pipeline_mode=live_deribit/asset_group=cefi/venue=DERIBIT/"
         "instrument_type=options_chain/data_type=trades/"
         "underlying=BTC/quote=USDC/margin=usdc/ticks.parquet"
     )
@@ -115,6 +143,7 @@ def test_cefi_v6_falls_back_to_v5_for_single_symbol() -> None:
         data_type="trades",
         day=DAY,
         file_name="BTC-USDT.parquet",
+        pipeline_mode="batch_tardis",
         underlying="BTC",
         quote_asset="USDT",
         margin_type="USDT",
@@ -131,11 +160,29 @@ def test_cefi_v6_chain_without_all_axes_falls_back_to_v5() -> None:
         data_type="trades",
         day=DAY,
         file_name="BTC.parquet",
+        pipeline_mode="live_deribit",
         underlying="BTC",
         quote_asset="USDC",
     )
     assert "underlying=" not in path
     assert path.endswith("/data_type=trades/BTC.parquet")
+
+
+def test_cefi_partition_path_pipeline_mode_position() -> None:
+    """pipeline_mode= lands immediately after day=/ and before asset_group= —
+    the SAME position every confirmed-correct MTDS CeFi writer inserted it via
+    the manual .replace() this fix retires (symbol_rules.py,
+    websocket_runner.py, book_microstructure_handler.py,
+    _perp_funding_kalshi_polymarket.py, deribit_options_chain_handler.py)."""
+    path = build_cefi_partition_path(
+        venue="binance",
+        instrument_type=InstrumentType.PERPETUAL,
+        data_type="trades",
+        day=DAY,
+        file_name="BTC-USDT.parquet",
+        pipeline_mode="batch_tardis",
+    )
+    assert "day=2026-04-17/pipeline_mode=batch_tardis/asset_group=cefi/" in path
 
 
 # ---------------------------------------------------------------------------
@@ -150,11 +197,52 @@ def test_tradfi_partition_path_canonical() -> None:
         data_type="series_dgs10",
         day=DAY,
         file_name="DGS10.parquet",
+        pipeline_mode="batch_fred",
     )
     assert path == (
-        "raw_tick_data/by_date/day=2026-04-17/asset_group=tradfi/venue=FRED/"
+        "raw_tick_data/by_date/day=2026-04-17/pipeline_mode=batch_fred/asset_group=tradfi/venue=FRED/"
         "instrument_type=bond/data_type=series_dgs10/DGS10.parquet"
     )
+
+
+def test_tradfi_partition_path_requires_pipeline_mode() -> None:
+    """pipeline_mode is now a REQUIRED kwarg (2026-07-29 write-side footgun fix) —
+    omitting it must fail loudly with Python's own required-kwarg TypeError, not
+    silently produce a non-canonical path."""
+    with pytest.raises(TypeError):
+        build_tradfi_partition_path(  # pyright: ignore[reportCallIssue]
+            venue="fred",
+            instrument_type=InstrumentType.BOND,
+            data_type="series_dgs10",
+            day=DAY,
+            file_name="DGS10.parquet",
+        )
+
+
+def test_tradfi_partition_path_rejects_empty_pipeline_mode() -> None:
+    with pytest.raises(ValueError, match="pipeline_mode"):
+        build_tradfi_partition_path(
+            venue="fred",
+            instrument_type=InstrumentType.BOND,
+            data_type="series_dgs10",
+            day=DAY,
+            file_name="DGS10.parquet",
+            pipeline_mode="",
+        )
+
+
+def test_tradfi_partition_path_pipeline_mode_position() -> None:
+    """pipeline_mode= lands immediately after day=/ and before asset_group= —
+    the SAME position every confirmed-correct MTDS writer already inserted it."""
+    path = build_tradfi_partition_path(
+        venue="fred",
+        instrument_type=InstrumentType.BOND,
+        data_type="series_dgs10",
+        day=DAY,
+        file_name="DGS10.parquet",
+        pipeline_mode="batch_fred",
+    )
+    assert "day=2026-04-17/pipeline_mode=batch_fred/asset_group=tradfi/" in path
 
 
 def test_tradfi_partition_path_chain_v6() -> None:
@@ -186,6 +274,7 @@ def test_tradfi_partition_path_chain_backcompat_when_dims_empty() -> None:
         data_type="trades",
         day=DAY,
         file_name="SP500.parquet",
+        pipeline_mode="batch_databento",
     )
     assert path.endswith("/instrument_type=futures_chain/data_type=trades/SP500.parquet")
 
@@ -639,20 +728,22 @@ def test_tradfi_build_path_with_pipeline_mode_byte_identical_to_old_prepend(
     assert "pipeline_mode=" not in fallback_path
 
 
-def test_tradfi_build_path_without_pipeline_mode_unchanged() -> None:
-    """Back-compat: no pipeline_mode= → legacy path shape unchanged."""
-    path = build_tradfi_partition_path(
-        venue="CME",
-        instrument_type=InstrumentType.FUTURE,
-        data_type="ohlcv",
-        day=DAY,
-        file_name="ESM26.parquet",
-    )
-    assert path == (
-        "raw_tick_data/by_date/day=2026-04-17/asset_group=tradfi/venue=CME/"
-        "instrument_type=future/data_type=ohlcv/ESM26.parquet"
-    )
-    assert "pipeline_mode=" not in path
+def test_tradfi_build_path_without_pipeline_mode_raises() -> None:
+    """pipeline_mode is now a REQUIRED kwarg (2026-07-29 write-side footgun
+    fix) — the old back-compat "no pipeline_mode= → bare legacy shape"
+    behaviour is GONE from the builder itself (the bare shape is still what
+    legacy on-disk objects look like, and readers still probe for it — see
+    test_tradfi_candidate_paths_without_pipeline_mode_single_path below — but
+    the BUILDER can no longer produce it, closing the footgun that let a
+    writer silently skip the segment)."""
+    with pytest.raises(TypeError):
+        build_tradfi_partition_path(  # pyright: ignore[reportCallIssue]
+            venue="CME",
+            instrument_type=InstrumentType.FUTURE,
+            data_type="ohlcv",
+            day=DAY,
+            file_name="ESM26.parquet",
+        )
 
 
 def test_tradfi_candidate_paths_without_pipeline_mode_single_path() -> None:

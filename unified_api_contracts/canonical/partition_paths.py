@@ -25,11 +25,14 @@ DeFi (operator-locked 2026-06-01): ``pipeline_mode={mode}`` IS a CANONICAL
        ``raw_tick_data/by_date/day={D}/asset_group=defi/venue={V}/chain={C}/
        instrument_type={IT}/data_type={DT}/{file}``
        SSOT: ``codex/02-data/defi-canonical-naming-ssot.md``.
-CeFi: ``raw_tick_data/by_date/day={D}/asset_group=cefi/venue={V}/
+CeFi: ``raw_tick_data/by_date/day={D}/pipeline_mode={mode}/asset_group=cefi/venue={V}/
        instrument_type={IT}/data_type={DT}/{file}``
+       (``pipeline_mode`` is a REQUIRED :func:`build_cefi_partition_path` parameter as
+       of 2026-07-29 — see the "write-side footgun fix" note below.)
 TradFi: ``raw_tick_data/by_date/day={D}/pipeline_mode={mode}/asset_group=tradfi/venue={V}/
          instrument_type={IT}/data_type={DT}/{file}``
-         (back-compat without segment: ``raw_tick_data/by_date/day={D}/asset_group=tradfi/...``)
+         (``pipeline_mode`` is likewise REQUIRED as of 2026-07-29 — the old back-compat
+         no-segment shape can no longer be produced by :func:`build_tradfi_partition_path`.)
 Prediction: ``raw_tick_data/by_date/day={D}/asset_group=prediction/
              venue={V}/instrument_type={IT}/data_type={DT}/{condition_id}.parquet``
 
@@ -44,6 +47,21 @@ prepend further.
 Use the unified dispatcher :func:`candidate_parquet_paths` for code that
 spans asset_groups; use the per-asset-group ``build_*_partition_path``
 functions for type-checked single-asset-group code.
+
+Write-side footgun fix (2026-07-29): :func:`build_cefi_partition_path` and
+:func:`build_tradfi_partition_path` now REQUIRE ``pipeline_mode`` as a
+keyword argument (mirroring :func:`build_defi_partition_path`'s existing
+contract) instead of leaving every caller to remember a post-hoc
+``.replace(f"day={D}/", f"day={D}/pipeline_mode={pm}/", 1)`` insertion. That
+manual-insertion convention caused the SAME bug — a writer forgetting the
+insertion, silently producing a non-canonical object path — to recur 3
+independent times (KALSHI_PERP/POLYMARKET_PERP, Deribit options_chain, and
+the original MDPS ``_check_existing_outputs`` bug that triggered the audit).
+This is a BREAKING signature change on purpose: a call missing
+``pipeline_mode`` now fails loudly (``TypeError``) at the call site instead
+of silently shipping a wrong path. SSOT:
+``unified-trading-pm/plans/active/issues/gcs_path_resolution_centralization_audit_2026_07_28.md``
+§ "Centralization design ... RULED 2026-07-29".
 """
 
 from __future__ import annotations
@@ -205,6 +223,7 @@ def build_cefi_partition_path(
     data_type: str,
     day: _dt.date,
     file_name: str,
+    pipeline_mode: str,
     underlying: str = "",
     quote_asset: str = "",
     margin_type: str = "",
@@ -217,14 +236,15 @@ def build_cefi_partition_path(
     v5 (legacy) layout — single-symbol shards or callers leaving
     underlying / quote_asset / margin_type empty:
 
-    ``raw_tick_data/by_date/day={YYYY-MM-DD}/asset_group=cefi/venue={V}/
-    instrument_type={IT}/data_type={DT}/{file_name}``
+    ``raw_tick_data/by_date/day={YYYY-MM-DD}/pipeline_mode={mode}/
+    asset_group=cefi/venue={V}/instrument_type={IT}/data_type={DT}/{file_name}``
 
     v6 layout (2026-04-23) — only when ``instrument_type`` is a CHAIN bundle
     (``options_chain`` / ``futures_chain``) AND all three of
     ``underlying`` / ``quote_asset`` / ``margin_type`` are populated:
 
-    ``raw_tick_data/by_date/day=.../instrument_type={IT}/data_type={DT}/
+    ``raw_tick_data/by_date/day=.../pipeline_mode={mode}/asset_group=cefi/
+    venue={V}/instrument_type={IT}/data_type={DT}/
     underlying={U}/quote={Q}/margin={M}/ticks.parquet``
 
     For per-symbol (non-chain) shards, v6 does NOT add extra path segments —
@@ -235,6 +255,23 @@ def build_cefi_partition_path(
     either ``InstrumentType`` enum members or raw lowercase strings (the
     chain-bundle tokens ``options_chain`` / ``futures_chain`` aren't in the
     canonical enum so callers pass them as strings).
+
+    Args:
+        pipeline_mode: REQUIRED (2026-07-29 write-side footgun fix — see the
+            module docstring). Inserted as the ``pipeline_mode={mode}/``
+            segment immediately after ``day={D}/`` and before
+            ``asset_group=cefi/`` — the SAME position every confirmed-correct
+            CeFi writer already inserted it via a manual post-hoc
+            ``.replace()`` before this fix (mirrors
+            :func:`build_defi_partition_path`'s existing contract). A caller
+            with no real ``pipeline_mode`` value is a bug at the call site,
+            not something this builder should paper over with a default.
+
+    Raises:
+        TypeError: if ``pipeline_mode`` (or any other required keyword-only
+            argument) is omitted — Python's own required-kwarg enforcement.
+        ValueError: if ``pipeline_mode`` is an empty string, or any of
+            ``data_type`` / ``file_name`` are empty.
     """
     if not data_type:
         msg = "data_type must be a non-empty string"
@@ -242,12 +279,15 @@ def build_cefi_partition_path(
     if not file_name:
         msg = "file_name must be a non-empty string"
         raise ValueError(msg)
+    if not pipeline_mode:
+        msg = "pipeline_mode must be a non-empty string"
+        raise ValueError(msg)
 
     v = _normalize_venue_upper(venue)
     it = instrument_type.value.lower() if isinstance(instrument_type, InstrumentType) else instrument_type.lower()
     day_str = day.strftime("%Y-%m-%d")
     base = (
-        f"{RAW_TICK_DATA_PREFIX}day={day_str}/{ASSET_GROUP_HIVE_KEY}=cefi/"
+        f"{RAW_TICK_DATA_PREFIX}day={day_str}/pipeline_mode={pipeline_mode}/{ASSET_GROUP_HIVE_KEY}=cefi/"
         f"venue={v}/instrument_type={it}/data_type={data_type}"
     )
 
@@ -284,7 +324,7 @@ def build_tradfi_partition_path(
     data_type: str,
     day: _dt.date,
     file_name: str,
-    pipeline_mode: str | None = None,
+    pipeline_mode: str,
     underlying: str = "",
     quote_asset: str = "",
     margin_type: str = "",
@@ -294,19 +334,21 @@ def build_tradfi_partition_path(
     Returns the full path including the ``raw_tick_data/by_date/`` prefix —
     callers MUST NOT prepend further.
 
-    With ``pipeline_mode`` (canonical — operator-locked 2026-06-01), the
-    ``pipeline_mode={mode}/`` segment is inserted AFTER ``day={D}/`` and
+    ``pipeline_mode`` (canonical — operator-locked 2026-06-01; REQUIRED as of
+    the 2026-07-29 write-side footgun fix, see the module docstring) is
+    inserted as the ``pipeline_mode={mode}/`` segment AFTER ``day={D}/`` and
     BEFORE ``asset_group=tradfi/``:
 
     ``raw_tick_data/by_date/day={YYYY-MM-DD}/pipeline_mode={mode}/
     asset_group=tradfi/venue={V}/instrument_type={IT}/data_type={DT}/{file_name}``
 
-    Without ``pipeline_mode`` (``None``, back-compat default) the segment is
-    omitted — matching the legacy on-disk shape that readers still probe via
-    the fallback chain in :func:`candidate_parquet_paths`.
-
-    ``raw_tick_data/by_date/day={YYYY-MM-DD}/asset_group=tradfi/venue={V}/
-    instrument_type={IT}/data_type={DT}/{file_name}``
+    The old back-compat no-segment shape
+    (``raw_tick_data/by_date/day={YYYY-MM-DD}/asset_group=tradfi/venue={V}/
+    instrument_type={IT}/data_type={DT}/{file_name}``) can no longer be
+    produced by this builder — it is still what legacy pre-migration objects
+    on disk look like, and readers still probe for it via the fallback chain
+    in :func:`candidate_parquet_paths`, but a NEW write must always carry the
+    segment.
 
     v6 chain layout (2026-07-19) — only when ``instrument_type`` is a CHAIN
     bundle (``options_chain`` / ``futures_chain``) AND all three of
@@ -314,7 +356,8 @@ def build_tradfi_partition_path(
     :func:`build_cefi_partition_path` byte-for-byte + the shipped migration
     executor ``migrate_tradfi_canonical_2026_07._canonical_chain_path``):
 
-    ``raw_tick_data/by_date/day=.../instrument_type={IT}/data_type={DT}/
+    ``raw_tick_data/by_date/day=.../pipeline_mode={mode}/asset_group=tradfi/
+    venue={V}/instrument_type={IT}/data_type={DT}/
     underlying={U}/quote={Q}/margin={M}/ticks.parquet``
 
     For single-instrument (non-chain) shards, the v6 layout does NOT add extra
@@ -328,6 +371,12 @@ def build_tradfi_partition_path(
     Used by FRED (rates curve via DGS series), OPRA (options chains via
     Databento), Tardis (ETF flows / institutional feeds), CME (futures
     chains).
+
+    Raises:
+        TypeError: if ``pipeline_mode`` (or any other required keyword-only
+            argument) is omitted — Python's own required-kwarg enforcement.
+        ValueError: if ``pipeline_mode`` is an empty string, or any of
+            ``data_type`` / ``file_name`` are empty.
     """
     if not data_type:
         msg = "data_type must be a non-empty string"
@@ -335,13 +384,15 @@ def build_tradfi_partition_path(
     if not file_name:
         msg = "file_name must be a non-empty string"
         raise ValueError(msg)
+    if not pipeline_mode:
+        msg = "pipeline_mode must be a non-empty string"
+        raise ValueError(msg)
 
     v = _normalize_venue_upper(venue)
     it = instrument_type.value.lower() if isinstance(instrument_type, InstrumentType) else instrument_type.lower()
     day_str = day.strftime("%Y-%m-%d")
-    pipeline_mode_segment = f"pipeline_mode={pipeline_mode}/" if pipeline_mode else ""
     base = (
-        f"{RAW_TICK_DATA_PREFIX}day={day_str}/{pipeline_mode_segment}"
+        f"{RAW_TICK_DATA_PREFIX}day={day_str}/pipeline_mode={pipeline_mode}/"
         f"{ASSET_GROUP_HIVE_KEY}=tradfi/"
         f"venue={v}/instrument_type={it}/data_type={data_type}"
     )
@@ -431,6 +482,14 @@ def build_prediction_partition_path(
 # Cross-asset-group dispatcher
 # ---------------------------------------------------------------------------
 
+# Throwaway value used ONLY to obtain build_cefi_partition_path's /
+# build_tradfi_partition_path's positional path SHAPE when a
+# candidate_parquet_paths() caller doesn't know pipeline_mode yet (both
+# builders now REQUIRE it — 2026-07-29 write-side footgun fix). Stripped back
+# out by _strip_pipeline_mode_segment before any path is returned — this
+# literal string never appears in a candidate path a caller sees.
+_LEGACY_SHAPE_PROBE_PIPELINE_MODE = "_legacy_shape_probe_"
+
 
 def candidate_parquet_paths(
     asset_group: AssetGroup | str,
@@ -490,13 +549,35 @@ def candidate_parquet_paths(
     def _prepend_pipeline_mode(path: str) -> str:
         """Insert ``pipeline_mode={mode}/`` after ``day={D}/`` in a canonical path.
 
-        Used by CeFi / TradFi / Prediction. DeFi does NOT use this — its
-        ``pipeline_mode={mode}/`` segment is canonical and produced directly by
-        :func:`build_defi_partition_path` (the single source), so the DeFi
-        branch passes ``pipeline_mode`` through to the builder instead.
+        Used by Prediction only (its builder has no ``pipeline_mode`` param).
+        DeFi does NOT use this — its ``pipeline_mode={mode}/`` segment is
+        canonical and produced directly by :func:`build_defi_partition_path`
+        (the single source), so the DeFi branch passes ``pipeline_mode``
+        through to the builder instead. CeFi / TradFi ALSO pass
+        ``pipeline_mode`` straight to their builders now (2026-07-29
+        write-side footgun fix made it a required builder param) — see
+        ``_strip_pipeline_mode_segment`` below for how those two branches
+        derive the bare/legacy fallback candidate instead.
         """
         marker = f"day={day_str}/{ASSET_GROUP_HIVE_KEY}="
         return path.replace(marker, f"day={day_str}/pipeline_mode={pipeline_mode}/{ASSET_GROUP_HIVE_KEY}=", 1)
+
+    def _strip_pipeline_mode_segment(path_with_segment: str, pipeline_mode_value: str) -> str:
+        """Inverse of the builders' own segment insertion: remove a
+        ``pipeline_mode={value}/`` segment, recovering the pre-2026-06-01-lock
+        bare (legacy) path shape used as the CeFi/TradFi read-side fallback
+        candidate.
+
+        ``build_cefi_partition_path`` / ``build_tradfi_partition_path`` can no
+        longer produce the bare shape directly (``pipeline_mode`` is a
+        REQUIRED param as of the 2026-07-29 write-side footgun fix), so the
+        bare candidate is derived by building WITH a value, then stripping the
+        segment back out. When the caller's own ``pipeline_mode`` is unknown
+        (``None``), ``_LEGACY_SHAPE_PROBE_PIPELINE_MODE`` is used purely to
+        obtain the builder's positional shape — that placeholder value never
+        appears in a path this dispatcher returns (always stripped below).
+        """
+        return path_with_segment.replace(f"pipeline_mode={pipeline_mode_value}/", "", 1)
 
     if ag == AssetGroup.DEFI:
         # DeFi: pipeline_mode= is a CANONICAL segment owned by the builder
@@ -526,49 +607,46 @@ def candidate_parquet_paths(
         return [bare]
 
     if ag == AssetGroup.CEFI:
-        base = build_cefi_partition_path(
+        # build_cefi_partition_path now REQUIRES pipeline_mode (2026-07-29
+        # write-side footgun fix) — build WITH a value (the caller's real one,
+        # or the shape-probe placeholder when unknown) then derive the bare
+        # legacy fallback candidate by stripping the segment back out, rather
+        # than asking the builder for a shape it can no longer produce.
+        _cefi_probe_pm = pipeline_mode or _LEGACY_SHAPE_PROBE_PIPELINE_MODE
+        _cefi_with_segment = build_cefi_partition_path(
             venue=str(kwargs["venue"]),
             instrument_type=_coerce_instrument_type(kwargs["instrument_type"]),
             data_type=data_type,
             day=day,
             file_name=str(kwargs["file_name"]),
+            pipeline_mode=_cefi_probe_pm,
         )
+        _cefi_bare = _strip_pipeline_mode_segment(_cefi_with_segment, _cefi_probe_pm)
         if pipeline_mode:
-            return [_prepend_pipeline_mode(base), base]
-        return [base]
+            return [_cefi_with_segment, _cefi_bare]
+        return [_cefi_bare]
 
     if ag == AssetGroup.TRADFI:
         # TradFi: pipeline_mode= is a CANONICAL segment (operator-locked
-        # 2026-06-01) — pass it through to the builder (single code path)
-        # so the UAC builder is the sole source of path-construction logic.
-        # The canonical (with-segment) path is the first probe; the bare
-        # path follows as a migration fallback (Phase 5.3 / 8 window).
+        # 2026-06-01) and — like CeFi above — now a REQUIRED builder param
+        # (2026-07-29 write-side footgun fix). Same build-with-a-value /
+        # strip-for-the-bare-fallback approach as CeFi (one builder call
+        # instead of the old two-call pattern). The canonical (with-segment)
+        # path is the first probe; the bare path follows as a migration
+        # fallback (Phase 5.3 / 8 window).
+        _tradfi_probe_pm = pipeline_mode or _LEGACY_SHAPE_PROBE_PIPELINE_MODE
+        _tradfi_with_segment = build_tradfi_partition_path(
+            venue=str(kwargs["venue"]),
+            instrument_type=_coerce_instrument_type(kwargs["instrument_type"]),
+            data_type=data_type,
+            day=day,
+            file_name=str(kwargs["file_name"]),
+            pipeline_mode=_tradfi_probe_pm,
+        )
+        _tradfi_bare = _strip_pipeline_mode_segment(_tradfi_with_segment, _tradfi_probe_pm)
         if pipeline_mode:
-            canonical = build_tradfi_partition_path(
-                venue=str(kwargs["venue"]),
-                instrument_type=_coerce_instrument_type(kwargs["instrument_type"]),
-                data_type=data_type,
-                day=day,
-                file_name=str(kwargs["file_name"]),
-                pipeline_mode=pipeline_mode,
-            )
-            base = build_tradfi_partition_path(
-                venue=str(kwargs["venue"]),
-                instrument_type=_coerce_instrument_type(kwargs["instrument_type"]),
-                data_type=data_type,
-                day=day,
-                file_name=str(kwargs["file_name"]),
-            )
-            return [canonical, base]
-        return [
-            build_tradfi_partition_path(
-                venue=str(kwargs["venue"]),
-                instrument_type=_coerce_instrument_type(kwargs["instrument_type"]),
-                data_type=data_type,
-                day=day,
-                file_name=str(kwargs["file_name"]),
-            )
-        ]
+            return [_tradfi_with_segment, _tradfi_bare]
+        return [_tradfi_bare]
 
     if ag == AssetGroup.PREDICTION:
         instrument_type_raw = kwargs.get("instrument_type", "prediction_market")
