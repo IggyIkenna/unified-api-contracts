@@ -241,6 +241,18 @@ AVAILABILITY_AT_SEMANTICS: Final[dict[tuple[str, str], AvailabilitySemantic]] = 
     # available_at = write-time per ``fetch_completed_at`` (downstream of
     # weekly EIA publication cadence). d5_features_missing_data_downgrade_2026_05_20 Phase 1.
     ("tradfi", "commodity_signal"): "fetch_completed_at",
+    # FRED/ECB yield_curve + ohlcv_1d, OFR cds_spread — daily/monthly/quarterly
+    # published macro/rate/CDS-spread series (same publication-cadence class as
+    # EIA's energy_data below); available_at = fetch completion time (row written
+    # after the periodic release is fetched and parsed), not a tick timestamp.
+    # Added 2026-07-29 per the round-3 TRADFI
+    # gcs_path_resolution_centralization_audit_2026_07_28.md pipeline_mode
+    # provenance-fallback fix — SOURCE_PRIORITY additions require a matching
+    # AVAILABILITY_AT_SEMANTICS entry (closed-set round-trip,
+    # test_every_source_priority_pair_has_availability_semantic).
+    ("tradfi", "yield_curve"): "fetch_completed_at",
+    ("tradfi", "ohlcv_1d"): "fetch_completed_at",
+    ("tradfi", "cds_spread"): "fetch_completed_at",
     # ---- Prediction -----------------------------------------------------
     # Prediction CLOB ticks: tick_timestamp at write, but the orchestrator
     # ALSO clips by market_created_at upstream (no ticks before market

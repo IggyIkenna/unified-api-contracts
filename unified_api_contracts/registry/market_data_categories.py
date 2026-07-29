@@ -2335,8 +2335,23 @@ def get_venue_data_type_start_date(venue: str, data_type: str) -> str | None:
 def get_expected_data_types_for_venue(
     venue: str,
     service: str = "",
+    *,
+    for_batch: bool = False,
 ) -> list[str]:
     """Return the list of data types a venue is expected to produce.
+
+    ``for_batch=True`` additionally drops any data_type declared in
+    ``VENUE_DATA_TYPE_NO_BATCH_SOURCE`` for this venue (a real capability the
+    venue has, but only via a live-only transport with no historical/batch
+    query surface — e.g. LIGHTER-ZKSYNC ``trades``). Callers driving an actual
+    BATCH fetch attempt (or its expected-vs-captured sentinel/coverage math)
+    MUST pass this so a physically-unattemptable combo is never even seeded
+    into the batch expected/reachable universe, per the 2026-07-15 operator
+    ruling documented in market-tick-data-service's
+    ``_onchain_perp_batch_live_only.py``. Default ``False`` preserves the
+    existing "full declared capability, any transport" behavior for every
+    other caller (coverage-display / documentation-style consumers that
+    legitimately want the complete capability list regardless of transport).
 
     The capabilities registry is split by service layer:
     - instruments-service → VENUE_REFERENCE_DATA_CAPABILITIES (static metadata)
@@ -2383,7 +2398,9 @@ def get_expected_data_types_for_venue(
             MDPS_DERIVABLE_DATA_TYPES,
         )
 
-        return sorted(set(dts) & MDPS_DERIVABLE_DATA_TYPES)
+        dts = sorted(set(dts) & MDPS_DERIVABLE_DATA_TYPES)
+    if for_batch:
+        dts = [dt for dt in dts if venue_data_type_has_batch_source(venue, dt)]
     return dts
 
 

@@ -409,6 +409,34 @@ SOURCE_PRIORITY: Final[dict[tuple[str, str], list[str]]] = {
     # d5_features_missing_data_downgrade_2026_05_20 Phase 1 — closes
     # PipelineMode.BATCH_EIA closed-set round-trip with SOURCE_PRIORITY.
     ("tradfi", "commodity_signal"): ["eia"],
+    # FRED/ECB yield_curve — US Treasury yield/TIPS/rate/spread/credit series
+    # (DGS*/DFII*/FEDFUNDS/DFF/SOFR/T10Y*/BAMLH0A0HYM2 via FRED) + EU sovereign
+    # yield curves (OIS/ESTR via ECB SDMX IRS/YC/BSI flows). Added 2026-07-29
+    # per the round-3 TRADFI gcs_path_resolution_centralization_audit_2026_07_28.md
+    # finding: this (asset_group, data_type) pair was UNREGISTERED, so any
+    # venue-blind derivation fell through to the tradfi asset_group fallback
+    # (batch_databento) — a provenance lie, since Databento never touches FRED/ECB
+    # data. At write-time both venues resolve via their own UTL
+    # ``_VENUE_OVERRIDES["FRED"]``/``["ECB"]`` (always known at write time, so this
+    # entry never actually competes) — registered here to satisfy the
+    # PipelineMode<->SOURCE_PRIORITY closed-set round-trip and to give a sane
+    # venue-blind fallback. Not yet in DATA_TYPES_BY_ASSET_GROUP["tradfi"]'s
+    # validity matrix (test_validity_matrix_completeness.py exclusion:
+    # TRADFI_VENDOR_DATA_TYPE_NOT_IN_VALIDITY_MATRIX) — widening the matrix is a
+    # separate follow-up decision, out of scope for this provenance fix.
+    ("tradfi", "yield_curve"): ["fred", "ecb"],
+    # FRED/ECB ohlcv_1d — the non-BOND KEY_SERIES categories (FRED
+    # volatility/inflation/macro, e.g. VIXCLS/CPIAUCSL/UNRATE/GDPC1; ECB
+    # EXR/ICP flows) are written as a single-observation "degenerate OHLCV bar"
+    # (fred_adapter.py/ecb_adapter.py ``write_canonical_shard``). Same round-3
+    # finding + closed-set/validity-matrix-exclusion rationale as yield_curve
+    # above.
+    ("tradfi", "ohlcv_1d"): ["fred", "ecb"],
+    # OFR cds_spread — CDS spread indices + the NFCI financial-conditions family
+    # (ofr_adapter.py ``write_canonical_shard``, InstrumentType.CDS). Same
+    # round-3 finding + closed-set/validity-matrix-exclusion rationale as
+    # yield_curve/ohlcv_1d above.
+    ("tradfi", "cds_spread"): ["ofr"],
     # ---- Prediction -----------------------------------------------------
     # Prediction is venue-disambiguated: Polymarket data comes from polymarket_clob, Kalshi
     # data from kalshi (the vendor IS the venue). Both serve the same data_types — the
@@ -516,6 +544,12 @@ SOURCE_MODE_CAPABILITY: Final[dict[str, frozenset[Mode]]] = {
     "yahoo": frozenset({Mode.BATCH}),
     # "barchart" RETIRED 2026-06-24 (VIX 15m → VX futures via databento XCBF.PITCH).
     "eia": frozenset({Mode.BATCH, Mode.REPLAY}),  # weekly series re-fetchable by date
+    # FRED/ECB/OFR — public REST macro/rate/CDS-spread archives, no live/WS leg
+    # (daily/monthly/quarterly-cadence series). Added 2026-07-29 per the round-3
+    # TRADFI gcs_path_resolution_centralization_audit_2026_07_28.md finding.
+    "fred": frozenset({Mode.BATCH}),
+    "ecb": frozenset({Mode.BATCH}),
+    "ofr": frozenset({Mode.BATCH}),
     # ---- DeFi ----
     # hyperliquid (unified vendor) lives in the CeFi-venue block below — it is the
     # ONE venue that is ALSO batch-capable (DeFi perp_funding/solana_defi via REST
@@ -714,6 +748,13 @@ EMISSION_LATENCY_MS_BY_SOURCE: Final[dict[str, int]] = {
     # matches barchart-tier daily-archive sources; tightenable later via
     # source_emission_latency_calibration_2026_*<TBD>.md.
     "eia": 86_400_000,
+    # FRED/ECB/OFR — daily/monthly/quarterly-cadence macro/rate/CDS-spread series
+    # (same conservative daily-archive class as eia/footystats). Added 2026-07-29
+    # per the round-3 TRADFI gcs_path_resolution_centralization_audit_2026_07_28.md
+    # finding.
+    "fred": 86_400_000,  # 24h: FRED daily/monthly/quarterly series publication cadence
+    "ecb": 86_400_000,  # 24h: ECB SDMX yield-curve/rate series publication cadence
+    "ofr": 86_400_000,  # 24h: OFR CDS spread / NFCI series publication cadence
     # DeFi REST APIs — Hyperliquid + oracle aggregators.
     "hyperliquid": 1_000,  # 1s: HL REST API polling cadence (source=hyperliquid, transport=rest)
     "aster": 1_000,  # 1s: Aster native REST polling cadence (source=aster, transport=rest)

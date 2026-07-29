@@ -500,3 +500,48 @@ class TestMdpsCanonicalTimeframes:
         signature change."""
         assert get_expected_timeframes_for_venue_dt("BINANCE-FUTURES", "trades") == list(MDPS_CANONICAL_TIMEFRAMES)
         assert get_expected_timeframes_for_venue_dt("CME", "ohlcv_1m") == list(MDPS_CANONICAL_TIMEFRAMES)
+
+
+class TestGetExpectedDataTypesForVenueForBatch:
+    """Regression for lighter_zksync_trades_generic_tardis_path_bypasses_no_batch_source_2026_07_29.md:
+    the generic MTDS batch-fetch loop (venue_fetch.py::_process_venue) resolved its
+    per-venue data_type list via ``get_expected_data_types_for_venue`` without ever
+    consulting ``VENUE_DATA_TYPE_NO_BATCH_SOURCE`` -- so it kept attempting (and
+    failing) a real Tardis fetch for LIGHTER-ZKSYNC trades forever, a combo declared
+    to have no batch source at all. ``for_batch=True`` closes that gap; default
+    ``False`` must stay byte-identical to every other (coverage-display) caller.
+    """
+
+    def test_default_still_includes_no_batch_source_combo(self) -> None:
+        from unified_api_contracts.registry.market_data_categories import (
+            get_expected_data_types_for_venue,
+        )
+
+        dts = get_expected_data_types_for_venue("LIGHTER-ZKSYNC")
+        assert "trades" in dts, "default (for_batch=False) must not change for existing callers"
+
+    def test_for_batch_excludes_no_batch_source_combo(self) -> None:
+        from unified_api_contracts.registry.market_data_categories import (
+            get_expected_data_types_for_venue,
+        )
+
+        dts = get_expected_data_types_for_venue("LIGHTER-ZKSYNC", for_batch=True)
+        assert "trades" not in dts
+        assert "book_snapshot_5" not in dts
+
+    def test_for_batch_keeps_batch_sourced_combo(self) -> None:
+        from unified_api_contracts.registry.market_data_categories import (
+            get_expected_data_types_for_venue,
+        )
+
+        dts = get_expected_data_types_for_venue("LIGHTER-ZKSYNC", for_batch=True)
+        assert "derivative_ticker" in dts, "LIGHTER-ZKSYNC derivative_ticker IS Tardis-batch-sourced"
+
+    def test_for_batch_is_a_noop_for_venues_with_no_carve_out(self) -> None:
+        from unified_api_contracts.registry.market_data_categories import (
+            get_expected_data_types_for_venue,
+        )
+
+        without = get_expected_data_types_for_venue("BINANCE-FUTURES")
+        with_batch = get_expected_data_types_for_venue("BINANCE-FUTURES", for_batch=True)
+        assert without == with_batch

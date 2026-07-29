@@ -55,6 +55,12 @@ EXPECTED_SOURCE_MODE_CAPABILITY: dict[str, frozenset[Mode]] = {
     "yahoo": _B,
     # "barchart" retired 2026-06-24 (VIX 15m → VX futures via databento)
     "eia": _BR,
+    # FRED/ECB/OFR — public REST macro/rate/CDS-spread archives, no live/WS leg.
+    # Added 2026-07-29 per the round-3 TRADFI
+    # gcs_path_resolution_centralization_audit_2026_07_28.md finding.
+    "fred": _B,
+    "ecb": _B,
+    "ofr": _B,
     # DeFi
     # hyperliquid (unified vendor) is in the CeFi-venue block below with _BLR — it is
     # the ONE CeFi venue that is also a DeFi batch source (R4 2026-06-07). The

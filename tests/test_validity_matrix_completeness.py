@@ -98,6 +98,18 @@ from unified_api_contracts.registry.market_data_categories import (
 #       re-adding the uppercase form to the content-validity matrix (that would
 #       misrepresent what the manifest actually contains).
 #
+#   TRADFI_VENDOR_DATA_TYPE_NOT_IN_VALIDITY_MATRIX — a real external tradfi
+#       vendor (FRED/ECB/OFR) writes canonical shards under a data_type
+#       (yield_curve / ohlcv_1d / cds_spread) that has not yet been added to
+#       DATA_TYPES_BY_ASSET_GROUP["tradfi"] or any tradfi instrument_type's
+#       VALID_DATA_TYPES_BY_AG_AND_INSTRUMENT_TYPE frozenset. Registered in
+#       SOURCE_PRIORITY to fix the pipeline_mode provenance-fallback mis-stamp
+#       (round-3 TRADFI gcs_path_resolution_centralization_audit_2026_07_28.md
+#       finding — without a SOURCE_PRIORITY entry these rows silently fell
+#       through to batch_databento). Widening the validity matrix itself to
+#       formally admit these data_types is a separate follow-up decision, out
+#       of scope for the provenance fix.
+#
 # If a pair is removed from this list without being present in the matrix, the
 # test will fail loudly — that is the point.
 #
@@ -111,6 +123,7 @@ _BLOCKED_UPSTREAM_CAPABILITY = "BLOCKED_UPSTREAM_CAPABILITY"
 _REFERENCE_NOT_INSTRUMENT_GRAIN = "REFERENCE_NOT_INSTRUMENT_GRAIN"
 _CEFI_MATRIX_GAP = "CEFI_MATRIX_GAP"
 _SOURCE_PRIORITY_CASE_FALLBACK_KEY = "SOURCE_PRIORITY_CASE_FALLBACK_KEY"
+_TRADFI_VENDOR_DATA_TYPE_NOT_IN_VALIDITY_MATRIX = "TRADFI_VENDOR_DATA_TYPE_NOT_IN_VALIDITY_MATRIX"
 # PENDING_SNAPSHOT_SLICE — options_chain / futures_chain SOURCE_PRIORITY entries
 #     retained for cefi/tradfi pending the per-AG instrument_type snapshot slice
 #     widening (slot-3 widens cefi futures_chain to admit data_type=options_chain;
@@ -206,6 +219,12 @@ _SOURCE_PRIORITY_EXCLUSION_REASONS: dict[tuple[str, str], str] = {
     ("tradfi", "commodity_signal"): _COMPUTED_SERVICE_OUTPUT,
     ("tradfi", "commodity_features"): _COMPUTED_SERVICE_OUTPUT,
     ("tradfi", "energy_data"): _COMPUTED_SERVICE_OUTPUT,
+    # ── TradFi vendor data_types not yet in the validity matrix (FRED/ECB/OFR
+    #    pipeline_mode provenance fix — round-3 TRADFI
+    #    gcs_path_resolution_centralization_audit_2026_07_28.md) ──
+    ("tradfi", "yield_curve"): _TRADFI_VENDOR_DATA_TYPE_NOT_IN_VALIDITY_MATRIX,
+    ("tradfi", "ohlcv_1d"): _TRADFI_VENDOR_DATA_TYPE_NOT_IN_VALIDITY_MATRIX,
+    ("tradfi", "cds_spread"): _TRADFI_VENDOR_DATA_TYPE_NOT_IN_VALIDITY_MATRIX,
     # ── Prediction ──
     # "book_snapshot_5" is the canonical prediction depth key in SOURCE_PRIORITY
     # (upgraded from the legacy "book_snapshot" bare name — item 69/75-prediction).
@@ -366,6 +385,7 @@ class TestSourcePriorityReachability:
             _CEFI_MATRIX_GAP,
             _PENDING_SNAPSHOT_SLICE,
             _SOURCE_PRIORITY_CASE_FALLBACK_KEY,
+            _TRADFI_VENDOR_DATA_TYPE_NOT_IN_VALIDITY_MATRIX,
         }
 
         # Every exclusion key must appear in the reasons dict.
