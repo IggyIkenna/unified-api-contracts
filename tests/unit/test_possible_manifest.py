@@ -131,9 +131,15 @@ class TestCanonicalPathTemplates:
         # cefi 21→27 (+6: aster/databento/deribit/extended/hyperliquid/kalshi_perp — tardis
         # and lighter_api stay BATCH-only). defi 17→24 (+7: chainlink/helius_rpc/
         # hyperliquid/onchain_rpc/onchain_subgraph/pyth_hermes/solana_rpc — aave/defillama
-        # stay BATCH-only). tradfi 6→9 (+3: databento/eia/massive — yahoo stays BATCH-only).
+        # stay BATCH-only). tradfi 6→9 (+3: databento/eia/massive — yahoo stays BATCH-only);
+        # 9→12 (2026-07-29: +fred/ecb/ofr — round-3 TRADFI
+        # gcs_path_resolution_centralization_audit_2026_07_28.md pipeline_mode
+        # provenance-fallback fix, SOURCE_PRIORITY[("tradfi","yield_curve"/"ohlcv_1d"/
+        # "cds_spread")] now registers fred/ecb/ofr; all three are BATCH-only, so each
+        # contributes exactly one prefix, same as yahoo's existing single-BATCH-prefix
+        # pattern above).
         # Other AGs stay at their capability-derived baseline.
-        expected_pipeline_mode_counts = {"cefi": 27, "defi": 24, "tradfi": 9, "sports": 0}
+        expected_pipeline_mode_counts = {"cefi": 27, "defi": 24, "tradfi": 12, "sports": 0}
         for ag, expected in expected_pipeline_mode_counts.items():
             templates = canonical_path_templates(ag)
             pmode = [t for t in templates if "pipeline_mode=" in t]

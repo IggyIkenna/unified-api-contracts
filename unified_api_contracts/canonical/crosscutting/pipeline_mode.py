@@ -94,6 +94,22 @@ class PipelineMode(StrEnum):
     # live/replay leg.
     BATCH_DEFILLAMA = "batch_defillama"
     BATCH_EIA = "batch_eia"
+    # FRED (Federal Reserve Economic Data) — US Treasury yields/TIPS/rates/spreads/
+    # credit + macro series (VIXCLS/CPIAUCSL/UNRATE/GDPC1/...), self-archiving
+    # public REST (fred.stlouisfed.org). Added 2026-07-29 per the round-3 TRADFI
+    # gcs_path_resolution_centralization_audit_2026_07_28.md finding: with no
+    # venue override, any real FRED capture silently mis-stamped
+    # pipeline_mode=batch_databento (Databento never touched this data).
+    # BATCH-only — no live/replay leg (daily/monthly/quarterly series).
+    BATCH_FRED = "batch_fred"
+    # ECB (European Central Bank) Data Portal — EU sovereign yield curves (OIS,
+    # ESTR) + HICP/exchange-rate flows via SDMX 2.1 REST, no auth. Same round-3
+    # finding as FRED above. BATCH-only.
+    BATCH_ECB = "batch_ecb"
+    # OFR (Office of Financial Research, US Treasury) — CDS spread indices + the
+    # NFCI financial-conditions family via public REST, no auth. Same round-3
+    # finding as FRED/ECB above. BATCH-only.
+    BATCH_OFR = "batch_ofr"
     BATCH_EXECUTION_SERVICE = "batch_execution_service"
     BATCH_FEATURES_ONCHAIN_SERVICE = "batch_features_onchain_service"
     BATCH_FOOTYSTATS = "batch_footystats"
