@@ -62,6 +62,9 @@ BETFAIR_SB_UK = "BETFAIR_SB_UK"  # Betfair Sportsbook (UK)
 BETFAIR_EX_UK = "BETFAIR_EX_UK"  # Betfair Exchange (UK)
 BETFAIR_EX_EU = "BETFAIR_EX_EU"  # Betfair Exchange (EU)
 MATCHBOOK = "MATCHBOOK"
+SMARKETS = "SMARKETS"  # UK betting exchange, ODDS_API fan-out — added 2026-07-30 (was
+# missing entirely despite 1.1M+ live captured rows; see market_data_categories.py
+# VENUES_BY_ASSET_GROUP["sports"] for the confirming citation)
 
 # Prediction Markets — crypto/blockchain-based prediction exchanges
 POLYMARKET = "POLYMARKET"

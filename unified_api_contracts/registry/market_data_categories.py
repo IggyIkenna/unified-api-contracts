@@ -461,6 +461,19 @@ VENUES_BY_ASSET_GROUP: dict[str, list[str]] = {
         "BETFAIR_EX_EU",  # MTDS manifest sub-venue: Betfair Exchange EU
         "DRAFTKINGS",  # US bookmaker via ODDS_API fan-out (manifest-confirmed)
         "FANDUEL",  # US bookmaker via ODDS_API fan-out (manifest-confirmed)
+        # Added 2026-07-30 (distinct-values census review, sports_consolidated_native_ao_
+        # extract_2026_07_25.md Track C + sports_distinct_values_registry_cleanup_2026_07_30.md):
+        # real VenueConstant already existed for all 3 below, just never added here.
+        "LADBROKES",  # ODDS_API fan-out bookmaker; fold target of SPORTS_VENUE_FOLD
+        # ("ladbrokes_uk" wire spelling); raw-tick shape re-stamped + GCS-verified 2026-07-27/30.
+        "BET888SPORT",  # ODDS_API fan-out bookmaker; fold target of SPORTS_VENUE_FOLD
+        # ("sport888" wire spelling); raw-tick shape re-stamped + GCS-verified 2026-07-27/30.
+        "FOOTYSTATS",  # Football stats/odds provider (pipeline_mode=batch_footystats);
+        # legacy venue=ODDS_API mislabel re-stamped + GCS-verified 2026-07-30 (42,476 shards).
+        "SMARKETS",  # UK betting exchange, ODDS_API fan-out — confirmed live production
+        # data (1.1M+ rows through 2026-07-26, GCS-path-clean); was missing a VenueConstant
+        # entirely (see venue_constants.py) — see sports_consolidated_native_ao_extract_
+        # 2026_07_25.md's explicit "SMARKETS is NOT stale/deleted-venue residue" correction.
     ],
     "prediction": [
         # Prediction markets (binary / multi-outcome)
@@ -703,6 +716,143 @@ CHAIN_BUNDLE_ACCEPTED_NONCANONICAL_INSTRUMENT_TYPES: frozenset[str] = frozenset(
     {
         "options_chain",
         "futures_chain",
+    }
+)
+
+# TradFi venue-axis dead/legacy residue (distinct_values_noncanonical_audit_2026_07_20.md
+# follow-up, 2026-07-30 census review). BARCHART: removed from VENUES_BY_ASSET_GROUP
+# ["tradfi"] 2026-06-24 (VIX 15m preload retired) but the live manifest still carries
+# 9,119 quarantine-with-tracking rows (operator ruling 2026-07-20, tradfi_consolidated_
+# closeout Progress Log: "barchart + ICE qualifier variants quarantine-with-tracking"),
+# 100% capture_status=empty_confirmed (0 captured, no real data at risk) — never had an
+# accepted-exception entry despite the ruling, so it kept re-badging as fresh drift every
+# census run. YAHOO_FINANCE: removed 2026-07-15 (see the NOTE above in VENUES_BY_ASSET_
+# GROUP["tradfi"] — "legacy source-as-venue artifact... Do NOT re-add it here"); the
+# manifest rows behind this badge are pre-2026-07-15 legacy captures (GCS-confirmed
+# 2026-07-30 at day=2025-01-02) from before the writer was fixed to stamp real venues
+# (DXY→ICE, KRW/USD→FX) with source=yahoo instead — genuinely dead, not a registry gap.
+# Mirrors CEFI_VENUE_ACCEPTED_NONCANONICAL_ALIASES exactly: consumed by deployment-api's
+# `_distinct_values.py` `_ACCEPTED_EXCEPTIONS` to drop these from the tradfi `venues` axis
+# finding count. NOT a canonical set — never merge into VENUES_BY_ASSET_GROUP/ALL_VENUES.
+TRADFI_VENUE_ACCEPTED_NONCANONICAL_ALIASES: frozenset[str] = frozenset(
+    {
+        "BARCHART",
+        "YAHOO_FINANCE",
+    }
+)
+
+# TradFi chain-axis dead residue (2026-07-30 census review,
+# tradfi_distinct_values_net_new_clusters_2026_07_28.md). `chain` is meaningless for
+# tradfi (manifest_finalize.py::_resolve_manifest_venue_chain short-circuits chain=""
+# for every non-DeFi venue) — these 14 rows are the ONLY non-empty `chain` rows in the
+# entire tradfi manifest, all venue=CME/instrument_type=combo/capture_status=
+# attempted_failed/row_count=0/error_reason=SCHEMA_VALIDATION_FAILED from a failed
+# 2020-01-01/02 capture attempt. GCS-confirmed 2026-07-30: zero underlying=ESM0* objects
+# anywhere — pure dead manifest bookkeeping, not a live writer bug. NOT a canonical set —
+# `chain` has no canonical set for tradfi at all; consumed by deployment-api's
+# `_ACCEPTED_EXCEPTIONS[("chains", "tradfi")]`.
+TRADFI_CHAIN_AXIS_ACCEPTED_DEAD_RESIDUE: frozenset[str] = frozenset(
+    {
+        "ESM0",
+        "ESM0_MIGRATED_20260418T131054Z",
+    }
+)
+
+# TradFi instrument_type-axis unresolved residue (2026-07-30 census review,
+# tradfi_distinct_values_net_new_clusters_2026_07_28.md). `UD` — 3,607 captured rows,
+# venue=CME, spanning 2021-2026 in disjoint yearly chunks. Investigated twice (this
+# session): no writer found stamping bare instrument_type="UD" (CBOE's real `UD:` combo
+# classifier tags a `CBOE:UD:...` instrument_id, not this shape); GCS checked at 3 dates
+# found no `instrument_type=UD/` or `instrument_type=ud/` path. Quarantined per the
+# operator's standing classify-or-quarantine precedent (UNKNOWN, 2026-07-18) — root cause
+# NOT fully confirmed, flagged here for a deeper trace, not a closed finding. NOT a
+# canonical set — consumed by `_ACCEPTED_EXCEPTIONS[("instrument_types", "tradfi")]`.
+TRADFI_INSTRUMENT_TYPE_ACCEPTED_UNRESOLVED_RESIDUE: frozenset[str] = frozenset(
+    {
+        "UD",
+    }
+)
+
+# Sports venue-axis cross-asset-group bleed (2026-07-30 census review). KALSHI is a real,
+# registered `prediction` venue (VENUES_BY_ASSET_GROUP["prediction"]) whose rows also
+# appear in the SPORTS manifest — 20,785 rows, 100% capture_status=empty_confirmed/
+# row_count=0, paired with source=polymarket_clob, dates 2020-06-06..2026-05-21.
+# GCS-confirmed 2026-07-30: zero real objects under asset_group=sports/venue=KALSHI at 3
+# dates spanning the full range — purely a manifest phantom, no data at risk. Root-cause
+# classification (fleet-wide manifest_consolidator TOCTOU vs. legacy artifact) remains open
+# on `sports_satellite_ao_dispatch_batch3_2026_07_25.md`; this only silences the panel
+# badge for the confirmed-phantom population. NOT a canonical set — never merge into
+# VENUES_BY_ASSET_GROUP["sports"] (KALSHI belongs to prediction, not sports). Consumed by
+# `_ACCEPTED_EXCEPTIONS[("venues", "sports")]`.
+SPORTS_VENUE_ACCEPTED_CROSS_AG_BLEED: frozenset[str] = frozenset(
+    {
+        "KALSHI",
+    }
+)
+
+# Sports data_type-axis stale uppercase residue (2026-07-30 census review,
+# sports_consolidated_closeout_2026_07_19.md "K1/K2 revert"). `ODDS`/`ODDS_MOVEMENT`/
+# `ODDS_SNAPSHOT` (uppercase) are dead — the registry+writer revert shipped 2026-07-27
+# and the 345,852 uppercase GCS objects were deleted+re-verified-0-remaining 2026-07-28.
+# GCS-confirmed 2026-07-30: zero uppercase data_type= objects on 2 recent dates; the
+# current writer (market-data-processing-service canonical_writer.py) correctly lowercases
+# both the path and the manifest row. The only remaining badge source is 4 stale
+# capture_status=empty_confirmed/row_count=0 manifest rows with zero backing GCS content —
+# bookkeeping residue, not a live regression. NOT a canonical set — never merge into
+# DATA_TYPES_BY_ASSET_GROUP["sports"] (the K1/K2 revert deliberately keeps this lowercase-
+# only). Consumed by `_ACCEPTED_EXCEPTIONS[("data_types", "sports")]`.
+SPORTS_DATA_TYPE_ACCEPTED_STALE_UPPERCASE_RESIDUE: frozenset[str] = frozenset(
+    {
+        "ODDS",
+        "ODDS_MOVEMENT",
+        "ODDS_SNAPSHOT",
+    }
+)
+
+# Sports MDPS market-token instrument_type values (sports_instrument_type_market_token_
+# ssot_gap_2026_07_28.md). These 30 values are real, DELIBERATELY-produced MDPS output —
+# `canonical_writer_shaping.py::_type_token_from_canonical_id` resolves a sports candle
+# row's instrument_type from the market segment of the canonical id via
+# ODDS_API_MARKET_TO_CANONICAL (the operator's "branch the OHLCV mapping by instrument
+# market type" ruling), not a writer bug. Mirrors the tradfi/cefi
+# CHAIN_BUNDLE_ACCEPTED_NONCANONICAL_INSTRUMENT_TYPES precedent exactly: these are
+# bundle/market-grain tokens, never members of the per-CONTRACT-grain `InstrumentType`
+# enum, and never going to be added to it (operator decision 2026-07-30 — accepted-
+# exception over global enum growth, avoiding cross-asset-group enum bloat + denominator
+# blast radius). NOT a canonical set — consumed by
+# `_ACCEPTED_EXCEPTIONS[("instrument_types", "sports")]`.
+SPORTS_MARKET_TOKEN_ACCEPTED_NONCANONICAL_INSTRUMENT_TYPES: frozenset[str] = frozenset(
+    {
+        "ASIAN_HANDICAP_-0",
+        "ASIAN_HANDICAP_0",
+        "ASIAN_HANDICAP_0_25",
+        "ASIAN_HANDICAP_0_5",
+        "ASIAN_HANDICAP_0_75",
+        "ASIAN_HANDICAP_1",
+        "ASIAN_HANDICAP_1_25",
+        "ASIAN_HANDICAP_1_5",
+        "ASIAN_HANDICAP_1_75",
+        "ASIAN_HANDICAP_2",
+        "ASIAN_HANDICAP_M0_25",
+        "ASIAN_HANDICAP_M0_5",
+        "ASIAN_HANDICAP_M0_75",
+        "ASIAN_HANDICAP_M1",
+        "ASIAN_HANDICAP_M1_25",
+        "ASIAN_HANDICAP_M1_5",
+        "ASIAN_HANDICAP_M1_75",
+        "ASIAN_HANDICAP_M2",
+        "MATCH_ODDS",
+        "MATCH_ODDS_LAY",
+        "OVER_UNDER_1_5",
+        "OVER_UNDER_1_75",
+        "OVER_UNDER_2",
+        "OVER_UNDER_2_25",
+        "OVER_UNDER_2_5",
+        "OVER_UNDER_2_75",
+        "OVER_UNDER_3",
+        "OVER_UNDER_3_25",
+        "OVER_UNDER_3_5",
+        "SPORT",
     }
 )
 

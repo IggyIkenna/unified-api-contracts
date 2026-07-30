@@ -233,6 +233,11 @@ VENUE_TO_ADAPTER_KEY: dict[str, str] = {
     "BETFAIR_EX_EU": NO_ADAPTER_YET,
     "DRAFTKINGS": NO_ADAPTER_YET,
     "FANDUEL": NO_ADAPTER_YET,
+    # Added to VENUES_BY_ASSET_GROUP["sports"] 2026-07-30 (distinct-values census
+    # review) — same MTDS-owned-odds-venue shape as the 7 entries directly above.
+    "LADBROKES": NO_ADAPTER_YET,
+    "BET888SPORT": NO_ADAPTER_YET,
+    "SMARKETS": NO_ADAPTER_YET,
     # ODDS_API fan-out bookmakers promoted into VENUES_BY_ASSET_GROUP["sports"]
     # 2026-07-20, then REVERTED 2026-07-22 (operator ruling: "do NOT add them,
     # in fact remove them everywhere so they don't come up in audit" —
