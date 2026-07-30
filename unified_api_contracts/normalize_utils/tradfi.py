@@ -4,7 +4,6 @@ Covers:
 - FRED (Federal Reserve Economic Data) — US Treasury yield observations
 - ECB (European Central Bank SDMX REST) — EU OIS/ESTR yield curve
 - OFR (Office of Financial Research) — CDS spread indices
-- OpenBB Platform — Treasury bond bid/ask/YTM data
 """
 
 from __future__ import annotations
@@ -36,12 +35,6 @@ from ..external.ofr.normalize import (
     normalize_ofr_cds_spread,
 )
 
-# OpenBB
-from ..external.openbb.normalize import (
-    normalize_openbb_treasury_price,
-    normalize_openbb_treasury_prices_response,
-)
-
 __all__ = [
     "normalize_baker_hughes_rig_count",
     "normalize_cftc_cot_report",
@@ -52,6 +45,4 @@ __all__ = [
     "normalize_fred_series_response",
     "normalize_ofr_cds_response",
     "normalize_ofr_cds_spread",
-    "normalize_openbb_treasury_price",
-    "normalize_openbb_treasury_prices_response",
 ]

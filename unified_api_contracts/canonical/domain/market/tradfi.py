@@ -11,7 +11,7 @@ class CanonicalYieldCurvePoint(CanonicalBase):
     """One point on a yield curve."""
 
     timestamp: AwareDatetime
-    venue: str = Field(description="Data provider: fred | ecb | ofr | openbb | ibkr")
+    venue: str = Field(description="Data provider: fred | ecb | ofr | ibkr")
     series_id: str = Field(description="Series identifier e.g. DGS10 (FRED), OIS5Y (ECB)")
     tenor: str | None = Field(default=None, description="Tenor label e.g. 1Y, 5Y, 10Y")
     value: Decimal = Field(description="Yield / rate / spread (units per provider docs)")
@@ -23,7 +23,7 @@ class CanonicalBondData(CanonicalBase):
     """Normalized bond bid/ask/YTM data row."""
 
     timestamp: AwareDatetime
-    venue: str = Field(description="Data provider: openbb | ibkr")
+    venue: str = Field(description="Data provider: ibkr")
     symbol: str = Field(description="Bond symbol or ISIN")
     name: str | None = None
     bid: Decimal | None = None

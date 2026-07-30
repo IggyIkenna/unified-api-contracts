@@ -12,7 +12,7 @@ from pydantic import BaseModel
 
 
 class CanonicalBondData(BaseModel):
-    """Normalized bond market data — IBKR TWS, OpenBB."""
+    """Normalized bond market data — IBKR TWS."""
 
     instrument_key: str
     venue: str

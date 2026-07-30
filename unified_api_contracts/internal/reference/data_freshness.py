@@ -214,15 +214,6 @@ MARKET_TICK_FRESHNESS: dict[str, DataFreshnessContract] = {
         criticality="important",
         refetch_action="refetch-feed:yahoo_finance",
     ),
-    # Alt data — daily (informational)
-    "openbb": DataFreshnessContract(
-        source="openbb",
-        asset_group="tradfi",
-        max_age_seconds=86400,
-        warn_age_seconds=43200,
-        expected_cadence_seconds=86400,
-        criticality="informational",
-    ),
     "fred": DataFreshnessContract(
         source="fred",
         asset_group="tradfi",

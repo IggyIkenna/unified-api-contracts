@@ -1,13 +1,13 @@
 {
   "_meta": {
-    "version": "0.1.20",
+    "version": "0.80.1.dev632+gd4045838a.d20260729",
     "generator": "generate_ui_reference_data.py",
     "registry_count": 15
   },
   "venue_error_map": {
     "registry_name": "venue_error_map",
-    "version": "0.1.20",
-    "venue_count": 53,
+    "version": "0.80.1.dev632+gd4045838a.d20260729",
+    "venue_count": 55,
     "entries": {
       "aave_plasma": [
         {
@@ -471,6 +471,30 @@
           "reconnect": false,
           "action": "fail",
           "description": "Wrong season parameter \u2014 use season start year not current year"
+        },
+        {
+          "venue": "api_football",
+          "error_code": "plan",
+          "retry_safe": false,
+          "reconnect": false,
+          "action": "fail",
+          "description": "Current plan does not have access to this endpoint/date range"
+        },
+        {
+          "venue": "api_football",
+          "error_code": "requests",
+          "retry_safe": true,
+          "reconnect": false,
+          "action": "retry",
+          "description": "Daily request quota exceeded"
+        },
+        {
+          "venue": "api_football",
+          "error_code": "token",
+          "retry_safe": false,
+          "reconnect": false,
+          "action": "fail",
+          "description": "Invalid or missing API token"
         }
       ],
       "aster": [
@@ -521,6 +545,72 @@
           "reconnect": false,
           "action": "retry",
           "description": "Service unavailable"
+        }
+      ],
+      "baker_hughes": [
+        {
+          "venue": "baker_hughes",
+          "error_code": "401",
+          "retry_safe": false,
+          "reconnect": false,
+          "action": "fail",
+          "description": "Unauthorized (bad/missing API key)"
+        },
+        {
+          "venue": "baker_hughes",
+          "error_code": "403",
+          "retry_safe": false,
+          "reconnect": false,
+          "action": "fail",
+          "description": "Forbidden"
+        },
+        {
+          "venue": "baker_hughes",
+          "error_code": "404",
+          "retry_safe": false,
+          "reconnect": false,
+          "action": "skip",
+          "description": "Series/report not found for window"
+        },
+        {
+          "venue": "baker_hughes",
+          "error_code": "429",
+          "retry_safe": true,
+          "reconnect": false,
+          "action": "retry",
+          "description": "Rate limited \u2014 back off and retry"
+        },
+        {
+          "venue": "baker_hughes",
+          "error_code": "500",
+          "retry_safe": true,
+          "reconnect": false,
+          "action": "retry",
+          "description": "Upstream server error"
+        },
+        {
+          "venue": "baker_hughes",
+          "error_code": "502",
+          "retry_safe": true,
+          "reconnect": false,
+          "action": "retry",
+          "description": "Bad gateway"
+        },
+        {
+          "venue": "baker_hughes",
+          "error_code": "503",
+          "retry_safe": true,
+          "reconnect": false,
+          "action": "retry",
+          "description": "Service unavailable"
+        },
+        {
+          "venue": "baker_hughes",
+          "error_code": "504",
+          "retry_safe": true,
+          "reconnect": false,
+          "action": "retry",
+          "description": "Gateway timeout"
         }
       ],
       "balancer": [
@@ -587,48 +677,6 @@
           "reconnect": false,
           "action": "fail",
           "description": "Pool paused"
-        }
-      ],
-      "barchart": [
-        {
-          "venue": "barchart",
-          "error_code": "400",
-          "retry_safe": false,
-          "reconnect": false,
-          "action": "fail",
-          "description": "Bad request \u2014 invalid symbol or parameter"
-        },
-        {
-          "venue": "barchart",
-          "error_code": "401",
-          "retry_safe": false,
-          "reconnect": false,
-          "action": "fail",
-          "description": "Unauthorized \u2014 invalid API key"
-        },
-        {
-          "venue": "barchart",
-          "error_code": "429",
-          "retry_safe": true,
-          "reconnect": false,
-          "action": "retry",
-          "description": "Rate limit exceeded"
-        },
-        {
-          "venue": "barchart",
-          "error_code": "500",
-          "retry_safe": true,
-          "reconnect": false,
-          "action": "retry",
-          "description": "Internal server error"
-        },
-        {
-          "venue": "barchart",
-          "error_code": "NO_DATA_FOUND",
-          "retry_safe": false,
-          "reconnect": false,
-          "action": "fail",
-          "description": "No data found for symbol"
         }
       ],
       "betfair": [
@@ -969,6 +1017,72 @@
           "description": "Rate limit"
         }
       ],
+      "cftc": [
+        {
+          "venue": "cftc",
+          "error_code": "401",
+          "retry_safe": false,
+          "reconnect": false,
+          "action": "fail",
+          "description": "Unauthorized (bad/missing API key)"
+        },
+        {
+          "venue": "cftc",
+          "error_code": "403",
+          "retry_safe": false,
+          "reconnect": false,
+          "action": "fail",
+          "description": "Forbidden"
+        },
+        {
+          "venue": "cftc",
+          "error_code": "404",
+          "retry_safe": false,
+          "reconnect": false,
+          "action": "skip",
+          "description": "Series/report not found for window"
+        },
+        {
+          "venue": "cftc",
+          "error_code": "429",
+          "retry_safe": true,
+          "reconnect": false,
+          "action": "retry",
+          "description": "Rate limited \u2014 back off and retry"
+        },
+        {
+          "venue": "cftc",
+          "error_code": "500",
+          "retry_safe": true,
+          "reconnect": false,
+          "action": "retry",
+          "description": "Upstream server error"
+        },
+        {
+          "venue": "cftc",
+          "error_code": "502",
+          "retry_safe": true,
+          "reconnect": false,
+          "action": "retry",
+          "description": "Bad gateway"
+        },
+        {
+          "venue": "cftc",
+          "error_code": "503",
+          "retry_safe": true,
+          "reconnect": false,
+          "action": "retry",
+          "description": "Service unavailable"
+        },
+        {
+          "venue": "cftc",
+          "error_code": "504",
+          "retry_safe": true,
+          "reconnect": false,
+          "action": "retry",
+          "description": "Gateway timeout"
+        }
+      ],
       "coinbase": [
         {
           "venue": "coinbase",
@@ -1165,6 +1279,14 @@
           "reconnect": true,
           "action": "reconnect",
           "description": "Reset"
+        },
+        {
+          "venue": "databento",
+          "error_code": "DATABENTO_ENTITLEMENT",
+          "retry_safe": false,
+          "reconnect": false,
+          "action": "fail",
+          "description": "Subscription-entitlement breach (403, NOT 402/PAYG) \u2014 request's (dataset, schema, start) fell outside the paid 3-dataset subscription or the schema's free included-history window. Pre-request guard refused it before it reached the vendor (would have been metered). DO NOT retry; fix the request scope. SSOT: registry/databento_subscription_allowlist.py."
         },
         {
           "venue": "databento",
@@ -1389,6 +1511,72 @@
           "description": "Service temporarily unavailable"
         }
       ],
+      "eia": [
+        {
+          "venue": "eia",
+          "error_code": "401",
+          "retry_safe": false,
+          "reconnect": false,
+          "action": "fail",
+          "description": "Unauthorized (bad/missing API key)"
+        },
+        {
+          "venue": "eia",
+          "error_code": "403",
+          "retry_safe": false,
+          "reconnect": false,
+          "action": "fail",
+          "description": "Forbidden"
+        },
+        {
+          "venue": "eia",
+          "error_code": "404",
+          "retry_safe": false,
+          "reconnect": false,
+          "action": "skip",
+          "description": "Series/report not found for window"
+        },
+        {
+          "venue": "eia",
+          "error_code": "429",
+          "retry_safe": true,
+          "reconnect": false,
+          "action": "retry",
+          "description": "Rate limited \u2014 back off and retry"
+        },
+        {
+          "venue": "eia",
+          "error_code": "500",
+          "retry_safe": true,
+          "reconnect": false,
+          "action": "retry",
+          "description": "Upstream server error"
+        },
+        {
+          "venue": "eia",
+          "error_code": "502",
+          "retry_safe": true,
+          "reconnect": false,
+          "action": "retry",
+          "description": "Bad gateway"
+        },
+        {
+          "venue": "eia",
+          "error_code": "503",
+          "retry_safe": true,
+          "reconnect": false,
+          "action": "retry",
+          "description": "Service unavailable"
+        },
+        {
+          "venue": "eia",
+          "error_code": "504",
+          "retry_safe": true,
+          "reconnect": false,
+          "action": "retry",
+          "description": "Gateway timeout"
+        }
+      ],
       "ethena": [
         {
           "venue": "ethena",
@@ -1471,6 +1659,72 @@
           "reconnect": false,
           "action": "retry",
           "description": "Server error"
+        }
+      ],
+      "fear_greed": [
+        {
+          "venue": "fear_greed",
+          "error_code": "401",
+          "retry_safe": false,
+          "reconnect": false,
+          "action": "fail",
+          "description": "Unauthorized (bad/missing API key)"
+        },
+        {
+          "venue": "fear_greed",
+          "error_code": "403",
+          "retry_safe": false,
+          "reconnect": false,
+          "action": "fail",
+          "description": "Forbidden"
+        },
+        {
+          "venue": "fear_greed",
+          "error_code": "404",
+          "retry_safe": false,
+          "reconnect": false,
+          "action": "skip",
+          "description": "Series/report not found for window"
+        },
+        {
+          "venue": "fear_greed",
+          "error_code": "429",
+          "retry_safe": true,
+          "reconnect": false,
+          "action": "retry",
+          "description": "Rate limited \u2014 back off and retry"
+        },
+        {
+          "venue": "fear_greed",
+          "error_code": "500",
+          "retry_safe": true,
+          "reconnect": false,
+          "action": "retry",
+          "description": "Upstream server error"
+        },
+        {
+          "venue": "fear_greed",
+          "error_code": "502",
+          "retry_safe": true,
+          "reconnect": false,
+          "action": "retry",
+          "description": "Bad gateway"
+        },
+        {
+          "venue": "fear_greed",
+          "error_code": "503",
+          "retry_safe": true,
+          "reconnect": false,
+          "action": "retry",
+          "description": "Service unavailable"
+        },
+        {
+          "venue": "fear_greed",
+          "error_code": "504",
+          "retry_safe": true,
+          "reconnect": false,
+          "action": "retry",
+          "description": "Gateway timeout"
         }
       ],
       "fluid": [
@@ -2655,48 +2909,6 @@
           "description": "Requested weather variable not available for location"
         }
       ],
-      "openbb": [
-        {
-          "venue": "openbb",
-          "error_code": "400",
-          "retry_safe": false,
-          "reconnect": false,
-          "action": "fail",
-          "description": "Bad request \u2014 invalid parameters"
-        },
-        {
-          "venue": "openbb",
-          "error_code": "401",
-          "retry_safe": false,
-          "reconnect": false,
-          "action": "fail",
-          "description": "Unauthorized \u2014 invalid token"
-        },
-        {
-          "venue": "openbb",
-          "error_code": "429",
-          "retry_safe": true,
-          "reconnect": false,
-          "action": "retry",
-          "description": "Rate limit exceeded"
-        },
-        {
-          "venue": "openbb",
-          "error_code": "500",
-          "retry_safe": true,
-          "reconnect": false,
-          "action": "retry",
-          "description": "Internal server error"
-        },
-        {
-          "venue": "openbb",
-          "error_code": "503",
-          "retry_safe": true,
-          "reconnect": false,
-          "action": "retry",
-          "description": "Service unavailable"
-        }
-      ],
       "opticodds": [
         {
           "venue": "opticodds",
@@ -2914,6 +3126,22 @@
         }
       ],
       "tardis": [
+        {
+          "venue": "tardis",
+          "error_code": "140",
+          "retry_safe": false,
+          "reconnect": false,
+          "action": "skip",
+          "description": "Requested dataset is not available for the given date \u2014 the symbol IS archived but the date is outside its availableSince..availableTo window (honest absence)"
+        },
+        {
+          "venue": "tardis",
+          "error_code": "300",
+          "retry_safe": false,
+          "reconnect": false,
+          "action": "skip",
+          "description": "Invalid 'symbol' param \u2014 the symbol is not in Tardis's archive at all (honest absence)"
+        },
         {
           "venue": "tardis",
           "error_code": "400",
@@ -3559,7 +3787,7 @@
   },
   "instruction_constraints": {
     "registry_name": "instruction_constraints",
-    "version": "0.1.20",
+    "version": "0.80.1.dev632+gd4045838a.d20260729",
     "entry_count": 11,
     "entries": {
       "ADD_LIQUIDITY": {
@@ -3597,7 +3825,7 @@
       "PREDICTION_BET": {
         "order_types": ["LIMIT", "MARKET"],
         "instrument_types": ["PREDICTION_MARKET"],
-        "venue_categories": ["sports"],
+        "venue_categories": ["prediction", "sports"],
         "operation_types": ["BUY", "SELL"],
         "requires_price": true,
         "allows_partial_fill": true
@@ -3689,7 +3917,7 @@
   },
   "market_data_categories": {
     "registry_name": "market_data_categories",
-    "version": "0.1.20",
+    "version": "0.80.1.dev632+gd4045838a.d20260729",
     "entries": {
       "data_types_by_asset_group": {
         "cefi": [
@@ -3699,12 +3927,15 @@
           "liquidations",
           "ohlcv_1m",
           "options_chain",
-          "trades"
+          "perp_funding",
+          "trades",
+          "volatility_index"
         ],
         "defi": [
           "bridge_events",
-          "dex_pools",
-          "dex_swaps",
+          "derivative_ticker",
+          "dex_pool_state",
+          "dex_pool_swaps",
           "eigenlayer_rewards",
           "flash_loan_availability",
           "flash_loan_events",
@@ -3718,6 +3949,7 @@
           "native_staking_rates",
           "oracle_prices",
           "perp_funding",
+          "perp_trades",
           "position_data",
           "rewards",
           "risk_params",
@@ -3730,12 +3962,12 @@
         ],
         "prediction": [
           "MARKET_LIFECYCLE",
+          "book_snapshot_5",
           "market_lifecycle",
           "prediction_canonical_question_group",
           "trades"
         ],
         "sports": [
-          "ODDS",
           "arbitrage_opportunity",
           "markets",
           "odds",
@@ -3744,7 +3976,8 @@
           "odds_snapshot",
           "outcomes",
           "settlements",
-          "trades"
+          "trades",
+          "trades_inplay"
         ],
         "tradfi": [
           "corporate_action_confirmed",
@@ -3752,15 +3985,19 @@
           "macro_result",
           "mbp_10",
           "ohlcv_15m",
+          "ohlcv_1d",
           "ohlcv_1m",
+          "ohlcv_1s",
           "ohlcv_24h",
           "tbbo",
-          "trades"
+          "trades",
+          "yield_curve"
         ]
       },
       "venues_by_asset_group": {
         "cefi": [
           "ASTER",
+          "BINANCE-DELIVERY",
           "BINANCE-FUTURES",
           "BINANCE-SPOT",
           "BITFINEX-FUTURES",
@@ -3768,50 +4005,35 @@
           "BITGET-FUTURES",
           "BITGET-SPOT",
           "BYBIT",
-          "COINBASE",
+          "BYBIT-SPOT",
+          "COINBASE-CDE",
+          "COINBASE-FUTURES",
+          "COINBASE-SPOT",
           "DERIBIT",
           "EXTENDED-STARKNET",
           "HYPERLIQUID",
+          "KALSHI-PERP",
           "KRAKEN-FUTURES",
           "KRAKEN-SPOT",
           "LIGHTER-ZKSYNC",
           "OKX",
+          "OKX-FUTURES",
+          "OKX-SPOT",
+          "OKX-SWAP",
+          "POLYMARKET-PERP",
           "UPBIT"
         ],
         "defi": [
           "AAVE-ETHEREUM",
-          "AAVE-PLASMA",
-          "AAVE_V3-ARBITRUM",
           "AAVE_V3-ARBITRUM",
           "AAVE_V3-AVALANCHE",
-          "AAVE_V3-AVALANCHE",
-          "AAVE_V3-BASE",
           "AAVE_V3-BASE",
           "AAVE_V3-BSC",
-          "AAVE_V3-BSC",
-          "AAVE_V3-ETHEREUM",
           "AAVE_V3-ETHEREUM",
           "AAVE_V3-LINEA",
-          "AAVE_V3-LINEA",
-          "AAVE_V3-OPTIMISM",
           "AAVE_V3-OPTIMISM",
           "AAVE_V3-POLYGON",
-          "AAVE_V3-POLYGON",
-          "AAVE_V3-SCROLL",
-          "AAVE_V3-SCROLL",
-          "AAVE_V3-ZKSYNC",
-          "AAVE_V3-ZKSYNC",
-          "ACROSS-ETHEREUM",
           "AERODROME_V3-BASE",
-          "AERODROME_V3-BASE",
-          "ALCHEMY-ARBITRUM",
-          "ALCHEMY-BASE",
-          "ALCHEMY-ETHEREUM",
-          "ALCHEMY-ONCHAIN",
-          "ALCHEMY-OPTIMISM",
-          "ALCHEMY-POLYGON",
-          "ANKR-ETHEREUM",
-          "ASTER",
           "BALANCER-ARBITRUM",
           "BALANCER-AVALANCHE",
           "BALANCER-BASE",
@@ -3823,23 +4045,20 @@
           "BEEFY-BASE",
           "BEEFY-BSC",
           "BEEFY-ETHEREUM",
-          "BEEFY-POLYGON",
           "BENQI-AVALANCHE",
+          "BINANCE-BSC",
+          "BINANCE-ETHEREUM",
           "CAMELOT_V3-ARBITRUM",
-          "CAMELOT_V3-ARBITRUM",
-          "COMPOUND-ETHEREUM",
-          "COMPOUND_V3-ARBITRUM",
+          "CHAINLINK-ARBITRUM",
+          "CHAINLINK-BASE",
+          "CHAINLINK-ETHEREUM",
+          "CHAINLINK-OPTIMISM",
+          "CHAINLINK-POLYGON",
+          "COINBASE-ETHEREUM",
           "COMPOUND_V3-ARBITRUM",
           "COMPOUND_V3-BASE",
-          "COMPOUND_V3-BASE",
-          "COMPOUND_V3-ETHEREUM",
           "COMPOUND_V3-ETHEREUM",
           "COMPOUND_V3-OPTIMISM",
-          "COMPOUND_V3-OPTIMISM",
-          "COMPOUND_V3-POLYGON",
-          "COMPOUND_V3-POLYGON",
-          "COMPOUND_V3-SCROLL",
-          "COMPOUND_V3-SCROLL",
           "CONVEX-ETHEREUM",
           "CURVE-AVALANCHE",
           "CURVE-ETHEREUM",
@@ -3847,49 +4066,28 @@
           "EIGENLAYER-ETHEREUM",
           "ETHENA-ETHEREUM",
           "ETHERFI-ETHEREUM",
-          "EULER_V2-ARBITRUM",
           "EULER_V2-ETHEREUM",
-          "FLASHBOTS-ETHEREUM",
-          "FLUID-ARBITRUM",
           "FLUID-ETHEREUM",
-          "FLUID-PLASMA",
-          "FRAX-ETHEREUM",
-          "GMX-ARBITRUM",
-          "GMX-AVALANCHE",
-          "HYPERLIQUID",
-          "IDLE-ARBITRUM",
           "IDLE-ETHEREUM",
-          "IDLE-POLYGON",
           "JITO-SOLANA",
           "JITORESTAKING-SOLANA",
-          "JUPITER-SOLANA",
           "KAMINO-SOLANA",
           "KARAK-ARBITRUM",
           "KARAK-ETHEREUM",
           "KELPDAO-ETHEREUM",
           "LIDO-ETHEREUM",
-          "MAKER-ETHEREUM",
-          "MANTLE-ETHEREUM",
           "MARGINFI-SOLANA",
           "MARINADE-SOLANA",
-          "MORPHO-ARBITRUM",
           "MORPHO-BASE",
           "MORPHO-ETHEREUM",
-          "MORPHO-OPTIMISM",
-          "MORPHO-POLYGON",
-          "MORPHOVAULTS-ETHEREUM",
           "ORCA-SOLANA",
-          "PANCAKESWAP_V3-ARBITRUM",
-          "PANCAKESWAP_V3-ARBITRUM",
-          "PANCAKESWAP_V3-BASE",
           "PANCAKESWAP_V3-BASE",
           "PANCAKESWAP_V3-BSC",
-          "PANCAKESWAP_V3-BSC",
-          "PANCAKESWAP_V3-ETHEREUM",
           "PANCAKESWAP_V3-ETHEREUM",
           "PENDLE-ARBITRUM",
           "PENDLE-ETHEREUM",
           "PUFFER-ETHEREUM",
+          "PYTH-SOLANA",
           "RADIANT-ARBITRUM",
           "RADIANT-BSC",
           "RADIANT-ETHEREUM",
@@ -3897,46 +4095,29 @@
           "RENZO-ARBITRUM",
           "RENZO-ETHEREUM",
           "ROCKETPOOL-ETHEREUM",
+          "SANCTUM-SOLANA",
+          "SOLANA-NATIVE-SOLANA",
           "SOLBLAZE-SOLANA",
           "SOLEND-SOLANA",
           "SPARK-ETHEREUM",
-          "STADER-ETHEREUM",
-          "STAKEWISE-ETHEREUM",
-          "STARGATE-ETHEREUM",
           "SUSHISWAP-ARBITRUM",
           "SUSHISWAP_V3-AVALANCHE",
-          "SUSHISWAP_V3-AVALANCHE",
-          "SUSHISWAP_V3-BASE",
           "SUSHISWAP_V3-BASE",
           "SUSHISWAP_V3-ETHEREUM",
-          "SUSHISWAP_V3-ETHEREUM",
-          "SWELL-ETHEREUM",
           "SYMBIOTIC-ETHEREUM",
           "TRADER_JOE_V2-AVALANCHE",
-          "UNISWAP-ETHEREUM",
-          "UNISWAP_V2-ETHEREUM",
           "UNISWAP_V2-ETHEREUM",
           "UNISWAP_V3-ARBITRUM",
-          "UNISWAP_V3-ARBITRUM",
-          "UNISWAP_V3-BASE",
           "UNISWAP_V3-BASE",
           "UNISWAP_V3-ETHEREUM",
-          "UNISWAP_V3-ETHEREUM",
-          "UNISWAP_V3-OPTIMISM",
           "UNISWAP_V3-OPTIMISM",
           "UNISWAP_V3-POLYGON",
-          "UNISWAP_V3-POLYGON",
-          "UNISWAP_V4-ETHEREUM",
           "UNISWAP_V4-ETHEREUM",
           "VELODROME_V2-OPTIMISM",
           "VENUS-BSC",
           "VENUS-ETHEREUM",
           "YEARN_V3-ARBITRUM",
-          "YEARN_V3-ARBITRUM",
-          "YEARN_V3-ETHEREUM",
-          "YEARN_V3-ETHEREUM",
-          "YEARN_V3-OPTIMISM",
-          "YEARN_V3-OPTIMISM"
+          "YEARN_V3-ETHEREUM"
         ],
         "prediction": ["KALSHI", "POLYMARKET"],
         "sports": [
@@ -3949,23 +4130,14 @@
           "ODDS_API",
           "PINNACLE"
         ],
-        "tradfi": [
-          "BARCHART",
-          "CBOE",
-          "CME",
-          "FX",
-          "ICE",
-          "NASDAQ",
-          "NYSE",
-          "YAHOO_FINANCE"
-        ]
+        "tradfi": ["CBOE", "CME", "FRED", "FX", "ICE", "KRX", "NASDAQ", "NYSE"]
       },
       "timeframes": ["15s", "1m", "5m", "15m", "1h", "4h", "24h"]
     }
   },
   "venue_rate_limits": {
     "registry_name": "venue_rate_limits",
-    "version": "0.1.20",
+    "version": "0.80.1.dev632+gd4045838a.d20260729",
     "venue_count": 13,
     "entries": {
       "api_football": {
@@ -4050,7 +4222,7 @@
   },
   "risk_taxonomy": {
     "registry_name": "risk_taxonomy",
-    "version": "0.1.20",
+    "version": "0.80.1.dev632+gd4045838a.d20260729",
     "entries": {
       "risk_types": [
         {
@@ -4234,7 +4406,7 @@
   },
   "defi_protocol_registry": {
     "registry_name": "defi_protocol_registry",
-    "version": "0.1.20",
+    "version": "0.80.1.dev632+gd4045838a.d20260729",
     "entries": {
       "protocols": [
         ["aave_plasma", null],
@@ -4247,7 +4419,6 @@
         ["ethena", "ETHEREUM"],
         ["etherfi", "ETHEREUM"],
         ["fluid_plasma", null],
-        ["gmx", "ARBITRUM"],
         ["hyperliquid", null],
         ["lido", "ETHEREUM"],
         ["morpho", "ETHEREUM"],
@@ -4264,15 +4435,11 @@
         "AAVE-PLASMA": ["aave_plasma", null],
         "AAVE_V3-ETHEREUM": ["aave_v3", "ETHEREUM"],
         "AERODROME_V3-BASE": ["aerodrome_v3", "BASE"],
-        "ASTER": ["aster", null],
         "CAMELOT_V3-ARBITRUM": ["camelot_v3", "ARBITRUM"],
         "CURVE-ETHEREUM": ["curve", "ETHEREUM"],
         "ETHENA-ETHEREUM": ["ethena", "ETHEREUM"],
         "ETHERFI-ETHEREUM": ["etherfi", "ETHEREUM"],
         "FLUID-PLASMA": ["fluid_plasma", null],
-        "GMX-ARBITRUM": ["gmx", "ARBITRUM"],
-        "GMX-AVALANCHE": ["gmx", "AVALANCHE"],
-        "HYPERLIQUID": ["hyperliquid", null],
         "LIDO-ETHEREUM": ["lido", "ETHEREUM"],
         "MORPHO-ETHEREUM": ["morpho", "ETHEREUM"],
         "PANCAKESWAP_V3-BASE": ["pancakeswap_v3", "BASE"],
@@ -4292,7 +4459,7 @@
   },
   "chain_rpc_templates": {
     "registry_name": "chain_rpc_templates",
-    "version": "0.1.20",
+    "version": "0.80.1.dev632+gd4045838a.d20260729",
     "chain_count": 35,
     "entries": {
       "1": "https://eth-mainnet.g.alchemy.com/v2/{api_key}",
@@ -4309,7 +4476,7 @@
       "1101": "https://polygonzkevm-mainnet.g.alchemy.com/v2/{api_key}",
       "1284": "https://rpc.api.moonbeam.network",
       "2741": "https://abstract-mainnet.g.alchemy.com/v2/{api_key}",
-      "5000": "https://rpc.mantle.xyz",
+      "5000": "https://mantle-mainnet.g.alchemy.com/v2/{api_key}",
       "8453": "https://base-mainnet.g.alchemy.com/v2/{api_key}",
       "34443": "https://mode-mainnet.g.alchemy.com/v2/{api_key}",
       "42161": "https://arb-mainnet.g.alchemy.com/v2/{api_key}",
@@ -4334,8 +4501,8 @@
   },
   "subgraph_ids": {
     "registry_name": "subgraph_ids",
-    "version": "0.1.20",
-    "protocol_count": 18,
+    "version": "0.80.1.dev632+gd4045838a.d20260729",
+    "protocol_count": 21,
     "entries": {
       "aave_v3": {
         "ARBITRUM": "DLuE98kEb5pQNXAcKFQGQgfSQ57Xdou4jnVbAEqMfy3B",
@@ -4358,6 +4525,9 @@
         "OPTIMISM": "FsmdxmvBJLGjUQPxKMRtcWKzuCNpomKuMTbSbtRtggZ7",
         "POLYGON": "H9oPAbXnobBRq1cB3HDmbZ1E8MWQyJYQjT1QDJMrdbNp"
       },
+      "benqi": {
+        "AVALANCHE": "HcTvZi3fwucvRJvVmtFzNDTnomvMBk64xCLNQQg6GPAV"
+      },
       "camelot_v3": {
         "ARBITRUM": "7mPnp1UqmefcCycB8umy4uUkTkFxMoHn1Y7ncBUscePp"
       },
@@ -4372,12 +4542,12 @@
         "ETHEREUM": "3fy93eAT56UJsRCEht8iFhfi6wjHWXtZ9dnnbQmvFopF",
         "OPTIMISM": "CXDZPduZE6nWuWEkSzWkRoJSSJ6CneSqiDxdnhhURShX"
       },
+      "euler_v2": {
+        "ARBITRUM": "euler-v2-arbitrum",
+        "ETHEREUM": "euler-v2-mainnet"
+      },
       "fluid": {
         "ETHEREUM": "fluid-mainnet"
-      },
-      "gmx": {
-        "ARBITRUM": "DiR5cWwB3pwXXQWWdus7fDLR2mnFRQLiBFsVmHAH9VAs",
-        "AVALANCHE": "6pXgnXcL6mkXBjKX7NyHN7tCudv2JGFnXZ8wf8WbjPXv"
       },
       "morpho": {
         "BASE": "71ZTy1veF9twER9CLMnPWeLQ7GZcwKsjmygejrgKirqs",
@@ -4387,6 +4557,10 @@
         "BASE": "5YYKGBcRkJs6tmDfB3RpHdbK2R5KBACHQebXVgbUcYQp",
         "BSC": "Hv1GncLY5docZoGtXjo4kwbTvxm3MAhVZqBZE4sUT9eZ",
         "ETHEREUM": "CJYGNhb7RvnhfBDjqpRnD3oxgyhibzc7fkAMa38YV3oS"
+      },
+      "radiant": {
+        "ARBITRUM": "E1UTUGaNbTb4XbEYoupJZ5hU62hW9CnadKTXLRSP2hM",
+        "ETHEREUM": "683Qhh8TEta6qS5gdTpXCs84xnrp77fPWGQyBmRe6qgo"
       },
       "spark": {
         "ETHEREUM": "GbKdmBe4ycCYCQLQSjqGg6UHYoYfbyJyq5WrG35pv1si"
@@ -4417,13 +4591,17 @@
       },
       "velodrome_v2": {
         "OPTIMISM": "A4Y1A82YhSLTn998BVVELC8eWzhi992k4ZitByvssxqA"
+      },
+      "venus": {
+        "BSC": "H2a3D64RV4NNxyJqx9jVFQRBpQRzD6zNZjLDotgdCrTC",
+        "ETHEREUM": "Htf6Hh1qgkvxQxqbcv4Jp5AatsaiY5dNLVcySkpCaxQ8"
       }
     }
   },
   "capability_declarations": {
     "registry_name": "capability_declarations",
-    "version": "0.1.20",
-    "entry_count": 58,
+    "version": "0.80.1.dev632+gd4045838a.d20260729",
+    "entry_count": 60,
     "entries": [
       {
         "source": "aave",
@@ -4530,17 +4708,6 @@
         "operations": {
           "market": ["rig_count"],
           "reference": ["rig_count_series"]
-        }
-      },
-      {
-        "source": "barchart",
-        "domains": ["market", "reference"],
-        "supports_live": true,
-        "supports_batch": true,
-        "supports_testnet": false,
-        "operations": {
-          "market": ["dividends", "earnings", "ohlcv", "quotes"],
-          "reference": ["indices", "sectors", "symbols"]
         }
       },
       {
@@ -4840,6 +5007,16 @@
         }
       },
       {
+        "source": "fear_greed",
+        "domains": ["market"],
+        "supports_live": false,
+        "supports_batch": true,
+        "supports_testnet": false,
+        "operations": {
+          "market": ["fear_greed_index"]
+        }
+      },
+      {
         "source": "fix",
         "domains": ["execution", "market", "reference"],
         "supports_live": true,
@@ -5027,6 +5204,17 @@
         }
       },
       {
+        "source": "kalshi_perp",
+        "domains": ["market", "reference"],
+        "supports_live": true,
+        "supports_batch": true,
+        "supports_testnet": false,
+        "operations": {
+          "market": ["funding_rates", "markets", "trades", "ws_trades"],
+          "reference": ["market_detail"]
+        }
+      },
+      {
         "source": "kraken",
         "domains": ["execution", "market", "position", "reference"],
         "supports_live": true,
@@ -5102,6 +5290,16 @@
           ],
           "position": ["account_ledger", "get_account", "list_accounts"],
           "reference": ["currencies", "server_time", "symbols_list"]
+        }
+      },
+      {
+        "source": "lighter_api",
+        "domains": ["market"],
+        "supports_live": false,
+        "supports_batch": true,
+        "supports_testnet": false,
+        "operations": {
+          "market": ["candles", "orderbook", "trades"]
         }
       },
       {
@@ -5272,17 +5470,6 @@
         }
       },
       {
-        "source": "openbb",
-        "domains": ["market", "reference"],
-        "supports_live": false,
-        "supports_batch": true,
-        "supports_testnet": false,
-        "operations": {
-          "market": ["bond_data", "fixed_income", "yield_curves"],
-          "reference": ["bond_indices", "government_bonds"]
-        }
-      },
-      {
         "source": "opticodds",
         "domains": ["market", "reference"],
         "supports_live": true,
@@ -5315,6 +5502,17 @@
           "market": ["markets", "orderbook", "prices", "trades", "ws_prices"],
           "position": ["balances", "pnl", "positions"],
           "reference": ["events", "markets_metadata", "tags"]
+        }
+      },
+      {
+        "source": "polymarket_perp",
+        "domains": ["market", "reference"],
+        "supports_live": false,
+        "supports_batch": false,
+        "supports_testnet": false,
+        "operations": {
+          "market": ["funding_rates", "markets", "trades", "ws_trades"],
+          "reference": ["market_detail"]
         }
       },
       {
@@ -5455,7 +5653,7 @@
   },
   "venue_capabilities": {
     "registry_name": "venue_capabilities",
-    "version": "0.1.20",
+    "version": "0.80.1.dev632+gd4045838a.d20260729",
     "description": "Combined view: venues with their capabilities, rate limits, and error maps",
     "entries": {
       "aave_plasma": {
@@ -5476,19 +5674,19 @@
           "requests_per_second": null,
           "requests_per_minute": null
         },
-        "error_code_count": 9
+        "error_code_count": 12
       },
       "aster": {
         "venue": "aster",
         "error_code_count": 6
       },
+      "baker_hughes": {
+        "venue": "baker_hughes",
+        "error_code_count": 8
+      },
       "balancer": {
         "venue": "balancer",
         "error_code_count": 8
-      },
-      "barchart": {
-        "venue": "barchart",
-        "error_code_count": 5
       },
       "betfair": {
         "venue": "betfair",
@@ -5518,6 +5716,10 @@
         "venue": "ccxt",
         "error_code_count": 7
       },
+      "cftc": {
+        "venue": "cftc",
+        "error_code_count": 8
+      },
       "coinbase": {
         "venue": "coinbase",
         "rate_limit": {
@@ -5536,7 +5738,7 @@
           "requests_per_second": null,
           "requests_per_minute": null
         },
-        "error_code_count": 12
+        "error_code_count": 13
       },
       "defillama": {
         "venue": "defillama",
@@ -5554,6 +5756,10 @@
         "venue": "ecb",
         "error_code_count": 6
       },
+      "eia": {
+        "venue": "eia",
+        "error_code_count": 8
+      },
       "ethena": {
         "venue": "ethena",
         "error_code_count": 5
@@ -5561,6 +5767,10 @@
       "etherfi": {
         "venue": "etherfi",
         "error_code_count": 5
+      },
+      "fear_greed": {
+        "venue": "fear_greed",
+        "error_code_count": 8
       },
       "fluid": {
         "venue": "fluid",
@@ -5654,10 +5864,6 @@
         },
         "error_code_count": 7
       },
-      "openbb": {
-        "venue": "openbb",
-        "error_code_count": 5
-      },
       "opticodds": {
         "venue": "opticodds",
         "error_code_count": 6
@@ -5680,7 +5886,7 @@
       },
       "tardis": {
         "venue": "tardis",
-        "error_code_count": 4
+        "error_code_count": 6
       },
       "thegraph": {
         "venue": "thegraph",
@@ -5718,7 +5924,7 @@
   },
   "data_pipeline_config": {
     "registry_name": "data_pipeline_config",
-    "version": "0.1.20",
+    "version": "0.80.1.dev632+gd4045838a.d20260729",
     "description": "Data types, timeframes, and venues by asset_group for pipeline configuration",
     "entries": {
       "asset_groups": ["cefi", "defi", "prediction", "sports", "tradfi"],
@@ -5727,7 +5933,7 @@
   },
   "error_classifications": {
     "registry_name": "error_classifications",
-    "version": "0.1.20",
+    "version": "0.80.1.dev632+gd4045838a.d20260729",
     "description": "Error action summary by venue \u2014 how many RETRY/FAIL/SKIP/RECONNECT per venue",
     "entries": {
       "aave_plasma": {
@@ -5745,20 +5951,21 @@
         "retry": 3
       },
       "api_football": {
-        "retry": 3,
-        "fail": 6
+        "retry": 4,
+        "fail": 8
       },
       "aster": {
         "retry": 4,
         "fail": 2
       },
+      "baker_hughes": {
+        "retry": 5,
+        "fail": 2,
+        "skip": 1
+      },
       "balancer": {
         "fail": 5,
         "retry": 3
-      },
-      "barchart": {
-        "retry": 2,
-        "fail": 3
       },
       "betfair": {
         "reconnect": 2,
@@ -5783,6 +5990,11 @@
         "retry": 5,
         "fail": 2
       },
+      "cftc": {
+        "retry": 5,
+        "fail": 2,
+        "skip": 1
+      },
       "coinbase": {
         "retry": 5,
         "fail": 2
@@ -5794,7 +6006,7 @@
       },
       "databento": {
         "retry": 4,
-        "fail": 7,
+        "fail": 8,
         "reconnect": 1
       },
       "defillama": {
@@ -5810,6 +6022,11 @@
         "retry": 3,
         "fail": 3
       },
+      "eia": {
+        "retry": 5,
+        "fail": 2,
+        "skip": 1
+      },
       "ethena": {
         "fail": 2,
         "retry": 3
@@ -5817,6 +6034,11 @@
       "etherfi": {
         "fail": 2,
         "retry": 3
+      },
+      "fear_greed": {
+        "retry": 5,
+        "fail": 2,
+        "skip": 1
       },
       "fluid": {
         "fail": 2,
@@ -5898,10 +6120,6 @@
         "retry": 2,
         "fail": 5
       },
-      "openbb": {
-        "retry": 3,
-        "fail": 2
-      },
       "opticodds": {
         "fail": 3,
         "retry": 3
@@ -5920,7 +6138,8 @@
       },
       "tardis": {
         "fail": 2,
-        "retry": 2
+        "retry": 2,
+        "skip": 2
       },
       "thegraph": {
         "fail": 5,
@@ -5959,10 +6178,10 @@
   },
   "tradfi_symbology": {
     "registry_name": "tradfi_symbology",
-    "version": "0.1.20",
+    "version": "0.80.1.dev632+gd4045838a.d20260729",
     "description": "TradFi instrument definitions and data provider bindings",
     "entries": {
-      "instrument_count": 52,
+      "instrument_count": 58,
       "instruments": [
         {
           "symbol": "6A.FUT",
@@ -6043,12 +6262,6 @@
           "instrument_type": "FUTURE"
         },
         {
-          "symbol": "CL.OPT",
-          "base_asset": "CRUDE",
-          "venue": "CME",
-          "instrument_type": "OPTION"
-        },
-        {
           "symbol": "CT.FUT",
           "base_asset": "COTTON",
           "venue": "ICE",
@@ -6109,12 +6322,6 @@
           "instrument_type": "FUTURE"
         },
         {
-          "symbol": "GC.OPT",
-          "base_asset": "GOLD",
-          "venue": "CME",
-          "instrument_type": "OPTION"
-        },
-        {
           "symbol": "HE.FUT",
           "base_asset": "LEANHOGS",
           "venue": "CME",
@@ -6133,6 +6340,12 @@
           "instrument_type": "FUTURE"
         },
         {
+          "symbol": "HXE.OPT",
+          "base_asset": "COPPER",
+          "venue": "CME",
+          "instrument_type": "OPTION"
+        },
+        {
           "symbol": "KC.FUT",
           "base_asset": "COFFEE",
           "venue": "ICE",
@@ -6143,6 +6356,12 @@
           "base_asset": "LIVECATTLE",
           "venue": "CME",
           "instrument_type": "FUTURE"
+        },
+        {
+          "symbol": "LO.OPT",
+          "base_asset": "CRUDE",
+          "venue": "CME",
+          "instrument_type": "OPTION"
         },
         {
           "symbol": "NG.FUT",
@@ -6163,16 +6382,52 @@
           "instrument_type": "OPTION"
         },
         {
+          "symbol": "OB.OPT",
+          "base_asset": "GASOLINE",
+          "venue": "CME",
+          "instrument_type": "OPTION"
+        },
+        {
+          "symbol": "OG.OPT",
+          "base_asset": "GOLD",
+          "venue": "CME",
+          "instrument_type": "OPTION"
+        },
+        {
+          "symbol": "OH.OPT",
+          "base_asset": "HEATINGOIL",
+          "venue": "CME",
+          "instrument_type": "OPTION"
+        },
+        {
           "symbol": "OJ.FUT",
           "base_asset": "ORANGEJUICE",
           "venue": "ICE",
           "instrument_type": "FUTURE"
         },
         {
+          "symbol": "ON.OPT",
+          "base_asset": "NATGAS",
+          "venue": "CME",
+          "instrument_type": "OPTION"
+        },
+        {
+          "symbol": "PAO.OPT",
+          "base_asset": "PALLADIUM",
+          "venue": "CME",
+          "instrument_type": "OPTION"
+        },
+        {
           "symbol": "PL.FUT",
           "base_asset": "PLATINUM",
           "venue": "CME",
           "instrument_type": "FUTURE"
+        },
+        {
+          "symbol": "PO.OPT",
+          "base_asset": "PLATINUM",
+          "venue": "CME",
+          "instrument_type": "OPTION"
         },
         {
           "symbol": "RB.FUT",
@@ -6199,21 +6454,21 @@
           "instrument_type": "FUTURE"
         },
         {
+          "symbol": "SO.OPT",
+          "base_asset": "SILVER",
+          "venue": "CME",
+          "instrument_type": "OPTION"
+        },
+        {
           "symbol": "T.FUT",
           "base_asset": "WTI",
           "venue": "ICE",
           "instrument_type": "FUTURE"
         },
         {
-          "symbol": "VIX-USD",
-          "base_asset": "VIX",
-          "venue": "CBOE",
-          "instrument_type": "INDEX"
-        },
-        {
           "symbol": "VX.FUT",
           "base_asset": "VIX",
-          "venue": "CFE",
+          "venue": "XCBF.PITCH",
           "instrument_type": "FUTURE"
         },
         {
@@ -6277,12 +6532,12 @@
           "instrument_type": "FUTURE"
         }
       ],
-      "venue_mapping_count": 52
+      "venue_mapping_count": 58
     }
   },
   "representative_instrument_sample": {
     "registry_name": "representative_instrument_sample",
-    "version": "0.1.20",
+    "version": "0.80.1.dev632+gd4045838a.d20260729",
     "description": "SSOT for mock/test instrument selection \u2014 Layer 1 of 3-layer architecture",
     "entries": {
       "cefi_base_assets": ["BTC", "ETH", "SOL"],
@@ -6500,7 +6755,7 @@
   },
   "deployment_enums": {
     "registry_name": "deployment_enums",
-    "version": "0.1.20",
+    "version": "0.80.1.dev632+gd4045838a.d20260729",
     "description": "Deployment clusters, tiers, operation modes, statuses from UIC",
     "entries": {
       "DeploymentCluster": [

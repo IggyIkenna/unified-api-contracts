@@ -15,7 +15,7 @@ class TestDomainReExports:
             get_slas_by_category,
         )
 
-        assert len(VENUE_FRESHNESS_SLAS) == 30  # barchart retired 2026-06-24 (was 31)
+        assert len(VENUE_FRESHNESS_SLAS) == 29  # barchart retired 2026-06-24, openbb retired 2026-07-30 (was 31)
         assert VenueCategory.CEFI.value == "cefi"
         assert isinstance(get_sla_for_venue("binance"), VenueFreshnessSLA)
         assert len(get_slas_by_category(VenueCategory.DEFI)) == 13

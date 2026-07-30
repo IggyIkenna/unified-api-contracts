@@ -296,8 +296,6 @@ from .tradfi import (
     normalize_fred_series_response,
     normalize_ofr_cds_response,
     normalize_ofr_cds_spread,
-    normalize_openbb_treasury_price,
-    normalize_openbb_treasury_prices_response,
 )
 from .versifi import (
     normalize_versifi_order_detail,
@@ -545,8 +543,6 @@ __all__ = [
     "normalize_open_meteo_forecast",
     "normalize_open_meteo_weather",
     "normalize_open_meteo_weather_multi",
-    "normalize_openbb_treasury_price",
-    "normalize_openbb_treasury_prices_response",
     "normalize_pinnacle_error",
     "normalize_polymarket_error",
     "normalize_polymarket_fill",

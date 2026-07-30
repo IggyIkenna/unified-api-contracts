@@ -61,7 +61,6 @@ _TRADFI_SLAS: list[VenueFreshnessSLA] = [
     VenueFreshnessSLA("fred", VenueCategory.TRADFI, 60),
     VenueFreshnessSLA("ecb", VenueCategory.TRADFI, 60),
     VenueFreshnessSLA("ofr", VenueCategory.TRADFI, 60),
-    VenueFreshnessSLA("openbb", VenueCategory.TRADFI, 60),
     VenueFreshnessSLA("ibkr", VenueCategory.TRADFI, 30),
 ]
 

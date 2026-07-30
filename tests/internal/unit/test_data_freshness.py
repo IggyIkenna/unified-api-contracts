@@ -147,7 +147,6 @@ _EXPECTED_MARKET_VENUES = [
     ("databento_intraday", "tradfi", 60, 30, 60, "important"),
     ("databento_eod", "tradfi", 86400, 43200, 86400, "important"),
     ("yahoo_finance", "tradfi", 86400, 43200, 86400, "important"),
-    ("openbb", "tradfi", 86400, 43200, 86400, "informational"),
     ("fred", "tradfi", 86400, 43200, 86400, "informational"),
     ("ecb", "tradfi", 86400, 43200, 86400, "informational"),
     ("ofr", "tradfi", 86400, 43200, 86400, "informational"),
