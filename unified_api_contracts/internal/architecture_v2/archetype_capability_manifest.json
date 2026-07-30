@@ -600,9 +600,9 @@
           ],
           "representative_slot_labels": [
             "CARRY_BASIS_DATED@ibkr-cme-spy-es-dated-usd-prod",
-            "CARRY_BASIS_DATED@ibkr-ice-brent-fixed-feb26-usd-prod"
+            "CARRY_BASIS_DATED@ice-cme-cl-1d-usd-v2-prod"
           ],
-          "notes": "IBKR \u2194 CME cross-venue routing policy IS declared in UAC (cross_venue_routing_policy.py: ibkr_spy_cme_es_basis / ibkr_qqq_cme_nq_basis / ibkr_iwm_cme_rty_basis, gap #10 registry closed for the CME leg) but execution-service/strategy-service do not yet consume CROSS_VENUE_ROUTING_POLICIES \u2014 routing policy not wired into the SOR. IBKR \u2194 ICE has no declared policy yet (gap #10 registry still open for that leg)."
+          "notes": "IBKR \u2194 CME cross-venue routing policy IS declared in UAC (cross_venue_routing_policy.py: ibkr_spy_cme_es_basis / ibkr_qqq_cme_nq_basis / ibkr_iwm_cme_rty_basis, gap #10 registry closed for the CME leg) but execution-service/strategy-service do not yet consume CROSS_VENUE_ROUTING_POLICIES \u2014 routing policy not wired into the SOR. The ICE leg is NOT an IBKR\u2194ICE direct pairing (that construct doesn't exist in strategy-service: IBKR never appears as a `future` leg venue in archetype_leg_spec_seeds.py's CARRY_BASIS_DATED leg structure, and no ibkr-ice slot exists) \u2014 the real ICE leg is a same-instrument ICE(spot)\u2194CME(future) crude cash-and-carry, matching the actual production slots CARRY_BASIS_DATED@ice-cme-cl-1d-usd-v2-prod / CARRY_BASIS_DATED_INV@ice-cme-cl-1d-usd-v1-prod (strategy-service catalog_carry.py). That pairing's registry gap is now closed too (cross_venue_routing_policy.py: ice_cme_cl_basis) \u2014 so all three edges (cme/ibkr/ice) share the SAME remaining SOR-wiring gap, none is a further registry absence."
         }
       ]
     },

@@ -4,8 +4,13 @@ Stage 3E § 2.9 gap #10 from ``codex/09-strategy/architecture-v2/uac-registry-ga
 Declares the cross-venue leg-pairing + routing policies used by:
 
 * ``CARRY_BASIS_DATED x TradFi`` — spot-ETF (IBKR) vs index-future
-  (CME) basis trade. Needs explicit leg-venue + settlement currency
-  pairing so execution-service can fair-price the basis.
+  (CME) basis trade, AND commodity cash-and-carry where the spot leg
+  is itself an exchange-listed venue (ICE crude cash proxy vs CME CL
+  dated future — no IBKR leg; IBKR never appears as a ``future`` leg
+  venue in ``archetype_leg_spec_seeds.py``'s CARRY_BASIS_DATED future
+  leg, so an IBKR<->ICE direct pairing is not a real trade construct).
+  Needs explicit leg-venue + settlement currency pairing so
+  execution-service can fair-price the basis.
 * ``ARBITRAGE_PRICE_DISPERSION x TradFi x dated_future`` — cross-product
   spreads (CME ES vs ICE Brent, CME WTI vs ICE Brent).
 * ``VOL_TRADING_OPTIONS x TradFi x option`` — when the hedge leg is on
@@ -155,6 +160,24 @@ CROSS_VENUE_ROUTING_POLICIES: Final[tuple[CrossVenueRoutingPolicy, ...]] = (
         leg_latency_p50_ms=180,
         priority=RoutingPriority.PRICE,
         notes="CME WTI vs ICE Brent cross-product spread.",
+    ),
+    # ── Commodity same-instrument cash-and-carry (ICE spot leg) ─────────
+    CrossVenueRoutingPolicy(
+        policy_id="ice_cme_cl_basis",
+        leg_venues=("ice", "cme"),
+        leg_roles=(CrossVenueLegRole.SPOT_LEG, CrossVenueLegRole.FUTURE_LEG),
+        settlement_currency="USD",
+        max_execution_spread_bps=20,
+        leg_latency_p50_ms=170,
+        priority=RoutingPriority.PRICE,
+        notes=(
+            "ICE crude cash proxy vs CME CL dated future — same-instrument cash-and-carry basis "
+            "(distinct from cme_wti_ice_brent_spread, which is a cross-COMMODITY future-vs-future "
+            "spread for ARBITRAGE_PRICE_DISPERSION). Real production slots: "
+            "CARRY_BASIS_DATED@ice-cme-cl-1d-usd-v2-prod (strategy-service catalog_carry.py "
+            "build_carry_basis_dated()) and CARRY_BASIS_DATED_INV@ice-cme-cl-1d-usd-v1-prod "
+            "(build_carry_basis_dated_inv())."
+        ),
     ),
     # ── Crypto spot vs perp basis ──────────────────────────────────────
     CrossVenueRoutingPolicy(

@@ -53,6 +53,18 @@ class TestContent:
         assert set(policy.leg_venues) == {"cme", "ice"}
         assert all(r is CrossVenueLegRole.FUTURE_LEG for r in policy.leg_roles)
 
+    def test_ice_cme_cl_basis_policy(self) -> None:
+        # ICE(spot)/CME(future) crude cash-and-carry — distinct from the
+        # cme_wti_ice_brent_spread cross-product spread above: same instrument
+        # (CL) on both legs, SPOT_LEG/FUTURE_LEG (not FUTURE_LEG/FUTURE_LEG).
+        policy = routing_policy_for("ice_cme_cl_basis")
+        assert policy.leg_venues == ("ice", "cme")
+        assert policy.leg_roles == (
+            CrossVenueLegRole.SPOT_LEG,
+            CrossVenueLegRole.FUTURE_LEG,
+        )
+        assert policy.settlement_currency == "USD"
+
 
 class TestHelpers:
     def test_unknown_policy_id_raises(self) -> None:

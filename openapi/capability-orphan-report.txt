@@ -1,6 +1,6 @@
 # Capability Manifest — Orphan + Dead-End Report
 # manifest_version: 1.0.0
-# generated_from_commit: 3a8c845b799cd5eb3c5067d860a62dabb520eb99
+# generated_from_commit: f8515eb7406089dd7e20161a3547739be68e702f
 #
 # Orphan nodes have no edges. Unbuilt dead-ends are registry-available
 # archetype/instrument combos with no supporting venue (build gap).
@@ -12,7 +12,7 @@
 
 (none — all declared brokers correctly classified as broker nodes)
 
-## Orphan nodes (81)
+## Orphan nodes (47)
 
 ORPHAN: chain:1101
 ORPHAN: chain:11155111
@@ -43,40 +43,6 @@ ORPHAN: chain:MOONBEAM
 ORPHAN: chain:POLYGON
 ORPHAN: chain:SCROLL
 ORPHAN: chain:ZKSYNC
-ORPHAN: feature_group:candlestick_patterns
-ORPHAN: feature_group:confluence
-ORPHAN: feature_group:economic_events
-ORPHAN: feature_group:fibonacci
-ORPHAN: feature_group:funding_oi
-ORPHAN: feature_group:futures_basis
-ORPHAN: feature_group:level_confluence
-ORPHAN: feature_group:liquidations
-ORPHAN: feature_group:market_structure
-ORPHAN: feature_group:market_structure_sequence
-ORPHAN: feature_group:microstructure
-ORPHAN: feature_group:momentum
-ORPHAN: feature_group:moving_averages
-ORPHAN: feature_group:order_flow_inference
-ORPHAN: feature_group:oscillators
-ORPHAN: feature_group:polynomial_trendlines
-ORPHAN: feature_group:return_kurtosis
-ORPHAN: feature_group:returns
-ORPHAN: feature_group:risk_reward
-ORPHAN: feature_group:round_numbers
-ORPHAN: feature_group:signal_confirmation
-ORPHAN: feature_group:sr_memory
-ORPHAN: feature_group:statistical_anomaly
-ORPHAN: feature_group:streaks
-ORPHAN: feature_group:supply_demand_zones
-ORPHAN: feature_group:swing_outcome_targets
-ORPHAN: feature_group:targets
-ORPHAN: feature_group:technical_indicators
-ORPHAN: feature_group:temporal
-ORPHAN: feature_group:volatility_realized
-ORPHAN: feature_group:volume_analysis
-ORPHAN: feature_group:volume_flow
-ORPHAN: feature_group:vwap
-ORPHAN: feature_group:wedge_quality
 ORPHAN: selector_contradiction:ghost_algorithms
 ORPHAN: selector_contradiction:heuristic_selector_bypasses_instruction_type
 ORPHAN: selector_contradiction:iceberg_path_split

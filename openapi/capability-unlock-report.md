@@ -13,12 +13,12 @@ every roadmap row currently carries a documented placeholder `demand=0`.
 are structurally impossible (`logical_dead_end` / explicit negatives) carry NO
 distance and are listed separately — they are correct negatives, not roadmap items.
 
-Manifest commit: `3a8c845b799cd5eb3c5067d860a62dabb520eb99`
+Manifest commit: `f8515eb7406089dd7e20161a3547739be68e702f`
 
 ## Summary (3)
 
-- blocked edges total: **850**
-- roadmap edges (have an unlock set): **359**
+- blocked edges total: **852**
+- roadmap edges (have an unlock set): **361**
 - structurally-impossible edges (excluded from ranking): **491**
 
 ## Missing-piece counts (across roadmap edges) (10)
@@ -26,11 +26,11 @@ Manifest commit: `3a8c845b799cd5eb3c5067d860a62dabb520eb99`
 - `needs-adapter`: 6
 - `needs-auth`: 3
 - `needs-code-scan`: 1
-- `needs-config`: 26
+- `needs-config`: 23
 - `needs-data-feed`: 22
 - `needs-docs`: 7
-- `needs-extraction`: 3
-- `needs-leg-spec`: 105
+- `needs-extraction`: 5
+- `needs-leg-spec`: 108
 - `needs-registry-entry`: 178
 - `needs-test`: 8
 
@@ -90,3 +90,4 @@ Manifest commit: `3a8c845b799cd5eb3c5067d860a62dabb520eb99`
 - `ARBITRAGE_MEV_JIT_LIQUIDITY` --uses_algo--> `execution_algo:ADAPTIVE_TWAP` — ADAPTIVE_TWAP is not in ALGORITHMS_BY_INSTRUCTION_TYPE for any of this archetype's instruction type(s) (SWAP, ZERO_ALPHA); the selector would raise AlgorithmNotSupportedError / fall back to a default
 - `ARBITRAGE_MEV_JIT_LIQUIDITY` --uses_algo--> `execution_algo:ALMGREN_CHRISS` — ALMGREN_CHRISS is not in ALGORITHMS_BY_INSTRUCTION_TYPE for any of this archetype's instruction type(s) (SWAP, ZERO_ALPHA); the selector would raise AlgorithmNotSupportedError / fall back to a default
 - … and 466 more
+
