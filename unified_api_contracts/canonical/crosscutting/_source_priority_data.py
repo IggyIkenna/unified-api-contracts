@@ -210,8 +210,14 @@ SOURCE_PRIORITY: Final[dict[tuple[str, str], list[str]]] = {
     # perp venues. kalshi_perp + polymarket_perp each expose a dedicated
     # /markets/{ticker}/funding_rates endpoint (cursor-paginated, public-read).
     # polymarket_perp is BLOCKED-UPSTREAM-OUTAGE (DNS NXDOMAIN 2026-06-21).
-    # SSOT: prediction-perps-sourcing.md.
-    ("cefi", "perp_funding"): ["kalshi_perp", "polymarket_perp"],
+    # SSOT: prediction-perps-sourcing.md. hyperliquid RESTORED 2026-07-30
+    # (defi_hyperliquid_perp_funding_derivative_ticker_divergence_2026_07_28.md)
+    # — its dedicated POST /info fundingHistory REST endpoint, proven NOT
+    # byte-identical to (cefi, derivative_ticker)'s funding_rate field. The
+    # pre-existing ("defi", "perp_funding"): ["hyperliquid"] entry below stays
+    # untouched — it still resolves the historical rows already captured under
+    # asset_group=defi before the 2026-07-06 DeFi→CeFi reclassification.
+    ("cefi", "perp_funding"): ["kalshi_perp", "polymarket_perp", "hyperliquid"],
     # greeks_snapshot + implied_vol_surface — computed in-house by greeks-service
     # from the canonical options_chain (venue mark_iv, else BS-fitted). Internal
     # computed source (greeks_service, COMPUTED_SOURCES-exempt from external
