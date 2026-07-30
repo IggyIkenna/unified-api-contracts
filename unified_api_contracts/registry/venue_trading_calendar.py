@@ -74,6 +74,22 @@ US_MARKET_HOLIDAYS: frozenset[str] = frozenset({
     "2028-07-04", "2028-09-04", "2028-11-23", "2028-12-25",
 })
 
+# tradfi venues that are NOT equity/futures exchanges and therefore do NOT
+# follow the NYSE/NASDAQ trading calendar, even though they share the
+# 'tradfi' asset_group for routing purposes. FRED (Federal Reserve Economic
+# Data) publishes on the federal government's own release schedule, not the
+# stock market's — e.g. Good Friday closes NYSE but is NOT a federal holiday,
+# so FRED series can have real observations on a date this SSOT's
+# US_MARKET_HOLIDAYS would otherwise skip. Added 2026-07-30 after the FRED
+# backfill's own smoke test caught it live: 2024-01-01 (the one date that
+# happens to be a genuine federal holiday too) got silently stamped
+# EXPECTED_HOLIDAY with zero fetch attempt, via the blanket
+# asset_group=='tradfi' check below — harmless for that specific date, but
+# the SAME mechanism would wrongly skip Good-Friday-class dates across the
+# full 1962-2026 backfill window. See
+# unified-trading-pm/plans/active/issues/macro_micro_econ_data_capture_audit_2026_06_05.md.
+CALENDAR_EXEMPT_TRADFI_VENUES: frozenset[str] = frozenset({"FRED"})
+
 # Prediction-market shards tied to traditional financial instruments —
 # these only trade on US equity weekdays (no UP_DOWN market on weekends
 # because the underlying doesn't move). Crypto shards trade 24/7.
@@ -105,8 +121,12 @@ def _venue_excludes_weekends_holidays(venue: str) -> bool:
 
     TradFi venues (asset_group=='tradfi') and the prediction-market
     shards in :data:`WEEKDAY_ONLY_PREDICTION_SHARDS` exclude weekends +
-    US market holidays. Crypto venues trade 24/7.
+    US market holidays. Crypto venues trade 24/7. :data:`CALENDAR_EXEMPT_TRADFI_VENUES`
+    carves out tradfi-routed venues (e.g. FRED) whose real-world release
+    calendar is NOT the equity-market calendar — never gate them here.
     """
+    if venue in CALENDAR_EXEMPT_TRADFI_VENUES:
+        return False
     asset_group = VENUE_TO_ASSET_GROUP.get(venue, "")
     return asset_group == "tradfi" or venue in WEEKDAY_ONLY_PREDICTION_SHARDS
 
