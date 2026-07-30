@@ -7,6 +7,8 @@ from __future__ import annotations
 
 from enum import StrEnum
 
+from unified_api_contracts.canonical.crosscutting.share_class import ShareClass as ShareClass
+
 
 class StrategyFamily(StrEnum):
     """9 orthogonal families — a strategy belongs to exactly one.
@@ -290,18 +292,6 @@ class HoldPolicy(StrEnum):
     EXPIRY_DRIVEN = "EXPIRY_DRIVEN"
     CONVERGENCE_DRIVEN = "CONVERGENCE_DRIVEN"
     REBALANCE_DRIVEN = "REBALANCE_DRIVEN"
-
-
-class ShareClass(StrEnum):
-    USDT = "USDT"
-    USDC = "USDC"
-    FDUSD = "FDUSD"
-    USD = "USD"
-    GBP = "GBP"
-    EUR = "EUR"
-    ETH = "ETH"
-    BTC = "BTC"
-    SOL = "SOL"
 
 
 class VenueRoutingMode(StrEnum):
