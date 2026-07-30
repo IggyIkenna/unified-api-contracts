@@ -1855,7 +1855,7 @@
       "from_node_id": "CARRY_BASIS_DATED",
       "gap_type": null,
       "readiness": "backtest-only",
-      "reason": "IBKR \u2194 CME cross-venue routing policy not declared (UAC gap #10).",
+      "reason": "IBKR \u2194 CME cross-venue routing policy IS declared in UAC (cross_venue_routing_policy.py: ibkr_spy_cme_es_basis / ibkr_qqq_cme_nq_basis / ibkr_iwm_cme_rty_basis, gap #10 registry closed for the CME leg) but execution-service/strategy-service do not yet consume CROSS_VENUE_ROUTING_POLICIES \u2014 routing policy not wired into the SOR. IBKR \u2194 ICE has no declared policy yet (gap #10 registry still open for that leg).",
       "relation": "trades_instrument",
       "status": "partial",
       "to_node_id": "instrument_type:dated_future"
@@ -1905,7 +1905,7 @@
       "from_node_id": "CARRY_BASIS_DATED",
       "gap_type": null,
       "readiness": "backtest-only",
-      "reason": "IBKR \u2194 CME cross-venue routing policy not declared (UAC gap #10).",
+      "reason": "IBKR \u2194 CME cross-venue routing policy IS declared in UAC (cross_venue_routing_policy.py: ibkr_spy_cme_es_basis / ibkr_qqq_cme_nq_basis / ibkr_iwm_cme_rty_basis, gap #10 registry closed for the CME leg) but execution-service/strategy-service do not yet consume CROSS_VENUE_ROUTING_POLICIES \u2014 routing policy not wired into the SOR. IBKR \u2194 ICE has no declared policy yet (gap #10 registry still open for that leg).",
       "relation": "supports",
       "status": "partial",
       "to_node_id": "venue:cme"
@@ -1945,7 +1945,7 @@
       "from_node_id": "CARRY_BASIS_DATED",
       "gap_type": null,
       "readiness": "backtest-only",
-      "reason": "IBKR \u2194 CME cross-venue routing policy not declared (UAC gap #10).",
+      "reason": "IBKR \u2194 CME cross-venue routing policy IS declared in UAC (cross_venue_routing_policy.py: ibkr_spy_cme_es_basis / ibkr_qqq_cme_nq_basis / ibkr_iwm_cme_rty_basis, gap #10 registry closed for the CME leg) but execution-service/strategy-service do not yet consume CROSS_VENUE_ROUTING_POLICIES \u2014 routing policy not wired into the SOR. IBKR \u2194 ICE has no declared policy yet (gap #10 registry still open for that leg).",
       "relation": "supports",
       "status": "partial",
       "to_node_id": "venue:ibkr"
@@ -1955,7 +1955,7 @@
       "from_node_id": "CARRY_BASIS_DATED",
       "gap_type": null,
       "readiness": "backtest-only",
-      "reason": "IBKR \u2194 CME cross-venue routing policy not declared (UAC gap #10).",
+      "reason": "IBKR \u2194 CME cross-venue routing policy IS declared in UAC (cross_venue_routing_policy.py: ibkr_spy_cme_es_basis / ibkr_qqq_cme_nq_basis / ibkr_iwm_cme_rty_basis, gap #10 registry closed for the CME leg) but execution-service/strategy-service do not yet consume CROSS_VENUE_ROUTING_POLICIES \u2014 routing policy not wired into the SOR. IBKR \u2194 ICE has no declared policy yet (gap #10 registry still open for that leg).",
       "relation": "supports",
       "status": "partial",
       "to_node_id": "venue:ice"
