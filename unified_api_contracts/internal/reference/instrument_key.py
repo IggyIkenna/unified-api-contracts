@@ -20,12 +20,20 @@ from dataclasses import dataclass
 # NOTE: This map is inlined rather than imported from unified-config-interface to avoid
 # a T0→T1 backward dependency (UIC is T0, UCI is T1). VenueMapping itself should eventually
 # move to UAC (external venue identity), tracked in cicd_code_rollout_master plan.
+#
+# "OKX" REMOVED 2026-07-30 (breaking_change_differ_blind_to_registry_data_dicts_2026_07_09.md
+# Layer-2 SIT-gap closure): stale post-Option-A-venue-split entry — "okex" now canonically
+# round-trips to "OKX-SPOT" (VenueMapping.tardis_to_venue), not bare "OKX", so this mapping was
+# never bijective for the current venue scheme. Confirmed unused on the real capture path: bare
+# "OKX" spans MULTIPLE non-bijective Tardis exchange slugs (okex/okex-swap/okex-futures) and is
+# special-cased directly in market-tick-data-service's own routing
+# (umi_tick_provider._TARDIS_CEFI_VENUES), never through this map's `parse_for_tardis()`. Falls
+# through to the `venue.lower()` default now, same as every other unmapped venue.
 _VENUE_TO_TARDIS: dict[str, str] = {
     "BINANCE-SPOT": "binance",
     "BINANCE-FUTURES": "binance-futures",
     "DERIBIT": "deribit",
     "BYBIT": "bybit",
-    "OKX": "okex",
     "UPBIT": "upbit",
     "COINBASE-SPOT": "coinbase",
 }
