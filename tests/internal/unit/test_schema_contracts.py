@@ -310,6 +310,20 @@ def test_low_row_count_reports_row_count_too_low() -> None:
     assert any(v.kind == "row_count_too_low" for v in violations)
 
 
+def test_book_snapshot_5_thin_book_missing_deep_level_reports_no_violations() -> None:
+    # A thin/illiquid book legitimately lacks 5 full levels on both sides at
+    # some instants -- the live-path parser (tardis_machine_ws.py's
+    # _parse_tardis_book_snapshot_5) already documents + handles "level
+    # absent" as an expected condition, not an error. DP-FETCH-009
+    # (2026-07-30): a nullable=False contract on these columns turned every
+    # such honest partial-book row into a write-time attempted_failed.
+    df = _df_cefi_perp_book_5()
+    df.loc[0, "asks[4].price"] = None
+    df.loc[0, "asks[4].amount"] = None
+    violations = validate_dataframe(df, CEFI_PERPETUAL_BOOK_SNAPSHOT_5)
+    assert violations == [], f"expected no violations for a thin book missing a deep level, got {violations}"
+
+
 def test_null_rate_cap_exceeded_reports_null_rate_exceeded() -> None:
     contract = SchemaContract(
         asset_group="cefi",

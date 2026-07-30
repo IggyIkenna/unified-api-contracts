@@ -232,11 +232,25 @@ CEFI_PERPETUAL_TRADES = SchemaContract(
 # levels_mismatch_2026_07_28.md). Replaces the aspirational single-string
 # ColumnSpec pair that was never implemented, exposed the moment validate=True
 # was flipped on for every CeFi Tardis write site (2026-07-27).
+#
+# NULLABLE (2026-07-30, DP-FETCH-009 cefi/book_snapshot_5 high-attempted_failed
+# escalation): a thin/illiquid book genuinely does not always have 5 levels on
+# both sides -- the LIVE path already documents + handles this exact condition
+# (market_tick_data_service/live/connectors/tardis_machine_ws.py's
+# _parse_tardis_book_snapshot_5: "level absent" is expected, stamped None, not
+# an error). The batch/bulk Tardis CSV wire format blanks the same way for a
+# level the venue's depth feed didn't populate at that instant. A nullable=False
+# contract turned every such honest partial-book row into a write-time
+# extra_required_null violation -> the whole shard recorded attempted_failed,
+# not a fetch failure at all. The real consumer (MDPS book_snapshot_adapter.py)
+# already computes depth/imbalance features with NaN-tolerant numpy ops, so
+# relaxing this to nullable matches both the true wire guarantee and the
+# downstream reader's existing tolerance.
 _BOOK_SNAPSHOT_5_LEVEL_COLUMNS = [
     ColumnSpec(
         name=f"{side}[{level}].{field}",
         dtype="float64",
-        nullable=False,
+        nullable=True,
         description=f"Level-{level} {side[:-1]} {field} (top-5 book_snapshot_5 depth).",
     )
     for side in ("bids", "asks")
