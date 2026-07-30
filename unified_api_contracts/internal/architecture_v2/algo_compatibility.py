@@ -43,8 +43,13 @@ HONEST GAPS / TYPED AMBIGUITY (operator wants these caught, not hidden):
     likewise ``implemented=False`` as ExecAlgorithm objects.
   - The selector contradictions (ICEBERG split across code paths; SOR vs
     SMART_ORDER_ROUTER naming; the heuristic ``engine/live/algo_selector.py``
-    bypassing the InstructionType rules) are recorded in
-    ``SELECTOR_CONTRADICTIONS`` so the manifest/finding-tracker can carry them.
+    bypassing the InstructionType rules; the ghost algos; the missing SSOT doc)
+    are recorded in ``SELECTOR_CONTRADICTIONS`` so the manifest/finding-tracker
+    can carry them. All five are ``resolved=True`` as of 2026-07-30 (see each
+    record's ``resolution`` field + unified-trading-pm
+    codex/04-architecture/execution-algorithm-selection.md) — kept as a
+    permanent record, not deleted, since the taxonomy split they document
+    (manual/live vs canonical-automated algo universes) is itself durable.
 
 MAPPING archetype → valid algos: an archetype's valid-algo set is the UNION of the
 valid sets of the InstructionTypes its legs induce (a leg's instrument-type + the
@@ -467,21 +472,38 @@ class SelectorContradiction(BaseModel):
     slug: str = Field(description="Stable id for the contradiction.")
     summary: str = Field(description="One-line statement of the contradiction.")
     citation: str = Field(description="The file:line evidence on each side.")
+    resolved: bool = Field(
+        default=False,
+        description="Whether execution-service remediation (F33-F37) has landed for this slug.",
+    )
+    resolution: str = Field(
+        default="",
+        description="How + where this was reconciled, cited, when resolved=True.",
+    )
 
 
 SELECTOR_CONTRADICTIONS: Final[tuple[SelectorContradiction, ...]] = (
     SelectorContradiction(
         slug="iceberg_path_split",
         summary=(
-            "ICEBERG is a valid algo on the manual-instruction API + engine/live "
-            "selector + adapters factory, but is EXCLUDED from the canonical "
-            "ALGORITHMS_BY_INSTRUCTION_TYPE — requesting it through select_algorithm() "
-            "falls back / would not validate, while the manual API accepts it."
+            "ICEBERG is a valid algo on the manual-instruction API + adapters factory, "
+            "but is EXCLUDED from the canonical ALGORITHMS_BY_INSTRUCTION_TYPE — "
+            "requesting it through select_algorithm() falls back / would not validate, "
+            "while the manual API accepts it."
         ),
         citation=(
-            "selector.py:30 (ICEBERG removed comment) vs api/manual_instruction_helpers.py:70 "
-            "(_SUPPORTED_ALGOS includes ICEBERG) + engine/live/algo_selector.py:31 + "
-            "adapters/algorithm_factory.py (_ALGO_MAP 'iceberg')"
+            "selector.py:30-35 (ICEBERG removed comment) vs api/manual_instruction_helpers.py:70-75 "
+            "(_SUPPORTED_ALGOS includes ICEBERG) + adapters/algorithm_factory.py (_ALGO_MAP 'iceberg')"
+        ),
+        resolved=True,
+        resolution=(
+            "RECONCILED 2026-07-30 as an intentional two-axis split, not a bug: ICEBERG has a real "
+            "algo_library.IcebergAlgorithm implementation and stays valid for manual/live real-fill "
+            "trading (no backtest-fill-simulation concern applies there); the canonical automated/"
+            "backtest-driven selector deliberately excludes it for queue-position-modeling realism. "
+            "Documented in unified-trading-pm codex/04-architecture/execution-algorithm-selection.md "
+            "§3 + inline comments at both code sites (execution-service commit, "
+            "capability_wizard_analysis_findings_2026_06_11.md F33)."
         ),
     ),
     SelectorContradiction(
@@ -489,9 +511,16 @@ SELECTOR_CONTRADICTIONS: Final[tuple[SelectorContradiction, ...]] = (
         summary=(
             "The adapters factory keys the smart-order-router as 'sor' (lowercase) "
             "while the canonical selector knows it only as 'SMART_ORDER_ROUTER' — a "
-            "request for 'SOR' through select_algorithm() raises AlgorithmNotSupportedError."
+            "caller forwarding select_algorithm()'s output into the factory would fail to resolve."
         ),
         citation="adapters/algorithm_factory.py (_ALGO_MAP 'sor') vs selector.py:39 ('SMART_ORDER_ROUTER')",
+        resolved=True,
+        resolution=(
+            "FIXED 2026-07-30 — adapters/algorithm_factory.py._ALGO_MAP now carries BOTH 'sor' "
+            "(back-compat) and 'smart_order_router' (canonical alias), both resolving to SORAlgorithm. "
+            "Regression test: tests/unit/test_algorithm_factory.py::test_create_smart_order_router_alias "
+            "(execution-service commit, capability_wizard_analysis_findings_2026_06_11.md F34)."
+        ),
     ),
     SelectorContradiction(
         slug="ghost_algorithms",
@@ -502,24 +531,54 @@ SELECTOR_CONTRADICTIONS: Final[tuple[SelectorContradiction, ...]] = (
             "string nothing executes."
         ),
         citation="selector.py:48-68 (valid sets + defaults) vs no class file in algorithms/ for these keys",
+        resolved=True,
+        resolution=(
+            "DOCUMENTED 2026-07-30 (not a runtime bug — verified fail-loud, not silent): a caller "
+            "routing one of these instruction types through ExecutionOrchestrator.execute_instruction "
+            "gets algorithm_factory.get_algorithm() -> None -> ValueError('Unknown algorithm: ...'), "
+            "never a silent misexecution. selector.py now inline-flags each GHOST key; building the "
+            "real implementations is separate future strategy-service-scoped work, out of this "
+            "reconciliation's scope. Registry here already carried implemented=False for all four — "
+            "unchanged. See codex/04-architecture/execution-algorithm-selection.md §2 "
+            "(capability_wizard_analysis_findings_2026_06_11.md F35)."
+        ),
     ),
     SelectorContradiction(
         slug="heuristic_selector_bypasses_instruction_type",
         summary=(
-            "engine/live/algo_selector.py applies a quantity-threshold heuristic "
-            "(>=10 → TWAP else MARKET) that ignores InstructionType entirely — when "
-            "active it bypasses ALL the canonical SWAP/TRADE/ZERO_ALPHA rules."
+            "engine/live/algo_selector.py applied a quantity-threshold heuristic "
+            "(>=10 → TWAP else MARKET) that ignored InstructionType entirely — when "
+            "active it would have bypassed ALL the canonical SWAP/TRADE/ZERO_ALPHA rules."
         ),
-        citation="engine/live/algo_selector.py:31 (quantity heuristic) vs selector.py:126-167 (canonical chain)",
+        citation=(
+            "DELETED 2026-07-30 (was engine/live/algo_selector.py:31, quantity heuristic) vs "
+            "selector.py:126-167 (canonical chain, unaffected)"
+        ),
+        resolved=True,
+        resolution=(
+            "FIXED 2026-07-30 by deletion, not repair — repo-wide grep confirmed AlgoSelector was "
+            "never instantiated in any production code path (zero call sites besides its own module "
+            "+ the package __init__.py re-export) and had zero test coverage: dead code with no live "
+            "bypass, removed per the workspace no-shims/delete-deprecated-code rule rather than fixed "
+            "in place. execution_service/engine/live/__init__.py no longer exports it. "
+            "(execution-service commit, capability_wizard_analysis_findings_2026_06_11.md F36)."
+        ),
     ),
     SelectorContradiction(
         slug="missing_ssot_doc",
         summary=(
-            "selector.py cites UNIFIED_EXECUTION_DELTA.md as its taxonomy SSOT, but "
+            "selector.py cited UNIFIED_EXECUTION_DELTA.md as its taxonomy SSOT, but "
             "that document does not exist anywhere in the workspace — the selector "
-            "code is the de-facto SSOT (this registry now transcribes it)."
+            "code was the de-facto SSOT (this registry transcribes it declaratively)."
         ),
         citation="selector.py:7 (docstring 'Based on UNIFIED_EXECUTION_DELTA.md') vs no such file",
+        resolved=True,
+        resolution=(
+            "FIXED 2026-07-30 — unified-trading-pm codex/04-architecture/execution-algorithm-selection.md "
+            "is now the written SSOT; selector.py + instruction_type.py docstrings cite it in place of "
+            "the nonexistent UNIFIED_EXECUTION_DELTA.md (execution-service commit, "
+            "capability_wizard_analysis_findings_2026_06_11.md F37)."
+        ),
     ),
 )
 
