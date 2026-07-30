@@ -394,15 +394,21 @@ _DEFI: dict[str, list[str]] = {
     "PYTH-SOLANA": ["oracle_prices"],
     # --- Perp funding (DeFi perpetual protocols) ---
     # perp_funding_handler DEFAULT_PROTOCOLS; venue is protocol-only (chain in shard dim).
-    # HYPERLIQUID / ASTER / LIGHTER-ZKSYNC perp_funding RETIRED
-    # 2026-07-08 (operator-approved) — funding now reads via each venue's
-    # derivative_ticker embedded funding_rate field (see the _CEFI dict above for
-    # HYPERLIQUID/ASTER's real coverage row; LIGHTER-ZKSYNC never
-    # actually captured a distinct perp_funding row — market_data_categories.py
-    # confirms "No liquidations/perp_funding feed wired for any of the three").
-    # (PACIFICA (Solana) was a fourth venue covered by this note until removed
-    # entirely 2026-07-16 — operator ruling: all Solana perp DEXes dropped
-    # except Jupiter, not integrated.)
+    # HYPERLIQUID / ASTER / LIGHTER-ZKSYNC perp_funding RETIRED 2026-07-08, then
+    # RESTORED 2026-07-30 — reverses the retirement (operator ruling 2026-07-28,
+    # see defi_hyperliquid_perp_funding_derivative_ticker_divergence_2026_07_28.md):
+    # a real cross-source parity check found derivative_ticker's embedded
+    # funding_rate (a per-minute LIVE snapshot) diverges materially from
+    # perp_funding's REALIZED hourly-settlement value — the retirement's
+    # "byte-identical" premise does not hold. Dedicated capture resumed for all 3
+    # venues (full-completion mandate, no partial fix); see the _CEFI dict above
+    # for HYPERLIQUID/ASTER's separate derivative_ticker coverage row.
+    # (PACIFICA (Solana) was a fourth venue covered by the original retirement
+    # note; it stays removed — 2026-07-16 operator ruling: all Solana perp DEXes
+    # dropped except Jupiter, not integrated.)
+    "HYPERLIQUID": ["perp_funding"],
+    "ASTER": ["perp_funding"],
+    "LIGHTER-ZKSYNC": ["perp_funding"],
     # GMX (flat "GMX"+chain-dimension entry) removed 2026-07-25 — see
     # unified-trading-pm/plans/active/defi_gmx_venue_removal_2026_07_25.md.
     # --- Bridge protocols ---
