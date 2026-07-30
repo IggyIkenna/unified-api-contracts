@@ -1085,7 +1085,7 @@
       "from_node_id": "ARBITRAGE_PRICE_DISPERSION",
       "gap_type": null,
       "readiness": "live-proven",
-      "reason": "Flash-loan receiver per-chain registry missing from UAC (gap #3).",
+      "reason": "UAC's flash-loan receiver registry now exists (flash_loan_receiver.py: FLASH_LOAN_RECEIVER_REGISTRY, incl. an Arbitrum Uniswap V3 flash-swap row) \u2014 the UAC-declaration half of gap #3 is closed. But no live flash-loan-arb execution path consumes it: the AAVE connector resolves receivers only via config override or the testnet-only TestnetContractRegistry, and FlashLoanHandler (the paper/backtest simulator) has no receiver-address concept at all; only RecursiveLoopOrchestrator (a different archetype, kind=recursive_leverage) calls flash_loan_receiver_for(). Execution-wiring half of gap #3 is the real remaining gap, not the registry's absence.",
       "relation": "trades_instrument",
       "status": "partial",
       "to_node_id": "instrument_type:lp"
@@ -1455,7 +1455,7 @@
       "from_node_id": "ARBITRAGE_PRICE_DISPERSION",
       "gap_type": null,
       "readiness": "live-proven",
-      "reason": "Flash-loan receiver per-chain registry missing from UAC (gap #3).",
+      "reason": "UAC's flash-loan receiver registry now exists (flash_loan_receiver.py: FLASH_LOAN_RECEIVER_REGISTRY, incl. an Arbitrum Uniswap V3 flash-swap row) \u2014 the UAC-declaration half of gap #3 is closed. But no live flash-loan-arb execution path consumes it: the AAVE connector resolves receivers only via config override or the testnet-only TestnetContractRegistry, and FlashLoanHandler (the paper/backtest simulator) has no receiver-address concept at all; only RecursiveLoopOrchestrator (a different archetype, kind=recursive_leverage) calls flash_loan_receiver_for(). Execution-wiring half of gap #3 is the real remaining gap, not the registry's absence.",
       "relation": "supports",
       "status": "partial",
       "to_node_id": "venue:uniswap_v3"
