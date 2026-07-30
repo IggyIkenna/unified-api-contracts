@@ -168,6 +168,23 @@ VENUE_TO_ADAPTER_KEY: dict[str, str] = {
     "BINANCE-BSC": "wbeth",
     "KARAK-ETHEREUM": "karak",
     "KARAK-ARBITRUM": "karak",
+    # ANKR/STADER/STAKEWISE/SWELL/MANTLE single-token LSTs + MAKER sDAI vault
+    # (2026-07-30, defi_venue_pipeline_to_live_ao_build_2026_07_30.md todo 1) —
+    # adapter classes now exist in instruments-service (ankr.py / stader.py /
+    # stakewise.py / swell.py / mantle.py / maker.py, registered in
+    # factory._ADAPTERS). Real key here is "adapter first" (mirrors the
+    # CHAINLINK precedent above): DEFI_VENUE_PHASE stays "pipeline" and these
+    # venues are deliberately NOT yet added to instruments-service's
+    # _STATIC_DEFI_VENUES — that "declaration" step (phase flip +
+    # _build_defi_venues() membership) is the coordinated, LAST todo of the
+    # same plan (todo 5), so the drift-guard test
+    # (test_defi_set_equals_uac_denominator_drift_guard) stays green today.
+    "ANKR-ETHEREUM": "ankr",
+    "STADER-ETHEREUM": "stader",
+    "STAKEWISE-ETHEREUM": "stakewise",
+    "SWELL-ETHEREUM": "swell",
+    "MANTLE-ETHEREUM": "mantle",
+    "MAKER-ETHEREUM": "maker",
     # DeFi — Vault/yield-aggregator protocols (Ethereum + L2, static curated registry)
     "CONVEX-ETHEREUM": "convex",
     "IDLE-ETHEREUM": "idle",
