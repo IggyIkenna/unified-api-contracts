@@ -44,6 +44,11 @@ EXPECTED_SENTINEL_VENUES: frozenset[str] = frozenset(
         "BETFAIR_EX_EU",
         "DRAFTKINGS",
         "FANDUEL",
+        # Added to VENUES_BY_ASSET_GROUP["sports"] 2026-07-30 (distinct-values census
+        # review) — same MTDS-owned-odds-venue shape as the 7 entries directly above.
+        "LADBROKES",
+        "BET888SPORT",
+        "SMARKETS",
         # The 20 ODDS_API fan-out bookmakers (BETMGM..WILLIAMHILL) that were
         # promoted into VENUES_BY_ASSET_GROUP["sports"] + sentineled here
         # 2026-07-20 were REVERTED 2026-07-22 (operator ruling: "do NOT add
