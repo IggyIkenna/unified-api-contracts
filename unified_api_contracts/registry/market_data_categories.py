@@ -297,6 +297,10 @@ DATA_TYPES_BY_ASSET_GROUP: dict[str, list[str]] = {
 }
 
 # Venues per asset group
+# @contract-surface — a removed asset_group key or a removed venue from a group's list
+# is a cross-repo breaking change (build_expected() iterates this dict as the venue
+# axis of the expected universe). See detect_breaking_change.py + issues/
+# breaking_change_differ_blind_to_registry_data_dicts_2026_07_09.md.
 VENUES_BY_ASSET_GROUP: dict[str, list[str]] = {
     "cefi": [
         # Centralized exchanges (Tardis API)
@@ -1711,7 +1715,12 @@ def valid_data_types_for_venue_instrument_type(
 # - A venue's data type started later than the venue itself (e.g. Deribit options added later)
 # - A venue only supports a subset of its category's data types (e.g. ICE has ohlcv_24h only)
 # - A data type has a different start date per venue (e.g. TradFi venues)
-
+#
+# @contract-surface — a removed venue key or a removed inner data_type key is a
+# cross-repo breaking change (build_expected() Carve-out 1 reads this dict as the
+# venue/data_type capability gate). Inner date-string VALUE changes are NOT tracked
+# (only key/member removal — see detect_breaking_change.py's `_diff_registry`). See
+# issues/breaking_change_differ_blind_to_registry_data_dicts_2026_07_09.md.
 VENUE_DATA_TYPE_CAPABILITIES: dict[str, dict[str, str]] = {
     # ── CeFi — Tardis exchanges ──
     # Most CeFi venues support all cefi data types from their launch date.
