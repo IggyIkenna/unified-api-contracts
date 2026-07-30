@@ -146,6 +146,14 @@ SINK_MATRIX: dict[tuple[str, str], SinkConfig] = {
     (_WILDCARD, "execution_positions"): SinkConfig(_SO, cold_ttl_days=None),
     (_WILDCARD, "execution_pnl"): SinkConfig(_SO, cold_ttl_days=None),
     (_WILDCARD, "paper_ledger"): SinkConfig(_SO, cold_ttl_days=None),
+    # -----------------------------------------------------------------------
+    # strategy-service shard — paper-LIVE routing seam (source="strategy").
+    # AtomicInstructions published for execution-service's atomic_instruction_router
+    # to route to AtomicLegExecutor.execute. STREAM_ONLY: this is the emitted
+    # instruction itself (the system-of-record trigger for what execution acted
+    # on), not a re-derivable market-data aggregate.
+    # -----------------------------------------------------------------------
+    (_WILDCARD, "atomic_instruction"): SinkConfig(_SO, cold_ttl_days=None),
 }
 
 

@@ -77,7 +77,7 @@ class CanonicalPersistEnvelope(BaseModel):
     source: str = Field(
         description=(
             "Emitting service tag. Closed set: 'MTDS' / 'MDPS' / 'features' / "
-            "'ml' / 'execution'. Used by the read() facade for provenance routing."
+            "'ml' / 'execution' / 'strategy'. Used by the read() facade for provenance routing."
         ),
     )
     available_at: datetime = Field(
