@@ -69,6 +69,14 @@ EXPECTED_SENTINEL_VENUES: frozenset[str] = frozenset(
         "TRANSFERMARKT",
         "SOCCER_FOOTBALL_INFO",
         "OPEN_METEO",
+        # FRED (2026-07-29): market-data TICK capture is fully wired (MTDS
+        # fred_adapter.py + market_tick_data_service.adapters._umi_fred), but
+        # instruments-service has no "fred" URDI reference-data adapter yet —
+        # FredAdapter.KEY_SERIES (the 29-series catalogue) lives only in MTDS
+        # today. Building that adapter (mirroring FX's small-static-list
+        # precedent) is a follow-up for instruments-service, out of scope for
+        # market-tick-data-service/unified-api-contracts.
+        "FRED",
     }
 )
 

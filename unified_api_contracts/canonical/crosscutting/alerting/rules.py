@@ -1333,6 +1333,31 @@ DATA_PIPELINE_ALERT_RULES: Final[tuple[DataPipelineAlertRule, ...]] = (
     # a deployment drift that must be resolved before the job is counted as "done".
     # Route: #data-pipeline-alerts (SLACK only, per WARN severity routing).
     _dp_rule("DP-VM-007", _C.VM, "DP_CLOUD_RUN_STALE_IMAGE", _S.WARN, _E.FILE_ISSUE),
+    # DP-VM-008..011: transcription-gap fix (vm_fleet_preemption_autorecovery_gap_2026_07_23.md
+    # item 5). The registry yaml (codex/05-infrastructure/data-pipeline-alerts.registry.yaml)
+    # already reserved DP-VM-007=DP_VM_PREEMPTED / DP-VM-008=DP_VM_PARTIAL_UNCONFIRMED, but
+    # DP-VM-007 was independently claimed here by DP_CLOUD_RUN_STALE_IMAGE (never added to the
+    # yaml) — so DP_VM_PREEMPTED / DP_VM_PARTIAL_UNCONFIRMED were NEVER actually transcribed to
+    # this Python contract. Confirmed via code read: exit_code_fleet_monitor.py emits both as
+    # PipelineFinding with hardcoded (now-wrong) registry_id strings, and
+    # relaunch_backfill_vm.py's DP_VM_PREEMPTED_NO_RELAUNCH (CRITICAL, the "silent vanish" page)
+    # was never registered at all. Without an entry here, alerting-service's
+    # data_pipeline_rule_for() exact-match lookup misses, so all three fall through to the
+    # generic catch-all routing_rules — landing on #uts-live-alerts (or nowhere, for the
+    # CRITICAL case, since the generic no-match fallback carries no PagerDuty severity) instead
+    # of #data-pipeline-alerts with the intended paging. New ids (not reusing DP-VM-007) to avoid
+    # renumbering the already-shipped DP_CLOUD_RUN_STALE_IMAGE entry.
+    _dp_rule("DP-VM-008", _C.VM, "DP_VM_PREEMPTED", _S.INFO, _E.AUTO_RECOVER),
+    _dp_rule("DP-VM-009", _C.VM, "DP_VM_PREEMPTED_NO_RELAUNCH", _S.CRITICAL, _E.PAGE_OPERATOR),
+    _dp_rule("DP-VM-010", _C.VM, "DP_VM_PARTIAL_UNCONFIRMED", _S.WARN, _E.AUTO_RECOVER),
+    # DP-VM-011: NEW resolved-bookend event (this issue's item 5) — emitted by
+    # RelaunchPreemptedVm.relaunch()'s success path INSTEAD OF re-emitting DP_VM_PREEMPTED, so a
+    # human reading #data-pipeline-alerts sees a distinct "recovered" message (vm_name/
+    # asset_group in the details correlate it to the earlier DP_VM_PREEMPTED open alert; no
+    # dedup-key collision risk since the event names differ). INFO/FILE_ISSUE mirrors the other
+    # informational one-shot events (DP-DIGEST-001..004) — no extra action needed, Slack mirror
+    # only.
+    _dp_rule("DP-VM-011", _C.VM, "DP_VM_PREEMPTED_RECOVERED", _S.INFO, _E.FILE_ISSUE),
     # ── DP-RATE (class C5) ──────────────────────────────────────────────────
     _dp_rule("DP-RATE-001", _C.RATE, "DP_SOURCE_RATE_LIMITED", _S.WARN, _E.AUTO_RECOVER),
     _dp_rule("DP-RATE-002", _C.RATE, "DP_KEY_POOL_EXHAUSTED", _S.CRITICAL, _E.PAGE_OPERATOR),

@@ -487,10 +487,6 @@ allowed:
     reason: recording-template
     detail: "Open-Meteo weather forecast REST (api.open-meteo.com/v1/forecast). IS or strategy-service weather signal adapter. UAC external/open_meteo schemas not yet imported. Phase 2 QG task."
     acked_by: slot-1 2026-05-26
-  - path: openbb/mocks/stub.yaml
-    reason: stub-placeholder
-    detail: "Empty interactions stub — OpenBB Platform API; tradfi data aggregator adapter pending."
-    acked_by: slot-1 2026-05-26
   - path: polygon/mocks/stub.yaml
     reason: stub-placeholder
     detail: "Empty interactions stub — Polygon.io tradfi tick data (polygon.io/docs); adapter pending under tradfi master epic."

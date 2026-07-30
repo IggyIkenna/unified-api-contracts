@@ -602,7 +602,7 @@
             "CARRY_BASIS_DATED@ibkr-cme-spy-es-dated-usd-prod",
             "CARRY_BASIS_DATED@ibkr-ice-brent-fixed-feb26-usd-prod"
           ],
-          "notes": "IBKR \u2194 CME cross-venue routing policy not declared (UAC gap #10)."
+          "notes": "IBKR \u2194 CME cross-venue routing policy IS declared in UAC (cross_venue_routing_policy.py: ibkr_spy_cme_es_basis / ibkr_qqq_cme_nq_basis / ibkr_iwm_cme_rty_basis, gap #10 registry closed for the CME leg) but execution-service/strategy-service do not yet consume CROSS_VENUE_ROUTING_POLICIES \u2014 routing policy not wired into the SOR. IBKR \u2194 ICE has no declared policy yet (gap #10 registry still open for that leg)."
         }
       ]
     },
@@ -949,7 +949,7 @@
           "representative_slot_labels": [
             "ARBITRAGE_PRICE_DISPERSION@uniswap-flashloan-eth-usdc-ethereum-prod"
           ],
-          "notes": "Flash-loan receiver per-chain registry missing from UAC (gap #3)."
+          "notes": "UAC's flash-loan receiver registry now exists (flash_loan_receiver.py: FLASH_LOAN_RECEIVER_REGISTRY, incl. an Arbitrum Uniswap V3 flash-swap row) \u2014 the UAC-declaration half of gap #3 is closed. But no live flash-loan-arb execution path consumes it: the AAVE connector resolves receivers only via config override or the testnet-only TestnetContractRegistry, and FlashLoanHandler (the paper/backtest simulator) has no receiver-address concept at all; only RecursiveLoopOrchestrator (a different archetype, kind=recursive_leverage) calls flash_loan_receiver_for(). Execution-wiring half of gap #3 is the real remaining gap, not the registry's absence."
         },
         {
           "asset_group": "DEFI",
@@ -999,7 +999,7 @@
             "ARBITRAGE_PRICE_DISPERSION@cme-es-nq-dated-ratio-usd-prod",
             "ARBITRAGE_PRICE_DISPERSION@cme-es-calendar-fixed-dec25-mar26-usd-prod"
           ],
-          "notes": "Cross-product routing policy not declared in UAC (gap #10)."
+          "notes": "Cross-venue routing policy IS declared in UAC (cross_venue_routing_policy.py: cme_wti_ice_brent_spread, gap #10 registry closed) but execution-service/strategy-service do not yet consume CROSS_VENUE_ROUTING_POLICIES \u2014 routing policy not wired into the SOR."
         },
         {
           "asset_group": "TRADFI",

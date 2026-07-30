@@ -88,7 +88,7 @@ class VenueMapping:
 
     # Canonical TradFi venues (user-friendly names, not data source names)
     # Note: Not all are Databento-sourced (FX + KRX use Yahoo Finance; CBOE is
-    # Databento XCBF.PITCH for VX/VIX futures).
+    # Databento XCBF.PITCH for VX/VIX futures; FRED is the FRED REST API).
     all_databento_venues: list[str] = field(
         default_factory=lambda: [
             "CME",  # Chicago Mercantile Exchange (futures, options, treasuries)
@@ -98,6 +98,13 @@ class VenueMapping:
             "ICE",  # Intercontinental Exchange (futures, options)
             "FX",  # OTC Foreign Exchange (KRW/USD via Yahoo Finance data provider)
             "KRX",  # Korea Exchange (single stocks via Yahoo Finance .KS tickers)
+            # FRED (Federal Reserve Economic Data) — macro venue, no Databento analog
+            # (unlike FX/KRX above, which are Yahoo-served ALTERNATE data for venues
+            # Databento already lists). Added 2026-07-29 to make it reachable via
+            # get_venues_for_asset_groups(["TRADFI"]) / the generic tick-data CLI;
+            # routed unconditionally (no Databento fallthrough) in
+            # market_tick_data_service.adapters._umi_fred.route_fred_tradfi.
+            "FRED",
         ]
     )
 
@@ -240,6 +247,11 @@ class VenueMapping:
             # gate (test_tradfi_venue_resolves_to_a_data_source) sees a valid source for
             # ICE (DXY via Yahoo), not a "routes nowhere" gap.
             "KRX": "yahoo_finance",  # Korea Exchange: KOSPI/KOSPI200 indices + single stocks via Yahoo
+            "FRED": "fred",  # Federal Reserve Economic Data REST API — its own source, no Databento
+            # analog at all (unlike FX/ICE/KRX, which are Yahoo-served ALTERNATE data for real
+            # Databento venues). Added 2026-07-29 alongside FRED's backfill-invocation wiring;
+            # satisfies test_tradfi_venue_resolves_to_a_data_source (else FRED "resolves to NO
+            # data source" per that parity gate).
             # DeFi venues with direct API integration
             "HYPERLIQUID": "hyperliquid_api",
             "ASTER": "aster_api",

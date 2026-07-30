@@ -197,6 +197,12 @@ _TRADFI: dict[str, list[str]] = {
     # YAHOO_FINANCE removed 2026-07-15 (source-as-venue modeling error) — Yahoo is a
     # SOURCE, not a venue; its rows land under real venues (DXY→ICE, KRW/USD→FX) with
     # source=yahoo. SOURCE modeling kept in data_source_continuity.py / _tradfi.py.
+    # FRED (Federal Reserve Economic Data) — added 2026-07-29 alongside the FRED
+    # backfill-invocation wiring (macro_micro_econ_data_capture_audit_2026_06_05.md).
+    # Mirrors VENUE_DATA_TYPE_CAPABILITIES["FRED"] in market_data_categories.py (the
+    # capability axis this policy axis sits beside) so honest-coverage/data-status
+    # counts newly-populated FRED rows instead of reading them as out_of_scope.
+    "FRED": ["yield_curve", "ohlcv_1d"],
 }
 
 # ---------------------------------------------------------------------------

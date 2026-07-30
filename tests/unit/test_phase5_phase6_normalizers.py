@@ -1,7 +1,7 @@
 """Unit tests for phase5 (tradfi, onchain) and phase6 (market_state) normalizers.
 
 Covers:
-- tradfi: FRED, ECB, OFR, OpenBB normalizers
+- tradfi: FRED, ECB, OFR normalizers
 - onchain: DeFiLlama normalizers
 - market_state: Binance, Bybit, OKX, Deribit, Coinbase, IBKR, Kalshi, Betfair normalizers
 """
@@ -276,73 +276,6 @@ class TestOfrNormalizers:
         results = normalize_ofr_cds_response(raw)
         assert len(results) == 2
         assert all(isinstance(r, CanonicalCdsSpread) for r in results)
-
-
-# ---------------------------------------------------------------------------
-# tradfi — OpenBB Treasury
-# ---------------------------------------------------------------------------
-
-
-class TestOpenBBNormalizers:
-    def test_normalize_openbb_treasury_price_valid(self):
-        from unified_api_contracts.canonical.domain import (
-            CanonicalBondData,
-        )
-        from unified_api_contracts.external.openbb.schemas import (
-            OpenBBTreasuryPrice,
-        )
-        from unified_api_contracts.normalize_utils.tradfi import (
-            normalize_openbb_treasury_price,
-        )
-
-        raw = OpenBBTreasuryPrice(
-            symbol="US10Y",
-            name="10-Year Treasury",
-            date="2024-03-01",
-            bid=98.5,
-            ask=98.6,
-            last=98.55,
-            yield_to_maturity=4.25,
-        )
-        result = normalize_openbb_treasury_price(raw)
-        assert isinstance(result, CanonicalBondData)
-        assert result.symbol == "US10Y"
-        assert result.bid == Decimal("98.5")
-        assert result.ask == Decimal("98.6")
-        assert result.yield_to_maturity == Decimal("4.25")
-
-    def test_normalize_openbb_treasury_price_no_symbol_no_name(self):
-        from unified_api_contracts.external.openbb.schemas import (
-            OpenBBTreasuryPrice,
-        )
-        from unified_api_contracts.normalize_utils.tradfi import (
-            normalize_openbb_treasury_price,
-        )
-
-        raw = OpenBBTreasuryPrice(symbol=None, name=None, date="2024-03-01")
-        result = normalize_openbb_treasury_price(raw)
-        assert result is None
-
-    def test_normalize_openbb_treasury_prices_response(self):
-        from unified_api_contracts.canonical.domain import (
-            CanonicalBondData,
-        )
-        from unified_api_contracts.external.openbb.schemas import (
-            OpenBBTreasuryPrice,
-            OpenBBTreasuryPricesResponse,
-        )
-        from unified_api_contracts.normalize_utils.tradfi import (
-            normalize_openbb_treasury_prices_response,
-        )
-
-        items = [
-            OpenBBTreasuryPrice(symbol="US2Y", name="2Y", date="2024-01-01", last=99.0),
-            OpenBBTreasuryPrice(symbol=None, name=None, date="2024-01-01"),  # skip
-        ]
-        raw = OpenBBTreasuryPricesResponse(results=items)
-        results = normalize_openbb_treasury_prices_response(raw)
-        assert len(results) == 1
-        assert isinstance(results[0], CanonicalBondData)
 
 
 # ---------------------------------------------------------------------------

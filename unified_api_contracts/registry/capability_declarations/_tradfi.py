@@ -163,27 +163,6 @@ _ECB = SourceCapability(
     kind=None,
 )
 
-_OPENBB = SourceCapability(
-    source="openbb",
-    domains=["market", "reference"],
-    crosscutting=["errors", "rate_limits"],
-    supports_live=False,
-    supports_batch=True,
-    supports_historical=True,
-    supports_testnet=False,
-    supports_mainnet=True,
-    auth_scope=["none"],
-    auth_environments={},
-    operations={
-        "market": ["bond_data", "yield_curves", "fixed_income"],
-        "reference": ["bond_indices", "government_bonds"],
-    },
-    base_urls={},
-    operation_details={},
-    chain=None,
-    kind=None,
-)
-
 _OFR = SourceCapability(
     source="ofr",
     domains=["market", "reference"],
@@ -215,6 +194,5 @@ TRADFI_CAPABILITIES: list[SourceCapability] = [
     _FRED,
     _YAHOO_FINANCE,
     _ECB,
-    _OPENBB,
     _OFR,
 ]

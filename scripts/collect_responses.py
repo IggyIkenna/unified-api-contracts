@@ -103,7 +103,6 @@ AUTH_CONFIG: dict[str, dict[str, str]] = {
     "fred": {"injection": "query_param", "param": "api_key"},
     "footystats": {"injection": "query_param", "param": "key"},
     "odds_api": {"injection": "query_param", "param": "apiKey"},
-    "openbb": {"injection": "header_bearer", "header_name": "Authorization"},
     "soccer_football_info": {
         "injection": "header",
         "header_name": "X-RapidAPI-Key",

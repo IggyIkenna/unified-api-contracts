@@ -366,13 +366,6 @@ providers:
     modes: [historical]
     free_tier: true
 
-  openbb:
-    api_version: "v4"
-    spec_url: "https://docs.openbb.co/platform"
-    last_verified: "2026-03-06"
-    status: yellow
-    cassette_status: pending
-
   pinnacle:
     api_version: "v3"
     spec_url: "https://pinnacleapi.github.io/"

@@ -158,7 +158,18 @@ DATA_TYPES_BY_ASSET_GROUP: dict[str, list[str]] = {
         # ── Reference/event types from Polygon.io and FRED (canonicalized 2026-05-23) ──
         "corporate_action_confirmed",  # Confirmed dividends + splits (Polygon.io Equities Basic)
         "earnings_result",  # Earnings results (Polygon.io)
-        "macro_result",  # Macro economic results: NFP/CPI/GDP/FOMC/Claims/PCE (FRED)
+        # "macro_result" was declared as FRED's data_type here, but the live
+        # ``FredAdapter.write_canonical_shard`` has never written it — it writes
+        # ``yield_curve``/``ohlcv_1d`` (below), already the SSOT MTDS's local
+        # ``tradfi_shared.TRADFI_DATA_TYPES`` legalizes and features-service's
+        # ``mtds_fred_reader.py`` (shipped 2026-07-27) already reads. Kept
+        # (not deleted) — legacy manifest rows may still carry it from a
+        # different Databento-sourced producer; only the FRED attribution was
+        # wrong. Found + corrected 2026-07-29 scoping FRED's backfill invocation
+        # (unified-trading-pm/plans/active/issues/macro_micro_econ_data_capture_audit_2026_06_05.md).
+        "macro_result",  # Macro economic results — legacy data_type, NOT written by FredAdapter
+        "yield_curve",  # FRED: BOND-classified series (Treasury yields, TIPS, rates, spreads, credit)
+        "ohlcv_1d",  # FRED: INDEX-classified series, degenerate 1-obs/day bar (VIXCLS, CPI, GDP, UNRATE, …)
     ],
     "defi": [
         "dex_pool_state",  # DEX pool metrics (TVL, liquidity depth)
@@ -392,6 +403,13 @@ VENUES_BY_ASSET_GROUP: dict[str, list[str]] = {
         "KRX",  # Korea Exchange — single stocks via Yahoo Finance (.KS tickers), source=yahoo
         # External data providers
         "FX",  # FX rates (KRW/USD via Yahoo Finance data provider)
+        # FRED (Federal Reserve Economic Data) — macro rates/curve/inflation series,
+        # source=fred (FRED REST API, no Databento analog). Added 2026-07-29: the
+        # adapter (market_interface/adapters/tradfi/fred_adapter.py) existed but was
+        # never in this list, so VENUE_TO_ASSET_GROUP had no entry for it and
+        # validate_data_type_for_venue("FRED", ...) always failed. See
+        # VENUE_DATA_TYPE_CAPABILITIES["FRED"] below for its data_types.
+        "FRED",
         # NOTE: BARCHART removed 2026-06-24 (VIX 15m now aggregates from VX futures
         # via Databento XCBF.PITCH — Barchart CSV preload retired).
         # YAHOO_FINANCE removed 2026-07-15: legacy source-as-venue artifact, NOT a real
@@ -1885,8 +1903,23 @@ VENUE_DATA_TYPE_CAPABILITIES: dict[str, dict[str, str]] = {
         "corporate_action_confirmed": "2020-01-01",
         "earnings_result": "2020-01-01",
     },
+    # Corrected 2026-07-29 (scoping the FRED backfill invocation — see
+    # macro_micro_econ_data_capture_audit_2026_06_05.md todo "Scope + build the
+    # actual FRED backfill invocation"): the live FredAdapter.write_canonical_shard
+    # writes ``yield_curve`` (BOND-classified KEY_SERIES: yield curve/TIPS/rates/
+    # spreads/credit) and ``ohlcv_1d`` (INDEX-classified: volatility/inflation/macro)
+    # — never ``macro_result``, which this entry previously (and wrongly) declared.
+    # Start date mirrors coverage_starts.py's existing per-venue
+    # SOURCE_COVERAGE_START["FRED"] = date(1962, 1, 2) (DGS Treasury series depth) —
+    # this per-data_type start is necessarily a whole-venue approximation (some
+    # KEY_SERIES, e.g. SOFR, start far later; FRED has no per-series start-date axis
+    # here). get_expected_data_types_for_venue("FRED") drives the actual pre-flight
+    # data_types filter in venue_fetch.py — without this fix a live capture run only
+    # ever requested "macro_result", which FredAdapter never emits, so the fetch
+    # honest-emptied every day.
     "FRED": {
-        "macro_result": "2010-01-01",
+        "yield_curve": "1962-01-02",
+        "ohlcv_1d": "1962-01-02",
     },
     # ── DeFi — multi-chain entries live in defi_venue_capabilities.py and
     # are merged into this dict at module-load time (see below). Split out

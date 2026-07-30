@@ -1,8 +1,8 @@
 # Strategy Prospectus: Carry Basis Dated
 
-> **Archetype ID**: `CARRY_BASIS_DATED`  
-> **Family**: `CARRY_AND_YIELD`  
-> **Status** (codex): design  
+> **Archetype ID**: `CARRY_BASIS_DATED`
+> **Family**: `CARRY_AND_YIELD`
+> **Status** (codex): design
 > **Alpha disclosure**: full (debugging mode) — no client-facing curtailment applied.
 
 ## 1. What It Does + How It Makes Decisions
@@ -11,12 +11,12 @@
 
 **[MACHINE-DERIVED]** Capability cells (from ARCHETYPE_CAPABILITY_REGISTRY):
 
-| Venue Category | Instrument Type | Status    | Notes                                                                       |
-| -------------- | --------------- | --------- | --------------------------------------------------------------------------- |
-| CEFI           | dated_future    | SUPPORTED | Spot + dated combo. Default rolls with front; expiry-targeted uses -fixed-. |
-| CEFI           | option          | PARTIAL   | Put-call parity synthetic expression; no worked instance yet.               |
-| DEFI           | dated_future    | BLOCKED   | No DeFi dated-future venue.                                                 |
-| TRADFI         | dated_future    | PARTIAL   | IBKR ↔ CME cross-venue routing policy not declared (UAC gap #10).          |
+| Venue Category | Instrument Type | Status    | Notes                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| -------------- | --------------- | --------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| CEFI           | dated_future    | SUPPORTED | Spot + dated combo. Default rolls with front; expiry-targeted uses -fixed-.                                                                                                                                                                                                                                                                                                                                                 |
+| CEFI           | option          | PARTIAL   | Put-call parity synthetic expression; no worked instance yet.                                                                                                                                                                                                                                                                                                                                                               |
+| DEFI           | dated_future    | BLOCKED   | No DeFi dated-future venue.                                                                                                                                                                                                                                                                                                                                                                                                 |
+| TRADFI         | dated_future    | PARTIAL   | IBKR ↔ CME cross-venue routing policy IS declared in UAC (cross_venue_routing_policy.py: ibkr_spy_cme_es_basis / ibkr_qqq_cme_nq_basis / ibkr_iwm_cme_rty_basis, gap #10 registry closed for the CME leg) but execution-service/strategy-service do not yet consume CROSS_VENUE_ROUTING_POLICIES — routing policy not wired into the SOR. IBKR ↔ ICE has no declared policy yet (gap #10 registry still open for that leg). |
 
 **[CODEX-DERIVED]** From `codex/09-strategy/architecture-v2/archetypes/`:
 
@@ -37,8 +37,8 @@ close-expiring-future → close-spot → open-new-future → open-spot, fired as
 same-venue.
 
 **Code-backport status:** DEFERRED — `carry_and_yield/carry_basis_dated.py` still wires legs hand-built. Backport
-tracked in `defi_recursive_borrow_archetypes_2026_05_10.md` factory-wiring phase. Docs ship n
-_...truncated (836 chars total). See codex archetype doc for full detail._
+tracked in `defi_recursive_borrow_archetypes_2026_05_10.md` factory-wiring phase. Docs ship n _...truncated (836 chars
+total). See codex archetype doc for full detail._
 
 **[CODEX-DERIVED]** Configurable parameters:
 
@@ -138,11 +138,13 @@ flowchart TD
 
 ## 6. Performance
 
-> **No backtest metrics recorded for this archetype configuration.** Run Phase 5 backtest-on-demand (`strategy_service/engine/backtest/runner.py` over historical data) to generate metrics.
+> **No backtest metrics recorded for this archetype configuration.** Run Phase 5 backtest-on-demand
+> (`strategy_service/engine/backtest/runner.py` over historical data) to generate metrics.
 
 **NEVER invented numbers are shown here** — this section is honest about the absence.
 
-When backtest results are available, the following metric set will be reported (from `unified_trading_library.performance_metrics`):
+When backtest results are available, the following metric set will be reported (from
+`unified_trading_library.performance_metrics`):
 
 - `DAYS_PER_YEAR`
 
@@ -153,4 +155,7 @@ When backtest results are available, the following metric set will be reported (
 - `archetype_id`: `CARRY_BASIS_DATED`
 - `generated_by`: `scripts/openapi/generate_strategy_prospectus.py` (unified-trading-pm generator family)
 
-_This prospectus is machine-generated. Sections marked [CODEX-DERIVED] are sourced from hand-authored engineering docs in `codex/09-strategy/architecture-v2/archetypes/`. Sections marked [MACHINE-DERIVED] are sourced from the capability manifest (UAC registry data, 409 nodes / 663 edges). Full alpha disclosure — debugging mode. Curtailment is a later config flag._
+_This prospectus is machine-generated. Sections marked [CODEX-DERIVED] are sourced from hand-authored engineering docs
+in `codex/09-strategy/architecture-v2/archetypes/`. Sections marked [MACHINE-DERIVED] are sourced from the capability
+manifest (UAC registry data, 409 nodes / 663 edges). Full alpha disclosure — debugging mode. Curtailment is a later
+config flag._

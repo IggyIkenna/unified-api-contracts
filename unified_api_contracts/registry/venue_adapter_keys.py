@@ -127,6 +127,16 @@ VENUE_TO_ADAPTER_KEY: dict[str, str] = {
     # (instruments-service/reference_data/adapters/tradfi/fx.py).
     "FX": "fx",
     "KRX": "databento",
+    # FRED (Federal Reserve Economic Data) — its market-data TICK capture is fully
+    # wired (MTDS market_interface/adapters/tradfi/fred_adapter.py + the
+    # market_tick_data_service.adapters._umi_fred dispatch route, 2026-07-29), but
+    # unlike FX above it has no instruments-service URDI reference-data adapter yet
+    # — FredAdapter.KEY_SERIES (the 29-series catalogue) lives only in MTDS today.
+    # Declared adapterless (not silently missing) per this dict's own contract;
+    # building the "fred" URDI reference adapter (mirroring FX's small-static-list
+    # precedent) is out of scope for market-tick-data-service/unified-api-contracts
+    # — a follow-up for instruments-service.
+    "FRED": NO_ADAPTER_YET,
     # YAHOO_FINANCE removed 2026-07-15 — it was a source-as-venue modeling error, not
     # a real venue (no adapter, no fetch code stamps venue=YAHOO_FINANCE). Yahoo is a
     # SOURCE; its rows land under real venues with source=yahoo. IS's

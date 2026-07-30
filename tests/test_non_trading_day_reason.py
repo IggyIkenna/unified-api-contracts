@@ -54,3 +54,27 @@ def test_returns_only_closed_set_values(iso_date: str) -> None:
     """The result is one of {None, EXPECTED_HOLIDAY, EXPECTED_WEEKEND} — closed set."""
     result = non_trading_day_reason("NYSE", iso_date)
     assert result in {None, "EXPECTED_HOLIDAY", "EXPECTED_WEEKEND"}
+
+
+@pytest.mark.parametrize(
+    "iso_date",
+    [
+        "2024-03-29",  # Good Friday — a US_MARKET_HOLIDAY, NOT a federal holiday
+        "2024-01-06",  # Saturday
+        "2024-01-07",  # Sunday
+    ],
+)
+def test_fred_calendar_exempt_venue_never_non_trading(iso_date: str) -> None:
+    """FRED is asset_group=='tradfi' but is release-schedule-driven, not equity-market-driven —
+    CALENDAR_EXEMPT_TRADFI_VENUES must keep it out of the weekend/US_MARKET_HOLIDAYS gate
+    entirely (2026-07-30 fix: 2024-01-01 was silently stamped EXPECTED_HOLIDAY with zero
+    fetch attempt before this; Good Friday closes NYSE but not the Fed/BLS)."""
+    assert not is_non_trading_day("FRED", iso_date)
+    assert non_trading_day_reason("FRED", iso_date) is None
+
+
+def test_calendar_exempt_venue_does_not_affect_sibling_tradfi_venues() -> None:
+    """The FRED exemption must not leak into other tradfi venues on the same holiday."""
+    iso_date = "2024-03-29"  # Good Friday
+    assert is_non_trading_day("NYSE", iso_date)
+    assert is_non_trading_day("CME", iso_date)

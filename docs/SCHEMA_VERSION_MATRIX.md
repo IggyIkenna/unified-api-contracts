@@ -16,9 +16,9 @@
 | Status    | Count  |
 | --------- | ------ |
 | green     | 19     |
-| yellow    | 47     |
+| yellow    | 46     |
 | red       | 0      |
-| **Total** | **66** |
+| **Total** | **65** |
 
 ## Status Definitions
 
@@ -80,7 +80,6 @@
 | opticodds            | v1               | N/A                      | 2026-03-09    | yellow |                                                                      |
 | onexbet              | v1               | N/A                      | 2026-03-06    | green  |                                                                      |
 | open_meteo           | v1               | N/A                      | 2026-03-06    | yellow |                                                                      |
-| openbb               | v4               | N/A                      | 2026-03-06    | yellow |                                                                      |
 | pinnacle             | v3               | N/A                      | 2026-03-06    | green  |                                                                      |
 | polymarket           | v2               | N/A                      | 2026-03-06    | green  |                                                                      |
 | predictit            | v1               | N/A                      | 2026-03-06    | yellow |                                                                      |
