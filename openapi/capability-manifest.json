@@ -1055,7 +1055,7 @@
       "from_node_id": "ARBITRAGE_PRICE_DISPERSION",
       "gap_type": null,
       "readiness": "live-proven",
-      "reason": "Cross-product routing policy not declared in UAC (gap #10).",
+      "reason": "Cross-venue routing policy IS declared in UAC (cross_venue_routing_policy.py: cme_wti_ice_brent_spread, gap #10 registry closed) but execution-service/strategy-service do not yet consume CROSS_VENUE_ROUTING_POLICIES \u2014 routing policy not wired into the SOR.",
       "relation": "trades_instrument",
       "status": "partial",
       "to_node_id": "instrument_type:dated_future"
@@ -1285,7 +1285,7 @@
       "from_node_id": "ARBITRAGE_PRICE_DISPERSION",
       "gap_type": null,
       "readiness": "live-proven",
-      "reason": "Cross-product routing policy not declared in UAC (gap #10).",
+      "reason": "Cross-venue routing policy IS declared in UAC (cross_venue_routing_policy.py: cme_wti_ice_brent_spread, gap #10 registry closed) but execution-service/strategy-service do not yet consume CROSS_VENUE_ROUTING_POLICIES \u2014 routing policy not wired into the SOR.",
       "relation": "supports",
       "status": "partial",
       "to_node_id": "venue:cme"
@@ -1375,7 +1375,7 @@
       "from_node_id": "ARBITRAGE_PRICE_DISPERSION",
       "gap_type": null,
       "readiness": "live-proven",
-      "reason": "Cross-product routing policy not declared in UAC (gap #10).",
+      "reason": "Cross-venue routing policy IS declared in UAC (cross_venue_routing_policy.py: cme_wti_ice_brent_spread, gap #10 registry closed) but execution-service/strategy-service do not yet consume CROSS_VENUE_ROUTING_POLICIES \u2014 routing policy not wired into the SOR.",
       "relation": "supports",
       "status": "partial",
       "to_node_id": "venue:ice"

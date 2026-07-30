@@ -1,8 +1,8 @@
 # Strategy Prospectus: Arbitrage Price Dispersion
 
-> **Archetype ID**: `ARBITRAGE_PRICE_DISPERSION`  
-> **Family**: `ARBITRAGE_STRUCTURAL`  
-> **Status** (codex): code-shipped  
+> **Archetype ID**: `ARBITRAGE_PRICE_DISPERSION`
+> **Family**: `ARBITRAGE_STRUCTURAL`
+> **Status** (codex): code-shipped
 > **Alpha disclosure**: full (debugging mode) — no client-facing curtailment applied.
 
 ## 1. What It Does + How It Makes Decisions
@@ -11,20 +11,20 @@
 
 **[MACHINE-DERIVED]** Capability cells (from ARCHETYPE_CAPABILITY_REGISTRY):
 
-| Venue Category | Instrument Type | Status    | Notes                                                                      |
-| -------------- | --------------- | --------- | -------------------------------------------------------------------------- |
-| CEFI           | option          | PARTIAL   | vol_arb not a separate capability; multi-leg vol-arb algo pending.         |
-| CEFI           | perp            | PARTIAL   | UAC lacks funding_arb flag distinct from price-arb (gap #2).               |
-| CEFI           | spot            | SUPPORTED |                                                                            |
-| DEFI           | lp              | PARTIAL   | Flash-loan receiver per-chain registry missing from UAC (gap #3).          |
-| DEFI           | option          | BLOCKED   | No supported DeFi options venue.                                           |
-| DEFI           | perp            | SUPPORTED |                                                                            |
-| DEFI           | spot            | SUPPORTED |                                                                            |
-| PREDICTION     | event_settled   | SUPPORTED | Cross-category arb (Polymarket ↔ Unity / Betfair for correlated markets). |
-| SPORTS         | event_settled   | SUPPORTED | Unity single-wallet makes cross-book arb near-atomic.                      |
-| TRADFI         | dated_future    | PARTIAL   | Cross-product routing policy not declared in UAC (gap #10).                |
-| TRADFI         | option          | PARTIAL   | Same-surface no-arb (butterfly / calendar / parity) on CBOE via IBKR.      |
-| TRADFI         | spot            | PARTIAL   | IBKR smart-router absorbs most intra-TradFi spot arb.                      |
+| Venue Category | Instrument Type | Status    | Notes                                                                                                                                                                                                                                                            |
+| -------------- | --------------- | --------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| CEFI           | option          | PARTIAL   | vol_arb not a separate capability; multi-leg vol-arb algo pending.                                                                                                                                                                                               |
+| CEFI           | perp            | PARTIAL   | UAC lacks funding_arb flag distinct from price-arb (gap #2).                                                                                                                                                                                                     |
+| CEFI           | spot            | SUPPORTED |                                                                                                                                                                                                                                                                  |
+| DEFI           | lp              | PARTIAL   | Flash-loan receiver per-chain registry missing from UAC (gap #3).                                                                                                                                                                                                |
+| DEFI           | option          | BLOCKED   | No supported DeFi options venue.                                                                                                                                                                                                                                 |
+| DEFI           | perp            | SUPPORTED |                                                                                                                                                                                                                                                                  |
+| DEFI           | spot            | SUPPORTED |                                                                                                                                                                                                                                                                  |
+| PREDICTION     | event_settled   | SUPPORTED | Cross-category arb (Polymarket ↔ Unity / Betfair for correlated markets).                                                                                                                                                                                        |
+| SPORTS         | event_settled   | SUPPORTED | Unity single-wallet makes cross-book arb near-atomic.                                                                                                                                                                                                            |
+| TRADFI         | dated_future    | PARTIAL   | Cross-venue routing policy IS declared in UAC (cross_venue_routing_policy.py: cme_wti_ice_brent_spread, gap #10 registry closed) but execution-service/strategy-service do not yet consume CROSS_VENUE_ROUTING_POLICIES — routing policy not wired into the SOR. |
+| TRADFI         | option          | PARTIAL   | Same-surface no-arb (butterfly / calendar / parity) on CBOE via IBKR.                                                                                                                                                                                            |
+| TRADFI         | spot            | PARTIAL   | IBKR smart-router absorbs most intra-TradFi spot arb.                                                                                                                                                                                                            |
 
 **[CODEX-DERIVED]** From `codex/09-strategy/architecture-v2/archetypes/`:
 

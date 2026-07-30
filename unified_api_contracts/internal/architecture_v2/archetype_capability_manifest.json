@@ -999,7 +999,7 @@
             "ARBITRAGE_PRICE_DISPERSION@cme-es-nq-dated-ratio-usd-prod",
             "ARBITRAGE_PRICE_DISPERSION@cme-es-calendar-fixed-dec25-mar26-usd-prod"
           ],
-          "notes": "Cross-product routing policy not declared in UAC (gap #10)."
+          "notes": "Cross-venue routing policy IS declared in UAC (cross_venue_routing_policy.py: cme_wti_ice_brent_spread, gap #10 registry closed) but execution-service/strategy-service do not yet consume CROSS_VENUE_ROUTING_POLICIES \u2014 routing policy not wired into the SOR."
         },
         {
           "asset_group": "TRADFI",
