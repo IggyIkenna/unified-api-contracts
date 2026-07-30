@@ -250,6 +250,15 @@ SERVICE_OUTPUT_POLICIES: Final[dict[tuple[str, str], ServiceEmissionPolicy]] = {
     ("features-calendar-service", "time_features"): ServiceEmissionPolicy.NAN_FILL,
     ("features-calendar-service", "economic_events"): ServiceEmissionPolicy.PARTIAL_OK,
     #
+    # yield_curve / economic_results — 2 entries (wired into CALENDAR_FEATURE_GROUPS
+    # 2026-07-30, per issues/macro_micro_econ_data_capture_audit_2026_06_05.md's
+    # "Recommended decision" Phase 1). Both are genuinely FRED-sourced with
+    # legitimate gaps (yield_curve: weekends/holidays with no treasury print;
+    # economic_results: most days have zero releases) — same rationale as
+    # economic_events above. → PARTIAL_OK.
+    ("features-calendar-service", "yield_curve"): ServiceEmissionPolicy.PARTIAL_OK,
+    ("features-calendar-service", "economic_results"): ServiceEmissionPolicy.PARTIAL_OK,
+    #
     # features-commodity-service — 6 entries (Phase 6.5 extension, 2026-05-12).
     # Source: FACTOR_REGISTRY in features_service/commodity/engine/factors/__init__.py
     # (6 distinct factor_groups).
