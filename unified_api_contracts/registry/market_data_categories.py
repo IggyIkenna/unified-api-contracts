@@ -544,6 +544,7 @@ SPORTS_ODDS_API_ACCEPTED_NONCANONICAL_BOOKMAKERS: frozenset[str] = frozenset(
         "PADDYPOWER",
         "PROPHETX",
         "SKYBET",
+        "SMARKETS",
         "UNIBET",
         "UNIBET_EU",
         "UNIBET_UK",

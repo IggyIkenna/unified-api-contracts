@@ -43,7 +43,7 @@ CEFI_SOURCE_COVERAGE_START: dict[str, date] = {
     # cross_propagation_2026_07_17.md [DATA] P1) — the prior dates were
     # unverified VENUE-LAUNCH-DATE guesses (per this module's own "derived
     # from venue launch dates" docstring caveat); probed live against
-    # market-data-tick-cefi-prd-central-element-323112's availability index
+    # market-data-tick-cefi-prd-{project}'s availability index
     # (`read_availability_index(bucket).groupby("venue")["date"].min()` on
     # capture_status="captured" rows) — every value below is the measured
     # min(date) across that venue's registry-2 (venue_mapping.py) suffixed
