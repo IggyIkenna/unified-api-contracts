@@ -391,6 +391,11 @@ VENUE_CATEGORY_MAP.update(dict.fromkeys(SPORTS_VENUES, "sports"))
 VENUE_CATEGORY_MAP[KALSHI] = "prediction"
 VENUE_CATEGORY_MAP[POLYMARKET] = "prediction"
 
+# @contract-surface — a removed key or removed instrument_type set-member is a
+# cross-repo breaking change (instruments-service's build_expected() enumerates this
+# dict; a removed entry silently drops real captured data from the expected universe
+# — the 23fa3a99 incident). See detect_breaking_change.py + issues/
+# breaking_change_differ_blind_to_registry_data_dicts_2026_07_09.md.
 INSTRUMENT_TYPES_BY_VENUE: dict[str, set[str]] = {
     BINANCE_SPOT: {"SPOT_PAIR"},
     COINBASE_SPOT: {"SPOT_PAIR"},
