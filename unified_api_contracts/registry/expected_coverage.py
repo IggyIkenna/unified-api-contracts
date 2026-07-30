@@ -113,6 +113,10 @@ _CEFI: dict[str, list[str]] = {
         "book_snapshot_5",
         "derivative_ticker",
         "liquidations",
+        # RESTORED 2026-07-30 (see the "Perp funding" comment below) — reverses
+        # the 2026-07-08 retirement; a cross-source parity check proved
+        # perp_funding is NOT byte-identical to derivative_ticker for HYPERLIQUID.
+        "perp_funding",
     ],
     "ASTER": [
         "trades",
@@ -394,12 +398,19 @@ _DEFI: dict[str, list[str]] = {
     "PYTH-SOLANA": ["oracle_prices"],
     # --- Perp funding (DeFi perpetual protocols) ---
     # perp_funding_handler DEFAULT_PROTOCOLS; venue is protocol-only (chain in shard dim).
-    # HYPERLIQUID / ASTER / LIGHTER-ZKSYNC perp_funding RETIRED
-    # 2026-07-08 (operator-approved) — funding now reads via each venue's
-    # derivative_ticker embedded funding_rate field (see the _CEFI dict above for
-    # HYPERLIQUID/ASTER's real coverage row; LIGHTER-ZKSYNC never
-    # actually captured a distinct perp_funding row — market_data_categories.py
-    # confirms "No liquidations/perp_funding feed wired for any of the three").
+    # HYPERLIQUID / ASTER / LIGHTER-ZKSYNC perp_funding RETIRED 2026-07-08
+    # (operator-approved). RE-EXAMINED 2026-07-30
+    # (defi_hyperliquid_perp_funding_derivative_ticker_divergence_2026_07_28.md):
+    # a cross-source parity check disproved the "byte-identical" premise for
+    # HYPERLIQUID (60.7% match at 2e-5 tolerance over 169 days, worst-case
+    # divergence 1.2e-3) — its expected-coverage entry is RESTORED in the
+    # `_CEFI` dict above (HYPERLIQUID now lists "perp_funding" alongside
+    # trades/book_snapshot_5/derivative_ticker/liquidations). ASTER stays
+    # retired — code-proven (not "unmeasured") to share ONE fetch with its
+    # derivative_ticker row, so a standalone shard would be pure duplication.
+    # LIGHTER-ZKSYNC never actually captured a distinct perp_funding row either
+    # (its old collector relabeled Tardis's own derivative_ticker dataset) —
+    # market_data_categories.py has the full per-venue evidence.
     # (PACIFICA (Solana) was a fourth venue covered by this note until removed
     # entirely 2026-07-16 — operator ruling: all Solana perp DEXes dropped
     # except Jupiter, not integrated.)

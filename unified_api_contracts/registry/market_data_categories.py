@@ -176,14 +176,19 @@ DATA_TYPES_BY_ASSET_GROUP: dict[str, list[str]] = {
         "dex_pool_swaps",  # DEX swap events (requires candle sampling)
         "lending_indices",  # Lending rate indices (supply/borrow APY, utilization)
         "liquidations",  # DeFi liquidation events
-        # Perpetual funding rates. HYPERLIQUID/ASTER/LIGHTER-ZKSYNC
-        # perp_funding RETIRED 2026-07-08 — funding now reads via
-        # derivative_ticker's embedded funding_rate field for those venues.
-        # (DRIFT/PACIFICA (Solana) + GMX (Arbitrum/Avalanche) were among the
-        # venues this note originally covered; all removed — DRIFT/PACIFICA
-        # 2026-07-16 (operator ruling: all Solana perp DEXes dropped except
-        # Jupiter, not integrated), GMX 2026-07-25 (unreliable historical
-        # funding data — see
+        # Perpetual funding rates for defi-asset-group perp DEXes. HYPERLIQUID/
+        # ASTER/LIGHTER-ZKSYNC are NOT covered by this entry — they are
+        # cefi-asset-group venues (VENUES_BY_ASSET_GROUP["cefi"], "On-chain
+        # CLOBs reclassified from DEFI" below); their perp_funding scope is the
+        # "cefi" list's own entry. ASTER/LIGHTER-ZKSYNC's standalone
+        # perp_funding stays RETIRED (code-proven byte-identical to
+        # derivative_ticker); HYPERLIQUID's was RESTORED 2026-07-30 (disproven
+        # byte-identical — see VENUE_DATA_TYPE_CAPABILITIES["HYPERLIQUID"]
+        # below). (DRIFT/PACIFICA (Solana) + GMX (Arbitrum/Avalanche) were
+        # defi-asset-group perp venues this entry originally covered; all
+        # removed — DRIFT/PACIFICA 2026-07-16 (operator ruling: all Solana perp
+        # DEXes dropped except Jupiter, not integrated), GMX 2026-07-25
+        # (unreliable historical funding data — see
         # unified-trading-pm/plans/active/defi_gmx_venue_removal_2026_07_25.md).)
         "perp_funding",
         # derivative_ticker (2026-07-15, defi_perp_funding_canonicalisation_derivative_
@@ -1807,15 +1812,22 @@ VENUE_DATA_TYPE_CAPABILITIES: dict[str, dict[str, str]] = {
     # Tardis trades fetch path (returns []), so trades start = S3 archive start
     # 2025-03-22. liquidations is out of scope (Hyperliquid does not publish a
     # liquidations feed — no S3 prefix, no Tardis channel).
-    # perp_funding (standalone data_type) RETIRED 2026-07-08 — operator-approved,
-    # in favor of this row's derivative_ticker embedded funding_rate field (S3
-    # asset_ctxs; a live-fetch probe confirmed byte-identical/same-source funding
-    # data). derivative_ticker IS the funding source now; no separate perp_funding
-    # start-date entry needed.
+    # perp_funding (standalone data_type) RESTORED 2026-07-30 (RULED 2026-07-28,
+    # defi_hyperliquid_perp_funding_derivative_ticker_divergence_2026_07_28.md) —
+    # REVERSES the 2026-07-08 retirement below. A cross-source parity check
+    # measured this row's derivative_ticker.funding_rate (S3 asset_ctxs, a
+    # continuously-updating LIVE snapshot) against perp_funding's realized
+    # hourly-settlement value (POST /info fundingHistory) over 169 overlapping
+    # historical days: only 60.7% of 2,640 rows matched within a 2e-5 tolerance
+    # (worst-case divergence 1.2e-3, >10x the signal's typical magnitude) —
+    # disproving the 2026-07-08 "byte-identical/same-source" premise for this
+    # venue. perp_funding is the canonical REALIZED-funding source; collector
+    # restored in market-tick-data-service/cli/handlers/_perp_funding_hyperliquid.py.
     "HYPERLIQUID": {
         "trades": "2025-03-22",  # S3 hl-mainnet-node-data/node_fills
         "book_snapshot_5": "2023-04-15",  # S3 hyperliquid-archive/market_data/
         "derivative_ticker": "2023-05-20",  # S3 hyperliquid-archive/asset_ctxs/
+        "perp_funding": "2023-05-20",  # perp_funding_handler REST /info fundingHistory
     },
     # ASTER — batch+live: derivative_ticker (fundingRate REST) and trades
     # (aggTrades REST, ~30-day rolling depth) are wired in _fetch_aster_rest;
@@ -1826,9 +1838,17 @@ VENUE_DATA_TYPE_CAPABILITIES: dict[str, dict[str, str]] = {
     # (EXPECTED_PRE_SOURCE_COVERAGE_START via the enumerator's per-(venue,dt)
     # start_date gate). Genesis = 2023-07-22 (operator-confirmed 2026-06-17
     # via the Astherus pre-rebrand venue). perp_funding (standalone data_type)
-    # RETIRED 2026-07-08 — operator-approved, in favor of this row's
-    # derivative_ticker embedded funding_rate field (fundingRate REST; a
-    # live-fetch probe confirmed byte-identical/same-source funding data).
+    # RETIRED 2026-07-08 and STAYS RETIRED (re-confirmed 2026-07-30,
+    # defi_hyperliquid_perp_funding_derivative_ticker_divergence_2026_07_28.md,
+    # in the same review that RESTORED perp_funding for HYPERLIQUID above) — code
+    # inspection of the pre-retirement collector (``_perp_funding_hl_aster.py``,
+    # git history) shows ASTER's perp_funding rows and its derivative_ticker row
+    # were derived from the exact SAME ``/fapi/v1/fundingRate`` REST response in
+    # one fetch ("Also emit the canonical CeFi derivative_ticker ... from the
+    # SAME funding settlements — one fetch"): genuinely byte-identical by
+    # construction, unlike HYPERLIQUID where the two are separate endpoints.
+    # Restoring a standalone shard here would duplicate storage, not add a
+    # second independent signal.
     # IMPORTANT — pre-2024 Aster funding is BINANCE-PROXIED (Astherus pre-rebrand
     # mirrored Binance funding); it is imported, NOT Aster-native — label `source`
     # honestly. SSOT: perp_funding_data_semantics_and_cadence_2026_06_16.md §GAP 2.
@@ -1906,10 +1926,17 @@ VENUE_DATA_TYPE_CAPABILITIES: dict[str, dict[str, str]] = {
     # Tardis routed pre-2026-04-17). Start dates = VenueMapping.
     # venue_start_dates (venue_mapping.py — documented "single source of
     # truth"/"earliest manifest data, NOT exchange founding dates"). No
-    # liquidations/perp_funding feed wired for either (same minimum-perp-
-    # surface note as data_type_capability.py). (PACIFICA (Solana) was a third
-    # venue here until removed 2026-07-16 — operator ruling: all Solana perp
-    # DEXes dropped except Jupiter, not integrated.)
+    # liquidations feed wired for either (same minimum-perp-surface note as
+    # data_type_capability.py). LIGHTER-ZKSYNC's perp_funding stays unwired too
+    # — re-confirmed 2026-07-30
+    # (defi_hyperliquid_perp_funding_derivative_ticker_divergence_2026_07_28.md,
+    # in the same review that RESTORED perp_funding for HYPERLIQUID): the
+    # pre-retirement collector (``_perp_funding_pacifica_lighter.py``, git
+    # history) fetched Tardis's OWN derivative_ticker dataset directly and
+    # relabeled it perp_funding — there was never a second, independent source
+    # to restore. (PACIFICA (Solana) was a third venue here until removed
+    # 2026-07-16 — operator ruling: all Solana perp DEXes dropped except
+    # Jupiter, not integrated.)
     "EXTENDED-STARKNET": {
         "trades": "2024-10-01",
         "book_snapshot_5": "2024-10-01",
