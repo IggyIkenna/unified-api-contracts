@@ -469,12 +469,13 @@ VENUES_BY_ASSET_GROUP: dict[str, list[str]] = {
         # Added 2026-07-30 (distinct-values census review, sports_consolidated_native_ao_
         # extract_2026_07_25.md Track C + sports_distinct_values_registry_cleanup_2026_07_30.md):
         # real VenueConstant already existed for all 3 below, just never added here.
+        # NOTE: FOOTYSTATS is deliberately NOT here — see SPORTS_ODDS_API_ACCEPTED_NONCANONICAL_BOOKMAKERS
+        # below (two-registry-model collision with IS's own FOOTYSTATS reference-data-provider venue,
+        # ldr_qg_failure escalation agt-57430c 2026-07-30).
         "LADBROKES",  # ODDS_API fan-out bookmaker; fold target of SPORTS_VENUE_FOLD
         # ("ladbrokes_uk" wire spelling); raw-tick shape re-stamped + GCS-verified 2026-07-27/30.
         "BET888SPORT",  # ODDS_API fan-out bookmaker; fold target of SPORTS_VENUE_FOLD
         # ("sport888" wire spelling); raw-tick shape re-stamped + GCS-verified 2026-07-27/30.
-        "FOOTYSTATS",  # Football stats/odds provider (pipeline_mode=batch_footystats);
-        # legacy venue=ODDS_API mislabel re-stamped + GCS-verified 2026-07-30 (42,476 shards).
         "SMARKETS",  # UK betting exchange, ODDS_API fan-out — confirmed live production
         # data (1.1M+ rows through 2026-07-26, GCS-path-clean); was missing a VenueConstant
         # entirely (see venue_constants.py) — see sports_consolidated_native_ao_extract_
@@ -510,6 +511,19 @@ ALL_VENUES: list[str] = sorted({v for vs in VENUES_BY_ASSET_GROUP.values() for v
 # values from its non-canonical findings count — "known and accepted", not
 # "drift needing a fix". NOT a canonical set — never merge into
 # VENUES_BY_ASSET_GROUP/ALL_VENUES or any canonicality check.
+#
+# FOOTYSTATS (added 2026-07-30, ldr_qg_failure escalation agt-57430c) is here rather than in
+# VENUES_BY_ASSET_GROUP["sports"] above for a DIFFERENT reason than the bookmakers above: it is a
+# genuine ODDS_API fan-out bookmaker source (pipeline_mode=batch_footystats; legacy venue=ODDS_API
+# mislabel re-stamped + GCS-verified 2026-07-30, 42,476 shards) — but the literal string "FOOTYSTATS"
+# is ALREADY a canonical instruments-service reference-data-provider venue (get_venues_for_asset_
+# groups(["SPORTS"]) in instruments-service, the FootyStats match-stats/xG-adjacent API — a completely
+# different data stream). The IS/UAC sports registries are a deliberate two-registry model required to
+# stay DISJOINT (operator Decision C, 2026-06-29;
+# instruments-service::tests/unit/test_orchestrator_helpers.py::test_sports_exempt_is_disjoint_from_
+# uac_sports), so adding FOOTYSTATS to VENUES_BY_ASSET_GROUP here broke that invariant. Accepted-non-
+# canonical (this set) silences the same distinct-values finding without claiming canonical venue
+# status, mirroring the treatment of the bookmakers below.
 SPORTS_ODDS_API_ACCEPTED_NONCANONICAL_BOOKMAKERS: frozenset[str] = frozenset(
     {
         "BETMGM",
@@ -522,6 +536,7 @@ SPORTS_ODDS_API_ACCEPTED_NONCANONICAL_BOOKMAKERS: frozenset[str] = frozenset(
         "BOVADA",
         "CASUMO",
         "CORAL",
+        "FOOTYSTATS",
         "LIVESCOREBET",
         "MATCHBOOK",
         "NOVIG",
