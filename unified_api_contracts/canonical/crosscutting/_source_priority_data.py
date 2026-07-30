@@ -326,7 +326,20 @@ SOURCE_PRIORITY: Final[dict[tuple[str, str], list[str]]] = {
     ("defi", "solana_defi"): ["hyperliquid"],
     ("defi", "staking_yields"): ["onchain_subgraph"],
     ("defi", "token_transfers"): ["onchain_rpc"],
-    ("defi", "vault_share_price"): ["onchain_subgraph"],
+    # Corrected 2026-07-30 (defi_pipeline_mode_source_desync_yearn_v3_2026_07_21.md
+    # todo 4): was "onchain_subgraph", but vault_share_price_handler.py has been
+    # RPC-only (ERC-4626 convertToAssets eth_call) since its 2026-05-03 introduction
+    # (9475e66b) — it has never queried a subgraph. The stale registration forced a
+    # permanent pipeline_mode<->source desync (pipeline_mode=batch_onchain_rpc,
+    # source=onchain_subgraph) on every captured row; harmless metadata drift until
+    # the Phase-4 writer invariant (d7b3ed7d, 2026-07-26) started hard-rejecting the
+    # mismatch, which silently dropped every ETHENA/FRAX/MAKER/MORPHOVAULTS/YEARN_V3
+    # captured manifest row from ~2026-07-28 onward. Mirrors the identical
+    # subgraph->onchain_rpc correction already applied to ("defi","mev_events")
+    # (commit 6bf6012a). vault_share_price_handler.py is the sole live producer of
+    # this cell (the DefiLlama-sourced market_interface/adapters/defi/vault_*
+    # adapters are unwired dead code — grep confirms no caller).
+    ("defi", "vault_share_price"): ["onchain_rpc"],
     # execution_fills — emitted by execution-service (not an external
     # market-data vendor); source tag is ``execution_service``.
     # d3_manifest_v8_finish_2026_05_20 Phase 1 — closes
