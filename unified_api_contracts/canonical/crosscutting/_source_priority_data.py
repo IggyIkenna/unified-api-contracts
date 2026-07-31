@@ -444,13 +444,17 @@ SOURCE_PRIORITY: Final[dict[tuple[str, str], list[str]]] = {
     # TRADFI_VENDOR_DATA_TYPE_NOT_IN_VALIDITY_MATRIX) — widening the matrix is a
     # separate follow-up decision, out of scope for this provenance fix.
     ("tradfi", "yield_curve"): ["fred", "ecb"],
-    # FRED/ECB ohlcv_1d — the non-BOND KEY_SERIES categories (FRED
+    # FRED/ECB/IBKR ohlcv_1d — the non-BOND KEY_SERIES categories (FRED
     # volatility/inflation/macro, e.g. VIXCLS/CPIAUCSL/UNRATE/GDPC1; ECB
     # EXR/ICP flows) are written as a single-observation "degenerate OHLCV bar"
     # (fred_adapter.py/ecb_adapter.py ``write_canonical_shard``). Same round-3
     # finding + closed-set/validity-matrix-exclusion rationale as yield_curve
-    # above.
-    ("tradfi", "ohlcv_1d"): ["fred", "ecb"],
+    # above. IBKR appended 2026-07-31 per
+    # ibkr_pipeline_mode_missing_venue_override_2026_07_30.md — same
+    # never-actually-competes rationale as FRED/ECB (write-time always
+    # resolves via UTL ``_VENUE_OVERRIDES["IBKR"]``; registered here purely to
+    # satisfy the closed-set round-trip + give a sane venue-blind fallback).
+    ("tradfi", "ohlcv_1d"): ["fred", "ecb", "ibkr"],
     # OFR cds_spread — CDS spread indices + the NFCI financial-conditions family
     # (ofr_adapter.py ``write_canonical_shard``, InstrumentType.CDS). Same
     # round-3 finding + closed-set/validity-matrix-exclusion rationale as
@@ -569,6 +573,10 @@ SOURCE_MODE_CAPABILITY: Final[dict[str, frozenset[Mode]]] = {
     "fred": frozenset({Mode.BATCH}),
     "ecb": frozenset({Mode.BATCH}),
     "ofr": frozenset({Mode.BATCH}),
+    # IBKR — TradFi execution venue whose adapter also writes canonical
+    # ohlcv_1d shards observed at execution time; no live/WS re-derivation
+    # leg. Added 2026-07-31 per ibkr_pipeline_mode_missing_venue_override_2026_07_30.md.
+    "ibkr": frozenset({Mode.BATCH}),
     # ---- DeFi ----
     # hyperliquid (unified vendor) lives in the CeFi-venue block below — it is the
     # ONE venue that is ALSO batch-capable (DeFi perp_funding/solana_defi via REST
@@ -774,6 +782,10 @@ EMISSION_LATENCY_MS_BY_SOURCE: Final[dict[str, int]] = {
     "fred": 86_400_000,  # 24h: FRED daily/monthly/quarterly series publication cadence
     "ecb": 86_400_000,  # 24h: ECB SDMX yield-curve/rate series publication cadence
     "ofr": 86_400_000,  # 24h: OFR CDS spread / NFCI series publication cadence
+    # IBKR ohlcv_1d — a daily-bar data_type regardless of vendor (same
+    # availability-semantics class as fred/ecb above, which share this
+    # (tradfi, ohlcv_1d) pair). Conservative 24h, same class as eia/footystats.
+    "ibkr": 86_400_000,  # 24h: ohlcv_1d daily-bar cadence (mirrors fred/ecb for the same pair)
     # DeFi REST APIs — Hyperliquid + oracle aggregators.
     "hyperliquid": 1_000,  # 1s: HL REST API polling cadence (source=hyperliquid, transport=rest)
     "aster": 1_000,  # 1s: Aster native REST polling cadence (source=aster, transport=rest)

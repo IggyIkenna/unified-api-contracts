@@ -137,9 +137,12 @@ class TestCanonicalPathTemplates:
         # provenance-fallback fix, SOURCE_PRIORITY[("tradfi","yield_curve"/"ohlcv_1d"/
         # "cds_spread")] now registers fred/ecb/ofr; all three are BATCH-only, so each
         # contributes exactly one prefix, same as yahoo's existing single-BATCH-prefix
-        # pattern above).
+        # pattern above); 12→13 (2026-07-31: +ibkr —
+        # ibkr_pipeline_mode_missing_venue_override_2026_07_30.md, same provenance-fallback
+        # fix class, SOURCE_PRIORITY[("tradfi","ohlcv_1d")] now also registers ibkr, BATCH-only
+        # so it contributes exactly one prefix, same pattern as fred/ecb/ofr above).
         # Other AGs stay at their capability-derived baseline.
-        expected_pipeline_mode_counts = {"cefi": 27, "defi": 24, "tradfi": 12, "sports": 0}
+        expected_pipeline_mode_counts = {"cefi": 27, "defi": 24, "tradfi": 13, "sports": 0}
         for ag, expected in expected_pipeline_mode_counts.items():
             templates = canonical_path_templates(ag)
             pmode = [t for t in templates if "pipeline_mode=" in t]

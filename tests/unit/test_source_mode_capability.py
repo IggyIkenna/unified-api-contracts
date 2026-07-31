@@ -61,6 +61,9 @@ EXPECTED_SOURCE_MODE_CAPABILITY: dict[str, frozenset[Mode]] = {
     "fred": _B,
     "ecb": _B,
     "ofr": _B,
+    # IBKR — TradFi execution venue, canonical ohlcv_1d writes only, no live/WS
+    # leg. Added 2026-07-31 per ibkr_pipeline_mode_missing_venue_override_2026_07_30.md.
+    "ibkr": _B,
     # DeFi
     # hyperliquid (unified vendor) is in the CeFi-venue block below with _BLR — it is
     # the ONE CeFi venue that is also a DeFi batch source (R4 2026-06-07). The
