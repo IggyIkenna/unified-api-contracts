@@ -110,6 +110,16 @@ class PipelineMode(StrEnum):
     # NFCI financial-conditions family via public REST, no auth. Same round-3
     # finding as FRED/ECB above. BATCH-only.
     BATCH_OFR = "batch_ofr"
+    # IBKR (Interactive Brokers, TWS/ib_insync) — TradFi execution venue whose
+    # adapter also writes canonical market-data shards (equity/FX/bond/index
+    # bars) observed during live execution. No venue override existed, so
+    # writes silently fell through to SOURCE_PRIORITY[("tradfi", data_type)]
+    # (fred-first for ohlcv_1d), mislabeling real IBKR-fetched bars as
+    # FRED-sourced. Added 2026-07-31 per
+    # ibkr_pipeline_mode_missing_venue_override_2026_07_30.md. BATCH-only (no
+    # live/replay leg — IBKR's canonical writes are the execution-time
+    # snapshot, not a streaming archive).
+    BATCH_IBKR = "batch_ibkr"
     BATCH_EXECUTION_SERVICE = "batch_execution_service"
     BATCH_FEATURES_ONCHAIN_SERVICE = "batch_features_onchain_service"
     BATCH_FOOTYSTATS = "batch_footystats"
