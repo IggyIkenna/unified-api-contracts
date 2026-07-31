@@ -232,12 +232,32 @@ CEFI_PERPETUAL_TRADES = SchemaContract(
 # levels_mismatch_2026_07_28.md). Replaces the aspirational single-string
 # ColumnSpec pair that was never implemented, exposed the moment validate=True
 # was flipped on for every CeFi Tardis write site (2026-07-27).
+#
+# nullable=True (2026-07-31, cefi_high_attempted_failed_batch_cluster_2026_07_23.md
+# follow-up): a real order book frequently has FEWER than 5 resting levels on
+# one or both sides -- especially thin/illiquid pairs and historical dates --
+# and Tardis's CSV export leaves those deeper level cells blank, which PyArrow
+# parses as NaN (confirmed via a local repro through finalise_rows_and_path:
+# a thin-book row with NaN at levels 3/4 raised
+# extra_required_null:bids[3].price/etc, byte-for-byte matching the live
+# manifest's ongoing "schema contract violated for cefi/<venue>/<type>/
+# book_snapshot_5" attempted_failed trickle across many venues since
+# 2026-07-27). This is honest absence of book depth, not corrupt data --
+# nullable=False was rejecting genuine thin-book captures outright (shard-level
+# isolation turned a per-row depth gap into a whole-shard write failure).
+# Verified safe: no downstream reader requires all 5 levels populated --
+# market-data-processing-service's book_snapshot_adapter.py already NaN-skips
+# (pandas .sum(skipna=True), np.isnan masks) in every calculator except
+# weighted-mid/effective-spread, where a NaN level correctly propagates to an
+# honest NaN output for that interval rather than crashing or fabricating a
+# value; strategy-service/execution-service consumers only ever read level 0.
 _BOOK_SNAPSHOT_5_LEVEL_COLUMNS = [
     ColumnSpec(
         name=f"{side}[{level}].{field}",
         dtype="float64",
-        nullable=False,
-        description=f"Level-{level} {side[:-1]} {field} (top-5 book_snapshot_5 depth).",
+        nullable=True,
+        description=f"Level-{level} {side[:-1]} {field} (top-5 book_snapshot_5 depth; "
+        f"null when the book has fewer than {level + 1} resting levels on this side).",
     )
     for side in ("bids", "asks")
     for level in range(5)
