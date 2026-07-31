@@ -8,13 +8,19 @@ helper. Per CLAUDE.md asset-group vocabulary rule: lowercase keys.
 
 Compressed-scope (2026-05-12 slot 7 Day-2): 10 scenarios shipped.
 
-- ``cefi.py`` (2): ``cefi_venue_circuit_breaker_trip``, ``cefi_funding_spike_10x``.
-- ``defi.py`` (7): ``defi_chain_rpc_outage_solana``, ``defi_liquidity_drain_lending_pool``,
+- ``cefi.py`` (3): ``cefi_venue_circuit_breaker_trip``, ``cefi_funding_spike_10x``,
+  ``cefi_execution_slippage_spike_book_thinning``.
+- ``defi.py`` (8): ``defi_chain_rpc_outage_solana``, ``defi_liquidity_drain_lending_pool``,
   ``defi_oracle_deviation_30sigma``, ``defi_gas_surge_50x``,
   ``defi_mempool_congestion_inclusion_delay``, ``defi_stablecoin_depeg``,
-  ``defi_lst_depeg_steth_5pct``.
+  ``defi_lst_depeg_steth_5pct``, ``defi_execution_slippage_spike_pool_drain``.
 - ``cross_asset.py`` (2): ``cross_asset_flash_crash``,
   ``cross_asset_basis_blowout_perp_spot``.
+
+The book-thinning/pool-drain pair (2026-07-31,
+``scenario_library_completion_13_16_2026_07_27.md``) implements Day-1 fragment
+``13_execution_slippage_spike.md`` — the last 2 of the original 18 Day-1
+scenario designs with zero downstream consumption.
 
 Phase 4 broader coverage (≥34 scenarios) deferred to successor
 ``simulation_scenarios_post_cutover_2026_06_01.md``.

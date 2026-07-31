@@ -1,4 +1,4 @@
-"""DeFi scenario seeds — 6 :class:`ScenarioOverlay` instances.
+"""DeFi scenario seeds — 8 :class:`ScenarioOverlay` instances.
 
 Per Day-1 design fragments at
 ``unified-trading-pm/plans/active/scratch_scenarios_day1/02..06+10*.md``.
@@ -24,6 +24,7 @@ from ...canonical.crosscutting.circuit_breaker import BreakerAction, CircuitBrea
 from ...canonical.crosscutting.kill_switch import KillSwitchId
 from ...canonical.crosscutting.risk_rule import RiskRuleConsequence
 from ...canonical.crosscutting.scenario_overlay import (
+    BookSpoof,
     GasSurge,
     LatencyInject,
     ManifestPhantom,
@@ -329,6 +330,70 @@ DEFI_LST_DEPEG_STETH_5PCT = ScenarioOverlay(
 )
 
 
+# ---------------------------------------------------------------------------
+# defi_execution_slippage_spike_pool_drain — DEX pool-drain execution slippage
+# ---------------------------------------------------------------------------
+# Per Day-1 fragment 13_execution_slippage_spike.md (2 sub-variants: DEX
+# pool-drain + CeFi book-thinning). ScenarioOverlay is one-mutation-per-id, so
+# each variant registers separately (this one DeFi-only; the CeFi-book-thinning
+# twin is `cefi_execution_slippage_spike_book_thinning` in cefi.py). Applies-to
+# scoped to the DEX protocols still live in `registry/defi_venue_capabilities.py`
+# PROTOCOL_CAPABILITIES as of 2026-07-31 — the source fragment's Drift (Solana)
+# and Hyperliquid-spot legs are excluded (Drift dropped 2026-07-16, all Solana
+# perp DEXes except unintegrated Jupiter; Hyperliquid has no DeFi/on-chain
+# capability entries at all, it's CeFi-only in this codebase). FOLLOW-UP gap:
+# no dedicated slippage `CircuitBreakerId` exists yet — `SPREAD_BLOWOUT_BPS`
+# ("illiquidity / venue degradation") substituted per the closest-fit
+# convention already used for `LENDING_POOL_UNAVAILABLE_SECONDS` /
+# `ORACLE_STALENESS_SECONDS` above.
+
+DEFI_EXECUTION_SLIPPAGE_SPIKE_POOL_DRAIN = ScenarioOverlay(
+    scenario_id="defi_execution_slippage_spike_pool_drain",
+    category=ScenarioCategory.PRICE_SHOCK,
+    layer=ScenarioOverlayLayer.ORDER,
+    asset_groups=frozenset({"defi"}),
+    applies_to=ScenarioApplicabilityFilter(
+        chains=frozenset({"ethereum", "arbitrum"}),
+        protocols=frozenset({"uniswap_v3", "curve", "balancer"}),
+        archetypes=frozenset({"carry_staked_basis", "ARBITRAGE_PRICE_DISPERSION"}),
+    ),
+    mutation_spec=BookSpoof(
+        book_depth_scale=Decimal("0.25"),
+        duration_seconds=300,
+        imbalance_target=Decimal("-0.6"),
+    ),
+    expected_outcomes=(
+        ScenarioOutcomeAssertion(
+            archetype="carry_staked_basis",
+            category=OutcomeCategory.RISK_BREAKER_TRIPPED,
+            consequence=RiskRuleConsequence.BLOCK,
+            breaker_id=CircuitBreakerId.SPREAD_BLOWOUT_BPS,
+            breaker_action=BreakerAction.CANCEL_OPEN,
+            alert_codes=frozenset({AlertCode.CIRCUIT_BREAKER_OPEN, AlertCode.RISK_RULE_BLOCKED}),
+            expected_within_seconds=5,
+        ),
+        ScenarioOutcomeAssertion(
+            archetype="ARBITRAGE_PRICE_DISPERSION",
+            category=OutcomeCategory.RISK_BREAKER_TRIPPED,
+            breaker_id=CircuitBreakerId.SPREAD_BLOWOUT_BPS,
+            breaker_action=BreakerAction.SCALE_DOWN,
+            consequence=RiskRuleConsequence.SCALE_DOWN,
+            alert_codes=frozenset({AlertCode.RISK_RULE_SCALED_DOWN}),
+            expected_within_seconds=60,
+        ),
+    ),
+    description=(
+        "Uniswap V3 / Curve / Balancer pool drains 75% of same-side liquidity for 5min; "
+        "swap fill slips ~4x baseline vs decision-time mid, tripping the illiquidity breaker."
+    ),
+    real_world_referent=(
+        "Uniswap V3 wstETH/ETH 2024-09 reorg-tail (240bps vs ~8bps expected); "
+        "Curve crvUSD/USDC 2024-08 depeg-tail (80-300bps); GMX V1 AVAX-spot 2025-02 (180bps)."
+    ),
+    composes_with=frozenset({"defi_liquidity_drain_lending_pool", "defi_oracle_deviation_30sigma"}),
+)
+
+
 SCENARIOS: Final[tuple[ScenarioOverlay, ...]] = (
     DEFI_CHAIN_RPC_OUTAGE_SOLANA,
     DEFI_LIQUIDITY_DRAIN_LENDING_POOL,
@@ -337,6 +402,7 @@ SCENARIOS: Final[tuple[ScenarioOverlay, ...]] = (
     DEFI_MEMPOOL_CONGESTION_INCLUSION_DELAY,
     DEFI_STABLECOIN_DEPEG,
     DEFI_LST_DEPEG_STETH_5PCT,
+    DEFI_EXECUTION_SLIPPAGE_SPIKE_POOL_DRAIN,
 )
 
 for _scenario in SCENARIOS:
