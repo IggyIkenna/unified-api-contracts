@@ -391,6 +391,11 @@ VENUE_CATEGORY_MAP.update(dict.fromkeys(SPORTS_VENUES, "sports"))
 VENUE_CATEGORY_MAP[KALSHI] = "prediction"
 VENUE_CATEGORY_MAP[POLYMARKET] = "prediction"
 
+# @contract-surface — a removed venue key or a removed instrument-type from a venue's
+# set is a cross-repo contract break (downstream consumers enumerate this dict to
+# materialise the expected coverage universe — see 23fa3a99 in
+# plans/active/issues/breaking_change_differ_blind_to_registry_data_dicts_2026_07_09.md).
+# Adding a key/member stays non-breaking.
 INSTRUMENT_TYPES_BY_VENUE: dict[str, set[str]] = {
     BINANCE_SPOT: {"SPOT_PAIR"},
     COINBASE_SPOT: {"SPOT_PAIR"},
