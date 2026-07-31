@@ -1383,6 +1383,17 @@ DATA_PIPELINE_ALERT_RULES: Final[tuple[DataPipelineAlertRule, ...]] = (
     # itself crashing is meta (like the watcher-down siblings above), not a routine
     # per-run telemetry event, so it pages same as DP_ZOMBIE_WATCHDOG_DOWN.
     _dp_rule("DP-WATCHER-003", _C.WATCHER, "DP_FLEET_MONITOR_RUN_FAILED", _S.CRITICAL, _E.PAGE_OPERATOR),
+    # DP-WATCHER-004: fresh, non-colliding id for DP_CONSOLIDATOR_SCHEDULER_PAUSED
+    # (dp_consolidator_scheduler_paused_prediction_recurrence_2026_07_31.md item 5).
+    # consolidator_scheduler_watcher.py previously emitted this event reusing
+    # "DP-WATCHER-003", which the registry already assigns to the DISTINCT
+    # DP_FLEET_MONITOR_RUN_FAILED event above — same failure class as the
+    # 2026-07-27 DIGEST-003/004 / VM-008..011 transcription gaps: without its own
+    # exact-match entry, DP_CONSOLIDATOR_SCHEDULER_PAUSED fell through to the
+    # generic catch-all (#uts-live-alerts), losing the intended
+    # #data-pipeline-alerts routing + PagerDuty page. CRITICAL/PAGE_OPERATOR
+    # mirrors DP-CATALOG-001's shape (the closest sibling meta-watcher).
+    _dp_rule("DP-WATCHER-004", _C.WATCHER, "DP_CONSOLIDATOR_SCHEDULER_PAUSED", _S.CRITICAL, _E.PAGE_OPERATOR),
     # ── DP-DIGEST (daily summaries, INFO) ───────────────────────────────────
     _dp_rule("DP-DIGEST-001", _C.DIGEST, "DP_DAILY_DIGEST", _S.INFO, _E.FILE_ISSUE),
     _dp_rule("DP-DIGEST-002", _C.DIGEST, "DP_HYGIENE_SUMMARY", _S.INFO, _E.FILE_ISSUE),
