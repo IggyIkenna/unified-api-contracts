@@ -1581,7 +1581,7 @@ class TestDeFiMvpExclusionV12:
 
         rule = MVP_SCOPE["defi"]
         assert isinstance(rule, DeFiMvpRule)
-        expected = frozenset((v, it) for v in rule.venues for it in rule.instrument_types)
+        expected = frozenset((v, it, dt) for v in rule.venues for it in rule.instrument_types for dt in rule.data_types)
         assert mdps_mvp_universe("defi") == expected
 
 
@@ -1690,17 +1690,20 @@ def test_accepted_quotes_for_venue_upbit_krw() -> None:
 
 # ---------------------------------------------------------------------------
 # mdps_mvp_universe — MVP-for-MDPS == MVP-for-MDS (Concept 1).
-# Identity gate: the (venue, instrument_type) set returned by the helper must
-# equal the same set derived directly from MVP_SCOPE (cefi/defi) or the
-# is_mvp predicate's reachable projection (tradfi, which composes the CME
-# futures complex with the equity-basis carve-out).
+# Identity gate: the (venue, instrument_type, data_type) set returned by the
+# helper must equal the same set derived directly from MVP_SCOPE (cefi/defi)
+# or the is_mvp predicate's reachable projection (tradfi, which composes the
+# CME futures complex with the equity-basis carve-out). Extended 2026-07-31
+# (uac_mdps_mvp_universe_data_type_axis_2026_07_30.md) to add the data_type
+# axis + make the function total over sports/prediction/models (empty, not a
+# raise).
 # ---------------------------------------------------------------------------
 
 
 class TestMdpsMvpUniverse:
-    """``mdps_mvp_universe`` returns the (venue, instrument_type) cells MDPS
-    processes — which by Concept 1 is identical to the MDS capture MVP for
-    the asset_group, derived structurally from MVP_SCOPE."""
+    """``mdps_mvp_universe`` returns the (venue, instrument_type, data_type)
+    cells MDPS processes — which by Concept 1 is identical to the MDS capture
+    MVP for the asset_group, derived structurally from MVP_SCOPE."""
 
     def test_public_import_surface(self) -> None:
         """``mdps_mvp_universe`` is importable from the package root + listed in __all__."""
@@ -1711,20 +1714,31 @@ class TestMdpsMvpUniverse:
 
     def test_cefi_identity_with_mds_capture_mvp(self) -> None:
         """cefi: returned set equals the (venue, instrument_type) product
-        declared in MVP_SCOPE['cefi'] — the SAME source MDS reads. This is
-        the identity proof: no separate hand-maintained list."""
-        from unified_api_contracts import MVP_SCOPE, mdps_mvp_universe
+        declared in MVP_SCOPE['cefi'], each pair expanded across its EFFECTIVE
+        data_type set via ``get_mvp_data_types_for_cefi_venue_itype`` — the SAME
+        source MDS reads. This is the identity proof: no separate
+        hand-maintained list."""
+        from unified_api_contracts import (
+            MVP_SCOPE,
+            get_mvp_data_types_for_cefi_venue_itype,
+            mdps_mvp_universe,
+        )
         from unified_api_contracts.canonical.crosscutting.mvp_scope import (
             CeFiMvpRule,
         )
 
         rule = MVP_SCOPE["cefi"]
         assert isinstance(rule, CeFiMvpRule)
-        expected = frozenset((v, it) for v in rule.venues for it in rule.instrument_types)
+        expected = frozenset(
+            (v, it, dt)
+            for v in rule.venues
+            for it in rule.instrument_types
+            for dt in get_mvp_data_types_for_cefi_venue_itype(v, it)
+        )
         assert mdps_mvp_universe("cefi") == expected
 
     def test_defi_identity_with_mds_capture_mvp(self) -> None:
-        """defi: same Cartesian-product identity."""
+        """defi: same Cartesian-product identity, now including the flat data_type axis."""
         from unified_api_contracts import MVP_SCOPE, mdps_mvp_universe
         from unified_api_contracts.canonical.crosscutting.mvp_scope import (
             DeFiMvpRule,
@@ -1732,13 +1746,14 @@ class TestMdpsMvpUniverse:
 
         rule = MVP_SCOPE["defi"]
         assert isinstance(rule, DeFiMvpRule)
-        expected = frozenset((v, it) for v in rule.venues for it in rule.instrument_types)
+        expected = frozenset((v, it, dt) for v in rule.venues for it in rule.instrument_types for dt in rule.data_types)
         assert mdps_mvp_universe("defi") == expected
 
     def test_tradfi_identity_includes_equity_basis_carve_out(self) -> None:
         """tradfi: CME futures complex + the equity-basis carve-out (NASDAQ/
         NYSE/ARCA/AMEX/BATS/KRX × {EQUITY, ETF}) that is_mvp's tradfi branch
-        hardcodes. Identity here is with the reachable set of the predicate."""
+        hardcodes, each expanded across the flat data_type set. Identity here
+        is with the reachable set of the predicate."""
         from unified_api_contracts import MVP_SCOPE, mdps_mvp_universe
         from unified_api_contracts.canonical.crosscutting.mvp_scope import (
             TradFiMvpRule,
@@ -1746,22 +1761,32 @@ class TestMdpsMvpUniverse:
 
         rule = MVP_SCOPE["tradfi"]
         assert isinstance(rule, TradFiMvpRule)
-        cme_cells = {(v, it) for v in rule.venues for it in rule.instrument_types}
-        equity_cells = {(v, it) for v in ("NASDAQ", "NYSE", "ARCA", "AMEX", "BATS", "KRX") for it in ("EQUITY", "ETF")}
+        cme_cells = {(v, it, dt) for v in rule.venues for it in rule.instrument_types for dt in rule.data_types}
+        equity_cells = {
+            (v, it, dt)
+            for v in ("NASDAQ", "NYSE", "ARCA", "AMEX", "BATS", "KRX")
+            for it in ("EQUITY", "ETF")
+            for dt in rule.data_types
+        }
         expected = frozenset(cme_cells | equity_cells)
         assert mdps_mvp_universe("tradfi") == expected
 
     def test_cefi_contains_deribit_option_and_binance_perp(self) -> None:
         """Spot-check the cefi cells the predicate ALSO admits for at least
         one base — confirms the helper's set is the same reachable set MDS
-        captures (not a stale subset)."""
+        captures (not a stale subset), including the per-cell effective
+        data_type resolution (Deribit OPTION -> options_chain only;
+        Coinbase-Futures PERPETUAL -> trades only, no book5/liquidations)."""
         from unified_api_contracts import is_in_mvp_capture_universe, mdps_mvp_universe
 
         cells = mdps_mvp_universe("cefi")
-        assert ("DERIBIT", "OPTION") in cells
-        assert ("BINANCE-FUTURES", "PERPETUAL") in cells
-        assert ("BINANCE-SPOT", "SPOT_PAIR") in cells
-        assert ("COINBASE-FUTURES", "PERPETUAL") in cells
+        assert ("DERIBIT", "OPTION", "options_chain") in cells
+        assert ("DERIBIT", "OPTION", "trades") not in cells
+        assert ("BINANCE-FUTURES", "PERPETUAL", "trades") in cells
+        assert ("BINANCE-FUTURES", "PERPETUAL", "liquidations") in cells
+        assert ("BINANCE-SPOT", "SPOT_PAIR", "trades") in cells
+        assert ("COINBASE-FUTURES", "PERPETUAL", "trades") in cells
+        assert ("COINBASE-FUTURES", "PERPETUAL", "book_snapshot_5") not in cells
         # Each axis pair the helper returns is reachable via the capture
         # predicate for some base — the per-(venue, base) carve-outs apply
         # at the instrument grain, not at the axis-pair grain.
@@ -1773,32 +1798,29 @@ class TestMdpsMvpUniverse:
         from unified_api_contracts import mdps_mvp_universe
 
         cells = mdps_mvp_universe("tradfi")
-        assert ("CME", "FUTURE") in cells
-        assert ("CME", "OPTION") in cells
-        assert ("NASDAQ", "EQUITY") in cells
-        assert ("KRX", "EQUITY") in cells
-        assert ("NYSE", "ETF") in cells
+        assert ("CME", "FUTURE", "ohlcv_1m") in cells
+        assert ("CME", "OPTION", "ohlcv_1m") in cells
+        assert ("NASDAQ", "EQUITY", "ohlcv_1m") in cells
+        assert ("KRX", "EQUITY", "ohlcv_1m") in cells
+        assert ("NYSE", "ETF", "ohlcv_1m") in cells
 
-    def test_sports_raises_no_axis(self) -> None:
-        """sports has no (venue, instrument_type) axis — raises ValueError."""
-        import pytest
-
+    def test_sports_is_total_returns_empty(self) -> None:
+        """sports has no (venue, instrument_type) axis — the function is TOTAL
+        (2026-07-30 ruling, BLK-fd70b57c): returns empty, does not raise."""
         from unified_api_contracts import mdps_mvp_universe
 
-        with pytest.raises(ValueError, match="no .venue, instrument_type. axis"):
-            mdps_mvp_universe("sports")
+        assert mdps_mvp_universe("sports") == frozenset()
 
-    def test_prediction_raises_no_axis(self) -> None:
-        """prediction has no (venue, instrument_type) axis — raises ValueError."""
-        import pytest
-
+    def test_prediction_is_total_returns_empty(self) -> None:
+        """prediction has no (venue, instrument_type) axis — TOTAL, empty, no raise."""
         from unified_api_contracts import mdps_mvp_universe
 
-        with pytest.raises(ValueError, match="no .venue, instrument_type. axis"):
-            mdps_mvp_universe("prediction")
+        assert mdps_mvp_universe("prediction") == frozenset()
 
     def test_unknown_asset_group_raises(self) -> None:
-        """An asset_group not declared in MVP_SCOPE raises ValueError."""
+        """An asset_group not declared in MVP_SCOPE at all still raises
+        ValueError — a genuine config error, distinct from "declared but has
+        no MDPS-relevant axis" (sports/prediction/models, which are total)."""
         import pytest
 
         from unified_api_contracts import mdps_mvp_universe
@@ -1807,36 +1829,34 @@ class TestMdpsMvpUniverse:
             mdps_mvp_universe("not-an-asset-group")
 
     def test_phase2_stub_returns_empty(self) -> None:
-        """Phase-2+ stubs (features/strategy) have no rule yet — empty set.
-        ``models`` graduated to ``ModelsMvpRule`` (P2b) — see
-        ``test_models_has_no_mdps_axis`` below (it now raises, same as
-        sports/prediction, since it's a real rule with no MDPS-relevant axis)."""
+        """Phase-2+ stubs (features/strategy) have no rule yet — empty set."""
         from unified_api_contracts import mdps_mvp_universe
 
         assert mdps_mvp_universe("features") == frozenset()
         assert mdps_mvp_universe("strategy") == frozenset()
 
-    def test_models_has_no_mdps_axis(self) -> None:
+    def test_models_is_total_returns_empty(self) -> None:
         """``models`` (P2b, a real ModelsMvpRule) has no (venue, instrument_type)
-        axis — mdps_mvp_universe raises, same as sports/prediction, NOT an
-        empty-stub return (that path is only for features/strategy)."""
+        axis — TOTAL (2026-07-30 ruling): returns empty, same as
+        sports/prediction, not a raise."""
         from unified_api_contracts import mdps_mvp_universe
 
-        with pytest.raises(ValueError, match="no \\(venue, instrument_type\\) axis"):
-            mdps_mvp_universe("models")
+        assert mdps_mvp_universe("models") == frozenset()
 
-    def test_return_type_is_frozenset_of_tuples(self) -> None:
-        """Return type is a frozenset of (venue, instrument_type) tuples — both strings."""
+    def test_return_type_is_frozenset_of_triples(self) -> None:
+        """Return type is a frozenset of (venue, instrument_type, data_type) triples — all strings."""
         from unified_api_contracts import mdps_mvp_universe
 
         result = mdps_mvp_universe("cefi")
         assert isinstance(result, frozenset)
+        assert result  # non-empty for cefi
         for cell in result:
             assert isinstance(cell, tuple)
-            assert len(cell) == 2
-            venue, itype = cell
+            assert len(cell) == 3
+            venue, itype, data_type = cell
             assert isinstance(venue, str) and venue == venue.upper().strip()
             assert isinstance(itype, str) and itype == itype.upper().strip()
+            assert isinstance(data_type, str) and data_type == data_type.strip()
 
 
 # ---------------------------------------------------------------------------

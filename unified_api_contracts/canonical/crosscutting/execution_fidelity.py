@@ -109,9 +109,7 @@ override drops ``book_snapshot_5`` (e.g. COINBASE = ``{trades}``,
 Deribit OPTION = ``{options_chain}``), the cell falls down to OHLC_BAR.
 """
 
-_AMM_POOL_DATA_TYPES: Final[frozenset[str]] = frozenset(
-    {"dex_pool_state", "dex_pool_swaps"}
-)
+_AMM_POOL_DATA_TYPES: Final[frozenset[str]] = frozenset({"dex_pool_state", "dex_pool_swaps"})
 """Data types whose JOINT presence resolves to CANDLE_BOOK_COLS.
 
 Plan-1 introduced book_summary columns on the candle artifact derived from
@@ -144,9 +142,7 @@ to OHLC_BAR.
 # ---------------------------------------------------------------------------
 
 
-def _cefi_data_types_for_cell(
-    venue: str, instrument_type: str, rule: CeFiMvpRule
-) -> frozenset[str]:
+def _cefi_data_types_for_cell(venue: str, instrument_type: str, rule: CeFiMvpRule) -> frozenset[str]:
     """Resolve the MVP data_type set for a CeFi ``(venue, instrument_type)``.
 
     Resolution order mirrors :func:`unified_api_contracts.is_mvp`:
@@ -187,12 +183,13 @@ def execution_fidelity(
 ) -> ExecutionFidelityTier:
     """Return the maximum :class:`ExecutionFidelityTier` for the cell.
 
-    The cell is the ``(asset_group, venue, instrument_type)`` grain — the
-    same shape ``mdps_mvp_universe`` returns and ``is_mvp`` accepts. The
-    resolution reads the cell's MVP data_types out of MVP_SCOPE (applying
-    the v11 / v12 per-venue + per-instrument_type overrides), then projects
-    onto the three-tier decision table documented in this module's
-    docstring.
+    The cell is the ``(asset_group, venue, instrument_type)`` grain — a
+    projection of the ``(venue, instrument_type, data_type)`` triples
+    ``mdps_mvp_universe`` returns (down to the two axes this gate checks) and
+    the same grain ``is_mvp`` accepts. The resolution reads the cell's MVP
+    data_types out of MVP_SCOPE (applying the v11 / v12 per-venue +
+    per-instrument_type overrides), then projects onto the three-tier
+    decision table documented in this module's docstring.
 
     Args:
         asset_group: One of ``cefi`` / ``defi`` / ``tradfi``. ``sports`` and
@@ -256,9 +253,7 @@ def execution_fidelity(
         )
     rule = MVP_SCOPE.get(asset_group)
     if rule is None:
-        raise ValueError(
-            f"execution_fidelity: unknown asset_group {asset_group!r} (not declared in MVP_SCOPE)."
-        )
+        raise ValueError(f"execution_fidelity: unknown asset_group {asset_group!r} (not declared in MVP_SCOPE).")
     if not isinstance(rule, CeFiMvpRule | DeFiMvpRule | TradFiMvpRule):
         raise ValueError(
             f"execution_fidelity: asset_group {asset_group!r} has no executable-instrument rule "
@@ -267,8 +262,10 @@ def execution_fidelity(
 
     # Cell must be in MVP. mdps_mvp_universe already encodes the tradfi
     # equity-basis carve-out, so this is a single membership check that
-    # covers every supported AG.
-    mvp_cells = mdps_mvp_universe(asset_group)
+    # covers every supported AG. Project the (venue, instrument_type,
+    # data_type) triples down to (venue, instrument_type) — this gate has no
+    # data_type axis of its own (fidelity is checked per-instrument).
+    mvp_cells = {(v, it) for v, it, _dt in mdps_mvp_universe(asset_group)}
     if (venue, instrument_type) not in mvp_cells:
         raise ValueError(
             f"execution_fidelity: ({venue!r}, {instrument_type!r}) is not an MVP cell for "
@@ -286,10 +283,7 @@ def execution_fidelity(
     # Decision table — apply the three tiers in descending fidelity.
     if data_types & _L2_TICK_DATA_TYPES:
         return ExecutionFidelityTier.L2_TICK
-    if (
-        instrument_type in _AMM_INSTRUMENT_TYPES
-        and _AMM_POOL_DATA_TYPES.issubset(data_types)
-    ):
+    if instrument_type in _AMM_INSTRUMENT_TYPES and _AMM_POOL_DATA_TYPES.issubset(data_types):
         return ExecutionFidelityTier.CANDLE_BOOK_COLS
     return ExecutionFidelityTier.OHLC_BAR
 
