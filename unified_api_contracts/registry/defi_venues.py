@@ -593,8 +593,11 @@ DEFI_VENUE_PHASE: dict[str, str] = {
     "ALCHEMY-ONCHAIN": "pipeline",
     "ALCHEMY-OPTIMISM": "pipeline",
     "ALCHEMY-POLYGON": "pipeline",
-    # ── Pipeline (Plasma chain variants — no MTDS tick data yet, added 2026-05-22) ──
-    "AAVE-PLASMA": "pipeline",
+    # ── Live (AAVE-PLASMA verified 2026-07-31: 18 rows captured for chain=PLASMA in
+    # the manifest via the RPC-fallback path — market-tick-data-service@9d6fc8cc) ──
+    "AAVE-PLASMA": "live",
+    # FLUID-PLASMA stays pipeline: PROTOCOL_LAUNCH_DATES entry still unconfirmed
+    # (defi_plasma_chain_onboarding_gap_2026_07_26.md P1 todo).
     "FLUID-PLASMA": "pipeline",
     # ── Live (Linea — IS-producible per _build_defi_venues()) ──
     "AAVE_V3-LINEA": "live",
