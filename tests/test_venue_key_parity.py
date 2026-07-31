@@ -107,14 +107,25 @@ def test_defi_adapter_verified_keys_are_canonical() -> None:
     )
 
 
-def test_defi_adapter_verified_is_exactly_the_six_manual_only_venues() -> None:
-    """Lock in the exact 6-venue membership from the 2026-07-22 design doc.
-
-    Regression guard against silently re-adding FRAX (UNVERIFIED-CLAIM) or
-    ALCHEMY/FLASHBOTS/ACROSS/STARGATE (STILL-BROKEN) -- none of those 5
-    qualified as ACCURATE-BUT-MANUAL-ONLY.
+def test_defi_adapter_verified_is_empty_post_graduation() -> None:
+    """The 2026-07-22 design doc's 6-venue ACCURATE-BUT-MANUAL-ONLY set graduated
+    to DEFI_VENUE_PHASE="live" 2026-07-31 (defi_venue_pipeline_to_live_ao_build_
+    2026_07_30.md todo 5, once todo 2 confirmed 3 consecutive real scheduled
+    production runs -- this dict's own documented promotion criterion) and were
+    removed from here. Regression guard against silently re-adding FRAX
+    (UNVERIFIED-CLAIM) or ALCHEMY/FLASHBOTS/ACROSS/STARGATE (STILL-BROKEN) --
+    none of those 5 ever qualified as ACCURATE-BUT-MANUAL-ONLY -- via an empty
+    dict; a future genuinely-new ACCURATE-BUT-MANUAL-ONLY venue is expected to
+    update this test's `expected` set, not treated as drift.
     """
-    expected = {
+    expected: set[str] = set()
+    actual = set(DEFI_VENUE_MTDS_ADAPTER_VERIFIED_NOT_YET_SCHEDULED)
+    assert actual == expected, (
+        f"DEFI_VENUE_MTDS_ADAPTER_VERIFIED_NOT_YET_SCHEDULED membership drifted from the "
+        f"post-2026-07-31-graduation empty set. "
+        f"Missing: {sorted(expected - actual)}; unexpected extras: {sorted(actual - expected)}"
+    )
+    graduated = {
         "ANKR-ETHEREUM",
         "STADER-ETHEREUM",
         "STAKEWISE-ETHEREUM",
@@ -122,18 +133,9 @@ def test_defi_adapter_verified_is_exactly_the_six_manual_only_venues() -> None:
         "MANTLE-ETHEREUM",
         "MAKER-ETHEREUM",
     }
-    actual = set(DEFI_VENUE_MTDS_ADAPTER_VERIFIED_NOT_YET_SCHEDULED)
-    assert actual == expected, (
-        f"DEFI_VENUE_MTDS_ADAPTER_VERIFIED_NOT_YET_SCHEDULED membership drifted from the "
-        f"2026-07-22 design doc's 6-venue ACCURATE-BUT-MANUAL-ONLY set. "
-        f"Missing: {sorted(expected - actual)}; unexpected extras: {sorted(actual - expected)}"
-    )
-    # These 6 must remain phase=="pipeline" -- none has an instruments-service
-    # reference-data adapter, so this dict must never widen DEFI_VENUE_PHASE.
-    still_pipeline = {v for v in expected if DEFI_VENUE_PHASE.get(v) == "pipeline"}
-    assert still_pipeline == expected, (
-        f"Expected all 6 venues to remain phase=='pipeline'; these flipped "
-        f"unexpectedly: {sorted(expected - still_pipeline)}"
+    now_live = {v for v in graduated if DEFI_VENUE_PHASE.get(v) == "live"}
+    assert now_live == graduated, (
+        f"Expected all 6 graduated venues to be phase=='live'; these are not: {sorted(graduated - now_live)}"
     )
 
 
