@@ -1,10 +1,12 @@
-"""CeFi scenario seeds — 2 :class:`ScenarioOverlay` instances.
+"""CeFi scenario seeds — 3 :class:`ScenarioOverlay` instances.
 
 Per Day-1 design fragments at
 ``unified-trading-pm/plans/active/scratch_scenarios_day1/01_cefi_venue_circuit_breaker_trip.md``
-+ ``07_cefi_funding_spike_10x.md``.
++ ``07_cefi_funding_spike_10x.md`` + ``13_execution_slippage_spike.md`` (CeFi
+book-thinning sub-variant; the DEX-pool-drain sub-variant registers in
+``defi.py`` as `defi_execution_slippage_spike_pool_drain`).
 
-Both target `ARBITRAGE_PRICE_DISPERSION` primarily; `carry_staked_basis` is
+Target `ARBITRAGE_PRICE_DISPERSION` primarily; `carry_staked_basis` is
 the hedge-leg secondary archetype.
 """
 
@@ -17,6 +19,7 @@ from ...canonical.crosscutting.alerting.codes import AlertCode
 from ...canonical.crosscutting.circuit_breaker import BreakerAction, CircuitBreakerId
 from ...canonical.crosscutting.risk_rule import RiskRuleConsequence
 from ...canonical.crosscutting.scenario_overlay import (
+    BookSpoof,
     OutcomeCategory,
     PriceShift,
     RejectFills,
@@ -124,9 +127,66 @@ CEFI_FUNDING_SPIKE_10X = ScenarioOverlay(
 )
 
 
+# ---------------------------------------------------------------------------
+# cefi_execution_slippage_spike_book_thinning — CeFi book-thinning execution slippage
+# ---------------------------------------------------------------------------
+# CeFi sub-variant of Day-1 fragment 13_execution_slippage_spike.md (the
+# DEX-pool-drain sub-variant registers in defi.py). No dedicated
+# `CEFI_BOOK_THIN`-style breaker exists yet — `SPREAD_BLOWOUT_BPS` ("Quoted
+# bid-ask spread >= threshold bps, illiquidity / venue degradation") is an
+# exact conceptual match and is the closest-fit substitution, per the same
+# convention used for the DEX twin.
+
+CEFI_EXECUTION_SLIPPAGE_SPIKE_BOOK_THINNING = ScenarioOverlay(
+    scenario_id="cefi_execution_slippage_spike_book_thinning",
+    category=ScenarioCategory.PRICE_SHOCK,
+    layer=ScenarioOverlayLayer.ORDER,
+    asset_groups=frozenset({"cefi"}),
+    applies_to=ScenarioApplicabilityFilter(
+        venues=frozenset({"bybit", "binance", "deribit", "okx", "hyperliquid", "aster"}),
+        archetypes=frozenset({"ARBITRAGE_PRICE_DISPERSION", "carry_staked_basis"}),
+    ),
+    mutation_spec=BookSpoof(
+        book_depth_scale=Decimal("0.2"),
+        duration_seconds=60,
+        imbalance_target=Decimal("-0.5"),
+    ),
+    expected_outcomes=(
+        ScenarioOutcomeAssertion(
+            archetype="ARBITRAGE_PRICE_DISPERSION",
+            category=OutcomeCategory.RISK_BREAKER_TRIPPED,
+            consequence=RiskRuleConsequence.BLOCK,
+            breaker_id=CircuitBreakerId.SPREAD_BLOWOUT_BPS,
+            breaker_action=BreakerAction.CANCEL_OPEN,
+            alert_codes=frozenset({AlertCode.CIRCUIT_BREAKER_OPEN, AlertCode.RISK_RULE_BLOCKED}),
+            expected_within_seconds=5,
+        ),
+        ScenarioOutcomeAssertion(
+            archetype="carry_staked_basis",
+            category=OutcomeCategory.RISK_BREAKER_TRIPPED,
+            breaker_id=CircuitBreakerId.SPREAD_BLOWOUT_BPS,
+            breaker_action=BreakerAction.SCALE_DOWN,
+            consequence=RiskRuleConsequence.SCALE_DOWN,
+            alert_codes=frozenset({AlertCode.RISK_RULE_SCALED_DOWN}),
+            expected_within_seconds=60,
+        ),
+    ),
+    description=(
+        "Top-of-book spread widens 20x baseline and top-5 depth collapses 80% for 60s across "
+        "6 CeFi perp venues; market-order fills walk the thinned book on the way to a fill."
+    ),
+    real_world_referent=(
+        "Binance BTCUSDT-perp 2024-04 CPI-print book thinning (spread 0.3bps->35bps, ~28bps realised slippage); "
+        "Bybit ETHUSDT-perp 2024-12 halt-recovery (50-120bps in the first ~90s post-resume)."
+    ),
+    composes_with=frozenset({"cefi_venue_circuit_breaker_trip", "cross_asset_flash_crash"}),
+)
+
+
 SCENARIOS: Final[tuple[ScenarioOverlay, ...]] = (
     CEFI_VENUE_CIRCUIT_BREAKER_TRIP,
     CEFI_FUNDING_SPIKE_10X,
+    CEFI_EXECUTION_SLIPPAGE_SPIKE_BOOK_THINNING,
 )
 
 # Register all into the module-level SCENARIO_REGISTRY at import time.
