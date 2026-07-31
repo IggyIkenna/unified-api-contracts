@@ -180,7 +180,11 @@ def execution_spot_representative(
             f"execution_spot_representative: asset_group {asset_group!r} has no "
             "spot-execution representative (supported: cefi / tradfi / defi)."
         )
-    mvp_cells = mdps_mvp_universe(asset_group)
+    # Project the (venue, instrument_type, data_type) triples down to the
+    # (venue, instrument_type) pairs this selector gates on — it picks a
+    # representative per-instrument, not per-shard, so it has no data_type
+    # axis of its own.
+    mvp_cells = {(v, it) for v, it, _dt in mdps_mvp_universe(asset_group)}
     eligible = [
         obs
         for obs in venue_volumes
@@ -313,7 +317,10 @@ def feature_perp_representative(
             "(defi perps are classified cefi; defi-native, sports, prediction do not run "
             "delta-one features via this selector)."
         )
-    mvp_cells = mdps_mvp_universe(asset_group)
+    # Project the (venue, instrument_type, data_type) triples down to the
+    # (venue, instrument_type) pairs this selector gates on — same rationale
+    # as execution_spot_representative above.
+    mvp_cells = {(v, it) for v, it, _dt in mdps_mvp_universe(asset_group)}
     eligible = [
         obs
         for obs in venue_volumes
