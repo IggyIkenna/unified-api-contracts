@@ -1,13 +1,29 @@
-"""Cross-asset scenario seeds — 2 :class:`ScenarioOverlay` instances.
+"""Cross-asset scenario seeds — 3 :class:`ScenarioOverlay` instances.
 
 Per Day-1 design fragments at
 ``unified-trading-pm/plans/active/scratch_scenarios_day1/08_cross_asset_flash_crash.md``
-+ ``09_cross_asset_basis_blowout.md``.
++ ``09_cross_asset_basis_blowout.md`` + ``13_execution_slippage_spike.md``.
 
-Both target BOTH cutover archetypes (`carry_staked_basis` +
+The first two target BOTH cutover archetypes (`carry_staked_basis` +
 `ARBITRAGE_PRICE_DISPERSION`) — cross-asset events affect every position.
 Asset groups span `cefi` + `defi` (primary correlated event; DeFi spot legs
 lag by 30-180s on Ethereum mainnet per block time).
+
+FOLLOW-UP gap (execution_slippage_spike, per the closest-fit-existing-enum
+substitution pattern established in ``defi.py``'s own header): the source
+design fragment's `EXECUTION_QUALITY`/`LIQUIDITY_DRAIN`/`BOOK_THINNING`
+categories, `EXECUTION_SLIPPAGE_EXCEEDED`/`CEFI_BOOK_THIN` alert codes, and
+per-archetype `max_slippage_bps` thresholds don't exist yet in UAC — mapped
+to the closest existing `ScenarioCategory`/`AlertCode`/`CircuitBreakerId`
+below (`VENUE_OUTAGE` per the same substitution `DEFI_LIQUIDITY_DRAIN_LENDING_POOL`
+already uses for a liquidity-drain shape; `SPREAD_BLOWOUT_BPS` — "quoted
+bid-ask spread >= threshold bps (illiquidity/venue degradation)" — is an
+exact fit for both the DEX pool-drain and CeFi book-thinning variants).
+`Drift`/`Hyperliquid-spot` DEX protocols named in the source fragment aren't
+registered `_ADAPTERS` keys anywhere in this workspace (confirmed via
+`market-tick-data-service`'s `VENUE_REGISTRY`/`PLANNED_VENUES`) — omitted
+from `protocols` rather than invented; only the 3 confirmed-registered DEX
+protocols (Uniswap V3 / Curve / Balancer) are declared.
 """
 
 from __future__ import annotations
@@ -153,9 +169,74 @@ CROSS_ASSET_BASIS_BLOWOUT_PERP_SPOT = ScenarioOverlay(
 )
 
 
+# ---------------------------------------------------------------------------
+# execution_slippage_spike — DEX pool-drain / CeFi book-thinning fill slippage
+# ---------------------------------------------------------------------------
+
+EXECUTION_SLIPPAGE_SPIKE = ScenarioOverlay(
+    scenario_id="execution_slippage_spike",
+    category=ScenarioCategory.VENUE_OUTAGE,
+    layer=ScenarioOverlayLayer.ORDER,
+    asset_groups=frozenset({"cefi", "defi"}),
+    applies_to=ScenarioApplicabilityFilter(
+        chains=frozenset({"ethereum", "arbitrum"}),
+        protocols=frozenset({"uniswap_v3", "curve", "balancer"}),
+        venues=frozenset({"bybit", "binance", "deribit", "okx", "hyperliquid", "aster"}),
+        archetypes=frozenset({"carry_staked_basis", "ARBITRAGE_PRICE_DISPERSION", "LEVERAGED_FUNDING_ARB"}),
+    ),
+    mutation_spec=BookSpoof(
+        book_depth_scale=Decimal("0.25"),
+        duration_seconds=300,
+        imbalance_target=Decimal("0"),
+    ),
+    expected_outcomes=(
+        ScenarioOutcomeAssertion(
+            archetype="carry_staked_basis",
+            category=OutcomeCategory.RISK_BREAKER_TRIPPED,
+            consequence=RiskRuleConsequence.BLOCK,
+            breaker_id=CircuitBreakerId.SPREAD_BLOWOUT_BPS,
+            breaker_action=BreakerAction.BLOCK_NEW,
+            alert_codes=frozenset({AlertCode.CIRCUIT_BREAKER_OPEN, AlertCode.RISK_RULE_BLOCKED}),
+            expected_within_seconds=5,
+        ),
+        ScenarioOutcomeAssertion(
+            archetype="ARBITRAGE_PRICE_DISPERSION",
+            category=OutcomeCategory.STRATEGY_SCALED_DOWN,
+            consequence=RiskRuleConsequence.SCALE_DOWN,
+            breaker_id=CircuitBreakerId.SPREAD_BLOWOUT_BPS,
+            breaker_action=BreakerAction.SCALE_DOWN,
+            alert_codes=frozenset({AlertCode.RISK_RULE_SCALED_DOWN}),
+            expected_within_seconds=5,
+        ),
+        ScenarioOutcomeAssertion(
+            archetype="LEVERAGED_FUNDING_ARB",
+            category=OutcomeCategory.ORDER_REJECTED,
+            consequence=RiskRuleConsequence.BLOCK,
+            breaker_id=CircuitBreakerId.SPREAD_BLOWOUT_BPS,
+            breaker_action=BreakerAction.BLOCK_NEW,
+            alert_codes=frozenset({AlertCode.RISK_RULE_BLOCKED}),
+            expected_within_seconds=5,
+        ),
+    ),
+    description=(
+        "Order fill price diverges from intended mid — DEX pool-drain (75% same-side "
+        "liquidity withdrawn) or CeFi book-thinning (spread blowout + top-N depth collapse); "
+        "auto-response pauses new entries per (venue, instrument) within 5s."
+    ),
+    real_world_referent=(
+        "Uniswap V3 wstETH/ETH 2024-09 reorg-tail (240bps vs ~8bps expected); "
+        "Curve crvUSD/USDC depeg-tail 2024-08 (80-300bps tail swaps); "
+        "Binance BTCUSDT-perp 2024-04 CPI-print book thinning (~28bps on 200 BTC hedge flow); "
+        "Bybit 2024-12 ETHUSDT-perp halt-recovery (50-120bps first ~90s)."
+    ),
+    composes_with=frozenset({"defi_liquidity_drain_lending_pool", "defi_oracle_deviation_30sigma"}),
+)
+
+
 SCENARIOS: Final[tuple[ScenarioOverlay, ...]] = (
     CROSS_ASSET_FLASH_CRASH,
     CROSS_ASSET_BASIS_BLOWOUT_PERP_SPOT,
+    EXECUTION_SLIPPAGE_SPIKE,
 )
 
 for _scenario in SCENARIOS:

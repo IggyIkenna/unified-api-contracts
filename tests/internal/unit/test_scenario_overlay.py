@@ -290,16 +290,19 @@ _EXPECTED_SCENARIO_IDS: frozenset[str] = frozenset(
         # CeFi (2)
         "cefi_venue_circuit_breaker_trip",
         "cefi_funding_spike_10x",
-        # DeFi (6)
+        # DeFi (7)
         "defi_chain_rpc_outage_solana",
         "defi_liquidity_drain_lending_pool",
         "defi_oracle_deviation_30sigma",
         "defi_gas_surge_50x",
         "defi_mempool_congestion_inclusion_delay",
         "defi_stablecoin_depeg",
+        "defi_lst_unstake_queue_blowup",
         # Cross-asset (2)
         "cross_asset_flash_crash",
         "cross_asset_basis_blowout_perp_spot",
+        # Cross-asset, non-prefixed id (1) — Day-1 fragment 13, lives in cross_asset.py
+        "execution_slippage_spike",
     },
 )
 
@@ -325,13 +328,15 @@ def test_per_scenario_in_registry_has_outcomes(scenario_id: str) -> None:
 
 
 def test_per_asset_group_split() -> None:
-    """2 cefi + 7 defi + 2 cross_asset = 11 total."""
+    """2 cefi + 8 defi + 2 cross_asset (prefix `cross_asset_`) = 12, plus
+    `execution_slippage_spike` (non-prefixed, lives in cross_asset.py) = 13 total."""
     cefi = [s for s in SCENARIO_REGISTRY.values() if s.scenario_id.startswith("cefi_")]
     defi = [s for s in SCENARIO_REGISTRY.values() if s.scenario_id.startswith("defi_")]
     cross = [s for s in SCENARIO_REGISTRY.values() if s.scenario_id.startswith("cross_asset_")]
     assert len(cefi) == 2
-    assert len(defi) == 7
+    assert len(defi) == 8
     assert len(cross) == 2
+    assert "execution_slippage_spike" in SCENARIO_REGISTRY
 
 
 # ---------------------------------------------------------------------------
@@ -397,3 +402,41 @@ def test_every_registry_scenario_outcome_uses_typed_alert_codes() -> None:
         for outcome in scenario.expected_outcomes:
             for code in outcome.alert_codes:
                 assert code in set(AlertCode)
+
+
+# ---------------------------------------------------------------------------
+# execution_slippage_spike (Day-1 fragment 13) — dedicated shape checks
+# ---------------------------------------------------------------------------
+
+
+def test_execution_slippage_spike_shape() -> None:
+    """Spans both DeFi (pool-drain) and CeFi (book-thinning) per the design fragment —
+    a single BookSpoof mutation covers both variants' shared depth-withdrawal mechanism."""
+    scenario = SCENARIO_REGISTRY["execution_slippage_spike"]
+    assert scenario.asset_groups == frozenset({"cefi", "defi"})
+    assert scenario.mutation_spec.mutation_type == "BookSpoof"
+    assert scenario.applies_to.protocols == frozenset({"uniswap_v3", "curve", "balancer"})
+    assert scenario.applies_to.venues == frozenset({"bybit", "binance", "deribit", "okx", "hyperliquid", "aster"})
+    archetypes = {o.archetype for o in scenario.expected_outcomes}
+    assert archetypes == {"carry_staked_basis", "ARBITRAGE_PRICE_DISPERSION", "LEVERAGED_FUNDING_ARB"}
+
+
+# ---------------------------------------------------------------------------
+# defi_lst_unstake_queue_blowup (Day-1 fragment 16) — dedicated shape checks
+# ---------------------------------------------------------------------------
+
+
+def test_defi_lst_unstake_queue_blowup_shape() -> None:
+    """DeFi-only (per the design fragment's own Asset groups field); only the 12
+    UAC-registered LST/LRT tokens are declared, not the fragment's aspirational set."""
+    scenario = SCENARIO_REGISTRY["defi_lst_unstake_queue_blowup"]
+    assert scenario.asset_groups == frozenset({"defi"})
+    assert scenario.mutation_spec.mutation_type == "LatencyInject"
+    assert scenario.applies_to.instruments is not None
+    assert "stETH" in scenario.applies_to.instruments
+    assert "jitoSOL" in scenario.applies_to.instruments
+    # Aspirational-but-not-onboarded tokens from the design fragment must NOT be invented.
+    assert "frxETH" not in scenario.applies_to.instruments
+    assert "LBTC" not in scenario.applies_to.instruments
+    archetypes = {o.archetype for o in scenario.expected_outcomes}
+    assert archetypes == {"carry_staked_basis", "LEVERAGED_FUNDING_ARB"}
