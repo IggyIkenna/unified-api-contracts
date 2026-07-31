@@ -23,7 +23,7 @@ _VALID_SEVERITIES = {AlertSeverity.CRITICAL, AlertSeverity.WARN, AlertSeverity.I
 
 
 def test_non_empty() -> None:
-    assert len(DATA_PIPELINE_ALERT_RULES) >= 38
+    assert len(DATA_PIPELINE_ALERT_RULES) >= 39
 
 
 def test_every_rule_is_well_formed() -> None:
@@ -102,3 +102,26 @@ def test_dp_fleet_monitor_lifecycle_events_registered() -> None:
     assert failed.severity is AlertSeverity.CRITICAL
     assert AlertChannel.PAGERDUTY in failed.channels
     assert AlertChannel.TELEGRAM in failed.channels
+
+
+def test_consolidator_scheduler_paused_has_own_registry_id() -> None:
+    """DP_CONSOLIDATOR_SCHEDULER_PAUSED must not collide with DP_FLEET_MONITOR_RUN_FAILED.
+
+    Regression test (dp_consolidator_scheduler_paused_prediction_recurrence_2026_07_31.md):
+    the watcher previously emitted DP_CONSOLIDATOR_SCHEDULER_PAUSED reusing
+    "DP-WATCHER-003", which the registry already assigns to the DISTINCT
+    DP_FLEET_MONITOR_RUN_FAILED event — the DP-DIGEST-003/004 / DP-VM-008..011
+    failure class. Without its own exact-match entry, the event would miss
+    alerting-service's data_pipeline_rule_for() lookup and fall through to the
+    generic catch-all routing.
+    """
+    by_event = {r.event: r for r in DATA_PIPELINE_ALERT_RULES}
+
+    paused = by_event["DP_CONSOLIDATOR_SCHEDULER_PAUSED"]
+    fleet_monitor_failed = by_event["DP_FLEET_MONITOR_RUN_FAILED"]
+
+    assert paused.registry_id != fleet_monitor_failed.registry_id
+    assert paused.registry_id == "DP-WATCHER-004"
+    assert paused.category is DataPipelineAlertCategory.WATCHER
+    assert paused.severity is AlertSeverity.CRITICAL
+    assert paused.escalation is DataPipelineEscalation.PAGE_OPERATOR
