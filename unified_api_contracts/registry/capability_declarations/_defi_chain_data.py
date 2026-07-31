@@ -235,6 +235,20 @@ CHAIN_CONFIGS: dict[int, ChainConfig] = {
         avg_block_time_s=1.0,
         native_gas_token="ETH",
     ),
+    9745: ChainConfig(
+        # PLASMA (XPL) — 2025 Tether-backed stablecoin L1, mainnet chain_id 9745
+        # (defi_plasma_chain_onboarding_gap_2026_07_26.md). Alchemy officially
+        # supports Plasma on the same already-provisioned alchemy-api-key
+        # (confirmed via alchemy.com/rpc/plasma). PlasmaBFT (HotStuff-derived)
+        # gives sub-second block production + fast (~2-3 round) finality with
+        # Bitcoin-anchored state roots; reorg_depth/avg_block_time_s follow the
+        # existing fast-finality-L2 convention used for INK/WORLDCHAIN/UNICHAIN
+        # rather than a slow L1 value.
+        rpc_url_template="https://plasma-mainnet.g.alchemy.com/v2/{api_key}",
+        reorg_depth=30,
+        avg_block_time_s=1.0,
+        native_gas_token="XPL",
+    ),
     # ── Testnets (EVM) — same key, different endpoints ───────────
     11155111: ChainConfig(
         rpc_url_template="https://eth-sepolia.g.alchemy.com/v2/{api_key}",
