@@ -442,7 +442,6 @@ DEFI_VENUE_PHASE: dict[str, str] = {
     # ── Pipeline (Ethereum vaults / analytics — NOT IS-producible) ──
     "MORPHOVAULTS-ETHEREUM": "pipeline",
     "FRAX-ETHEREUM": "pipeline",
-    "MAKER-ETHEREUM": "pipeline",
     # ── Live (Ethereum LST / staking-yield — IS-producible) ──
     "LIDO-ETHEREUM": "live",
     "ETHERFI-ETHEREUM": "live",
@@ -467,12 +466,22 @@ DEFI_VENUE_PHASE: dict[str, str] = {
     "YEARN_V3-ETHEREUM": "live",
     "COINBASE-ETHEREUM": "live",
     "BINANCE-ETHEREUM": "live",
-    # ── Pipeline (Ethereum LST/staking — NOT IS-producible; no adapter wired) ──
-    "ANKR-ETHEREUM": "pipeline",
-    "STADER-ETHEREUM": "pipeline",
-    "STAKEWISE-ETHEREUM": "pipeline",
-    "SWELL-ETHEREUM": "pipeline",
-    "MANTLE-ETHEREUM": "pipeline",
+    # ── Live (Ethereum LST / vault — IS-wired 2026-07-31,
+    #    defi_venue_pipeline_to_live_ao_build_2026_07_30.md todo 5, operator
+    #    ruling 2026-07-29). Flipped pipeline→live per the phase=="live" <=>
+    #    IS-producible invariant: genuine instruments-service adapters
+    #    (ankr.py/stader.py/stakewise.py/swell.py/mantle.py/maker.py, todo 1),
+    #    a verified-healthy production capture cron (todo 2), a complete
+    #    90-day manifest backfill (todo 3, 90/90 days per venue), and
+    #    instruments-catalogue registration (todo 4) all precede this flip.
+    #    MAKER is YIELD_BEARING (sDAI, no validator staking) — moved from the
+    #    "vaults / analytics" pipeline group above, not a duplicate. ──
+    "ANKR-ETHEREUM": "live",
+    "STADER-ETHEREUM": "live",
+    "STAKEWISE-ETHEREUM": "live",
+    "SWELL-ETHEREUM": "live",
+    "MANTLE-ETHEREUM": "live",
+    "MAKER-ETHEREUM": "live",
     # ── Pipeline (Ethereum gas oracles — NOT IS-producible) ──
     "ALCHEMY-ETHEREUM": "pipeline",
     # ── Live (Arbitrum — IS-producible per _build_defi_venues()) ──
@@ -652,61 +661,28 @@ DEFI_VENUE_PHASE: dict[str, str] = {
 # verification behind every entry is a SINGLE manual/ad-hoc invocation on one
 # historical day, not an ongoing or scheduled capture. Do not promote a venue
 # out of this dict until there is evidence of an actual scheduled/cron-driven
-# capture succeeding (see uts-prod-mtds-collect-lst-rates, which currently
-# fails both of its tracked runs -- OOM/timeout crash-loop -- and additionally
-# targets "yesterday" relative to run date rather than an explicit historical
-# day, so it could not have produced this data even if healthy).
+# capture succeeding.
 #
-# This is NOT wired into DEFI_VENUE_PHASE (phase stays "pipeline" for every
-# entry below -- none of these venues has an instruments-service reference-
-# data adapter), VENUES_BY_ASSET_GROUP["defi"], or MVP_SCOPE["defi"].venues.
+# This is NOT wired into DEFI_VENUE_PHASE, VENUES_BY_ASSET_GROUP["defi"], or
+# MVP_SCOPE["defi"].venues.
 #
 # SSOT: unified-trading-pm design doc "Correction Design: 11 DeFi Venues →
-# Honest-Coverage Registry" (2026-07-22). Of the 11 venues investigated, only
-# these 6 qualified as ACCURATE-BUT-MANUAL-ONLY; FRAX (UNVERIFIED-CLAIM: real
-# data exists but stopped dead 2026-06-21, no scheduler) and ALCHEMY /
-# FLASHBOTS / ACROSS / STARGATE (STILL-BROKEN: crash-looping cron or never
-# scheduled at all, two with no SchemaContract registered) do NOT qualify and
-# are deliberately excluded -- see that design doc for the full per-venue
-# evidence and the deferred follow-up items for those five.
+# Honest-Coverage Registry" (2026-07-22). Of the 11 venues investigated, 6
+# (ANKR/STADER/STAKEWISE/SWELL/MANTLE/MAKER-ETHEREUM) qualified as
+# ACCURATE-BUT-MANUAL-ONLY and lived here until 2026-07-31, when
+# defi_venue_pipeline_to_live_ao_build_2026_07_30.md's todo 2 confirmed 3
+# consecutive real Cloud Scheduler-triggered production runs succeeding for
+# all 6 (the exact promotion criterion this dict's own docstring names) —
+# graduated to DEFI_VENUE_PHASE="live" (todo 5), removed from here. FRAX
+# (UNVERIFIED-CLAIM: real data exists but stopped dead 2026-06-21, no
+# scheduler) and ALCHEMY / FLASHBOTS / ACROSS / STARGATE (STILL-BROKEN:
+# crash-looping cron or never scheduled at all, two with no SchemaContract
+# registered) never qualified and remain excluded -- see the design doc for
+# the full per-venue evidence and the deferred follow-up items for those five.
+# Empty today; kept defined for any FUTURE venue that reaches
+# ACCURATE-BUT-MANUAL-ONLY status.
 # ---------------------------------------------------------------------------
-DEFI_VENUE_MTDS_ADAPTER_VERIFIED_NOT_YET_SCHEDULED: dict[str, str] = {
-    "ANKR-ETHEREUM": (
-        "single verified-accurate ratio() read for ankrETH, day=2026-07-20, "
-        "block 25573787, via manual/ad-hoc invocation -- NOT the scheduled "
-        "uts-prod-mtds-collect-lst-rates cron (currently crash-looping on "
-        "OOM/timeout; also targets 'yesterday' relative to run date, never "
-        "day=2026-07-20 as run on 2026-07-22)."
-    ),
-    "STADER-ETHEREUM": (
-        "single verified-accurate getExchangeRate() read for ETHx, "
-        "day=2026-07-20, block 25573787, manual/ad-hoc invocation only; "
-        "production cron not yet capturing this venue."
-    ),
-    "STAKEWISE-ETHEREUM": (
-        "single verified-accurate convertToAssets(1e18) read for osETH, "
-        "day=2026-07-20, block 25573787, manual/ad-hoc invocation only; "
-        "production cron not yet capturing this venue."
-    ),
-    "SWELL-ETHEREUM": (
-        "single verified-accurate swETHToETHRate() read for swETH, "
-        "day=2026-07-20, block 25573787, manual/ad-hoc invocation only; "
-        "production cron not yet capturing this venue."
-    ),
-    "MANTLE-ETHEREUM": (
-        "single verified-accurate mETHToETH(1e18) read for mETH, "
-        "day=2026-07-20, block 25573787, manual/ad-hoc invocation only; "
-        "production cron not yet capturing this venue."
-    ),
-    "MAKER-ETHEREUM": (
-        "single verified-accurate convertToAssets(1e18) read for sDAI, "
-        "day=2026-07-20, block 25573787, manual/ad-hoc invocation only; "
-        "GCS object present but manifest row MISSING for this day (artifact "
-        "of the manual run's execution order, not a MAKER-specific writer "
-        "bug -- see provenance note); production cron not yet capturing "
-        "this venue."
-    ),
-}
+DEFI_VENUE_MTDS_ADAPTER_VERIFIED_NOT_YET_SCHEDULED: dict[str, str] = {}
 
 
 # On-chain perpetual DEX venues that are DeFi by settlement (wallet-signed
