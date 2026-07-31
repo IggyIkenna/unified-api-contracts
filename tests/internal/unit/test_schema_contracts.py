@@ -287,6 +287,26 @@ def test_null_instrument_id_reports_extra_required_null() -> None:
     assert any(v.kind == "extra_required_null" and v.column == "instrument_id" for v in violations)
 
 
+def test_book_snapshot_5_thin_book_partial_depth_levels_are_valid() -> None:
+    """Regression for the deep-level nullable=False gap
+    (cefi_book_snapshot5_schema_contract_ts_event_levels_mismatch_2026_07_28.md
+    §"deep-level nullable gap", 2026-07-31): a real order book does not always
+    carry 5 resting levels on both sides -- an illiquid/thin pair legitimately
+    has Tardis emit NaN for the deeper levels at a given snapshot instant. This
+    must validate clean (zero violations), not FATAL-reject the whole shard."""
+    df = _df_cefi_perp_book_5()
+    # Only 2 of 5 bid levels populated, only 3 of 5 ask levels populated --
+    # deeper levels NaN, exactly the real Tardis wire shape for a thin book.
+    for level in range(2, 5):
+        df.loc[0, f"bids[{level}].price"] = float("nan")
+        df.loc[0, f"bids[{level}].amount"] = float("nan")
+    for level in range(3, 5):
+        df.loc[0, f"asks[{level}].price"] = float("nan")
+        df.loc[0, f"asks[{level}].amount"] = float("nan")
+    violations = validate_dataframe(df, CEFI_PERPETUAL_BOOK_SNAPSHOT_5)
+    assert violations == [], f"expected a thin book to validate clean, got {violations}"
+
+
 def test_wrong_dtype_on_price_reports_wrong_dtype() -> None:
     df = _df_cefi_perp_trades()
     df["price"] = pd.Series(["65000.0", "65001.0"], dtype="string")

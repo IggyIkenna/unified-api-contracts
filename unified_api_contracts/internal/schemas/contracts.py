@@ -232,12 +232,31 @@ CEFI_PERPETUAL_TRADES = SchemaContract(
 # levels_mismatch_2026_07_28.md). Replaces the aspirational single-string
 # ColumnSpec pair that was never implemented, exposed the moment validate=True
 # was flipped on for every CeFi Tardis write site (2026-07-27).
+#
+# nullable=True (corrected 2026-07-31, same issue doc, §"deep-level nullable
+# gap"): a real order book legitimately does not always carry 5 resting
+# levels on both sides -- illiquid/thin pairs (e.g. a newly-listed quote
+# asset) routinely have Tardis emit NaN for the deeper levels[2..4] at a
+# given snapshot instant. The ORIGINAL nullable=False (2026-07-28) rejected
+# every such thin-book row as a FATAL schema violation (raising before any
+# write), silently discarding real market data and re-failing continuously as
+# backfills work through low-liquidity symbol/date combinations -- confirmed
+# via direct reproduction against finalise_rows_and_path with a partial-depth
+# row. The write-time gate's job is to catch malformed writes (wrong dtype,
+# missing required columns), not to reject an honestly-thin book; the ONLY
+# real consumer already NaN-tolerates throughout (book_snapshot_adapter.py's
+# time-weighted stats mask on ~np.isnan). Mirrors the existing nullable=True
+# precedent for CEFI_PERPETUAL_DERIVATIVE_TICKER's funding_rate/open_interest/
+# mark_price/index_price -- another "legitimately absent per-row" numeric set.
 _BOOK_SNAPSHOT_5_LEVEL_COLUMNS = [
     ColumnSpec(
         name=f"{side}[{level}].{field}",
         dtype="float64",
-        nullable=False,
-        description=f"Level-{level} {side[:-1]} {field} (top-5 book_snapshot_5 depth).",
+        nullable=True,
+        description=(
+            f"Level-{level} {side[:-1]} {field} (top-5 book_snapshot_5 depth; "
+            f"absent/NaN when the book has fewer than {level + 1} levels on this side)."
+        ),
     )
     for side in ("bids", "asks")
     for level in range(5)
