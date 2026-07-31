@@ -296,6 +296,11 @@ DATA_TYPES_BY_ASSET_GROUP: dict[str, list[str]] = {
     ],
 }
 
+# @contract-surface — a removed asset_group key or a removed venue from a group's list
+# is a cross-repo contract break (downstream consumers, e.g. instruments-service
+# build_expected(), enumerate this dict to materialise the expected coverage universe —
+# plans/active/issues/breaking_change_differ_blind_to_registry_data_dicts_2026_07_09.md).
+# Adding a key/member stays non-breaking.
 # Venues per asset group
 VENUES_BY_ASSET_GROUP: dict[str, list[str]] = {
     "cefi": [
@@ -1712,6 +1717,12 @@ def valid_data_types_for_venue_instrument_type(
 # - A venue only supports a subset of its category's data types (e.g. ICE has ohlcv_24h only)
 # - A data type has a different start date per venue (e.g. TradFi venues)
 
+# @contract-surface — a removed venue key or a removed data_type from a venue's
+# capability entry is a cross-repo contract break (downstream consumers gate expected
+# coverage on this dict —
+# plans/active/issues/breaking_change_differ_blind_to_registry_data_dicts_2026_07_09.md).
+# Adding a key/data_type stays non-breaking; changing a start-date VALUE is not tracked
+# (an operational data update, not a structural removal).
 VENUE_DATA_TYPE_CAPABILITIES: dict[str, dict[str, str]] = {
     # ── CeFi — Tardis exchanges ──
     # Most CeFi venues support all cefi data types from their launch date.
@@ -2090,11 +2101,15 @@ VENUE_DATA_TYPE_CAPABILITIES: dict[str, dict[str, str]] = {
     # VENUES_BY_ASSET_GROUP, never this dict's keys directly).
     # YAHOO_FINANCE caps block removed 2026-07-15 — source-as-venue modeling error
     # (kept the SOURCE modeling in data_source_continuity.py / _tradfi.py capability).
-    # ── TradFi reference data venues (canonicalized 2026-05-23) ──
-    "POLYGON": {
-        "corporate_action_confirmed": "2020-01-01",
-        "earnings_result": "2020-01-01",
-    },
+    # POLYGON (the TradFi reference-data VENDOR, formerly-Polygon.io — NOT the DeFi chain
+    # of the same name) capability block REMOVED (found + fixed via the
+    # breaking_change_differ_blind_to_registry_data_dicts_2026_07_09.md cross-repo
+    # invariant): Polygon.io was removed as a tradfi source 2026-07-19
+    # (/codex/02-data/tradfi-databento-sourcing-ssot.md), but this entry — dated
+    # 2026-05-23, predating the removal — was never cleaned up. Same unreachable-dead-code
+    # class as the BARCHART removal above (VENUES_BY_ASSET_GROUP has no bare "POLYGON"
+    # tradfi/reference-data venue; expected-universe producers iterate
+    # VENUES_BY_ASSET_GROUP, never this dict's keys directly).
     # Corrected 2026-07-29 (scoping the FRED backfill invocation — see
     # macro_micro_econ_data_capture_audit_2026_06_05.md todo "Scope + build the
     # actual FRED backfill invocation"): the live FredAdapter.write_canonical_shard

@@ -563,11 +563,19 @@ class TestInstrumentKey:
         assert result["tardis_exchange"] == "coinbase"
         assert result["tardis_symbol"] == "BTC-USD"
 
-    def test_parse_for_tardis_unknown_venue(self) -> None:
+    def test_parse_for_tardis_okx_perpetual_aggregate(self) -> None:
+        """Bare "OKX" (the perpetual/futures/options aggregate venue, distinct from
+        OKX-SPOT since Option A, 2026-07-10) resolves to the "okex-swap" Tardis exchange
+        — NOT "okex" (the spot feed, which resolves to the distinct OKX-SPOT venue).
+        Fixed 2026-07-31: this test previously asserted the OLD, incorrect "okex" value
+        (a pre-existing data bug in _VENUE_TO_TARDIS surfaced while resolving
+        breaking_change_differ_blind_to_registry_data_dicts_2026_07_09.md todo (d) — see
+        system-integration-tests' test_venue_to_tardis_matches_inverted_venue_mapping).
+        """
         from unified_api_contracts.internal.reference.instrument_key import InstrumentKey
 
-        result = InstrumentKey.parse_for_tardis("OKX:SPOT:BTC-USDT")
-        assert result["tardis_exchange"] == "okex"
+        result = InstrumentKey.parse_for_tardis("OKX:PERPETUAL:BTC-USDT")
+        assert result["tardis_exchange"] == "okex-swap"
 
     def test_parse_for_tardis_completely_unknown_venue(self) -> None:
         from unified_api_contracts.internal.reference.instrument_key import InstrumentKey

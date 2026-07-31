@@ -25,7 +25,14 @@ _VENUE_TO_TARDIS: dict[str, str] = {
     "BINANCE-FUTURES": "binance-futures",
     "DERIBIT": "deribit",
     "BYBIT": "bybit",
-    "OKX": "okex",
+    # Bare "OKX" is the perpetual/futures/options AGGREGATE venue (Option A, 2026-07-10:
+    # OKX-SPOT split out as its own distinct venue) — its real Tardis feed is the swap
+    # (perpetual) exchange "okex-swap", which folds to "OKX" via CEFI_VENUE_FOLD, NOT
+    # "okex" (the spot feed, which resolves to the distinct "OKX-SPOT" venue). Fixed
+    # 2026-07-31 (breaking_change_differ_blind_to_registry_data_dicts_2026_07_09.md todo
+    # (d) — resolving system-integration-tests' test_venue_to_tardis_matches_inverted_
+    # venue_mapping strict=False xfail surfaced this genuine pre-existing data bug).
+    "OKX": "okex-swap",
     "UPBIT": "upbit",
     "COINBASE-SPOT": "coinbase",
 }
