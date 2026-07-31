@@ -505,6 +505,37 @@ def test_build_cross_venue_mapping_pairs_on_shared_af_fixture_id() -> None:
     assert row.canonical_event_id == "SPORTS_FIX::99001::MATCH"
     assert row.underlying is None
     assert row.strike is None
+    # The numeric af_fixture_id that drove the strong-key match must also land on the
+    # dedicated schema field, not just get embedded in the composite canonical_event_id
+    # string (fixture-pairing residual: previously computed then silently discarded).
+    assert row.api_football_fixture_id == 99001
+
+
+def test_build_cross_venue_mapping_fuzzy_pair_leaves_api_football_fixture_id_none() -> None:
+    """A pair matched via the FUZZY pairing_key (no af_fixture_id on either side) must NOT
+    fabricate an api_football_fixture_id — honest absence, no guessed value."""
+    expiry = datetime(2026, 6, 26, 23, 10, tzinfo=UTC)
+    kalshi = _kalshi(
+        market_ticker="KXMLBGAME-26JUN261910SEACLE-SEA",
+        event_ticker="KXMLBGAME-26JUN261910SEACLE",
+        title="Seattle vs Cleveland",
+        expiry=expiry,
+    )
+    poly = _polymarket(
+        condition_id="0xMLBSEACLE",
+        slug="mlb-sea-cle-2026-06-26",
+        expiry=expiry,
+    )
+    titles = {
+        "KXMLBGAME-26JUN261910SEACLE-SEA": "Seattle vs Cleveland",
+        "0xMLBSEACLE": "Seattle vs. Cleveland",
+    }
+    mappings = build_cross_venue_mapping([kalshi], [poly], titles=titles)
+
+    assert len(mappings) == 1
+    row = mappings[0]
+    assert row.canonical_event_id.startswith("SPORTS::")
+    assert row.api_football_fixture_id is None
 
 
 def test_build_cross_venue_mapping_different_af_fixture_id_is_no_pair() -> None:

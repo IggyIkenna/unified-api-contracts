@@ -537,11 +537,18 @@ def _build_mapping(kalshi: _Classified, poly: _Classified) -> PredictionMarketCr
     # markets nominally on the same strike may not be fungible when one is
     # path-dependent and the other is point-in-time.
     poly_path_dependent = bet_type in {PredictionBetType.PRICE_LEVEL, PredictionBetType.PRICE_RANGE}
+    # The strong sports key embeds af_fixture_id literally (`SPORTS_FIX::{id}::{bet_type}`),
+    # so a shared key means both sides' `record.af_fixture_id` are the SAME int — but that
+    # numeric id was previously computed only to build the key string, then discarded (never
+    # copied onto the dedicated schema field). Stamp it back for a consumer that wants the raw
+    # id (not just the composite canonical_event_id string) without re-parsing it.
+    af_fixture_id = kalshi.record.af_fixture_id if (kalshi.key or "").startswith("SPORTS_FIX::") else None
     return PredictionMarketCrossVenueMapping(
         canonical_event_id=kalshi.key or poly.canonical_event_id,
         category=_category_for_underlying(underlying),
         sub_category=underlying.value.lower(),
         underlying=None if is_sports else underlying.value,
+        api_football_fixture_id=af_fixture_id,
         polymarket_condition_id=poly.record.instrument_key,
         kalshi_event_ticker=kalshi.record.raw_symbol or None,
         kalshi_market_ticker=kalshi.record.instrument_key,
