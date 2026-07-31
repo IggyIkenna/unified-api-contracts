@@ -1,7 +1,8 @@
-"""DeFi scenario seeds — 6 :class:`ScenarioOverlay` instances.
+"""DeFi scenario seeds — 8 :class:`ScenarioOverlay` instances.
 
 Per Day-1 design fragments at
-``unified-trading-pm/plans/active/scratch_scenarios_day1/02..06+10*.md``.
+``unified-trading-pm/plans/active/scratch_scenarios_day1/02..06+10*.md``
++ ``16_lst_unstake_queue_blowup.md``.
 
 Primary archetype target: `carry_staked_basis` (Solana LST yield + deleverage
 path); `ARBITRAGE_PRICE_DISPERSION` is secondary for any DeFi-leg variants.
@@ -12,6 +13,20 @@ doesn't yet exist (e.g. `LENDING_POOL_UNAVAILABLE_SECONDS` ↦
 `LIQUIDATION_CASCADE_RISK`; `ORACLE_STALENESS_SECONDS` ↦
 `ORACLE_DEVIATION_BPS`). DR plan Phase 1.A/Phase 4 owns the breaker
 extensions per the cross-side ping at PM@3daea56a.
+
+`lst_unstake_queue_blowup` gap: the fragment's own PRIMARY mechanism is a
+per-LST `unstake_days_remaining` feature (needs a UAC
+`LST_WITHDRAWAL_THROUGHPUT_BASELINES` registry the fragment itself marks
+`DEFERRED-TO-PHASE-2-IMPL`) — modeled here via `LatencyInject` (added
+redemption delay), the same mutation type `defi_mempool_congestion_
+inclusion_delay` already uses for an analogous "added delay to a
+settlement/redemption pipeline" mechanism. `LENDING_POOL_UNAVAILABLE_SECONDS`
+substitutes for the fragment's undefined queue-lockup breaker (same
+"prevented from acting on this position" shape as its existing Aave/Morpho
+use). Only the 12 LST/LRT tokens confirmed in UAC's real
+`LST_TOKEN_TO_PROTOCOL_ASSET` registry are declared — the fragment's
+frxETH/sfrxETH (Frax), Sanctum LSTs, and LBTC (Lombard) aren't onboarded
+there yet, so they're omitted rather than invented.
 """
 
 from __future__ import annotations
@@ -329,6 +344,77 @@ DEFI_LST_DEPEG_STETH_5PCT = ScenarioOverlay(
 )
 
 
+# ---------------------------------------------------------------------------
+# defi_lst_unstake_queue_blowup — LST/LRT withdrawal queue duration spike
+# ---------------------------------------------------------------------------
+
+DEFI_LST_UNSTAKE_QUEUE_BLOWUP = ScenarioOverlay(
+    scenario_id="defi_lst_unstake_queue_blowup",
+    category=ScenarioCategory.VENUE_OUTAGE,
+    layer=ScenarioOverlayLayer.RAW_TICK,
+    asset_groups=frozenset({"defi"}),
+    applies_to=ScenarioApplicabilityFilter(
+        chains=frozenset({"ethereum", "solana"}),
+        instruments=frozenset(
+            {
+                "stETH",
+                "wstETH",
+                "weETH",
+                "rETH",
+                "ezETH",
+                "rsETH",
+                "mETH",
+                "ETHx",
+                "cbETH",
+                "osETH",
+                "jitoSOL",
+                "mSOL",
+            }
+        ),
+        archetypes=frozenset({"carry_staked_basis", "LEVERAGED_FUNDING_ARB"}),
+    ),
+    mutation_spec=LatencyInject(
+        added_latency_seconds=Decimal("2592000"),  # 30 days — hits the fragment's CRITICAL threshold
+        duration_seconds=86400,
+        recovery_curve="linear",
+    ),
+    expected_outcomes=(
+        ScenarioOutcomeAssertion(
+            archetype="carry_staked_basis",
+            category=OutcomeCategory.RISK_BREAKER_TRIPPED,
+            consequence=RiskRuleConsequence.BLOCK,
+            breaker_id=CircuitBreakerId.LENDING_POOL_UNAVAILABLE_SECONDS,
+            breaker_action=BreakerAction.BLOCK_NEW,
+            alert_codes=frozenset({AlertCode.CIRCUIT_BREAKER_OPEN}),
+            expected_within_seconds=90,
+        ),
+        ScenarioOutcomeAssertion(
+            archetype="LEVERAGED_FUNDING_ARB",
+            category=OutcomeCategory.ORDER_REJECTED,
+            consequence=RiskRuleConsequence.BLOCK,
+            breaker_id=CircuitBreakerId.LENDING_POOL_UNAVAILABLE_SECONDS,
+            breaker_action=BreakerAction.BLOCK_NEW,
+            alert_codes=frozenset({AlertCode.RISK_RULE_BLOCKED}),
+            expected_within_seconds=90,
+        ),
+    ),
+    description=(
+        "LST/LRT redemption window grows from days to weeks/months (Ethereum exit queue / "
+        "EigenLayer redelegation delay / Lido buffer drained); the staked leg becomes "
+        "involuntarily illiquid — new entries on this LST are blocked until the queue clears."
+    ),
+    real_world_referent=(
+        "Ethereum withdrawal queue 2024-07 mass-exit (~17d peak vs ~6d steady-state); "
+        "EigenLayer 2024-10 delegated-withdrawal delay raised 7d->14d; "
+        "Renzo ezETH 2024-04 no-native-redemption depeg; Solana jitoSOL/mSOL queue "
+        "stretch during 2024-Q1 MEV-bundle high-priority-fee windows."
+    ),
+    composes_with=frozenset(
+        {"defi_liquidity_drain_lending_pool", "defi_lst_depeg_steth_5pct", "defi_stablecoin_depeg"}
+    ),
+)
+
+
 SCENARIOS: Final[tuple[ScenarioOverlay, ...]] = (
     DEFI_CHAIN_RPC_OUTAGE_SOLANA,
     DEFI_LIQUIDITY_DRAIN_LENDING_POOL,
@@ -337,6 +423,7 @@ SCENARIOS: Final[tuple[ScenarioOverlay, ...]] = (
     DEFI_MEMPOOL_CONGESTION_INCLUSION_DELAY,
     DEFI_STABLECOIN_DEPEG,
     DEFI_LST_DEPEG_STETH_5PCT,
+    DEFI_LST_UNSTAKE_QUEUE_BLOWUP,
 )
 
 for _scenario in SCENARIOS:
