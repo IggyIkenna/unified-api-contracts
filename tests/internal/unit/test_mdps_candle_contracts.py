@@ -68,6 +68,22 @@ def test_tradfi_factory_skipped_1m_timeframe() -> None:
     assert "1m" not in MDPS_TIMEFRAMES_TRADFI_RE_AGGREGATED
 
 
+@pytest.mark.parametrize("instrument_type", ["future", "futures_chain", "combo", "UNKNOWN"])
+def test_tradfi_ohlcv_1s_registered(instrument_type: str) -> None:
+    """Databento ohlcv_1s pass-through must resolve for CME future/futures_chain/
+    combo/UNKNOWN, reusing the timeframe-agnostic TRADFI_FUTURE_OHLCV_1M schema.
+
+    Regression for dp_vm_gone_no_capture_mdps_tradfi_ohlcv_1s_missing_contract_2026_07_31:
+    a full-year tradfi backfill VM raised SchemaContractNotFoundError on every
+    ohlcv_1s file (and the 15m/1h/4h/24h candles derived from it), all year,
+    because this key was never registered.
+    """
+    contract = CONTRACT_REGISTRY[("tradfi", instrument_type, "ohlcv_1s")]
+    assert contract is TRADFI_FUTURE_OHLCV_1M
+    resolved = lookup_contract(asset_group="tradfi", instrument_type=instrument_type, data_type="ohlcv_1s")
+    assert resolved is TRADFI_FUTURE_OHLCV_1M
+
+
 # ---------------------------------------------------------------------------
 # CeFi matrix
 # ---------------------------------------------------------------------------

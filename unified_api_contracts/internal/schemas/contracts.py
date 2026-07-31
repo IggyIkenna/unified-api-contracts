@@ -1027,6 +1027,19 @@ CONTRACT_REGISTRY: dict[tuple[str, str, str], SchemaContract] = {
     ("tradfi", "futures_chain", "ohlcv_1m"): TRADFI_FUTURE_OHLCV_1M,
     ("tradfi", "combo", "ohlcv_1m"): TRADFI_FUTURE_OHLCV_1M,
     ("tradfi", "UNKNOWN", "ohlcv_1m"): TRADFI_FUTURE_OHLCV_1M,
+    # ohlcv_1s mirrors ohlcv_1m's column shape (open/high/low/close/volume are
+    # timeframe-agnostic) — only the timeframe partition differs, so the same
+    # TRADFI_FUTURE_OHLCV_1M contract is reused. Missing until 2026-07-31
+    # (dp_vm_gone_no_capture_mdps_tradfi_ohlcv_1s_missing_contract_2026_07_31.md):
+    # every CME future/futures_chain/combo ohlcv_1s file raised
+    # SchemaContractNotFoundError on every date of a full-year (2024) tradfi
+    # backfill VM, which cascaded to the 15m/1h/4h/24h candles derived FROM the
+    # 1s source (chain-bundle aggregation reads the same file), so the VM's
+    # entire ohlcv_1s-and-derived capture stayed at zero for the whole run.
+    ("tradfi", "future", "ohlcv_1s"): TRADFI_FUTURE_OHLCV_1M,
+    ("tradfi", "futures_chain", "ohlcv_1s"): TRADFI_FUTURE_OHLCV_1M,
+    ("tradfi", "combo", "ohlcv_1s"): TRADFI_FUTURE_OHLCV_1M,
+    ("tradfi", "UNKNOWN", "ohlcv_1s"): TRADFI_FUTURE_OHLCV_1M,
     # TradFi options_chain / futures_chain snapshot registered via
     # _snapshot_contracts side-effect import (see end of file).
     # DeFi
