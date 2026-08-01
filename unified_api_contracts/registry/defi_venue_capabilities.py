@@ -14,6 +14,8 @@ multi-chain expansion) + §3 (data_type axes).
 
 from __future__ import annotations
 
+from datetime import date
+
 DEFI_VENUE_DATA_TYPE_CAPABILITIES: dict[str, dict[str, str]] = {
     # ── DeFi — DEX protocols (dex_pool_swaps + dex_pool_state) ──
     "UNISWAP_V2-ETHEREUM": {"dex_pool_swaps": "2020-05-06", "dex_pool_state": "2020-05-06"},
@@ -387,4 +389,70 @@ DEFI_VENUE_DATA_TYPE_CAPABILITIES.update(
     {canonical: DEFI_VENUE_DATA_TYPE_CAPABILITIES[ghost] for canonical, ghost in _CANONICAL_ALIASES.items()}
 )
 
-__all__ = ["DEFI_VENUE_DATA_TYPE_CAPABILITIES"]
+
+# ---------------------------------------------------------------------------
+# DeFi expected_unattempted seeder — honest-coverage denominator
+# ---------------------------------------------------------------------------
+# A venue/data_type pair disposed "(b) exclude — data genuinely unobtainable"
+# (per defi_expected_unattempted_seeder_design_2026_07_26.md's Background section
+# disposition rule) is registered here. Empty today: the only per-venue judgment
+# call resolved so far — FLUID-ETHEREUM lending_indices — was disposed "(a) wire"
+# (the adapter exists and was wired into lending_indices_handler.py, not excluded),
+# per that plan's P0. A future disposed-exclude venue gets ONE entry here,
+# commented with the issue-doc/BLK citation that ruled it — this is the SINGLE
+# place a disposed-exclude venue is filtered out of the honest-coverage
+# denominator (see get_defi_declared_venues_for_data_type below), replacing the
+# scatter of independent per-handler `_DEFAULT_PROTOCOLS` lists this seeder exists
+# to fix.
+DEFI_VENUE_COLLECTIBILITY_EXCEPTIONS: dict[str, set[str]] = {}
+
+
+def get_defi_declared_venues_for_data_type(data_type: str, as_of: date) -> list[tuple[str, str]]:
+    """Return the honest-coverage denominator: every UAC-declared ``(venue, chain)``
+    pair that should carry a manifest row (captured, empty, failed, or
+    ``expected_unattempted``) for ``data_type`` as of ``as_of``.
+
+    Filters ``DEFI_VENUE_DATA_TYPE_CAPABILITIES`` keys to entries where:
+
+    1. ``DEFI_VENUE_PHASE[key] == "live"`` — the same IS-producible filter
+       ``market_data_categories.py`` already uses to build the producible venue
+       list (reused, not re-derived).
+    2. ``data_type`` is declared for ``key`` with a start_date ``<= as_of`` — a
+       venue whose capability hasn't started yet is honestly out of scope, not
+       "expected".
+    3. ``key`` is not in ``DEFI_VENUE_COLLECTIBILITY_EXCEPTIONS[data_type]`` — the
+       exclusion registry above; this is where a disposed-exclude venue is
+       stopped from ever entering the denominator.
+
+    Keys are split into ``(venue, chain)`` via ``parse_defi_venue`` — the SAME
+    parser ``sentinels.py`` already uses to split these ``"PROTOCOL-CHAIN"``
+    strings, not a hand-rolled split.
+    """
+    # Deferred imports (leaf helpers, avoid module-load-order coupling — this
+    # module is imported early by market_data_categories.py's DEFI merge block).
+    from unified_api_contracts.registry.capability_declarations._defi import (  # noqa: imports-inside-functions
+        parse_defi_venue,
+    )
+    from unified_api_contracts.registry.defi_venues import DEFI_VENUE_PHASE  # noqa: imports-inside-functions
+
+    as_of_str = as_of.isoformat()
+    excluded = DEFI_VENUE_COLLECTIBILITY_EXCEPTIONS.get(data_type, set())
+    declared: list[tuple[str, str]] = []
+    for key, capabilities in DEFI_VENUE_DATA_TYPE_CAPABILITIES.items():
+        if DEFI_VENUE_PHASE.get(key) != "live":
+            continue
+        start_date = capabilities.get(data_type)
+        if start_date is None or start_date > as_of_str:
+            continue
+        if key in excluded:
+            continue
+        protocol, chain = parse_defi_venue(key)
+        declared.append((protocol.upper(), chain))
+    return declared
+
+
+__all__ = [
+    "DEFI_VENUE_COLLECTIBILITY_EXCEPTIONS",
+    "DEFI_VENUE_DATA_TYPE_CAPABILITIES",
+    "get_defi_declared_venues_for_data_type",
+]

@@ -202,6 +202,10 @@ from .defi_reserve_params import (
     get_reserve_params,
     get_spark_reserve_params,
 )
+from .defi_venue_capabilities import (
+    DEFI_VENUE_COLLECTIBILITY_EXCEPTIONS,
+    get_defi_declared_venues_for_data_type,
+)
 from .defi_venues import (
     ALL_DEFI_VENUES,
     LEGACY_DEFI_VENUE_ALIASES,
@@ -776,6 +780,7 @@ __all__ = [
     "DEFI_MAJOR_ASSET_SYMBOLS",
     "DEFI_POOL_PAIRS",
     "DEFI_PROTOCOLS",
+    "DEFI_VENUE_COLLECTIBILITY_EXCEPTIONS",
     "DEFI_VENUE_LAUNCH_DATES",
     "DEFI_VENUE_TO_PROTOCOL",
     "DEPRECATED_DEFI_GHOST_VENUE_NAMES",
@@ -1125,6 +1130,7 @@ __all__ = [
     "get_coverage_windows",
     "get_data_types_for_protocol",
     "get_databento_symbols_for_venue",
+    "get_defi_declared_venues_for_data_type",
     "get_display_axes",
     "get_emode_category",
     "get_emode_params",
