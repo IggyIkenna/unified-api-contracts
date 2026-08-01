@@ -319,6 +319,20 @@ VENUE_TO_ADAPTER_KEY: dict[str, str] = {
     # path even without a subgraph_id. Explicit entry since the auto-gen loop
     # can't infer it. mtds_is_full_adapter_smoketest_findings_2026_07_07.md P1.
     "RADIANT-BSC": "radiant",
+    # AAVE-PLASMA (2026-08-01): flipped defi_venues.py's DEFI_VENUE_PHASE to
+    # "live" once lending_indices capture was verified end-to-end (18 rows,
+    # venue=AAVE_V3/chain=PLASMA in the manifest — see
+    # defi_plasma_chain_onboarding_gap_2026_07_26.md todo 3). This venue is
+    # genuinely an Aave V3 market (same protocol/adapter as every AAVE_V3-*
+    # venue), but its UAC venue CONSTANT is the bare "AAVE-PLASMA" form (set
+    # 2026-05-22, before real chain identity was resolved) rather than the
+    # "AAVE_V3-PLASMA" form the auto-gen loop below expects — so it can never
+    # be picked up by that loop's f"{prefix}-{chain}" pattern regardless of
+    # subgraph registration. Plasma also has no subgraph_id at all (RPC-only
+    # fallback, per the same doc's P2 scoping), so it wouldn't be included in
+    # get_supported_chains_for_protocol("aave_v3") even if the prefix matched.
+    # Explicit entry, same class of gap as RADIANT-BSC above.
+    "AAVE-PLASMA": "aave_v3",
     # Jupiter is execution-only (swap aggregator), not instrument discovery.
     # DEX perp venues (L2 + StarkNet + Solana clone)
     "LIGHTER-ZKSYNC": "lighter",

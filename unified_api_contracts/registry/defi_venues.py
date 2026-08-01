@@ -593,8 +593,11 @@ DEFI_VENUE_PHASE: dict[str, str] = {
     "ALCHEMY-ONCHAIN": "pipeline",
     "ALCHEMY-OPTIMISM": "pipeline",
     "ALCHEMY-POLYGON": "pipeline",
-    # ── Pipeline (Plasma chain variants — no MTDS tick data yet, added 2026-05-22) ──
-    "AAVE-PLASMA": "pipeline",
+    # AAVE-PLASMA: 2026-08-01 — flipped live. lending_indices capture verified end-to-end
+    # (manifest: venue=AAVE_V3/chain=PLASMA, 18 rows, capture_status=captured, date=2026-07-30
+    # — see defi_plasma_chain_onboarding_gap_2026_07_26.md todo 3). FLUID-PLASMA stays pipeline:
+    # its PROTOCOL_LAUNCH_DATES entry is still unconfirmed (same doc's P1 todo).
+    "AAVE-PLASMA": "live",
     "FLUID-PLASMA": "pipeline",
     # ── Live (Linea — IS-producible per _build_defi_venues()) ──
     "AAVE_V3-LINEA": "live",
