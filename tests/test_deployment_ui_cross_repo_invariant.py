@@ -263,29 +263,56 @@ def _all_contain(source_path: Path, needles: list[str]) -> list[str]:
 
 
 def test_deployment_ui_deployment_api_client_routes_stable() -> None:
-    """src/api/deploymentApi.ts references the deployment-api route paths it consumes.
+    """deployment-ui's API client modules still reference the deployment-api route
+    paths the dashboard depends on.
 
-    /api/services, /api/deployments, and /api/builds/ are the three primary API
-    surfaces the deployment UI's dashboard calls. If these path strings disappear from
-    deploymentApi.ts (drift from the deployment-api server routes), the dashboard
-    silently 404s on every service-status and deploy-history request.
+    /api/deployments and /api/builds/ are literal path strings in
+    src/api/deploymentApi.ts. /api/services is NOT a literal string anywhere in
+    deployment-ui — src/api/client.ts's getServices() (called by the useServices()
+    hook feeding ServiceDetails/ReadinessTab/DeployForm) builds it at runtime from a
+    shared ``API_BASE = "/api"`` constant plus a relative ``fetchJson("/services")``
+    call, so it is checked against client.ts using that convention instead of a
+    literal "/api/services" substring in deploymentApi.ts (deploymentApi.ts's own
+    fetchServices()/"/api/services" was deleted as dead code alongside its only
+    callers — 2 deleted pages — while client.ts's getServices() has always been the
+    live path; see deployment-ui@98e2c7a).
+
+    If any of these disappear (drift from the deployment-api server routes), the
+    dashboard silently 404s on every service-status / deploy-history request.
     """
     _skip_if_ui_absent()
 
     deployment_api_ts = _ui_root() / "src" / "api" / "deploymentApi.ts"
     assert deployment_api_ts.is_file(), (
         f"deployment-ui src/api/deploymentApi.ts missing at {deployment_api_ts}.\n\n"
-        "deploymentApi.ts is the primary deployment-api consumption client — "
-        "removing it drops all service-status, deploy-history, and VM observability."
+        "deploymentApi.ts is a deployment-api consumption client — "
+        "removing it drops build and deploy-history data from the dashboard."
     )
 
-    required = ["/api/services", "/api/deployments", "/api/builds/"]
+    required = ["/api/deployments", "/api/builds/"]
     missing = _all_contain(deployment_api_ts, required)
     assert not missing, (
         f"deployment-ui src/api/deploymentApi.ts is MISSING route references:\n"
         f"  {missing}\n\n"
-        "/api/services / /api/deployments / /api/builds/ are the deployment-api "
+        "/api/deployments / /api/builds/ are the deployment-api "
         "endpoints the dashboard depends on — drift here causes silent 404s."
+    )
+
+    client_ts = _ui_root() / "src" / "api" / "client.ts"
+    assert client_ts.is_file(), (
+        f"deployment-ui src/api/client.ts missing at {client_ts}.\n\n"
+        "client.ts's getServices() serves the dashboard's /api/services call — "
+        "removing it drops the services overview from the deployment console."
+    )
+
+    services_wiring = ['API_BASE = "/api"', '"/services"']
+    services_missing = _all_contain(client_ts, services_wiring)
+    assert not services_missing, (
+        f"deployment-ui src/api/client.ts is MISSING /api/services route wiring:\n"
+        f"  {services_missing}\n\n"
+        "client.ts's getServices() builds /api/services from the API_BASE constant "
+        "plus a relative fetchJson('/services') call — drift here silently 404s the "
+        "dashboard's services overview."
     )
 
 
