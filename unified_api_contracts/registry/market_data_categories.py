@@ -924,6 +924,20 @@ NEEDS_CANDLE_PROCESSING: dict[str, bool] = {
     # DeFi — candle-sampled types need processing; pass-through types do not
     "dex_pool_state": False,
     "dex_pool_swaps": True,
+    # swaps_ohlcv_{15s,1m,5m,15m,1h,4h,1d} — these ARE the MDPS candle-adapter
+    # OUTPUT of "dex_pool_swaps" above (DefiSwapAdapter), not a raw input that
+    # itself needs further candle processing — False, same reasoning as
+    # dex_pool_state. No candle adapter is registered for these output keys
+    # (would be circular); the omitted-key default of True would otherwise
+    # route them to a non-existent adapter (test_defi_data_type_has_explicit_
+    # candle_classification enforces this explicitly for every defi data_type).
+    "swaps_ohlcv_15s": False,
+    "swaps_ohlcv_1m": False,
+    "swaps_ohlcv_5m": False,
+    "swaps_ohlcv_15m": False,
+    "swaps_ohlcv_1h": False,
+    "swaps_ohlcv_4h": False,
+    "swaps_ohlcv_1d": False,
     # Bypass — periodic supply/borrow-index snapshot read raw by features-onchain
     # (aave_lending_rates / aave_utilization); no lending_ohlcv consumer exists.
     # Same class as oracle_prices / lst_rates. Do NOT re-enable without a real
