@@ -235,6 +235,28 @@ DATA_TYPES_BY_ASSET_GROUP: dict[str, list[str]] = {
         "flash_loan_availability",  # Available flash-loan liquidity (Morpho historicalState)
         "vault_apy",  # ERC-4626 vault APY (Yearn/Beefy/Pendle/Convex/Idle)
         "vault_tvl",  # ERC-4626 vault TVL (same adapters as vault_apy)
+        # ── MDPS Phase-5b.1 processed-candle data_types (2026-08-02) ──
+        # DefiSwapAdapter-produced OHLCV candles derived from dex_pool_swaps raw
+        # ticks, co-located under processed_candles/ (see
+        # internal/schemas/_candle_contracts.py). Mirrors the analogous cefi
+        # "ohlcv_1m"/tradfi "ohlcv_1s" MDPS candle keys already present in their
+        # own asset_group lists above. instruments-service's
+        # enumerate_expected_universe.py excludes these from the MTDS raw-tick
+        # manifest's expected-universe seeding via a dedicated
+        # _DEFI_MTDS_TICK_MANIFEST_EXCLUDED_DATA_TYPES guard (mirroring the
+        # tradfi corporate_action_confirmed/earnings_result exclusion) — the
+        # real capture pipeline for these 7 keys is MDPS, not MTDS, so seeding
+        # them into the MTDS tick manifest without that guard would create a
+        # permanently-unsatisfiable expected_unattempted/attempted_failed cell.
+        # See unified-trading-pm/plans/active/issues/
+        # defi_swaps_ohlcv_candle_data_types_axis_gap_2026_07_22.md.
+        "swaps_ohlcv_15s",
+        "swaps_ohlcv_1m",
+        "swaps_ohlcv_5m",
+        "swaps_ohlcv_15m",
+        "swaps_ohlcv_1h",
+        "swaps_ohlcv_4h",
+        "swaps_ohlcv_1d",
     ],
     "sports": [
         "odds",  # Raw bookmaker odds from Odds API (MTDS raw tick data)
