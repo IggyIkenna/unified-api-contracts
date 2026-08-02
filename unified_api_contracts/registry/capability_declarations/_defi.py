@@ -340,6 +340,12 @@ _YIELD = [_IT.YIELD_BEARING.value]
 _STAKING = [_IT.STAKING.value]
 _PERPS = [_IT.PERPETUAL.value, _IT.SPOT_PAIR.value]
 _RESTAKING = [_IT.SPOT_ASSET.value]
+# LST — ankr/stader/stakewise/swell/mantle below are the first
+# PROTOCOL_CAPABILITIES entries to use this; lst_rates_handler.py's
+# write_grouped_lst_rows / _lst_rates_write.py genuinely stamp
+# instrument_type="lst" for them (verified directly, not assumed — see
+# defi_six_lst_vault_venues_missing_protocol_capabilities_2026_07_31.md).
+_LST = [_IT.LST.value]
 
 # Data type groups
 #
@@ -699,6 +705,70 @@ PROTOCOL_CAPABILITIES: dict[str, _ProtocolCapability] = {
         data_types=[*_YIELD_DATA],
         mtds_operations=["collect-lst-rates", "collect-oracle-prices"],
         required_tokens=frozenset({"USDE", "SUSDE"}),
+    ),
+    # ── Newly-live LST/vault venues (defi_venue_pipeline_to_live_ao_build_2026_07_30
+    # phase flip) — declared here so Layer-1 honest-coverage EXPECTED stops
+    # silently excluding them (defi_six_lst_vault_venues_missing_protocol_
+    # capabilities_2026_07_31.md). Ground truth verified directly against the
+    # actual MTDS writers, not copy-pasted from an existing entry's shape
+    # (PUFFER's own entry is a KNOWN declared-vs-actual mismatch — see that
+    # issue doc's P3 follow-up todo):
+    #   ankr/stader/stakewise/swell/mantle: lst_rates_handler.py's
+    #   write_grouped_lst_rows / _lst_rates_write.py stamp
+    #   instrument_type="lst", data_type="lst_rates" for these 5 (token→
+    #   protocol map in lst_rates_handler.py::_token_to_protocol: ankrETH→ankr,
+    #   ETHx→stader, osETH→stakewise, swETH→swell, mETH→mantle). Declaring
+    #   ONLY the verified-captured data_type (not oracle_prices, unlike
+    #   lido/etherfi/ethena above) to avoid manufacturing new stray/missing
+    #   Layer-1 tuples for a data_type these venues don't actually produce.
+    "ankr": _ProtocolCapability(
+        venue_prefix="ANKR",
+        protocol_class=ProtocolClass.STAKING,
+        instrument_types=_LST,
+        data_types=["lst_rates"],
+        mtds_operations=["collect-lst-rates"],
+    ),
+    "stader": _ProtocolCapability(
+        venue_prefix="STADER",
+        protocol_class=ProtocolClass.STAKING,
+        instrument_types=_LST,
+        data_types=["lst_rates"],
+        mtds_operations=["collect-lst-rates"],
+    ),
+    "stakewise": _ProtocolCapability(
+        venue_prefix="STAKEWISE",
+        protocol_class=ProtocolClass.STAKING,
+        instrument_types=_LST,
+        data_types=["lst_rates"],
+        mtds_operations=["collect-lst-rates"],
+    ),
+    "swell": _ProtocolCapability(
+        venue_prefix="SWELL",
+        protocol_class=ProtocolClass.STAKING,
+        instrument_types=_LST,
+        data_types=["lst_rates"],
+        mtds_operations=["collect-lst-rates"],
+    ),
+    "mantle": _ProtocolCapability(
+        venue_prefix="MANTLE",
+        protocol_class=ProtocolClass.STAKING,
+        instrument_types=_LST,
+        data_types=["lst_rates"],
+        mtds_operations=["collect-lst-rates"],
+    ),
+    # maker: sDAI (MakerDAO DSR) is an ERC-4626 vault, not a validator-staking
+    # LST — vault_share_price_handler.py is the current production writer
+    # (instrument_type=YIELD_BEARING, data_type="vault_share_price"; sDAI was
+    # REMOVED from lst_rates_handler.py's _EVM_LST_ABI_METADATA 2026-07-23,
+    # see that file's inline comment — a genuinely duplicate read of the same
+    # convertToAssets() call, this handler is the sole owner going forward).
+    "maker": _ProtocolCapability(
+        venue_prefix="MAKER",
+        protocol_class=ProtocolClass.YIELD,
+        instrument_types=_YIELD,
+        data_types=["vault_share_price"],
+        mtds_operations=["collect-vault-share-price"],
+        required_tokens=frozenset({"MKR", "DAI"}),
     ),
     "eigenlayer": _ProtocolCapability(
         venue_prefix="EIGENLAYER",
