@@ -22,10 +22,11 @@ class TestAllLeagueEntities:
     regardless of league. FIXTURE_STATS (game results) / FIXTURE_LINEUPS joined
     this set 2026-07-28 (operator ruling) — results and lineups are needed
     across the full curated universe, not just MVP/prediction scope, same as
-    INJURIES."""
+    INJURIES. MATCHES LEFT this set 2026-08-03 — see
+    ``TestFootystatsSubscriptionScopedCoverage`` below."""
 
     @pytest.mark.parametrize(
-        "entity", ["FIXTURES", "TEAMS", "STANDINGS", "INJURIES", "MATCHES", "FIXTURE_STATS", "FIXTURE_LINEUPS"]
+        "entity", ["FIXTURES", "TEAMS", "STANDINGS", "INJURIES", "FIXTURE_STATS", "FIXTURE_LINEUPS"]
     )
     def test_none_means_all_leagues_covered(self, entity: str) -> None:
         assert get_entity_league_coverage(entity) is None
@@ -106,3 +107,58 @@ class TestUnderstatXgLeagueScopedCoverage:
     def test_xg_covers_only_the_big5(self) -> None:
         cov = get_entity_league_coverage("XG")
         assert cov == frozenset({"EPL", "LA_LIGA", "BUNDESLIGA", "SERIE_A", "LIGUE_1"})
+
+
+class TestFootystatsSubscriptionScopedCoverage:
+    """MATCHES/PREDICTIONS/ODDS coverage is subscription-scoped
+    (``_FOOTYSTATS_LEAGUE_COVERAGE``), NOT ``None`` (all leagues) — fix for the
+    structural blind spot in
+    footystats_matches_predictions_odds_pending_fetch_universe_expansion_2026_07_27.md's
+    [CODE] P2 follow-up. Before this fix the enumerator had NO footystats
+    subscription gate at all: MATCHES/PREDICTIONS mapped to ``None`` and ODDS
+    wasn't even a key, so it kept seeding fresh ``expected_unattempted`` rows
+    for PRED_NO_FOOTYSTATS leagues forever, regardless of the fetch-loop
+    write-gate or how many times the non-covered-league typing scripts were
+    re-applied (their covered-league check is purely historical-capture-based
+    and can never un-cover a league contaminated by even one pre-write-gate
+    incidental captured row). Mirrors ``TestUnderstatXgLeagueScopedCoverage``
+    above — the same shared (entity -> league allow-list) mechanism, a
+    different source."""
+
+    @pytest.mark.parametrize("entity", ["MATCHES", "PREDICTIONS", "ODDS"])
+    def test_returns_a_frozenset_not_none(self, entity: str) -> None:
+        cov = get_entity_league_coverage(entity)
+        assert cov is not None
+        assert isinstance(cov, frozenset)
+
+    @pytest.mark.parametrize("entity", ["MATCHES", "PREDICTIONS", "ODDS"])
+    def test_major_covered_league_included(self, entity: str) -> None:
+        cov = get_entity_league_coverage(entity)
+        assert cov is not None
+        assert "EPL" in cov
+
+    @pytest.mark.parametrize("entity", ["MATCHES", "PREDICTIONS", "ODDS"])
+    @pytest.mark.parametrize("league_id", ["CHILE_PRIMERA", "K_LEAGUE_1", "LIGA_MX", "ARGENTINA_PRIMERA"])
+    def test_pred_no_footystats_leagues_excluded(self, entity: str, league_id: str) -> None:
+        """The exact 4 leagues diagnosed as contaminating the non-covered-league
+        typing scripts' historical-capture-based covered-league check must be
+        excluded from the enumerator's own denominator too — the fix closes
+        the gap at its source (the seeder), not just the typing-script symptom."""
+        cov = get_entity_league_coverage(entity)
+        assert cov is not None
+        assert league_id not in cov
+
+    def test_matches_the_fetch_loop_write_gate_denominator(self) -> None:
+        """MATCHES/PREDICTIONS/ODDS must all share the IDENTICAL denominator
+        the fetch-loop write-gate already uses
+        (instruments-service/engine/orchestrator/footystats.py's
+        ``get_expected_leagues_for_source("footystats", classifications=
+        ["Prediction", "Features"])``) — not three independently-drifting sets."""
+        from unified_api_contracts.canonical.domain.sports.league_data import get_expected_leagues_for_source
+
+        expected = frozenset(
+            lg.league_id
+            for lg in get_expected_leagues_for_source("footystats", classifications=["Prediction", "Features"])
+        )
+        for entity in ("MATCHES", "PREDICTIONS", "ODDS"):
+            assert get_entity_league_coverage(entity) == expected
