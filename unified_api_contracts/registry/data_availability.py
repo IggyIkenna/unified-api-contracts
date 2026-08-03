@@ -320,14 +320,6 @@ VENUE_DATA_AVAILABILITY: dict[str, ProviderDataAvailability] = {
         is_t_plus_one=False,
         notes="Federal Reserve Economic Data; updated on release schedule",
     ),
-    "POLYGON": ProviderDataAvailability(
-        venue_name="POLYGON",
-        asset_group="tradfi",
-        availability_lag_hours=0.0,
-        available_after_utc_hour=None,
-        is_t_plus_one=False,
-        notes="Real-time + historical equities/options data",
-    ),
 }
 
 # ---------------------------------------------------------------------------
