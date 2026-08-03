@@ -19,6 +19,13 @@ GCS layout (by date partition):
 Flat path (no by_date partition):
     sports_reference/{folder}/{folder}.parquet
         ↑ singletons like VENUES that don't change daily
+
+Flat-per-season path (no by_date partition, season-keyed):
+    sports_reference/{folder}/season={S}/{folder}.parquet
+        ↑ season-keyed snapshots like TEAMS_SEASON_SNAPSHOT — genuinely
+          season-keyed data (not date-keyed), so it does not fit the
+          per-day-per-league layout without inventing a fake day=/league=
+          label. See TEAMS_SEASON_SNAPSHOT below.
 """
 
 from __future__ import annotations
@@ -26,6 +33,21 @@ from __future__ import annotations
 from enum import StrEnum
 
 from .fixture_lifecycle import FIXTURES_OUTCOMES, FIXTURES_SCHEDULE
+
+# ---------------------------------------------------------------------------
+# TEAMS_SEASON_SNAPSHOT — additive data_type (2026-08-03)
+# ---------------------------------------------------------------------------
+TEAMS_SEASON_SNAPSHOT: str = "TEAMS_SEASON_SNAPSHOT"
+"""Canonical data_type for the season-keyed team x venue snapshot folded from
+the legacy ``day=all/entity=teams`` archive. Distinct from the routine daily
+``"TEAMS"`` data_type (``PER_DAY_PER_LEAGUE``) — this one is genuinely
+season-keyed (22,241 unique ``(team_id, season)`` pairs, seasons 2019-2025),
+so it gets its own ``FLAT_PER_SEASON`` layout instead of a fake
+``day=``/``league=`` label forced onto rows that have neither.
+
+Ruled 2026-07-28 (Option A of the sub-decision):
+``sports_day_all_teams_venues_fold_key_scheme_mismatch_2026_07_25.md``.
+"""
 
 # ---------------------------------------------------------------------------
 # data_type → entity folder mapping
@@ -55,6 +77,14 @@ SPORTS_DATA_TYPE_TO_FOLDER: dict[str, str] = {
     "LEAGUES": "leagues",
     "TEAMS": "teams",
     "VENUES": "venues",
+    # 2026-08-03: season-keyed TEAMS archive, distinct from the routine daily
+    # "TEAMS" data_type above (PER_DAY_PER_LEAGUE). Folded from the legacy
+    # day=all/entity=teams snapshot (30,069 rows, seasons 2019-2025) — see
+    # sports_day_all_teams_venues_fold_key_scheme_mismatch_2026_07_25.md.
+    # Shares the "teams" folder name with the daily data_type; the two never
+    # collide on disk because their layouts (FLAT_PER_SEASON vs
+    # PER_DAY_PER_LEAGUE) produce disjoint path shapes.
+    TEAMS_SEASON_SNAPSHOT: "teams",
     # footystats
     "MATCHES": "footystats_matches",
     "ODDS": "footystats_odds",
@@ -109,6 +139,11 @@ class SportsPathLayout(StrEnum):
     FLAT = "flat"
     """``sports_reference/{F}/{F}.parquet`` — singleton, not partitioned by date."""
 
+    FLAT_PER_SEASON = "flat_per_season"
+    """``sports_reference/{F}/season={S}/{F}.parquet`` — singleton per season, not
+    partitioned by date. Used by ``TEAMS_SEASON_SNAPSHOT`` (a genuinely
+    season-keyed snapshot, not a daily capture)."""
+
 
 # Default layout per data_type. When ``BOTH`` is needed (per-league + bare
 # path probed) callers should request ``candidate_parquet_paths`` which
@@ -151,6 +186,8 @@ SPORTS_DATA_TYPE_LAYOUT: dict[str, SportsPathLayout] = {
     "LEAGUES": SportsPathLayout.PER_DAY_BARE,
     # Flat (singleton)
     "VENUES": SportsPathLayout.FLAT,
+    # Flat, season-keyed (singleton per season) — see TEAMS_SEASON_SNAPSHOT above.
+    TEAMS_SEASON_SNAPSHOT: SportsPathLayout.FLAT_PER_SEASON,
 }
 
 
@@ -213,15 +250,15 @@ def candidate_parquet_paths(
             returned (typically a phantom). Informational only for
             ``PER_DAY_PER_SEASON`` (league filtering happens intra-file).
         season: Explicit season (e.g. ``"2024"``) for
-            ``PER_DAY_PER_SEASON`` data_types. When ``None`` the function
-            returns paths for ``[year-1, year, year+1]`` to cover transfer-
-            window overlap where multiple seasons co-exist on the same day.
-            Ignored for other layouts.
+            ``PER_DAY_PER_SEASON``/``FLAT_PER_SEASON`` data_types. When
+            ``None`` the function returns paths for ``[year-1, year, year+1]``
+            (derived from ``day``) to cover transfer-window overlap where
+            multiple seasons co-exist. Ignored for other layouts.
         pipeline_mode: When provided, the pipeline_mode-aware canonical path
             ``sports_reference/by_date/day={D}/pipeline_mode={mode}/entity=...``
             is prepended as the first probe (Phase 5.3 migration fallback
             chain). Default ``None`` skips the canonical level (back-compat).
-            Ignored for ``FLAT`` layout (no date partition).
+            Ignored for ``FLAT``/``FLAT_PER_SEASON`` layouts (no date partition).
 
     Returns:
         List of GCS paths (relative to bucket). Empty if data_type unknown.
@@ -234,6 +271,21 @@ def candidate_parquet_paths(
     paths: list[str] = []
     if layout == SportsPathLayout.FLAT:
         paths.append(f"{SPORTS_FLAT_PREFIX}{folder}/{folder}.parquet")
+        return paths
+
+    if layout == SportsPathLayout.FLAT_PER_SEASON:
+        if season:
+            paths.append(f"{SPORTS_FLAT_PREFIX}{folder}/season={season}/{folder}.parquet")
+        else:
+            # No explicit season: probe a [year-1, year, year+1] window derived
+            # from `day` (mirrors PER_DAY_PER_SEASON's fallback) — `day` itself
+            # is not part of this layout's path, only used as a year hint.
+            try:
+                year = int(day[:4])
+            except (ValueError, TypeError):
+                year = 0
+            for s in (str(year - 1), str(year), str(year + 1)):
+                paths.append(f"{SPORTS_FLAT_PREFIX}{folder}/season={s}/{folder}.parquet")
         return paths
 
     base = f"{SPORTS_BY_DATE_PREFIX}day={day}/entity={folder}"
@@ -381,6 +433,7 @@ __all__ = [
     "SPORTS_DATA_TYPE_LAYOUT",
     "SPORTS_DATA_TYPE_TO_FOLDER",
     "SPORTS_FLAT_PREFIX",
+    "TEAMS_SEASON_SNAPSHOT",
     "SportsPathLayout",
     "candidate_parquet_paths",
     "candidate_parquet_uris",

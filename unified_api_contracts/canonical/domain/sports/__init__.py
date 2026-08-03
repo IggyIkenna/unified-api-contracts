@@ -70,6 +70,7 @@ from .fixture_status import MatchStatus as MatchStatus
 from .gcs_paths import SPORTS_BUCKET_TEMPLATE as SPORTS_BUCKET_TEMPLATE
 from .gcs_paths import SPORTS_DATA_TYPE_LAYOUT as SPORTS_DATA_TYPE_LAYOUT
 from .gcs_paths import SPORTS_DATA_TYPE_TO_FOLDER as SPORTS_DATA_TYPE_TO_FOLDER
+from .gcs_paths import TEAMS_SEASON_SNAPSHOT as TEAMS_SEASON_SNAPSHOT
 from .gcs_paths import SportsPathLayout as SportsPathLayout
 from .gcs_paths import candidate_parquet_paths as candidate_parquet_paths
 from .gcs_paths import candidate_parquet_uris as candidate_parquet_uris

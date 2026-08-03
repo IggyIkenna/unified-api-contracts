@@ -509,6 +509,29 @@ class EmptyConfirmedReason(StrEnum):
     SOURCE_RETURNED_ZERO = "SOURCE_RETURNED_ZERO"
     """We expected data, the source returned 200+empty. Distinct from EXPECTED_* — this is data-side honest absence."""
 
+    STRATEGY_ENGINE_RETURNED_ZERO = "STRATEGY_ENGINE_RETURNED_ZERO"
+    """A strategy engine ran its own signal-generation compute (no external fetch involved -- the
+    strategy engine itself IS the source) and legitimately produced zero instructions for a
+    ``(client_id, strategy_id, day)`` -- a hold-day decision, not a pipeline gap. Sibling of
+    ``SOURCE_RETURNED_ZERO`` (post-fetch data-side honest absence) but for an internally-computed
+    decision instead of an external fetch: :class:`FetchEvidence`'s proof-of-honest-absence gate is
+    HTTP-fetch-shaped ("Threaded from the adapter HTTP layer") and does not apply here -- there is no
+    HTTP response to prove, so this reason is EXEMPT from that gate (the writer only requires
+    ``FetchEvidence`` when ``reason == SOURCE_RETURNED_ZERO`` literally). WITHIN the honest-coverage
+    window (deliberately NOT a member of ``OUT_OF_COVERAGE_WINDOW_REASONS``): the strategy DID run
+    and DID consider the day, so the cell should count normally in coverage denominators, same as any
+    other attempted-and-resolved shard.
+
+    Used by: ``strategy-service`` ``batch_results.py::write_instructions_to_gcs`` for the
+    ``strategy_instructions`` data_type's "Always write instructions -- even empty. This is the
+    heartbeat from strategy to execution" design (every batch run writes a 0-row parquet on a
+    hold day, same as a real-signal day). Distinct from every ``EXPECTED_*`` calendar/coverage-window
+    primitive (this is not "we didn't attempt because of a known scope boundary" -- the engine DID
+    run, and DID decide).
+
+    Plan: ``ml_strategy_manifest_coverage_gap_2026_08_03.md`` todo 2 (operator ruling 2026-08-03:
+    option A -- new taxonomy member, closed-set one-reason-per-distinct-semantic pattern)."""
+
     NO_INPUT_AVAILABLE = "NO_INPUT_AVAILABLE"
     """Downstream feature or model computation skipped because an upstream input had
     ``attempted_failed`` status in the availability manifest. Distinct from

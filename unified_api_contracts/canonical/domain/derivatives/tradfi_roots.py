@@ -506,6 +506,173 @@ def get_roots_by_category(category: str) -> list[str]:
     return [r for r, m in TRADFI_ROOTS.items() if m.category == category]
 
 
+# ---------------------------------------------------------------------------
+# Reverse lookup: manifest-captured spelled-out underlying name -> short root
+# code (issue: tradfi_combo_underlying_naming_mismatch_blocks_g1_enum_present_
+# rollup_2026_07_28.md). TradFi COMBO/futures_chain/options_chain captures in
+# the market-tick-data manifest sometimes carry a SPELLED-OUT underlying value
+# ("HEATING-OIL", "PLATINUM") instead of the catalog's short root-code
+# convention ("HO", "PL") this registry uses. This is the query-time
+# reconciliation half (direction 2 of the issue's two candidate directions);
+# the writer-side normalization (direction 1, MTDS `venue_fetch.py`/
+# `manifest_finalize.py`) is a separate follow-up.
+# ---------------------------------------------------------------------------
+
+
+def _normalize_underlying_name(name: str) -> str:
+    """Fold a spelled-out underlying string to one comparable form.
+
+    Uppercases and collapses hyphens/spaces/underscores to a single ``_``
+    separator so ``"HEATING-OIL"``, ``"HEATING_OIL"``, and ``"Heating Oil"``
+    all fold to the same key. No fuzzy matching — this is a pure, deterministic
+    string fold; anything it doesn't line up with is a real near-miss handled
+    (or knowingly left unresolved) via ``_MANIFEST_UNDERLYING_ALIASES`` below.
+    """
+    folded = name.strip().upper()
+    for sep in ("-", " "):
+        folded = folded.replace(sep, "_")
+    while "__" in folded:
+        folded = folded.replace("__", "_")
+    return folded.strip("_")
+
+
+def _build_underlying_name_to_root_index() -> dict[str, str]:
+    """Build the ``RootMetadata.underlying`` (normalized) -> ``root`` index.
+
+    Built once at import time — never rebuilt per call.
+
+    Only "primary" roots participate as index VALUES (a name should reverse-
+    resolve to the one product root a combo/futures_chain/options_chain
+    capture actually means, not to an arbitrary variant sharing the same
+    underlying):
+
+    - micro contracts (``parent_root is not None``, e.g. MES/MBT/MET) are
+      skipped — a spelled underlying name resolves to the full-size root.
+    - options sub-series (``options_parent is not None``, e.g. EW/EW1/E1A)
+      are skipped — resolves to the underlying future root, not the option
+      cluster root.
+    - event contracts (``CATEGORY_EVENT_CONTRACT``, e.g. ECGC/ECCL) are
+      skipped — same underlying as the plain future root; resolves there.
+
+    Where a genuine ambiguity survives this filter (e.g. "VIX" is the
+    ``underlying`` of both the VX future and the VIX spot-index root), the
+    first-declared root in ``TRADFI_ROOTS`` insertion order wins and later
+    duplicates are dropped — deterministic, not arbitrary.
+    """
+    index: dict[str, str] = {}
+    for root, meta in TRADFI_ROOTS.items():
+        if meta.parent_root is not None:
+            continue
+        if meta.options_parent is not None:
+            continue
+        if meta.category == CATEGORY_EVENT_CONTRACT:
+            continue
+        key = _normalize_underlying_name(meta.underlying)
+        if key not in index:
+            index[key] = root
+    return index
+
+
+_UNDERLYING_NAME_TO_ROOT: dict[str, str] = _build_underlying_name_to_root_index()
+
+
+# Real manifest `underlying` spellings that do NOT fold cleanly onto a
+# TRADFI_ROOTS `underlying` value even after normalization — each verified via
+# a direct probe of the live prod market-data-tick-tradfi manifest's
+# `_index/availability_index.parquet` (bucket via resolve_bucket_name()),
+# `instrument_type` in {COMBO, combo}, 2026-07-28; row counts are the
+# distinct-value counts seen in that probe, not estimates). Exact + documented,
+# not fuzzy-derived — this is a data-correctness-sensitive lookup.
+#
+# NOT included here (left to correctly resolve to None — honest absence, not
+# a single-root concept): composite/spread values that name TWO roots at once
+# (e.g. "WTI-BZ", "WTI-MCL", "NKD-NIY", "LIVE-CATTLE-LEAN-HOG", "WHEAT-CORN",
+# "RBOB-GAS-HEATING-OIL") and the ~1,200 distinct calendar/butterfly spread
+# *type* codes ("GN", "VT", "12", "3W", "CFO", "IB", ...) and raw composite
+# ICE instrument-id strings (e.g. "ICE:COMBO:G   FMV0025_Z") that leak into
+# the manifest's `underlying` column for a subset of ICE combo rows — these
+# are a distinct writer-side data-quality residual, not a naming-convention
+# near-miss this alias table can honestly resolve to one root.
+_MANIFEST_UNDERLYING_ALIASES: dict[str, str] = {
+    # NatGas family: registry key "NG" has underlying="NATGAS"; the manifest
+    # carries the Henry-Hub hub/contract-type qualifier as a suffix.
+    "NAT-GAS": "NG",  # 3,291 rows
+    "NAT-GAS-HH": "NG",  # 3,288 rows (Henry Hub)
+    "NAT-GAS-MNG": "NG",  # 1,354 rows (Henry Hub Last-Day Financial "MNG")
+    "NAT-GAS-QG": "NG",  # 1,252 rows (Henry Hub Penultimate "QG")
+    "NAT-GAS-NN": "NG",  # 16 rows
+    # RBOB gasoline: registry "RB" underlying="GASOLINE"; manifest uses the
+    # RBOB acronym instead.
+    "RBOB-GAS": "RB",  # 3,189 rows
+    # Livestock: registry underlying values are single-word/no-separator
+    # ("LIVECATTLE", "LEANHOGS"); manifest hyphenates and (for hogs) drops the
+    # plural "S".
+    "LIVE-CATTLE": "LE",  # 3,247 rows
+    "LEAN-HOG": "HE",  # 3,245 rows
+    # Soy family: registry underlying values are full compound words
+    # ("SOYBEANS", "SOYBEAN_OIL", "SOYBEAN_MEAL"); manifest abbreviates.
+    "SOYBEAN": "ZS",  # 2,931 rows (registry: "SOYBEANS", plural)
+    "SOYOIL": "ZL",  # 3,049 rows (registry: "SOYBEAN_OIL")
+    "SOYMEAL": "ZM",  # 3,052 rows (registry: "SOYBEAN_MEAL")
+    # US Treasuries: registry underlying values are "TREASURY_<tenor>"; the
+    # manifest uses the "UST-<tenor>" convention instead.
+    "UST-10Y": "ZN",  # 2,993 rows
+    "UST-30Y": "ZB",  # 2,922 rows
+    "UST-5Y": "ZF",  # 2,730 rows
+    "UST-2Y": "ZT",  # 2,618 rows
+    # FX futures: registry underlying values are the bare currency code
+    # ("EUR", "GBP", ...); the manifest uses the currency-PAIR convention
+    # against USD instead.
+    "EURUSD": "6E",  # 3,249 rows
+    "GBPUSD": "6B",  # 3,239 rows
+    "JPYUSD": "6J",  # 3,212 rows
+    "AUDUSD": "6A",  # 3,207 rows
+    "CADUSD": "6C",  # 3,238 rows
+    "CHFUSD": "6S",  # 2,255 rows
+    "BRLUSD": "6L",  # 3,087 rows
+    "MXNUSD": "6M",  # 1,761 rows
+    "NZDUSD": "6N",  # 1,188 rows
+}
+
+_NORMALIZED_MANIFEST_ALIASES: dict[str, str] = {
+    _normalize_underlying_name(raw): root for raw, root in _MANIFEST_UNDERLYING_ALIASES.items()
+}
+
+
+def root_for_underlying_name(name: str) -> str | None:
+    """Reverse-lookup: a captured ``underlying`` string -> its short root code.
+
+    Honest-absence, never a guess: returns ``None`` for anything not
+    recognized rather than a fuzzy best-effort match. Resolves, in order:
+
+    1. Exact root code (case-insensitive) — some real manifest rows already
+       carry the correct short root code (e.g. "CL", "NG", "HO", "MES") as
+       their ``underlying`` value; that is already the answer.
+    2. A known alias for a real manifest spelling that does not fold onto the
+       registry's ``underlying`` convention even after normalization (see
+       ``_MANIFEST_UNDERLYING_ALIASES``).
+    3. The registry's own ``underlying`` value, normalized the same way as
+       the input (handles "HEATING-OIL"/"HEATING_OIL"/"Heating Oil" all
+       resolving to "HO" via ``RootMetadata.underlying == "HEATING_OIL"``).
+
+    Args:
+        name: The captured/spelled underlying string to resolve (e.g. from a
+            manifest row's ``underlying`` column).
+
+    Returns:
+        The short TradFi root code (a ``TRADFI_ROOTS`` key), or ``None`` if
+        ``name`` does not resolve to a known root.
+    """
+    normalized = _normalize_underlying_name(name)
+    if not normalized:
+        return None
+    if normalized in TRADFI_ROOTS:
+        return normalized
+    if normalized in _NORMALIZED_MANIFEST_ALIASES:
+        return _NORMALIZED_MANIFEST_ALIASES[normalized]
+    return _UNDERLYING_NAME_TO_ROOT.get(normalized)
+
+
 __all__ = [
     "ALL_ROOT_SYMBOLS",
     "CATEGORY_CRYPTO_FUTURES",
@@ -539,4 +706,5 @@ __all__ = [
     "get_root_category",
     "get_roots_by_category",
     "is_tradfi_root",
+    "root_for_underlying_name",
 ]
