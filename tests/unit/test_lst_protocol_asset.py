@@ -32,6 +32,7 @@ class TestLstTokenToProtocolAsset:
             "ETHx",
             "osETH",
             "pufETH",
+            "wBETH",
             # Yield-bearing stablecoins
             "sUSDe",
             "sDAI",
@@ -39,6 +40,7 @@ class TestLstTokenToProtocolAsset:
             "jitoSOL",
             "mSOL",
             "bSOL",
+            "sanctumSOL",
             # Restaking LRTs (defi_catalogue Phase 1G + 1A; added 2026-05-12)
             "ezETH",
             "rsETH",
@@ -58,19 +60,27 @@ class TestLstTokenToProtocolAsset:
             "ETHx",
             "osETH",
             "pufETH",
+            "wBETH",
         }
         for token in eth_lsts:
             _proto, asset = LST_TOKEN_TO_PROTOCOL_ASSET[token]
             assert asset == "ETH", f"{token} should map to ETH base"
 
     def test_sol_lsts_resolve_to_sol(self) -> None:
-        for token in ("jitoSOL", "mSOL", "bSOL"):
+        for token in ("jitoSOL", "mSOL", "bSOL", "sanctumSOL"):
             _proto, asset = LST_TOKEN_TO_PROTOCOL_ASSET[token]
             assert asset == "SOL"
 
     def test_stablecoin_lsts(self) -> None:
         assert LST_TOKEN_TO_PROTOCOL_ASSET["sUSDe"] == ("ETHENA", "USDE")
         assert LST_TOKEN_TO_PROTOCOL_ASSET["sDAI"] == ("SPARK", "DAI")
+
+    def test_wbeth_and_sanctumsol(self) -> None:
+        """wBETH (Binance) + sanctumSOL (Sanctum Infinity) — added 2026-08-03 per
+        lst_yields_writegate_permanently_blocked_2026_07_28.md's follow-up; both were
+        genuine LSTs dropped by ``_drop_unmapped_tokens`` purely for being absent here."""
+        assert LST_TOKEN_TO_PROTOCOL_ASSET["wBETH"] == ("BINANCE", "ETH")
+        assert LST_TOKEN_TO_PROTOCOL_ASSET["sanctumSOL"] == ("SANCTUM", "SOL")
 
     def test_protocol_uppercase_no_version_suffix(self) -> None:
         """Protocol names must be upper-case, no version suffix.
@@ -101,7 +111,7 @@ class TestTokensForProtocolAsset:
         assert "stETH" in eth_tokens
         assert "weETH" in eth_tokens
         assert "jitoSOL" not in eth_tokens
-        assert sol_tokens == {"jitoSOL", "mSOL", "bSOL"}
+        assert sol_tokens == {"jitoSOL", "mSOL", "bSOL", "sanctumSOL"}
 
     def test_empty_asset_filters_by_protocol_only(self) -> None:
         assert tokens_for_protocol_asset("ETHENA", "") == {"sUSDe"}
