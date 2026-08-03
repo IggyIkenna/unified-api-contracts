@@ -505,11 +505,15 @@ MVP_SCOPE: Final[dict[str, object]] = {
                 # already unioned into ``base_ccys`` below, so they stay MVP. The
                 # equity identity is carried by the catalogue ``is_equity_perp`` /
                 # ``tracks_equity`` tags (IS rollup), NOT by a scoped instrument_type.
-                # InstrumentType.COMBO ("DERIBIT-COMBO"-only CeFi entry) removed
-                # 2026-07-21 (operator decision: legacy venue deregistered). TradFi's
-                # SEPARATE ``TradFiMvpRule`` instance owns its own independent
-                # "COMBO" declaration for Databento spread/bag instruments —
-                # unaffected by this CeFi-scoped removal.
+                # InstrumentType.COMBO — RE-ADDED 2026-08-03, scoped to bare
+                # DERIBIT (already a ``venues`` member, no venue_data_types
+                # override — inherits the flat data_types set below). Reverses
+                # part of the 2026-07-21 removal per an operator ruling on
+                # deribit_combo_perpetual_partition_move_2026_07_21.md; full
+                # rationale (70,128-row empirical finding) in mvp_scope.py's
+                # v22 changelog. `DERIBIT-COMBO` (the venue) stays deregistered
+                # — unaffected, instrument_type-axis only.
+                "COMBO",  # InstrumentType.COMBO (bare-DERIBIT combo/spread shapes)
             }
         ),
         # FLAT data_types — apply to SPOT_PAIR / PERPETUAL / FUTURE (everything

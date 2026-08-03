@@ -119,8 +119,20 @@ _canonical_repr = canonical_config_repr
 # ---------------------------------------------------------------------------
 
 
-MVP_SCOPE_CONFIG_VERSION: Final[int] = 21
+MVP_SCOPE_CONFIG_VERSION: Final[int] = 22
 """Monotonic version of :data:`MVP_SCOPE`. Bump on any content change.
+
+v22 (2026-08-03): "COMBO" RE-ADDED to ``CeFiMvpRule.instrument_types`` (operator
+ruling on deribit_combo_perpetual_partition_move_2026_07_21.md's [OPERATOR] P2
+todo), partially reversing v20 below. v20's stated premise — "DERIBIT-COMBO was
+the only CeFi consumer of 'COMBO'" — is empirically disproven by that same doc's
+live census: the real catalogue declares **70,128** bare-``venue=DERIBIT`` (NOT
+``DERIBIT-COMBO``) rows with ``instrument_type=COMBO``, all silently tagged
+``mvp=False`` since v20. This re-add covers that population for bare DERIBIT
+(already ``venues``-registered, no per-venue override, so COMBO inherits the flat
+``data_types`` set — matches the real captured data_types: trades,
+book_snapshot_5, derivative_ticker). ``DERIBIT-COMBO`` itself stays deregistered
+(the venue-axis decision is untouched — only the instrument_type axis reverses).
 
 v21 (2026-07-28): ``MVP_SCOPE["models"]`` graduated from the ``FeaturesModelsMvpStub``
 placeholder to a typed :class:`ModelsMvpRule` (P2b —

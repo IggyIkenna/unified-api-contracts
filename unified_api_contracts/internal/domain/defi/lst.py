@@ -49,6 +49,14 @@ LST_TOKEN_TO_PROTOCOL_ASSET: dict[str, tuple[str, str]] = {
     "jitoSOL": ("JITO", "SOL"),
     "mSOL": ("MARINADE", "SOL"),
     "bSOL": ("BLAZESTAKE", "SOL"),
+    # wBETH = Binance's Wrapped Beacon ETH LST (instruments-service wbeth.py adapter,
+    # venue tag BINANCE-<CHAIN>); sanctumSOL = the MTDS/UAC token key for Sanctum
+    # Infinity (INF), Sanctum's meta-LST (instruments-service sanctum.py adapter,
+    # venue tag SANCTUM-<CHAIN>) — added 2026-08-03 per
+    # lst_yields_writegate_permanently_blocked_2026_07_28.md's follow-up: both were
+    # genuine LSTs dropped by _drop_unmapped_tokens purely for being absent here.
+    "wBETH": ("BINANCE", "ETH"),
+    "sanctumSOL": ("SANCTUM", "SOL"),
     # Restaking LRTs (added 2026-05-12 per defi_catalogue_chain_primitives_2026_05_10.md
     # Phase 1G + 1A; RESTAKING classification confirmed + weETH/pufETH moved into this
     # block 2026-07-22 per distinct_values_noncanonical_audit_2026_07_20.md — all four

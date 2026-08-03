@@ -1,4 +1,17 @@
-"""TradFi (traditional finance) capability declarations."""
+"""TradFi (traditional finance) capability declarations.
+
+STATUS re: execution-venue coverage (operator ruling 2026-08-03,
+plans/active/issues/tradfi_adapter_dead_code_fallback_audit_2026_07_25.md Finding E-1): only "ibkr" is declared
+here as a source; CME/CBOE/NASDAQ/NYSE/ICE/FX have no SourceCapability entries. This is one of two gates (the
+other is execution-service's utils/nautilus_compatibility.py NAUTILUS_UNSUPPORTED_VENUES, checked by the
+strategy pre-load path) that together make execution-service's 6 tradfi venue order-adapters + their shared
+ibkr_tradfi.py base structurally unreachable from live execution today — manual_instruction_api.py's
+_get_supported_venues() derives its venue vocabulary from CAPABILITY_DECLARATIONS, so the manual/HTTP path
+rejects every one of those venues too (even "ibkr" itself isn't a TRADFI_VENUES key in execution-service's
+factory.py). Kept deliberately, not a gap to close reflexively — do not add CME/CBOE/NASDAQ/NYSE/ICE/FX
+SourceCapability entries here until backfill=paper=live wiring is proven for tradfi
+(tradfi_consolidated_native_ao_extract_2026_07_25.md todo 1, still open).
+"""
 
 from __future__ import annotations
 

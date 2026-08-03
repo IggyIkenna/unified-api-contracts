@@ -3,17 +3,28 @@
 # Lifecycle: permanent
 # Delete-when: NA
 """
-Check SDK version alignment between api-contracts and all consumers.
+Check SDK version alignment between api-contracts and its interface consumers.
 
 Parses api-contracts pyproject.toml [schema-validation] for pinned SDK versions.
-For each interface, reads their pyproject.toml and extracts deps (api-contracts,
-databento, tardis-client, ccxt, ib_insync). FAILs (exit 1) if:
-- Interface uses api-contracts but version range does not include api-contracts version
+For each interface, reads their pyproject.toml and extracts SDK deps (databento,
+tardis-client, ccxt, ib_insync). FAILs (exit 1) if:
 - Interface uses SDK version X and api-contracts has no schemas for that version
 - Version ranges don't overlap (for databento, ccxt, ib_insync, tardis-client)
 
-Interfaces with only api-contracts (no SDK deps): still check api-contracts version overlap.
 Interfaces without SDK deps: skip SDK alignment for those packages.
+
+Does NOT check a consumer's declared api-contracts version range against api-contracts'
+own version — that concern is superseded by
+unified-trading-pm/scripts/cicd/assert_version_coherence.py's _check_dep_floors() (wired
+into PM's quality-gates.sh), which resolves api-contracts' current version from
+workspace-manifest.json's git-tag-aware versions{} cache. A version-overlap check used to
+live here but was removed 2026-08-03: it read api-contracts' own version from this repo's
+pyproject.toml [project].version, which is always "" (api-contracts is version_source:
+git-tag, i.e. dynamic/hatch-vcs — no committed version line), so the check silently no-op'd
+for every consumer; it was also independently broken by a dependency-key mismatch (it
+looked up the literal key "api-contracts", but every real consumer's pyproject.toml
+declares the dependency as "unified-api-contracts"), so it never fired even on a non-empty
+version. Not wired into any workflow at the time of removal (grep-confirmed).
 
 Path resolution: interfaces at ../repo_name relative to api-contracts root.
 Use --interface-path to check a single interface (path resolved relative to cwd).
@@ -87,18 +98,6 @@ def _parse_deps_from_pyproject(path: Path) -> dict[str, str]:
     return deps
 
 
-def _get_api_contracts_version(root: Path) -> str:
-    """Get api-contracts version from [project] version in pyproject.toml."""
-    path = root / "pyproject.toml"
-    if not path.exists():
-        return ""
-    with path.open("rb") as f:
-        data = cast(dict[str, object], tomllib.load(f))
-    project = data.get("project")
-    version: object = project.get("version", "") if isinstance(project, dict) else ""
-    return str(version) if version else ""
-
-
 def _parse_schema_validation_deps(root: Path) -> dict[str, str]:
     """Parse [schema-validation] optional deps from api-contracts pyproject.toml."""
     path = root / "pyproject.toml"
@@ -126,26 +125,8 @@ def _extract_version_spec(spec: str) -> str:
     return m.group(1).strip() if m and m.group(1).strip() else spec
 
 
-def _version_satisfies_spec(version: str, spec: str) -> bool:
-    """Check if version satisfies the given spec (e.g. api-contracts 1.1.0 in >=1.0.0,<2.0.0)."""
-    if not version or not spec:
-        return True
-    spec_part = _extract_version_spec(spec)
-    if not spec_part:
-        return True
-    try:
-        from packaging.specifiers import SpecifierSet
-        from packaging.version import Version
-
-        v = Version(version)
-        ss = SpecifierSet(spec_part)
-        return ss.contains(v)
-    except (ConnectionError, TimeoutError, OSError, ValueError):
-        return True  # Conservative: assume OK when uncertain
-
-
 def _version_ranges_overlap(api_spec: str, iface_spec: str) -> bool:
-    """Check if two version specs overlap. Uses packaging if available, else heuristic."""
+    """Check if two version specs overlap using `packaging`."""
     api_ver = _extract_version_spec(api_spec)
     iface_ver = _extract_version_spec(iface_spec)
     from packaging.specifiers import SpecifierSet
@@ -192,35 +173,16 @@ def _candidate_versions(spec: str) -> list[str]:
     return candidates
 
 
-def _heuristic_overlap(api_spec: str, iface_spec: str) -> bool:
-    """Fallback when packaging not available. Conservative: assume overlap if both have >=."""
-    api_min = re.search(r">=\s*([\d.]+)", api_spec)
-    iface_min = re.search(r">=\s*([\d.]+)", iface_spec)
-    if not api_min or not iface_min:
-        return True  # Can't determine, assume OK
-    api_ver = tuple(int(x) for x in api_min.group(1).split("."))
-    iface_ver = tuple(int(x) for x in iface_min.group(1).split("."))
-    # If interface requires >= X and api requires >= Y, overlap if max(X,Y) satisfies both
-    # Interface allows [X, inf), api allows [Y, Z). Overlap if X <= some v <= Z.
-    # Simplified: if api_min >= iface_min, overlap (api's min satisfies interface)
-    if api_ver >= iface_ver:
-        return True
-    # If iface_min >= api_min, we need to check api's upper bound
-    if iface_ver >= api_ver:
-        return True  # Conservative
-    return True  # Default to overlap when uncertain
-
-
 def _schema_module_exists(root: Path, module: str) -> bool:
-    """Check that the schema module exists (e.g. api_contracts/ccxt/ or api_contracts_external/ccxt/)."""
+    """Check that the schema module exists (e.g. unified_api_contracts/ccxt/ or .../external/ccxt/)."""
     parts = module.split(".")
     if parts[0] != "unified_api_contracts":
         return False
-    # Venues moved to api_contracts_external; check both locations
+    # Venue/SDK modules mostly live under external/; check both locations.
     base = root / "unified_api_contracts"
     subdir = base / parts[1]
     if not subdir.exists():
-        subdir = base / "api_contracts_external" / parts[1]
+        subdir = base / "external" / parts[1]
     return (subdir / "schemas.py").exists() or (subdir / "__init__.py").exists()
 
 
@@ -241,7 +203,6 @@ def main() -> int:
     args = _parse_args()
     root = _repo_root()
     api_deps = _parse_schema_validation_deps(root)
-    api_version = _get_api_contracts_version(root)
     errors: list[str] = []
 
     if args.interface_path is not None:
@@ -273,14 +234,6 @@ def main() -> int:
         iface_deps = _parse_deps_from_pyproject(iface_path / "pyproject.toml")
         if not iface_deps:
             continue
-
-        # api-contracts version overlap (all consumers with api-contracts)
-        if "api-contracts" in iface_deps and api_version:
-            iface_spec = iface_deps["api-contracts"]
-            if not _version_satisfies_spec(api_version, iface_spec):
-                errors.append(
-                    f"{iface_name}: api-contracts {iface_spec} does not include api-contracts version {api_version}"
-                )
 
         # SDK alignment (skip for interfaces that don't have those SDK deps)
         for sdk_pkg, schema_module in SDK_TO_SCHEMA_MODULE.items():
