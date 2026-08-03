@@ -306,6 +306,36 @@ def test_tradfi_index_candles(tf: str) -> None:
 
 
 # ---------------------------------------------------------------------------
+# TradFi ohlcv_24h alias (mdps_tradfi_ohlcv_15m_24h_conversion_still_zero_2026_07_27.md,
+# 2026-08-03 live re-run): future/equity ohlcv_24h shard writes crashed
+# "No SchemaContract registered" — the live write path's data_type token is
+# the literal "ohlcv_24h" the CLI/manifest use, not this module's internal
+# "ohlcv_1d". combo/futures_chain deliberately excluded (see
+# _candle_contracts.py's registration-loop comment — tradfi-owner-verified
+# VALID_DATA_TYPES_BY_AG_AND_INSTRUMENT_TYPE policy, not a gap).
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.parametrize("instrument_type", ["future", "equity"])
+def test_tradfi_ohlcv_24h_alias_resolves(instrument_type: str) -> None:
+    contract = lookup_contract(asset_group="tradfi", instrument_type=instrument_type, data_type="ohlcv_24h")
+    assert contract.symbol_column == "symbol"
+    assert contract.data_type == "ohlcv_24h"
+
+
+def test_tradfi_options_chain_ohlcv_24h_alias_resolves() -> None:
+    contract = lookup_contract(asset_group="tradfi", instrument_type="options_chain", data_type="ohlcv_24h")
+    assert contract.symbol_column == "underlying"
+    assert contract.data_type == "ohlcv_24h"
+
+
+def test_tradfi_index_ohlcv_24h_alias_resolves() -> None:
+    contract = lookup_contract(asset_group="tradfi", instrument_type="index", data_type="ohlcv_24h")
+    assert contract.symbol_column == "symbol"
+    assert contract.data_type == "ohlcv_24h"
+
+
+# ---------------------------------------------------------------------------
 # DeFi candles
 # ---------------------------------------------------------------------------
 

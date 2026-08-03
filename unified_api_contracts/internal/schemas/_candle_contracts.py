@@ -415,6 +415,35 @@ _TIMEFRAMES_TRADFI_RE_AGGREGATED: tuple[str, ...] = tuple(tf for tf in _TIMEFRAM
 for _tf in _TIMEFRAMES_TRADFI_RE_AGGREGATED:
     _register(_build("tradfi", "future", _trades_key(_tf), symbol_column="symbol", extra_cols=[], nullable_ohlcv=True))
     _register(_build("tradfi", "equity", _trades_key(_tf), symbol_column="symbol", extra_cols=[], nullable_ohlcv=True))
+    # NOTE (2026-08-03, mdps_tradfi_ohlcv_15m_24h_conversion_still_zero_2026_07_27.md):
+    # deliberately NOT registering "combo"/"futures_chain" here. A live re-run
+    # (mdps-backfill-tradfi-20260803-104812) crashed "No SchemaContract
+    # registered" for instrument_type=COMBO at every re-aggregated timeframe —
+    # but `unified_api_contracts.registry.market_data_categories
+    # .VALID_DATA_TYPES_BY_AG_AND_INSTRUMENT_TYPE[("tradfi","combo"/"futures_chain")]`
+    # is a tradfi-owner-verified (2026-06-08/06-22), deliberately-tight set —
+    # `{"trades","ohlcv_1s","ohlcv_1m","tbbo"}`, explicitly WITHOUT 15m/24h,
+    # "to avoid over-fanning cells the writer never captures". Adding a
+    # contract here would make the SchemaContract layer contradict that
+    # audited policy. The crash is more likely the CALLER wrongly attempting
+    # a 15m/24h write for a bundle grain that was never meant to have one —
+    # tracked as a new todo in the issue doc rather than papered over here.
+    # ``ohlcv_24h`` alias for the daily bar (future/equity only — both list
+    # ``ohlcv_24h`` as valid in VALID_DATA_TYPES_BY_AG_AND_INSTRUMENT_TYPE).
+    # The live write path's ``mdps_data_type_key`` pass-through branch returns
+    # an already-``ohlcv_``-prefixed ``source_data_type`` UNCHANGED (it never
+    # applies ``_normalise_timeframe``'s ``"24h"->"1d"`` translation in that
+    # branch), so TradFi's real runtime lookup key is the literal
+    # ``ohlcv_24h`` token the CLI/manifest use everywhere else — NOT this
+    # module's internal ``ohlcv_1d`` convention. Confirmed live: 100% of
+    # ohlcv_24h shard writes failed "No SchemaContract registered" for BOTH
+    # future and equity in the same re-run. Registering the identical shape
+    # under both keys (rather than fixing the shared ``mdps_data_type_key``
+    # pass-through, which many other asset_group callers also rely on) is the
+    # narrow, low-risk fix.
+    if _tf == "1d":
+        _register(_build("tradfi", "future", "ohlcv_24h", symbol_column="symbol", extra_cols=[], nullable_ohlcv=True))
+        _register(_build("tradfi", "equity", "ohlcv_24h", symbol_column="symbol", extra_cols=[], nullable_ohlcv=True))
 
 for _tf in _TIMEFRAMES_OPTIONS:
     _register(
@@ -428,9 +457,23 @@ for _tf in _TIMEFRAMES_OPTIONS:
             nullable_ohlcv=True,
         )
     )
+    if _tf == "1d":
+        _register(
+            _build(
+                "tradfi",
+                "options_chain",
+                "ohlcv_24h",
+                symbol_column="underlying",
+                extra_cols=[],
+                anchor_col=UNDERLYING_COL,
+                nullable_ohlcv=True,
+            )
+        )
 
 for _tf in _TIMEFRAMES_INDEX:
     _register(_build("tradfi", "index", _trades_key(_tf), symbol_column="symbol", extra_cols=[], nullable_ohlcv=True))
+    if _tf == "1d":
+        _register(_build("tradfi", "index", "ohlcv_24h", symbol_column="symbol", extra_cols=[], nullable_ohlcv=True))
 
 
 # ---------------------------------------------------------------------------
