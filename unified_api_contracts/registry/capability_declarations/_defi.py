@@ -340,6 +340,11 @@ _YIELD = [_IT.YIELD_BEARING.value]
 _STAKING = [_IT.STAKING.value]
 _PERPS = [_IT.PERPETUAL.value, _IT.SPOT_PAIR.value]
 _RESTAKING = [_IT.SPOT_ASSET.value]
+# ANKR/STADER/STAKEWISE/SWELL/MANTLE genuinely write instrument_type="lst" via
+# lst_rates_handler.py (verified against real backfilled GCS objects, NOT
+# instrument_type="yield_bearing" like the LIDO/ETHERFI/ETHENA entries below —
+# see defi_six_lst_vault_venues_missing_protocol_capabilities_2026_07_31.md).
+_LST = [_IT.LST.value]
 
 # Data type groups
 #
@@ -717,6 +722,47 @@ PROTOCOL_CAPABILITIES: dict[str, _ProtocolCapability] = {
         ],
         required_tokens=frozenset({"EIGEN", "ETHFI"}),
     ),
+    # ── EVM Liquid Staking Token (LST) protocols (instrument_type=lst) ─────────
+    # Newly-live 2026-07-31 (DEFI_VENUE_PHASE flip); ground-truthed against real
+    # backfilled GCS objects — lst_rates_handler.py writes
+    # instrument_type="lst"/data_type="lst_rates" for these 5, NOT
+    # "yield_bearing"/"staking_yields" like the LIDO/ETHERFI/ETHENA entries above
+    # (defi_six_lst_vault_venues_missing_protocol_capabilities_2026_07_31.md).
+    "ankr": _ProtocolCapability(
+        venue_prefix="ANKR",
+        protocol_class=ProtocolClass.STAKING,
+        instrument_types=_LST,
+        data_types=["lst_rates"],
+        mtds_operations=["collect-lst-rates"],
+    ),
+    "stader": _ProtocolCapability(
+        venue_prefix="STADER",
+        protocol_class=ProtocolClass.STAKING,
+        instrument_types=_LST,
+        data_types=["lst_rates"],
+        mtds_operations=["collect-lst-rates"],
+    ),
+    "stakewise": _ProtocolCapability(
+        venue_prefix="STAKEWISE",
+        protocol_class=ProtocolClass.STAKING,
+        instrument_types=_LST,
+        data_types=["lst_rates"],
+        mtds_operations=["collect-lst-rates"],
+    ),
+    "swell": _ProtocolCapability(
+        venue_prefix="SWELL",
+        protocol_class=ProtocolClass.STAKING,
+        instrument_types=_LST,
+        data_types=["lst_rates"],
+        mtds_operations=["collect-lst-rates"],
+    ),
+    "mantle": _ProtocolCapability(
+        venue_prefix="MANTLE",
+        protocol_class=ProtocolClass.STAKING,
+        instrument_types=_LST,
+        data_types=["lst_rates"],
+        mtds_operations=["collect-lst-rates"],
+    ),
     # ── CeFi-style Perps (API-based, not on-chain) ─────────────
     # OPTIONS: not supported — venue does not offer listed options contracts
     "hyperliquid": _ProtocolCapability(
@@ -865,6 +911,18 @@ PROTOCOL_CAPABILITIES: dict[str, _ProtocolCapability] = {
         data_types=["staking_yields"],  # vault APY time-series (IDLE-ETHEREUM 2019-08-13)
         mtds_operations=["collect-staking-yields"],
         required_tokens=frozenset({"IDLE"}),
+    ),
+    "maker": _ProtocolCapability(
+        venue_prefix="MAKER",
+        protocol_class=ProtocolClass.YIELD,
+        instrument_types=_YIELD,
+        # Newly-live 2026-07-31; ground-truthed against real backfilled GCS
+        # objects — vault_share_price_handler.py writes
+        # instrument_type="yield_bearing"/data_type="vault_share_price" for
+        # MAKER's sDAI vault (defi_six_lst_vault_venues_missing_
+        # protocol_capabilities_2026_07_31.md).
+        data_types=["vault_share_price"],
+        mtds_operations=["collect-vault-share-price"],
     ),
     # ── Restaking protocols (staking_yields + oracle_prices) ──────────────────
     # EigenLayer restaking wrappers; evidence in DEFI_VENUE_DATA_TYPE_CAPABILITIES.
