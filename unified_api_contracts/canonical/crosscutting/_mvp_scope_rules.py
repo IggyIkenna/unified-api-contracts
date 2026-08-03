@@ -505,25 +505,14 @@ MVP_SCOPE: Final[dict[str, object]] = {
                 # already unioned into ``base_ccys`` below, so they stay MVP. The
                 # equity identity is carried by the catalogue ``is_equity_perp`` /
                 # ``tracks_equity`` tags (IS rollup), NOT by a scoped instrument_type.
-                # InstrumentType.COMBO — RE-ADDED 2026-08-03 (operator ruling on
-                # deribit_combo_perpetual_partition_move_2026_07_21.md's
-                # [OPERATOR] P2 todo), reversing the 2026-07-21 `uac@11adf279`
-                # removal. That removal's stated premise — "DERIBIT-COMBO was the
-                # only CeFi consumer of 'COMBO'" — is empirically FALSE: the same
-                # doc's live census found the real catalogue still declares
-                # **70,128** bare-`venue=DERIBIT` (NOT `DERIBIT-COMBO`) rows with
-                # `instrument_type=COMBO`, all now silently `mvp=False`. Re-adding
-                # "COMBO" here re-covers that population for bare DERIBIT (already
-                # a member of ``venues`` above, no per-venue ``venue_data_types``
-                # override, so COMBO inherits the flat ``data_types`` set below —
-                # matches the real captured data_types for these rows: trades,
-                # book_snapshot_5, derivative_ticker). `DERIBIT-COMBO` itself stays
-                # deregistered/excluded (NOT re-added to ``venues`` — this is a
-                # venue-axis decision, separate from and unaffected by this
-                # instrument_type-axis reversal). TradFi's SEPARATE
-                # ``TradFiMvpRule`` instance owns its own independent "COMBO"
-                # declaration for Databento spread/bag instruments — unaffected
-                # either way.
+                # InstrumentType.COMBO — RE-ADDED 2026-08-03, scoped to bare
+                # DERIBIT (already a ``venues`` member, no venue_data_types
+                # override — inherits the flat data_types set below). Reverses
+                # part of the 2026-07-21 removal per an operator ruling on
+                # deribit_combo_perpetual_partition_move_2026_07_21.md; full
+                # rationale (70,128-row empirical finding) in mvp_scope.py's
+                # v22 changelog. `DERIBIT-COMBO` (the venue) stays deregistered
+                # — unaffected, instrument_type-axis only.
                 "COMBO",  # InstrumentType.COMBO (bare-DERIBIT combo/spread shapes)
             }
         ),
