@@ -118,6 +118,91 @@ real consumer.
 
 
 # ---------------------------------------------------------------------------
+# LEAGUE_ID_TO_TIER — league_id → tier mapping for cluster validation.
+#
+# Routes each observed league_id to a LeagueTier key in EXPECTED_BOOKMAKER_MARKET_SETS.
+# Without this, runtime cluster-validation code cannot determine which expected
+# bookmaker set applies to a given manifest row.
+#
+# Empirical seed 2026-06-27: P1c golden-window audit of 51 distinct league_ids
+# (2025-09-01..2025-11-30, odds_api source, 18,194 captured trades rows).
+# This mapping covers the 23 league_ids that cleanly fit the existing 3 tiers:
+#   - tier_1_domestic: top-5 EU domestic (EPL, LaLiga, Bundesliga, Serie A, Ligue 1)
+#   - tier_1_international: EU continental tournaments (UCL)
+#   - tier_2_domestic: second-tier EU domestic (Championship, Bundesliga 2, etc.)
+#
+# 28 non-EU leagues (A-LEAGUE, MLS, J1_LEAGUE, etc.) are UNMAPPED here — they
+# are handled by the follow-up todo (plan sports_odds_bookmaker_coverage_enumeration_2026_06_20:227)
+# which will either add them to one of the existing tiers or create a tier_3_global/
+# no_expectation tier for leagues with inconsistent bookmaker coverage.
+#
+# Both naming conventions are present (odds_api SOCCER_* prefixed names and
+# canonical LEAGUE_REGISTRY slugs). Some leagues appear in both forms in the
+# empirical data; both are mapped for completeness.
+# ---------------------------------------------------------------------------
+
+
+LEAGUE_ID_TO_TIER: Final[dict[str, LeagueTier]] = {
+    # tier_1_domestic — top-5 EU domestic leagues
+    # EPL
+    "EPL": "tier_1_domestic",
+    "PREMIER_LEAGUE": "tier_1_domestic",
+    "SOCCER_EPL": "tier_1_domestic",
+    # Bundesliga (German top-tier)
+    "BUNDESLIGA": "tier_1_domestic",
+    "SOCCER_GERMANY_BUNDESLIGA": "tier_1_domestic",
+    # Serie A (Italian top-tier)
+    "SERIE_A": "tier_1_domestic",
+    "SOCCER_ITALY_SERIE_A": "tier_1_domestic",
+    # La Liga (Spanish top-tier)
+    "LA_LIGA": "tier_1_domestic",
+    "SOCCER_SPAIN_LA_LIGA": "tier_1_domestic",
+    # Ligue 1 (French top-tier)
+    "LIGUE_1": "tier_1_domestic",
+    "SOCCER_FRANCE_LIGUE_ONE": "tier_1_domestic",
+    # tier_1_international — EU continental tournaments
+    "SOCCER_UEFA_CHAMPS_LEAGUE": "tier_1_international",
+    # tier_2_domestic — second-tier EU domestic leagues
+    # Championship (English second-tier)
+    "CHAMPIONSHIP": "tier_2_domestic",
+    # Bundesliga 2 (German second-tier)
+    "2._BUNDESLIGA": "tier_2_domestic",
+    # Eredivisie (Dutch top-tier, treated as tier-2 in coverage)
+    "EREDIVISIE": "tier_2_domestic",
+    "SOCCER_NETHERLANDS_EREDIVISIE": "tier_2_domestic",
+    # First Division A (Belgian top-tier, treated as tier-2 in coverage)
+    "FIRST_DIVISION_A": "tier_2_domestic",
+    "SOCCER_BELGIUM_FIRST_DIV": "tier_2_domestic",
+    # Ligue 2 (French second-tier)
+    "LIGUE_2": "tier_2_domestic",
+    # Primeira Liga (Portuguese top-tier, treated as tier-2 in coverage)
+    "PRIMEIRA_LIGA": "tier_2_domestic",
+    "SOCCER_PORTUGAL_PRIMEIRA_LIGA": "tier_2_domestic",
+    # Primera División (Spanish second-tier)
+    "PRIMERA_DIVISION": "tier_2_domestic",
+    # Segunda División (Spanish second-tier)
+    "SEGUNDA_DIVISION": "tier_2_domestic",
+    # Serie B (Italian second-tier)
+    "SERIE_B": "tier_2_domestic",
+}
+"""League ID to tier mapping for sports fixture cluster validation.
+
+Maps each of the 51 empirically-observed league_ids (2026-06-27 golden window)
+to a LeagueTier key in EXPECTED_BOOKMAKER_MARKET_SETS. Used at runtime by
+cluster-validation code to determine which expected bookmaker set applies
+to a given manifest row.
+
+This seed covers 23 league_ids that fit the existing 3 tiers (tier_1_domestic,
+tier_1_international, tier_2_domestic). The 28 unmapped non-EU leagues (A-LEAGUE,
+MLS, J1_LEAGUE, etc.) are handled by plan sports_odds_bookmaker_coverage_enumeration_2026_06_20:227.
+
+Both naming conventions are present:
+  - odds_api SOCCER_* prefixed names (SOCCER_EPL, SOCCER_GERMANY_BUNDESLIGA)
+  - canonical LEAGUE_REGISTRY slugs (EPL, BUNDESLIGA)
+"""
+
+
+# ---------------------------------------------------------------------------
 # EXPECTED_BOOKMAKER_MARKET_SETS — per-league-tier expected bookmaker x market.
 #
 # Output of plan sports_odds_bookmaker_coverage_enumeration_2026_06_20 P1.
