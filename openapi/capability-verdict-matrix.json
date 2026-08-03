@@ -81354,7 +81354,7 @@
     "algo_not_valid_for_instruction": "execution algo not valid for the cell's instruction_action",
     "unbuildable_slot_venue": "F47 \u2014 the leg-eligible venue id is rejected by the v2 slot-label venue-token registry (its alnum-folded token is not in KNOWN_VENUE_TOKENS); cell carries venue_buildable=false and zero available_algos (demoted from AVAILABLE)"
   },
-  "generated_from_commit": "431cb79a1e83d45dfc74caf0c71c00da38e09eaa",
+  "generated_from_commit": "bda8bfc7079bddf205780f94909708a11c39b111",
   "matrix_version": "1.0.0",
   "not_registered_gap_types": {
     "missing_registry": "archetype has no leg structure (ARCHETYPE_LEG_STRUCTURES.not_registered)",
