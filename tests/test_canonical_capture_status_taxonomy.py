@@ -6,7 +6,8 @@ Invariants:
 - EMPTY_CONFIRMED_REASONS is EXACTLY the set of all EmptyConfirmedReason member values.
 - No reason string can be added to EMPTY_CONFIRMED_REASONS without also adding an enum member.
 - All members are non-empty strings.
-- All calendar/schedule-driven reasons carry the EXPECTED_ prefix; SOURCE_RETURNED_ZERO is the only non-prefixed member.
+- All calendar/schedule-driven reasons carry the EXPECTED_ prefix; the non-prefixed members are the closed
+  set enumerated in test_expected_prefix_members_carry_expected_prefix's docstring.
 - LegacyBlankErrorReasonError carries a useful message referencing the closed set.
 """
 
@@ -45,11 +46,20 @@ def test_expected_prefix_members_carry_expected_prefix() -> None:
 
     Non-prefixed members are a closed set:
     - SOURCE_RETURNED_ZERO: source returned zero rows (not a calendar skip)
+    - STRATEGY_ENGINE_RETURNED_ZERO: strategy engine's own compute legitimately produced zero
+      instructions (not a calendar skip, not a fetch -- ml_strategy_manifest_coverage_gap_2026_08_03.md
+      todo 2)
     - NO_INPUT_AVAILABLE: upstream input had attempted_failed status
     - LEG_ABSENT_LEFT / LEG_ABSENT_RIGHT: cross-instrument paired calc leg absent
       (writegate_honest_coverage_endtoend_2026_05_06.md Phase 2.E.3)
     """
-    allowed_non_prefixed = {"SOURCE_RETURNED_ZERO", "NO_INPUT_AVAILABLE", "LEG_ABSENT_LEFT", "LEG_ABSENT_RIGHT"}
+    allowed_non_prefixed = {
+        "SOURCE_RETURNED_ZERO",
+        "STRATEGY_ENGINE_RETURNED_ZERO",
+        "NO_INPUT_AVAILABLE",
+        "LEG_ABSENT_LEFT",
+        "LEG_ABSENT_RIGHT",
+    }
     non_prefixed = {e.value for e in EmptyConfirmedReason if not e.value.startswith(EXPECTED_EMPTY_REASON_PREFIX)}
     unexpected_non_prefixed = non_prefixed - allowed_non_prefixed
     assert not unexpected_non_prefixed, (
