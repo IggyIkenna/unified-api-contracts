@@ -16,6 +16,7 @@ from decimal import Decimal
 from typing import cast
 
 from unified_api_contracts.internal.domain.execution_service.types import PositionType, ensure_dict
+from unified_api_contracts.internal.risk import LIQUIDATION_PARAMS_REGISTRY, MarginModel
 
 
 @dataclass
@@ -156,11 +157,19 @@ class DeFiPosition:
         """
         Check if position is at liquidation risk.
 
-        For lending: health_factor < 1.1 is risky
+        Uses UAC ``LIQUIDATION_PARAMS_REGISTRY[MarginModel.AAVE_V3].
+        health_factor_critical`` (1.15) as the canonical at-risk floor.
+        Per-protocol thresholds are accessible via the registry; the
+        AAVE_V3 critical threshold is the conservative default for any
+        lending position whose protocol isn't specifically tagged.
         """
-        if self.health_factor is not None:
-            return self.health_factor < Decimal("1.1")
-        return False
+        if self.health_factor is None:
+            return False
+
+        threshold = LIQUIDATION_PARAMS_REGISTRY[MarginModel.AAVE_V3].health_factor_critical
+        if threshold is None:
+            return False
+        return self.health_factor < threshold
 
     def update_state(
         self,
