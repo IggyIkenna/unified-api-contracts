@@ -20,6 +20,7 @@ import json
 from pathlib import Path
 
 from unified_api_contracts.canonical.domain.sports.league_data import (
+    get_expected_leagues_for_source,
     get_mvp_football_league_ids,
 )
 
@@ -819,6 +820,27 @@ def does_understat_cover(league_id: str) -> bool:
     return league_id.upper() in UNDERSTAT_COVERED_LEAGUES
 
 
+# Derived from get_expected_leagues_for_source("footystats", ...) — the SAME
+# subscription-scoped denominator instruments-service's footystats fetch-loop
+# write-gate already uses (instruments_service/engine/orchestrator/footystats.py,
+# identical classifications=["Prediction", "Features"] filter, MATCHES/PREDICTIONS/
+# ODDS all use the one call). Excludes leagues whose LEAGUE_REGISTRY entry sets
+# ``data_sources=PRED_NO_FOOTYSTATS`` (footystats-subscription-excluded, e.g.
+# CHILE_PRIMERA/K_LEAGUE_1/LIGA_MX/ARGENTINA_PRIMERA + related cup/lower-division
+# leagues). Before this constant existed, the expected-universe enumerator had NO
+# footystats subscription gate at all (SPORTS_ENTITY_LEAGUE_COVERAGE mapped MATCHES/
+# PREDICTIONS to ``None`` = "all leagues", ODDS wasn't even a key) — so it kept
+# seeding fresh expected_unattempted rows for these leagues forever, regardless of
+# the fetch-loop write-gate or how many times the non-covered-league typing scripts
+# were re-applied (those scripts' covered-league check is purely historical-capture
+# based and can never un-cover a league contaminated by even one pre-write-gate
+# incidental captured row) — see
+# footystats_matches_predictions_odds_pending_fetch_universe_expansion_2026_07_27.md.
+_FOOTYSTATS_LEAGUE_COVERAGE: frozenset[str] = frozenset(
+    lg.league_id for lg in get_expected_leagues_for_source("footystats", classifications=["Prediction", "Features"])
+)
+
+
 SPORTS_ENTITY_LEAGUE_COVERAGE: dict[str, frozenset[str] | None] = {
     # Core entities — expected on all fixture dates
     "FIXTURES": None,
@@ -840,8 +862,11 @@ SPORTS_ENTITY_LEAGUE_COVERAGE: dict[str, frozenset[str] | None] = {
     # Enrichment entities — coverage varies by source
     "XG": _UNDERSTAT_LEAGUE_COVERAGE,  # Understat: 5 European leagues
     "XG_SHOTS": _UNDERSTAT_LEAGUE_COVERAGE,  # Understat: per-shot xG, same leagues
-    "MATCHES": None,  # FootyStats: all leagues
-    "PREDICTIONS": None,  # FootyStats: all leagues
+    # FootyStats: subscription-scoped (excludes PRED_NO_FOOTYSTATS leagues) —
+    # matches the fetch-loop write-gate's expected_canonical_leagues denominator.
+    "MATCHES": _FOOTYSTATS_LEAGUE_COVERAGE,
+    "PREDICTIONS": _FOOTYSTATS_LEAGUE_COVERAGE,
+    "ODDS": _FOOTYSTATS_LEAGUE_COVERAGE,
     # ODDS_HORIZON_BUCKET (mdps_odds_horizon_bucket): observed coverage from a
     # full-history manifest read (2026-07-25,
     # sports_post_backfill_relabel_premise_resolved_residual_gap_2026_07_25.md
