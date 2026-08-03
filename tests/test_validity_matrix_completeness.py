@@ -245,6 +245,11 @@ _SOURCE_PRIORITY_EXCLUSION_REASONS: dict[tuple[str, str], str] = {
     # since the resolver tries upper() unconditionally as its second attempt
     # regardless of which casing the writer currently emits.
     ("sports", "TRADES"): _SOURCE_PRIORITY_CASE_FALLBACK_KEY,
+    # TRADES_INPLAY mirrors TRADES exactly (same odds_api writer family, same
+    # resolve_source_and_mode() .upper() case-fallback, same deliberate
+    # non-registration in SPORTS_DATA_TYPE_TO_SOURCE) — added 2026-08-03,
+    # sports_manifest_blank_venue_captured_rows_2026_07_27.md todo 2.
+    ("sports", "TRADES_INPLAY"): _SOURCE_PRIORITY_CASE_FALLBACK_KEY,
     # NOTE: FIXTURE_PLAYER_STATS was excluded here precisely BECAUSE it was not in
     # SPORTS_DATA_TYPE_TO_SOURCE — the tell that it was a phantom name. Reconciled to
     # PLAYER_STATS 2026-07-15, which IS in the domain map and therefore reachable at

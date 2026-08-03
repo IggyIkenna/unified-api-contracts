@@ -87,6 +87,12 @@ AVAILABILITY_AT_SEMANTICS: Final[dict[tuple[str, str], AvailabilitySemantic]] = 
     # Added alongside the SOURCE_PRIORITY entry (_source_priority_data.py) — see
     # that file's comment for the full root-cause diagnosis.
     ("sports", "TRADES"): "publication_time",
+    # TRADES_INPLAY: same odds_api writer family as TRADES (post-kickoff split),
+    # same publication-time semantic. Added alongside the SOURCE_PRIORITY entry
+    # (_source_priority_data.py) — see that file's comment for the full
+    # root-cause diagnosis. sports_manifest_blank_venue_captured_rows_2026_07_27.md
+    # todo 2.
+    ("sports", "TRADES_INPLAY"): "publication_time",
     ("sports", "WEATHER_FORECAST"): "forecast_issue_time",
     # Sports raw data types written by instruments-service (as recorded in
     # the manifest and used by features-sports-service as upstream inputs).
