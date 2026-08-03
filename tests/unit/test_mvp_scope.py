@@ -454,17 +454,20 @@ class TestTradFiOptionUnderlierNarrowingV14:
         assert frozenset({"ES"}) == TRADFI_MVP_OPTION_UNDERLYING_ROOTS
 
     def test_config_version_is_latest(self) -> None:
-        """MVP_SCOPE_CONFIG_VERSION == 21 exactly (v21 = ``models`` graduated
-        from ``FeaturesModelsMvpStub`` to ``ModelsMvpRule``, P2b; v20 =
-        DERIBIT-COMBO fully deregistered, reverting v12's venues/
-        venue_data_types + v16's COMBO instrument_type; v19 = tradfi MVP-set
-        expansion: CME BTC/ETH/MBT/MET futures + CBOE VIX futures + CBOE
-        Treasury-yield INDEX tenors + FX KRW-USD; v18 = book_snapshot_5 added
-        to PredictionMvpRule.data_types; v17 = 26 LST/restaking/vault DeFi
-        venues onboarded to P → live → MVP)."""
+        """MVP_SCOPE_CONFIG_VERSION == 22 exactly (v22 = "COMBO" RE-ADDED to
+        CeFiMvpRule.instrument_types for bare DERIBIT, operator ruling
+        reversing part of v20 — the 70,128-row bare-DERIBIT COMBO population
+        v20 mistakenly zeroed out; DERIBIT-COMBO itself stays deregistered;
+        v21 = ``models`` graduated from ``FeaturesModelsMvpStub`` to
+        ``ModelsMvpRule``, P2b; v20 = DERIBIT-COMBO fully deregistered,
+        reverting v12's venues/venue_data_types + v16's COMBO instrument_type;
+        v19 = tradfi MVP-set expansion: CME BTC/ETH/MBT/MET futures + CBOE VIX
+        futures + CBOE Treasury-yield INDEX tenors + FX KRW-USD; v18 =
+        book_snapshot_5 added to PredictionMvpRule.data_types; v17 = 26
+        LST/restaking/vault DeFi venues onboarded to P → live → MVP)."""
         from unified_api_contracts.canonical.crosscutting.mvp_scope import MVP_SCOPE_CONFIG_VERSION
 
-        assert MVP_SCOPE_CONFIG_VERSION == 21
+        assert MVP_SCOPE_CONFIG_VERSION == 22
 
 
 # ---------------------------------------------------------------------------
@@ -1494,7 +1497,70 @@ class TestCoinbaseVenueOverrideV11:
 # v12's venues/venue_data_types membership and v16's COMBO instrument_type
 # addition; DERIBIT-COMBO was the only CeFi consumer of "COMBO"). See
 # market_data_categories.py's VENUES_BY_ASSET_GROUP["cefi"] comment.
+#
+# v22 (2026-08-03) — "COMBO" RE-ADDED, scoped to BARE DERIBIT only (operator
+# ruling on deribit_combo_perpetual_partition_move_2026_07_21.md's [OPERATOR]
+# P2 todo; NOT a restoration of the v16 DERIBIT-COMBO-scoped class above —
+# DERIBIT-COMBO stays deregistered/excluded, this is the bare-DERIBIT
+# population the v20 removal's premise incorrectly assumed didn't exist).
 # ---------------------------------------------------------------------------
+
+
+class TestDeribitBareComboInstrumentTypeV22:
+    """v22: "COMBO" re-added to CeFiMvpRule.instrument_types, scoped to bare DERIBIT.
+
+    Reverses part of v20 (2026-07-21's DERIBIT-COMBO deregistration), which
+    incorrectly assumed "DERIBIT-COMBO was the only CeFi consumer of 'COMBO'".
+    deribit_combo_perpetual_partition_move_2026_07_21.md's live census found
+    70,128 real bare-``venue=DERIBIT`` (NOT ``DERIBIT-COMBO``) catalogue rows
+    tagged ``instrument_type=COMBO``, all silently ``mvp=False`` since v20.
+    """
+
+    def test_bare_deribit_combo_trades_is_mvp(self) -> None:
+        """Bare DERIBIT COMBO trades -> MVP (the real catalogue-row itype)."""
+        assert is_mvp("cefi", "DERIBIT", "COMBO", "trades", base_ccy="BTC")
+
+    def test_bare_deribit_combo_book_snapshot_5_is_mvp(self) -> None:
+        """Bare DERIBIT COMBO book_snapshot_5 -> MVP (matches the real captured data_type)."""
+        assert is_mvp("cefi", "DERIBIT", "COMBO", "book_snapshot_5", base_ccy="BTC")
+
+    def test_bare_deribit_combo_derivative_ticker_is_mvp(self) -> None:
+        """Bare DERIBIT COMBO derivative_ticker -> MVP (matches the real captured data_type)."""
+        assert is_mvp("cefi", "DERIBIT", "COMBO", "derivative_ticker", base_ccy="BTC")
+
+    def test_bare_deribit_combo_eth_is_mvp(self) -> None:
+        """Bare DERIBIT COMBO trades -> MVP for ETH too (not BTC-only)."""
+        assert is_mvp("cefi", "DERIBIT", "COMBO", "trades", base_ccy="ETH")
+
+    def test_bare_deribit_combo_does_not_inherit_options_chain(self) -> None:
+        """Bare DERIBIT COMBO options_chain -> NOT MVP.
+
+        DERIBIT has no ``venue_data_types`` override, so COMBO inherits the
+        flat ``data_types`` set (trades/book_snapshot_5/derivative_ticker/
+        funding_rate) — NOT the ``instrument_type_data_types["OPTION"]``
+        override (``{options_chain}``), which is keyed to ``OPTION`` only.
+        """
+        assert not is_mvp("cefi", "DERIBIT", "COMBO", "options_chain", base_ccy="BTC")
+
+    def test_deribit_combo_venue_stays_excluded(self) -> None:
+        """DERIBIT-COMBO (the venue) stays deregistered/excluded — this reversal
+        is instrument_type-axis only, not a re-registration of the venue.
+        """
+        assert not is_mvp("cefi", "DERIBIT-COMBO", "COMBO", "trades", base_ccy="BTC")
+
+    def test_combo_instrument_type_scoped_to_mvp_venues(self) -> None:
+        """A COMBO itype on a venue that isn't in the CeFi MVP rule -> NOT MVP.
+
+        "COMBO" only broadens the instrument_type axis; venue membership is a
+        separate, still-enforced axis (axis 1 of is_mvp).
+        """
+        assert not is_mvp("cefi", "FAKE_VENUE_XYZ", "COMBO", "trades", base_ccy="BTC")
+
+    def test_config_version_is_at_least_v22(self) -> None:
+        """MVP_SCOPE_CONFIG_VERSION >= 22 (the bare-DERIBIT COMBO re-add)."""
+        from unified_api_contracts.canonical.crosscutting.mvp_scope import MVP_SCOPE_CONFIG_VERSION
+
+        assert MVP_SCOPE_CONFIG_VERSION >= 22
 
 
 class TestCoinbaseVenueOverrideV11Continued:
