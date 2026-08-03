@@ -75,6 +75,21 @@ SOURCE_PRIORITY: Final[dict[tuple[str, str], list[str]]] = {
     # sports fallback, so this uppercase key still resolves the now-lower-case
     # writer's lookups. No lower-case "trades" entry is needed alongside it.
     ("sports", "TRADES"): ["odds_api"],
+    # TRADES_INPLAY = the post-kickoff ("in-play") counterpart of TRADES (OR-5b(c)
+    # legacy-bucket recovery, market_data_categories.py's "trades_inplay" entry) —
+    # same MTDS odds_api writer family as TRADES, split off only by the
+    # bm_minutes_to_kickoff<0 discriminator at write time, so odds_api is the same
+    # sanctioned source. Registered here (SOURCE_PRIORITY only) so
+    # backfill_orphan_class_e_sports.py::resolve_source_and_mode() can resolve it
+    # instead of falling through to the BATCH_INSTRUMENTS_SERVICE producer-fallback
+    # (sports_manifest_blank_venue_captured_rows_2026_07_27.md todo 2). Deliberately
+    # NOT added to SPORTS_DATA_TYPE_TO_SOURCE — that's a different registry (the v2
+    # expected-universe enumerator's iteration axis, see
+    # enumerate_expected_universe.py::_sports_data_types) — market_data_categories.py's
+    # "trades_inplay" comment documents 3 deliberate non-registrations that keep it
+    # inert for the live sports fleet; this SOURCE_PRIORITY-only entry does not touch
+    # any of them.
+    ("sports", "TRADES_INPLAY"): ["odds_api"],
     ("sports", "WEATHER_FORECAST"): ["open_meteo"],
     # Sports raw data types (instruments-service manifest data_type names).
     ("sports", "XG"): ["understat"],
