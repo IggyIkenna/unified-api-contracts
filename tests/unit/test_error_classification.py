@@ -535,3 +535,48 @@ class TestClassifyVenueError:
         result = classify_venue_error("tardis", "400")
         assert result is not None
         assert result.action == ErrorAction.FAIL
+
+
+class TestInternalErrorFallback:
+    """classify_venue_error() falls back to the venue-agnostic 'internal' bucket
+    for write-guard rejections raised by our own code (not a vendor API error),
+    which can occur for ANY venue. SSOT:
+    cefi_onchain_perp_forward_capture_outage_2026_08_03.md.
+    """
+
+    def test_upstream_timestamp_bias_error_classifies_for_any_venue(self):
+        """UpstreamTimestampBiasError classifies via the internal fallback for a
+        venue that has no venue-specific entry for it (e.g. aster)."""
+        from unified_api_contracts.canonical.crosscutting.errors import classify_venue_error
+
+        result = classify_venue_error("aster", "UpstreamTimestampBiasError")
+        assert result is not None
+        assert result.action == ErrorAction.RETRY
+        assert result.retry_safe is True
+
+    def test_upstream_timestamp_bias_error_classifies_for_multiple_onchain_perp_venues(self):
+        """Same code classifies identically regardless of which venue raised it —
+        the guard is MTDS-internal, not vendor-specific."""
+        from unified_api_contracts.canonical.crosscutting.errors import classify_venue_error
+
+        for venue in ("aster", "lighter-zksync", "extended-starknet", "hyperliquid"):
+            result = classify_venue_error(venue, "UpstreamTimestampBiasError")
+            assert result is not None, f"classify_venue_error({venue!r}, 'UpstreamTimestampBiasError') returned None"
+            assert result.action == ErrorAction.RETRY
+
+    def test_venue_specific_match_takes_priority_over_internal_fallback(self):
+        """A venue's own entry for a code wins even if 'internal' also defines
+        that literal code string (no accidental shadowing either direction)."""
+        from unified_api_contracts.canonical.crosscutting.errors import classify_venue_error
+
+        # hyperliquid has its own "500" entry distinct from any internal bucket code.
+        result = classify_venue_error("hyperliquid", "500")
+        assert result is not None
+        assert result.venue == "hyperliquid"
+
+    def test_unknown_code_still_returns_none(self):
+        """A code absent from both the venue map and the internal bucket stays
+        unclassified (no over-broad fallback)."""
+        from unified_api_contracts.canonical.crosscutting.errors import classify_venue_error
+
+        assert classify_venue_error("aster", "SomeTotallyUnknownError") is None
