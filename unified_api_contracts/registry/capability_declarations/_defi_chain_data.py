@@ -177,7 +177,7 @@ CHAIN_CONFIGS: dict[int, ChainConfig] = {
     # DeFi pipeline extension Phase 6.1: backfill chains the analysis silently
     # treated as unsupported. Public RPCs work for read-only / instruments-
     # service ingest; for production execution-service calls, switch to a
-    # dedicated provider (QuickNode, Infura) via Secret Manager.
+    # dedicated paid RPC provider (e.g. QuickNode) via Secret Manager.
     250: ChainConfig(
         # 2026-05-04: switched from rpc.ftm.tools (returns 401 Unauthorized
         # without an API key) to the official Fantom Foundation RPC
