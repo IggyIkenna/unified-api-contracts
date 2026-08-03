@@ -814,9 +814,30 @@ TRADFI_CHAIN_AXIS_ACCEPTED_DEAD_RESIDUE: frozenset[str] = frozenset(
 # operator's standing classify-or-quarantine precedent (UNKNOWN, 2026-07-18) — root cause
 # NOT fully confirmed, flagged here for a deeper trace, not a closed finding. NOT a
 # canonical set — consumed by `_ACCEPTED_EXCEPTIONS[("instrument_types", "tradfi")]`.
+#
+# `OPTION`/`FUTURE`/`COMBO`/`EQUITY`/`ETF`/`INDEX` added 2026-08-03
+# (tradfi_bare_instrument_type_phantom_manifest_rows_2026_08_03.md). All 6 share ONE
+# confirmed root cause with `UD` (unlike UD, this one IS confirmed, not residual-unknown):
+# 13,923 manifest rows, 100% `service_name=market-data-processing-service`,
+# `source=databento`, `capture_status=captured`, written in a single 9-second batch
+# (2026-07-27T16:46:31-40Z), every row `instrument_id IS NULL` AND `underlying IS NULL`.
+# Traced to `market-data-processing-service/.../canonical_writer.py::write_candle_parquet`
+# omitting `instrument_id`/`underlying` from the row_key on its "aggregated" (non-per-
+# instrument) write path — legitimate for a genuine venue/underlying rollup, but these 6
+# instrument_type values have no chain/underlying-aggregation concept, so the write is
+# phantom bookkeeping with zero backing GCS object (directly GCS-confirmed for
+# OPTION/FUTURE/COMBO at 3 sampled dates; EQUITY/ETF/INDEX share the identical batch +
+# null-id+underlying signature). Exact upstream caller not fully traced — see the issue doc
+# for the honest boundary of that investigation.
 TRADFI_INSTRUMENT_TYPE_ACCEPTED_UNRESOLVED_RESIDUE: frozenset[str] = frozenset(
     {
         "UD",
+        "OPTION",
+        "FUTURE",
+        "COMBO",
+        "EQUITY",
+        "ETF",
+        "INDEX",
     }
 )
 
