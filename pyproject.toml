@@ -55,6 +55,16 @@ dependencies = [
     "pandas-stubs>=2.2.0,<3.0.0",
 ]
 
+[project.optional-dependencies]
+schema-validation = [
+    "pydantic>=2.12.5,<3.0.0",
+    "requests>=2.32.5,<3.0.0",
+    "databento>=0.32.0,<1.0.0",
+    "tardis-client>=1.3.7,<2.0.0",
+    "ccxt>=4.5.24,<5.0.0",
+    "ib_insync>=0.9.86,<1.0.0",
+]
+
 [project.urls]
 Homepage = "https://github.com/IggyIkenna/unified-api-contracts"
 Repository = "https://github.com/IggyIkenna/unified-api-contracts"
