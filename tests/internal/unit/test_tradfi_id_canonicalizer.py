@@ -81,30 +81,70 @@ class TestCanonicalizeRawTradfiIdQuarantine:
         assert result.status == "QUARANTINE_COMBO"
         assert result.canonical_id is None
 
-    def test_ice_qualifier_banned_char_quarantined(self) -> None:
-        # ICE qualifier variants (`BRN FMH0020!`) classify successfully but
-        # inject a banned `!` into the underlying that EXCHANGE_CODE_TO_NAME
-        # cannot resolve away — build_instrument_id() would happily emit
-        # `ICE:FUTURE:BRN!-USD@LIN-...`, but that fails the TARGET shape
-        # assertion, so it MUST be quarantined rather than emitted.
+    def test_ice_exclamation_qualifier_now_canonicalizes(self) -> None:
+        """ICE ``!`` qualifier (e.g. ``BRN FMH0020!``) — the ``!`` survives
+        _normalize_body + classification (ICE_FUTURE_RE accepts ``[!_][A-Z0-9]*``),
+        so the underlying comes out as ``"BRN!"``.  Option A strips the ``!``
+        suffix before EXCHANGE_CODE_TO_NAME lookup, resolving ``BRN`` → ``BRENT``
+        and building the clean canonical id (operator ruling 2026-07-28)."""
         result = canonicalize_raw_tradfi_id("BRN FMH0020!", venue="ICE", instrument_type="FUTURE")
-        assert result.status == "QUARANTINE_UNPARSEABLE"
-        assert result.canonical_id is None
-        # Proves this hit the post-build TARGET-mismatch branch specifically
-        # (classification succeeded — type is known — but the built id was
-        # rejected), not the earlier classify-raised-ValueError branch.
+        assert result.status == "OK"
+        assert result.canonical_id == "ICE:FUTURE:BRENT-USD@LIN-20200320"
         assert result.derived_instrument_type == "FUTURE"
+        assert result.derived_underlying_human == "BRENT"
+        assert TARGET_TRADFI_DERIVATIVE_ID_RE.match(result.canonical_id)
 
-    def test_ice_underscore_qualifier_normalized_away_then_unparseable(self) -> None:
-        # The `_`->space normalization (step c) also applies to ICE
-        # underscore-qualifier variants (`BRN FMH0020_MD1`), which then no
-        # longer matches ICE_FUTURE_RE at all -> classify raises -> quarantine
-        # via the earlier (still safe) unparseable branch.
+    def test_ice_underscore_md1_qualifier_now_canonicalizes(self) -> None:
+        """ICE ``_MD1`` qualifier (e.g. ``BRN FMH0020_MD1``) — the pre-strip
+        before _normalize_body removes the ``_MD1`` suffix while the body still
+        matches the ICE shape, so the classifier sees a clean ``BRN FMH0020``
+        and canonicalization succeeds (Option A, operator ruling 2026-07-28)."""
         result = canonicalize_raw_tradfi_id("BRN FMH0020_MD1", venue="ICE", instrument_type="FUTURE")
-        assert result.status == "QUARANTINE_UNPARSEABLE"
-        assert result.canonical_id is None
+        assert result.status == "OK"
+        assert result.canonical_id == "ICE:FUTURE:BRENT-USD@LIN-20200320"
+        assert result.derived_instrument_type == "FUTURE"
+        assert result.derived_underlying_human == "BRENT"
+        assert TARGET_TRADFI_DERIVATIVE_ID_RE.match(result.canonical_id)
+
+    def test_ice_underscore_z_qualifier_now_canonicalizes(self) -> None:
+        """ICE ``_Z`` qualifier (closing-auction variant)."""
+        result = canonicalize_raw_tradfi_id("BRN FMH0020_Z", venue="ICE", instrument_type="FUTURE")
+        assert result.status == "OK"
+        assert result.canonical_id == "ICE:FUTURE:BRENT-USD@LIN-20200320"
+        assert result.derived_underlying_human == "BRENT"
+
+    def test_ice_underscore_p_qualifier_now_canonicalizes(self) -> None:
+        """ICE ``_P`` qualifier (pending/posting variant)."""
+        result = canonicalize_raw_tradfi_id("BRN FMH0020_P", venue="ICE", instrument_type="FUTURE")
+        assert result.status == "OK"
+        assert result.canonical_id == "ICE:FUTURE:BRENT-USD@LIN-20200320"
+
+    def test_ice_underscore_mm1_qualifier_now_canonicalizes(self) -> None:
+        """ICE ``_MM1`` qualifier (market-maker variant)."""
+        result = canonicalize_raw_tradfi_id("BRN FMH0020_MM1", venue="ICE", instrument_type="FUTURE")
+        assert result.status == "OK"
+        assert result.canonical_id == "ICE:FUTURE:BRENT-USD@LIN-20200320"
+
+    def test_ice_gasoil_with_qualifier_now_canonicalizes(self) -> None:
+        """ICE Gasoil (``G`` → ``GASOIL``) with ``!`` qualifier — proves the
+        fix generalises across ICE product roots, not just BRN."""
+        result = canonicalize_raw_tradfi_id("G FMN0024!", venue="ICE", instrument_type="FUTURE")
+        assert result.status == "OK"
+        assert result.canonical_id == "ICE:FUTURE:GASOIL-USD@LIN-20240719"
+        assert result.derived_underlying_human == "GASOIL"
+        assert TARGET_TRADFI_DERIVATIVE_ID_RE.match(result.canonical_id)
+
+    def test_ice_wti_with_qualifier_now_canonicalizes(self) -> None:
+        """ICE WTI (``T`` → ``WTI``) with ``_Z`` qualifier."""
+        result = canonicalize_raw_tradfi_id("T FMZ0025_Z", venue="ICE", instrument_type="FUTURE")
+        assert result.status == "OK"
+        assert result.canonical_id == "ICE:FUTURE:WTI-USD@LIN-20251219"
+        assert result.derived_underlying_human == "WTI"
 
     def test_bare_ice_symbol_with_venue_argument_unparseable(self) -> None:
+        # ``BRN_Z FMH0020`` — qualifier on the ROOT before FM, not after the
+        # FM<month>00<year> pattern.  The pre-strip regex only matches
+        # ``FM..._<qualifier>`` at end-of-body, so this shape stays unparseable.
         result = canonicalize_raw_tradfi_id("BRN_Z FMH0020", venue="ICE", instrument_type="FUTURE")
         assert result.status == "QUARANTINE_UNPARSEABLE"
         assert result.canonical_id is None
