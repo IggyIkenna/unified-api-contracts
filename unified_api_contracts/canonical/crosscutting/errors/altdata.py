@@ -37,4 +37,23 @@ VENUE_ERRORS_ALTDATA: dict[str, list[VenueErrorClassification]] = {
     "eia": _rest_macro_errors("eia"),
     "baker_hughes": _rest_macro_errors("baker_hughes"),
     "fear_greed": _rest_macro_errors("fear_greed"),
+    "kalshi": [
+        *_rest_macro_errors("kalshi"),
+        ve(
+            "kalshi",
+            "TIMEOUT",
+            retry=True,
+            reconnect=False,
+            action=ErrorAction.RETRY,
+            desc="Request timed out — transient network",
+        ),
+        ve(
+            "kalshi",
+            "CONNECTION_ERROR",
+            retry=True,
+            reconnect=False,
+            action=ErrorAction.RETRY,
+            desc="Connection error (DNS/TCP/SSL) — transient infrastructure",
+        ),
+    ],
 }
