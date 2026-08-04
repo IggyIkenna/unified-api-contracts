@@ -7,6 +7,9 @@ override-dependencies = [
     # support (MockStream no longer needs the removed AsyncStreamReaderMixin). See
     # plans/active/issues/aiohttp_cve_2026_34993_vcrpy_deadlock_2026_06_03.md
     "aiohttp>=3.14.1,<4.0.0",
+    # CVE-2026-69247 (PKCS#7 EnvelopedData decryption Bleichenbacher oracle, introduced in 44.0.0) — see
+    # plans/active/issues/cve_affected_pinned_deps_remediation_2026_06_18.md
+    "cryptography>=50.0.0,<51.0.0",
 ]
 
 [build-system]
