@@ -892,7 +892,9 @@ SPORTS_DATA_TYPE_ACCEPTED_STALE_UPPERCASE_RESIDUE: frozenset[str] = frozenset(
 )
 
 # Sports MDPS market-token instrument_type values (sports_instrument_type_market_token_
-# ssot_gap_2026_07_28.md). These 30 values are real, DELIBERATELY-produced MDPS output —
+# ssot_gap_2026_07_28.md; 4 more added 2026-08-04 per data_pipeline_reconciliation_sports_
+# 2026_08_04.md's census — same MDPS output, just not yet observed in the manifest as of
+# the original 30-value draft). These 34 values are real, DELIBERATELY-produced MDPS output —
 # `canonical_writer_shaping.py::_type_token_from_canonical_id` resolves a sports candle
 # row's instrument_type from the market segment of the canonical id via
 # ODDS_API_MARKET_TO_CANONICAL (the operator's "branch the OHLCV mapping by instrument
@@ -915,6 +917,7 @@ SPORTS_MARKET_TOKEN_ACCEPTED_NONCANONICAL_INSTRUMENT_TYPES: frozenset[str] = fro
         "ASIAN_HANDICAP_1_5",
         "ASIAN_HANDICAP_1_75",
         "ASIAN_HANDICAP_2",
+        "ASIAN_HANDICAP_2_25",
         "ASIAN_HANDICAP_M0_25",
         "ASIAN_HANDICAP_M0_5",
         "ASIAN_HANDICAP_M0_75",
@@ -923,6 +926,7 @@ SPORTS_MARKET_TOKEN_ACCEPTED_NONCANONICAL_INSTRUMENT_TYPES: frozenset[str] = fro
         "ASIAN_HANDICAP_M1_5",
         "ASIAN_HANDICAP_M1_75",
         "ASIAN_HANDICAP_M2",
+        "ASIAN_HANDICAP_M2_25",
         "MATCH_ODDS",
         "MATCH_ODDS_LAY",
         "OVER_UNDER_1_5",
@@ -934,6 +938,8 @@ SPORTS_MARKET_TOKEN_ACCEPTED_NONCANONICAL_INSTRUMENT_TYPES: frozenset[str] = fro
         "OVER_UNDER_3",
         "OVER_UNDER_3_25",
         "OVER_UNDER_3_5",
+        "OVER_UNDER_3_75",
+        "OVER_UNDER_8_5",
         "SPORT",
     }
 )
