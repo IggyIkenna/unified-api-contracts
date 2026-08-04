@@ -109,6 +109,28 @@ _DASH_STRIKE_RE: Final[re.Pattern[str]] = re.compile(r"-([CP]\d)")
 
 _WHITESPACE_RE: Final[re.Pattern[str]] = re.compile(r"\s")
 
+# ICE qualifier suffix — stripped from the raw body BEFORE step (c) _→space
+# normalization so e.g. ``BRN FMH0020_MD1`` stays matched by ICE_FUTURE_RE
+# (otherwise ``BRN FMH0020 MD1`` becomes three space-separated tokens and
+# the classifier can no longer parse it). The qualifier is venue-specific
+# contract metadata (``_MD1`` / ``_Z`` / ``_MM1`` / ``_P`` / ``_SD1``)
+# that the canonical id does not need — the expiry + strike already uniquely
+# identify the contract (Option A, operator ruling 2026-07-28,
+# tradfi_manifest_content_recovery_completion_2026_07_24.md).
+# Matches a body whose LAST space-separated segment is an ICE
+# ``FM<month>00<year>_<qualifier>`` shape (underscore variant);
+# the ``!``-variant qualifier does not need pre-stripping because
+# ``_normalize_body`` leaves ``!`` alone.
+_ICE_UNDERSCORE_BODY_RE: Final[re.Pattern[str]] = re.compile(r"^([A-Z]{1,4}\s+FM[FGHJKMNQUVXZ]00\d{2})_[A-Z0-9]+$")
+
+# Post-classification strip — the ``!`` qualifier survives _normalize_body
+# and classification (ICE_FUTURE_RE accepts ``[!_][A-Z0-9]*``), so the
+# classification.underlying comes out as e.g. ``"BRN!"``.  Strip ANY
+# trailing ``[!_][A-Z0-9]*$`` suffix before EXCHANGE_CODE_TO_NAME lookup
+# so the base root (``BRN``, not ``BRN!``) resolves to the human name
+# (``BRENT``).
+_ICE_QUALIFIER_SUFFIX_RE: Final[re.Pattern[str]] = re.compile(r"[!_][A-Z0-9]*$")
+
 _MAX_VIOLATIONS_SAMPLE: Final[int] = 50
 
 # TradFi CASH/reference instrument types that carry the operator-decided
@@ -254,6 +276,77 @@ def _classify(body: str) -> DatabentoClassification | None:
         return None
 
 
+def _build_future_option_result(
+    classification: DatabentoClassification,
+    venue: str,
+    original: str,
+) -> CanonResult:
+    """Build a canonical FUTURE/OPTION result from a successful classification.
+
+    Strips any ICE qualifier suffix from the classifier's ``underlying``
+    before ``EXCHANGE_CODE_TO_NAME`` lookup (Option A, operator ruling
+    2026-07-28), then builds via :func:`build_instrument_id` and validates
+    against :data:`TARGET_TRADFI_DERIVATIVE_ID_RE`.
+    """
+    derived_type = classification.instrument_type.value
+
+    # The ``!`` qualifier survives normalization + classification (the
+    # ICE_FUTURE_RE regex accepts ``[!_][A-Z0-9]*``), so the underlying
+    # comes out as e.g. ``"BRN!"`` — strip it so the base root ``BRN``
+    # resolves to ``BRENT``.
+    clean_underlying = _ICE_QUALIFIER_SUFFIX_RE.sub("", classification.underlying)
+    if not clean_underlying:
+        return CanonResult(
+            status="QUARANTINE_UNPARSEABLE",
+            canonical_id=None,
+            derived_instrument_type=derived_type,
+            derived_underlying_human=None,
+        )
+    human_root = EXCHANGE_CODE_TO_NAME.get(clean_underlying, clean_underlying)
+
+    try:
+        built = build_instrument_id(
+            venue,
+            classification.instrument_type,
+            human_root,
+            expiry_date=classification.expiry_date,
+            strike=classification.strike,
+            option_right=classification.option_right,
+            margin_marker="LIN",
+            quote_asset="USD",
+        )
+    except ValueError:
+        return CanonResult(
+            status="QUARANTINE_UNPARSEABLE",
+            canonical_id=None,
+            derived_instrument_type=derived_type,
+            derived_underlying_human=human_root,
+        )
+
+    if not TARGET_TRADFI_DERIVATIVE_ID_RE.match(built):
+        return CanonResult(
+            status="QUARANTINE_UNPARSEABLE",
+            canonical_id=None,
+            derived_instrument_type=derived_type,
+            derived_underlying_human=human_root,
+        )
+
+    if built == original:
+        return CanonResult(
+            status="ALREADY_CANONICAL",
+            canonical_id=built,
+            derived_instrument_type=derived_type,
+            derived_underlying_human=human_root,
+        )
+
+    return CanonResult(
+        status="OK",
+        canonical_id=built,
+        derived_instrument_type=derived_type,
+        derived_underlying_human=human_root,
+    )
+
+
 def canonicalize_raw_tradfi_id(raw: str, venue: str, instrument_type: str) -> CanonResult:
     """Canonicalize one raw TradFi FUTURE/OPTION/CASH id — the Phase-B SSOT primitive.
 
@@ -334,6 +427,13 @@ def canonicalize_raw_tradfi_id(raw: str, venue: str, instrument_type: str) -> Ca
 
     body = _resolve_venue_prefix(original)
 
+    # Pre-strip ICE underscore qualifier — _normalize_body step (c) would
+    # otherwise convert `_MD1` → ` MD1`, breaking the ICE_FUTURE_RE match
+    # in the classifier (the three-token form ``BRN FMH0020 MD1`` no longer
+    # matches).  The qualifier is venue-specific contract metadata that the
+    # canonical id does not need (Option A, operator ruling 2026-07-28).
+    body = _ICE_UNDERSCORE_BODY_RE.sub(r"\1", body)
+
     # CBOE user-defined strategy — quarantine as COMBO without attempting
     # classification. The classifier's CBOE_UD_RE pattern requires literal
     # colons (``UD:1V: GN 0113805462``) which our GCS-safe `_`->space
@@ -393,51 +493,7 @@ def canonicalize_raw_tradfi_id(raw: str, venue: str, instrument_type: str) -> Ca
             derived_underlying_human=None,
         )
 
-    human_root = EXCHANGE_CODE_TO_NAME.get(classification.underlying, classification.underlying)
-
-    try:
-        built = build_instrument_id(
-            venue,
-            classification.instrument_type,
-            human_root,
-            expiry_date=classification.expiry_date,
-            strike=classification.strike,
-            option_right=classification.option_right,
-            margin_marker="LIN",
-            quote_asset="USD",
-        )
-    except ValueError:
-        return CanonResult(
-            status="QUARANTINE_UNPARSEABLE",
-            canonical_id=None,
-            derived_instrument_type=derived_type,
-            derived_underlying_human=human_root,
-        )
-
-    if not TARGET_TRADFI_DERIVATIVE_ID_RE.match(built):
-        # e.g. an ICE qualifier (`BRN_Z`) injects a banned `_`/`!` into the
-        # underlying — do NOT emit a banned-char id.
-        return CanonResult(
-            status="QUARANTINE_UNPARSEABLE",
-            canonical_id=None,
-            derived_instrument_type=derived_type,
-            derived_underlying_human=human_root,
-        )
-
-    if built == original:
-        return CanonResult(
-            status="ALREADY_CANONICAL",
-            canonical_id=built,
-            derived_instrument_type=derived_type,
-            derived_underlying_human=human_root,
-        )
-
-    return CanonResult(
-        status="OK",
-        canonical_id=built,
-        derived_instrument_type=derived_type,
-        derived_underlying_human=human_root,
-    )
+    return _build_future_option_result(classification, venue, original)
 
 
 def assert_tradfi_derivative_ids_canonical(ids: list[str], types: list[str]) -> tuple[int, int, list[str]]:

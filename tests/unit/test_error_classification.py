@@ -580,3 +580,57 @@ class TestInternalErrorFallback:
         from unified_api_contracts.canonical.crosscutting.errors import classify_venue_error
 
         assert classify_venue_error("aster", "SomeTotallyUnknownError") is None
+
+
+class TestDatabentoBillingGuardClassification:
+    """Databento pre-request billing-guard rejections (DatabentoLookbackExceededError
+    and DatabentoSubscriptionError subclasses) are classified as SKIP (honest absence),
+    not FAIL — they are structural/permanent unavailability at our subscription tier,
+    never transient fetch failures. SSOT:
+    plans/active/tradfi_consolidated_native_ao_extract_2026_07_25.md todo 5.
+    """
+
+    def test_lookback_exceeded_returns_skip(self):
+        """DATABENTO_LOOKBACK_EXCEEDED → SKIP (L2/L3 outside free window is permanent)."""
+        from unified_api_contracts.canonical.crosscutting.errors import ErrorAction, classify_venue_error
+
+        result = classify_venue_error("databento", "DATABENTO_LOOKBACK_EXCEEDED")
+        assert result is not None
+        assert result.action == ErrorAction.SKIP
+        assert result.retry_safe is False
+        assert result.reconnect is False
+
+    def test_subscription_guard_returns_skip(self):
+        """DATABENTO_SUBSCRIPTION_GUARD → SKIP (wrong dataset/schema/API is permanent)."""
+        from unified_api_contracts.canonical.crosscutting.errors import ErrorAction, classify_venue_error
+
+        result = classify_venue_error("databento", "DATABENTO_SUBSCRIPTION_GUARD")
+        assert result is not None
+        assert result.action == ErrorAction.SKIP
+        assert result.retry_safe is False
+        assert result.reconnect is False
+
+    def test_existing_entitlement_still_returns_fail(self):
+        """DATABENTO_ENTITLEMENT (actual 403 from vendor) still maps to FAIL — not
+        the same as the pre-request guards above."""
+        from unified_api_contracts.canonical.crosscutting.errors import ErrorAction, classify_venue_error
+
+        result = classify_venue_error("databento", "DATABENTO_ENTITLEMENT")
+        assert result is not None
+        assert result.action == ErrorAction.FAIL
+
+    def test_existing_payment_required_still_returns_fail(self):
+        """DATABENTO_PAYMENT_REQUIRED (PAYG credit exhaustion) still maps to FAIL."""
+        from unified_api_contracts.canonical.crosscutting.errors import ErrorAction, classify_venue_error
+
+        result = classify_venue_error("databento", "DATABENTO_PAYMENT_REQUIRED")
+        assert result is not None
+        assert result.action == ErrorAction.FAIL
+
+    def test_generic_fetch_failed_still_unclassified(self):
+        """DATABENTO_FETCH_FAILED (catch-all for unrecognized Databento errors) is
+        deliberately NOT in the venue map — it stays unclassified so new error
+        classes surface as attempted_failed rather than silently miscategorized."""
+        from unified_api_contracts.canonical.crosscutting.errors import classify_venue_error
+
+        assert classify_venue_error("databento", "DATABENTO_FETCH_FAILED") is None

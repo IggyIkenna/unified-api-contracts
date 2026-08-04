@@ -242,12 +242,21 @@ TRADFI_TICKER_COVERAGE_START: dict[str, date] = {
 # Prediction venues = market venues. Coverage start = venue inception.
 
 PREDICTION_SOURCE_COVERAGE_START: dict[str, date] = {
-    # Polymarket: CLOB (central-limit order book) launched 2022-11-21, which is
-    # the canonical "tradeable history" cutoff. The platform itself launched
-    # 2020-06-12 on Matic with AMM-style markets, but pre-CLOB data has no
-    # order-book trading history that can be backtested. The pre-CLOB window is
-    # entirely BELOW this floor, so the floor alone already clips it.
-    "POLYMARKET": date(2022, 11, 21),
+    # Polymarket: corrected 2026-08-04 (coverage_floor_registries_no_cross_
+    # propagation_2026_07_17.md [DATA] P2) — was 2022-11-21 (CLOB launch).
+    # The manifest's earliest actual captured POLYMARKET instrument is
+    # 2025-03-14 (per venue_mapping.py's per-market GCS-parquet-verified
+    # instrument parquet dates: POLYMARKET:BTC=2025-03-13,
+    # POLYMARKET:ETH/SOL/XRP=2025-03-14, POLYMARKET:OTHER=2025-03-13).
+    # The 2022-11-21..2025-03-13 window has ZERO rows of any capture_status —
+    # the CLOB existed but our data pipeline never captured any instrument
+    # in that window, so it was ~2.3 years of permanently-red "missing"
+    # coverage that was never actually fetchable. The catalogue denominator
+    # now measures from first actual captured instrument, matching
+    # venue_mapping.py's verified value — same pattern as the CME fix
+    # (2026-07-25, same issue doc, also corrected coverage_starts.py to
+    # match venue_mapping.py's manifest-probed date).
+    "POLYMARKET": date(2025, 3, 14),
     "KALSHI": date(2021, 7, 19),
     "MANIFOLD": date(2022, 1, 1),
 }

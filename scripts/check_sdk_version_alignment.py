@@ -51,28 +51,29 @@ SDK_TO_SCHEMA_MODULE: dict[str, str] = {
     "ib_insync": "unified_api_contracts.ibkr",
 }
 
-# All api-contracts consumers (relative to api-contracts root)
+# All api-contracts consumers (relative to api-contracts root).
+# Derived 2026-08-04 from workspace-manifest.json repositories{} — every repo whose
+# pyproject.toml declares unified-api-contracts as a dependency.
 INTERFACES: list[tuple[str, Path]] = [
-    ("unified-market-interface", Path("../unified-market-interface")),
-    ("unified-trade-execution-interface", Path("../unified-trade-execution-interface")),
-    ("unified-reference-data-interface", Path("../unified-reference-data-interface")),
-    ("unified-cloud-interface", Path("../unified-cloud-interface")),
-    ("unified-trading-library", Path("../unified-trading-library")),
-    ("market-tick-data-handler", Path("../market-tick-data-handler")),
-    ("instruments-service", Path("../instruments-service")),
-    ("execution-services", Path("../execution-services")),
-    # pnl-attribution-service archived — consolidated into strategy-service/pnl
-    ("ml-inference-service", Path("../ml-inference-service")),
-    ("ml-training-service", Path("../ml-training-service")),
-    ("features-volatility-service", Path("../features-volatility-service")),
-    ("features-onchain-service", Path("../features-onchain-service")),
-    # position-balance-monitor-service archived — consolidated into strategy-service/position
-    ("features-calendar-service", Path("../features-calendar-service")),
-    ("features-delta-one-service", Path("../features-delta-one-service")),
-    # risk-and-exposure-service archived — consolidated into strategy-service/risk
-    ("strategy-service", Path("../strategy-service")),
     ("alerting-service", Path("../alerting-service")),
+    ("batch-live-reconciliation-service", Path("../batch-live-reconciliation-service")),
+    ("client-reporting-api", Path("../client-reporting-api")),
+    ("deployment-api", Path("../deployment-api")),
+    ("deployment-service", Path("../deployment-service")),
+    ("e2e-testing", Path("../e2e-testing")),
+    ("execution-service", Path("../execution-service")),
+    ("features-service", Path("../features-service")),
+    ("fund-administration-service", Path("../fund-administration-service")),
+    ("greeks-service", Path("../greeks-service")),
+    ("instruments-service", Path("../instruments-service")),
     ("market-data-processing-service", Path("../market-data-processing-service")),
+    ("market-tick-data-service", Path("../market-tick-data-service")),
+    ("ml-service", Path("../ml-service")),
+    ("strategy-service", Path("../strategy-service")),
+    ("system-integration-tests", Path("../system-integration-tests")),
+    ("trading-agent-service", Path("../trading-agent-service")),
+    ("unified-trading-api", Path("../unified-trading-api")),
+    ("unified-trading-library", Path("../unified-trading-library")),
 ]
 
 

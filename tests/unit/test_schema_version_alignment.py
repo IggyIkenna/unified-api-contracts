@@ -96,9 +96,14 @@ def test_schema_validation_deps_match_schema_versions() -> None:
     for pkg, version in expected.items():
         if pkg == "pydantic":
             continue
-        if pkg in schema_validation:
-            py_ver = _version_spec(schema_validation[pkg])
-            assert py_ver == version, f"{pkg}: pyproject has {py_ver}, SCHEMA_VERSIONS.md expects {version}"
+        if pkg == "requests":
+            continue  # checked separately below (core dep, not schema-validation extra)
+        assert pkg in schema_validation, (
+            f"{pkg}: documented in SCHEMA_VERSIONS.md [schema-validation] table "
+            f"but MISSING from pyproject.toml [project.optional-dependencies.schema-validation]"
+        )
+        py_ver = _version_spec(schema_validation[pkg])
+        assert py_ver == version, f"{pkg}: pyproject has {py_ver}, SCHEMA_VERSIONS.md expects {version}"
 
     assert "requests" in core, "requests must be in [project.dependencies]"
 

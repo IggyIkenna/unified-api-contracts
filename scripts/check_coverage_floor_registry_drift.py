@@ -179,7 +179,11 @@ KNOWN_DIVERGENCES: tuple[_KnownDivergence, ...] = (
         "not a registry error.",
     ),
     # --- [DATA] P2: POLYMARKET (~2.3yr gap, CLOB-launch vs first-instrument) ---
-    _KnownDivergence("prediction", "POLYMARKET", f"{_AUDIT_DOC} [DATA] P2 — unresolved"),
+    # RESOLVED 2026-08-04 (same issue doc, [DATA] P2) — coverage_starts.py
+    # POLYMARKET corrected from 2022-11-21 (CLOB launch) to 2025-03-14
+    # (first actual captured instrument, manifest-verified per venue_mapping.py's
+    # per-market GCS-parquet-verified dates), matching venue_mapping.py. Entry
+    # removed — the registries now agree; the ratchet fires as intended.
     # --- [DATA] P3: small 1-21 day DeFi drifts + the AAVE_V3 chain-axis question ---
     _KnownDivergence("defi", "CURVE", f"{_AUDIT_DOC} [DATA] P3 — small drift, unresolved"),
     _KnownDivergence("defi", "UNISWAP_V2", f"{_AUDIT_DOC} [DATA] P3 — small drift, unresolved"),

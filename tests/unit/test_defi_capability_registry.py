@@ -280,6 +280,19 @@ class TestGetSubgraphId:
         subgraph = get_subgraph_id("uniswap_v3", "ETHEREUM")
         assert subgraph is None or isinstance(subgraph, str)
 
+    def test_uniswap_v3_optimism_subgraph_is_non_empty(self) -> None:
+        """Regression: UNISWAP_V3-OPTIMISM subgraph ID must resolve to a
+        non-empty string. Swapped 2026-08-04 (slot-12) to
+        EgnS9YE1avupkvCNj9fHnJxppfEmNNywYJtghqiu2pd9 after the prior
+        deployment had been persistently broken (bad indexers) for 4+ days.
+        See _defi.py SUBGRAPH_IDS comment for the full vetting evidence."""
+        subgraph = get_subgraph_id("uniswap_v3", "OPTIMISM")
+        assert isinstance(subgraph, str), f"Expected str, got {type(subgraph).__name__}"
+        assert len(subgraph) > 0, "OPTIMISM subgraph ID must not be empty"
+        # Must be a valid TheGraph deployment ID (IPFS hash pattern: 46-char
+        # base58-ish or similar). Minimum 40 chars catches most truncation bugs.
+        assert len(subgraph) >= 40, f"Subgraph ID too short ({len(subgraph)} chars): {subgraph}"
+
     def test_unknown_protocol_returns_none(self) -> None:
         subgraph = get_subgraph_id("nonexistent_xyz", "ETHEREUM")
         assert subgraph is None
