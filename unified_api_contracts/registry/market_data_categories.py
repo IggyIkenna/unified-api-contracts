@@ -191,6 +191,20 @@ DATA_TYPES_BY_ASSET_GROUP: dict[str, list[str]] = {
         # (unreliable historical funding data — see
         # unified-trading-pm/plans/active/defi_gmx_venue_removal_2026_07_25.md).)
         "perp_funding",
+        # Daily-close mark/notional-volume/open-interest context sibling of
+        # perp_funding (registered 2026-08-04, defi_perp_daily_ctx_manifest_gap_
+        # reader_risk issue) — CanonicalPerpFundingProvider (strategy-service
+        # engine/core/canonical_perp_funding_provider.py) reads this data_type
+        # TODAY for the funding-driven archetypes' mark price, but it was never a
+        # registered data_type/SchemaContract, so its rows were structurally
+        # invisible to the honest-coverage manifest. Registering it here ONLY
+        # (never under DATA_TYPES_BY_ASSET_GROUP["cefi"]) is confirmed inert for
+        # the HYPERLIQUID/CeFi (venue, data_type) combos this data_type is
+        # actually written for — those enumerate under the separate "cefi" key,
+        # per the verify todo's data_type-axis denominator trace
+        # (issues/defi_perp_daily_ctx_manifest_gap_reader_risk_2026_07_22.md,
+        # 2026-07-28 Progress Log entry). Zero change to the writer row shape.
+        "perp_daily_ctx",
         # derivative_ticker (2026-07-15, defi_perp_funding_canonicalisation_derivative_
         # ticker_all_perps issue, operator ruling): the canonical RAW-funding home for
         # ALL perp venues, defi-asset-group ones included — captured at the
@@ -966,6 +980,11 @@ NEEDS_CANDLE_PROCESSING: dict[str, bool] = {
     "lending_indices": False,
     # Note: "liquidations" already declared in CeFi section above (True — same for DeFi)
     "perp_funding": False,
+    # Daily-close mark/notional-volume/open-interest snapshot (sibling of perp_funding
+    # above) — no MDPS candle adapter exists for it; CanonicalPerpFundingProvider reads
+    # it directly as raw daily context, not through MDPS-derived candles. Same class as
+    # perp_funding/lending_indices/oracle_prices (pass-through, not OHLCV).
+    "perp_daily_ctx": False,
     # Per-fill prints; SEMANTICALLY the same class as "trades"/"dex_pool_swaps" (True).
     # Pass-through ONLY because no defi/perp_trades candle adapter exists in MDPS and no
     # defi-asset-group venue currently emits it — the Drift V2 ingester that motivated the
