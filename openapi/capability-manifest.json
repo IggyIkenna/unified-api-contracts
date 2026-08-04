@@ -1135,7 +1135,7 @@
       "from_node_id": "ARBITRAGE_PRICE_DISPERSION",
       "gap_type": null,
       "readiness": "live-proven",
-      "reason": null,
+      "reason": "gmx_v2 removed 2026-08-04 (unreliable historical funding data, see defi_gmx_venue_removal_2026_07_25.md).",
       "relation": "trades_instrument",
       "status": "available",
       "to_node_id": "instrument_type:perp"
@@ -1189,6 +1189,86 @@
       "relation": "has_leg",
       "status": "available",
       "to_node_id": "leg:ARBITRAGE_PRICE_DISPERSION:sell"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "ARBITRAGE_PRICE_DISPERSION",
+      "gap_type": null,
+      "readiness": "live-proven",
+      "reason": "signals funding_rate,iv_dispersion,odds,price \u2192 targets clv,clv_meta,direction,funding_rate (cefi,defi,sports,tradfi)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:catboost"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "ARBITRAGE_PRICE_DISPERSION",
+      "gap_type": null,
+      "readiness": "live-proven",
+      "reason": "signals funding_rate,iv_dispersion,price \u2192 targets direction,funding_rate,swing_high,swing_low (cefi,defi,tradfi)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:ensemble"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "ARBITRAGE_PRICE_DISPERSION",
+      "gap_type": null,
+      "readiness": "live-proven",
+      "reason": "signals funding_rate,iv_dispersion,odds,price \u2192 targets clv,clv_meta,direction,funding_rate (cefi,defi,sports,tradfi)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:huber"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "ARBITRAGE_PRICE_DISPERSION",
+      "gap_type": null,
+      "readiness": "live-proven",
+      "reason": "signals funding_rate,iv_dispersion,odds,price \u2192 targets clv,clv_meta,direction,funding_rate (cefi,defi,sports,tradfi)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:lightgbm"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "ARBITRAGE_PRICE_DISPERSION",
+      "gap_type": null,
+      "readiness": "live-proven",
+      "reason": "signals funding_rate,iv_dispersion,price \u2192 targets direction,funding_rate,swing_high,swing_low (cefi,defi,tradfi)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:poisson_glm"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "ARBITRAGE_PRICE_DISPERSION",
+      "gap_type": null,
+      "readiness": "live-proven",
+      "reason": "signals funding_rate,iv_dispersion,price \u2192 targets direction,funding_rate,swing_high,swing_low (cefi,defi,tradfi)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:random_forest"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "ARBITRAGE_PRICE_DISPERSION",
+      "gap_type": null,
+      "readiness": "live-proven",
+      "reason": "signals funding_rate,iv_dispersion,odds,price \u2192 targets clv,clv_meta,direction,funding_rate (cefi,defi,sports,tradfi)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:ridge"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "ARBITRAGE_PRICE_DISPERSION",
+      "gap_type": null,
+      "readiness": "live-proven",
+      "reason": "signals funding_rate,iv_dispersion,odds,price \u2192 targets clv,clv_meta,direction,funding_rate (cefi,defi,sports,tradfi)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:xgboost"
     },
     {
       "agent_annotation": null,
@@ -1328,16 +1408,6 @@
       "reason": null,
       "relation": "supports",
       "status": "available",
-      "to_node_id": "venue:gmx_v2"
-    },
-    {
-      "agent_annotation": null,
-      "from_node_id": "ARBITRAGE_PRICE_DISPERSION",
-      "gap_type": null,
-      "readiness": "live-proven",
-      "reason": null,
-      "relation": "supports",
-      "status": "available",
       "to_node_id": "venue:hyperliquid"
     },
     {
@@ -1355,7 +1425,7 @@
       "from_node_id": "ARBITRAGE_PRICE_DISPERSION",
       "gap_type": null,
       "readiness": "live-proven",
-      "reason": null,
+      "reason": "gmx_v2 removed 2026-08-04 (unreliable historical funding data, see defi_gmx_venue_removal_2026_07_25.md).",
       "relation": "supports",
       "status": "available",
       "to_node_id": "venue:hyperliquid"
@@ -2415,6 +2485,86 @@
       "from_node_id": "CARRY_BASIS_PERP",
       "gap_type": null,
       "readiness": "backtest-only",
+      "reason": "signals funding_rate \u2192 targets funding_rate (defi)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:catboost"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "CARRY_BASIS_PERP",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals funding_rate \u2192 targets funding_rate (defi)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:ensemble"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "CARRY_BASIS_PERP",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals funding_rate \u2192 targets funding_rate (defi)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:huber"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "CARRY_BASIS_PERP",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals funding_rate \u2192 targets funding_rate (defi)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:lightgbm"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "CARRY_BASIS_PERP",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals funding_rate \u2192 targets funding_rate (defi)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:poisson_glm"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "CARRY_BASIS_PERP",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals funding_rate \u2192 targets funding_rate (defi)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:random_forest"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "CARRY_BASIS_PERP",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals funding_rate \u2192 targets funding_rate (defi)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:ridge"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "CARRY_BASIS_PERP",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals funding_rate \u2192 targets funding_rate (defi)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:xgboost"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "CARRY_BASIS_PERP",
+      "gap_type": null,
+      "readiness": "backtest-only",
       "reason": "Single-venue netted (most capital-efficient) or cross-venue LEADER_HEDGE.",
       "relation": "supports",
       "status": "available",
@@ -2439,16 +2589,6 @@
       "relation": "supports",
       "status": "available",
       "to_node_id": "venue:deribit"
-    },
-    {
-      "agent_annotation": null,
-      "from_node_id": "CARRY_BASIS_PERP",
-      "gap_type": null,
-      "readiness": "backtest-only",
-      "reason": "Same-chain SUPPORTED; cross-chain PARTIAL (bridge latency).",
-      "relation": "supports",
-      "status": "available",
-      "to_node_id": "venue:gmx_v2"
     },
     {
       "agent_annotation": null,
@@ -2709,6 +2849,86 @@
       "relation": "has_leg",
       "status": "available",
       "to_node_id": "leg:CARRY_BASIS_PERP_INV:spot"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "CARRY_BASIS_PERP_INV",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals funding_rate \u2192 targets funding_rate (defi)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:catboost"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "CARRY_BASIS_PERP_INV",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals funding_rate \u2192 targets funding_rate (defi)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:ensemble"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "CARRY_BASIS_PERP_INV",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals funding_rate \u2192 targets funding_rate (defi)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:huber"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "CARRY_BASIS_PERP_INV",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals funding_rate \u2192 targets funding_rate (defi)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:lightgbm"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "CARRY_BASIS_PERP_INV",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals funding_rate \u2192 targets funding_rate (defi)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:poisson_glm"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "CARRY_BASIS_PERP_INV",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals funding_rate \u2192 targets funding_rate (defi)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:random_forest"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "CARRY_BASIS_PERP_INV",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals funding_rate \u2192 targets funding_rate (defi)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:ridge"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "CARRY_BASIS_PERP_INV",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals funding_rate \u2192 targets funding_rate (defi)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:xgboost"
     },
     {
       "agent_annotation": null,
@@ -3675,7 +3895,7 @@
       "from_node_id": "CARRY_STAKED_BASIS",
       "gap_type": null,
       "readiness": "live-proven",
-      "reason": "3-leg ATOMIC (stake + lending + perp). Ethereum (Lido/RocketPool + Aave + HL/GMX) and Solana (Jito/Marinade + Kamino + CeFi-perp hedge \u2014 native Solana perp DEX hedge leg (Drift) removed 2026-07-16, operator ruling: all Solana perp DEXes dropped except Jupiter, not integrated). CeFi-perp hedge legs (Binance/Bybit/Deribit/OKX) added 2026-05-08 for May-23 cutover (master_to_live_defi_2026_05_23 \u00a71 \u2014 6-venue hedge universe). Aster pending venue onboarding \u2014 track in defi_master.",
+      "reason": "3-leg ATOMIC (stake + lending + perp). Ethereum (Lido/RocketPool + Aave + HL; GMX removed 2026-08-04, see defi_gmx_venue_removal_2026_07_25.md) and Solana (Jito/Marinade + Kamino + CeFi-perp hedge \u2014 native Solana perp DEX hedge leg (Drift) removed 2026-07-16, operator ruling: all Solana perp DEXes dropped except Jupiter, not integrated). CeFi-perp hedge legs (Binance/Bybit/Deribit/OKX) added 2026-05-08 for May-23 cutover (master_to_live_defi_2026_05_23 \u00a71 \u2014 6-venue hedge universe). Aster pending venue onboarding \u2014 track in defi_master.",
       "relation": "trades_instrument",
       "status": "available",
       "to_node_id": "instrument_type:staking"
@@ -3725,7 +3945,87 @@
       "from_node_id": "CARRY_STAKED_BASIS",
       "gap_type": null,
       "readiness": "live-proven",
-      "reason": "3-leg ATOMIC (stake + lending + perp). Ethereum (Lido/RocketPool + Aave + HL/GMX) and Solana (Jito/Marinade + Kamino + CeFi-perp hedge \u2014 native Solana perp DEX hedge leg (Drift) removed 2026-07-16, operator ruling: all Solana perp DEXes dropped except Jupiter, not integrated). CeFi-perp hedge legs (Binance/Bybit/Deribit/OKX) added 2026-05-08 for May-23 cutover (master_to_live_defi_2026_05_23 \u00a71 \u2014 6-venue hedge universe). Aster pending venue onboarding \u2014 track in defi_master.",
+      "reason": "signals funding_rate \u2192 targets funding_rate (defi)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:catboost"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "CARRY_STAKED_BASIS",
+      "gap_type": null,
+      "readiness": "live-proven",
+      "reason": "signals funding_rate \u2192 targets funding_rate (defi)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:ensemble"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "CARRY_STAKED_BASIS",
+      "gap_type": null,
+      "readiness": "live-proven",
+      "reason": "signals funding_rate \u2192 targets funding_rate (defi)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:huber"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "CARRY_STAKED_BASIS",
+      "gap_type": null,
+      "readiness": "live-proven",
+      "reason": "signals funding_rate \u2192 targets funding_rate (defi)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:lightgbm"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "CARRY_STAKED_BASIS",
+      "gap_type": null,
+      "readiness": "live-proven",
+      "reason": "signals funding_rate \u2192 targets funding_rate (defi)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:poisson_glm"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "CARRY_STAKED_BASIS",
+      "gap_type": null,
+      "readiness": "live-proven",
+      "reason": "signals funding_rate \u2192 targets funding_rate (defi)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:random_forest"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "CARRY_STAKED_BASIS",
+      "gap_type": null,
+      "readiness": "live-proven",
+      "reason": "signals funding_rate \u2192 targets funding_rate (defi)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:ridge"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "CARRY_STAKED_BASIS",
+      "gap_type": null,
+      "readiness": "live-proven",
+      "reason": "signals funding_rate \u2192 targets funding_rate (defi)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:xgboost"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "CARRY_STAKED_BASIS",
+      "gap_type": null,
+      "readiness": "live-proven",
+      "reason": "3-leg ATOMIC (stake + lending + perp). Ethereum (Lido/RocketPool + Aave + HL; GMX removed 2026-08-04, see defi_gmx_venue_removal_2026_07_25.md) and Solana (Jito/Marinade + Kamino + CeFi-perp hedge \u2014 native Solana perp DEX hedge leg (Drift) removed 2026-07-16, operator ruling: all Solana perp DEXes dropped except Jupiter, not integrated). CeFi-perp hedge legs (Binance/Bybit/Deribit/OKX) added 2026-05-08 for May-23 cutover (master_to_live_defi_2026_05_23 \u00a71 \u2014 6-venue hedge universe). Aster pending venue onboarding \u2014 track in defi_master.",
       "relation": "supports",
       "status": "available",
       "to_node_id": "venue:aave_v3"
@@ -3735,7 +4035,7 @@
       "from_node_id": "CARRY_STAKED_BASIS",
       "gap_type": null,
       "readiness": "live-proven",
-      "reason": "3-leg ATOMIC (stake + lending + perp). Ethereum (Lido/RocketPool + Aave + HL/GMX) and Solana (Jito/Marinade + Kamino + CeFi-perp hedge \u2014 native Solana perp DEX hedge leg (Drift) removed 2026-07-16, operator ruling: all Solana perp DEXes dropped except Jupiter, not integrated). CeFi-perp hedge legs (Binance/Bybit/Deribit/OKX) added 2026-05-08 for May-23 cutover (master_to_live_defi_2026_05_23 \u00a71 \u2014 6-venue hedge universe). Aster pending venue onboarding \u2014 track in defi_master.",
+      "reason": "3-leg ATOMIC (stake + lending + perp). Ethereum (Lido/RocketPool + Aave + HL; GMX removed 2026-08-04, see defi_gmx_venue_removal_2026_07_25.md) and Solana (Jito/Marinade + Kamino + CeFi-perp hedge \u2014 native Solana perp DEX hedge leg (Drift) removed 2026-07-16, operator ruling: all Solana perp DEXes dropped except Jupiter, not integrated). CeFi-perp hedge legs (Binance/Bybit/Deribit/OKX) added 2026-05-08 for May-23 cutover (master_to_live_defi_2026_05_23 \u00a71 \u2014 6-venue hedge universe). Aster pending venue onboarding \u2014 track in defi_master.",
       "relation": "supports",
       "status": "available",
       "to_node_id": "venue:binance"
@@ -3745,7 +4045,7 @@
       "from_node_id": "CARRY_STAKED_BASIS",
       "gap_type": null,
       "readiness": "live-proven",
-      "reason": "3-leg ATOMIC (stake + lending + perp). Ethereum (Lido/RocketPool + Aave + HL/GMX) and Solana (Jito/Marinade + Kamino + CeFi-perp hedge \u2014 native Solana perp DEX hedge leg (Drift) removed 2026-07-16, operator ruling: all Solana perp DEXes dropped except Jupiter, not integrated). CeFi-perp hedge legs (Binance/Bybit/Deribit/OKX) added 2026-05-08 for May-23 cutover (master_to_live_defi_2026_05_23 \u00a71 \u2014 6-venue hedge universe). Aster pending venue onboarding \u2014 track in defi_master.",
+      "reason": "3-leg ATOMIC (stake + lending + perp). Ethereum (Lido/RocketPool + Aave + HL; GMX removed 2026-08-04, see defi_gmx_venue_removal_2026_07_25.md) and Solana (Jito/Marinade + Kamino + CeFi-perp hedge \u2014 native Solana perp DEX hedge leg (Drift) removed 2026-07-16, operator ruling: all Solana perp DEXes dropped except Jupiter, not integrated). CeFi-perp hedge legs (Binance/Bybit/Deribit/OKX) added 2026-05-08 for May-23 cutover (master_to_live_defi_2026_05_23 \u00a71 \u2014 6-venue hedge universe). Aster pending venue onboarding \u2014 track in defi_master.",
       "relation": "supports",
       "status": "available",
       "to_node_id": "venue:bybit"
@@ -3765,7 +4065,7 @@
       "from_node_id": "CARRY_STAKED_BASIS",
       "gap_type": null,
       "readiness": "live-proven",
-      "reason": "3-leg ATOMIC (stake + lending + perp). Ethereum (Lido/RocketPool + Aave + HL/GMX) and Solana (Jito/Marinade + Kamino + CeFi-perp hedge \u2014 native Solana perp DEX hedge leg (Drift) removed 2026-07-16, operator ruling: all Solana perp DEXes dropped except Jupiter, not integrated). CeFi-perp hedge legs (Binance/Bybit/Deribit/OKX) added 2026-05-08 for May-23 cutover (master_to_live_defi_2026_05_23 \u00a71 \u2014 6-venue hedge universe). Aster pending venue onboarding \u2014 track in defi_master.",
+      "reason": "3-leg ATOMIC (stake + lending + perp). Ethereum (Lido/RocketPool + Aave + HL; GMX removed 2026-08-04, see defi_gmx_venue_removal_2026_07_25.md) and Solana (Jito/Marinade + Kamino + CeFi-perp hedge \u2014 native Solana perp DEX hedge leg (Drift) removed 2026-07-16, operator ruling: all Solana perp DEXes dropped except Jupiter, not integrated). CeFi-perp hedge legs (Binance/Bybit/Deribit/OKX) added 2026-05-08 for May-23 cutover (master_to_live_defi_2026_05_23 \u00a71 \u2014 6-venue hedge universe). Aster pending venue onboarding \u2014 track in defi_master.",
       "relation": "supports",
       "status": "available",
       "to_node_id": "venue:deribit"
@@ -3785,17 +4085,7 @@
       "from_node_id": "CARRY_STAKED_BASIS",
       "gap_type": null,
       "readiness": "live-proven",
-      "reason": "3-leg ATOMIC (stake + lending + perp). Ethereum (Lido/RocketPool + Aave + HL/GMX) and Solana (Jito/Marinade + Kamino + CeFi-perp hedge \u2014 native Solana perp DEX hedge leg (Drift) removed 2026-07-16, operator ruling: all Solana perp DEXes dropped except Jupiter, not integrated). CeFi-perp hedge legs (Binance/Bybit/Deribit/OKX) added 2026-05-08 for May-23 cutover (master_to_live_defi_2026_05_23 \u00a71 \u2014 6-venue hedge universe). Aster pending venue onboarding \u2014 track in defi_master.",
-      "relation": "supports",
-      "status": "available",
-      "to_node_id": "venue:gmx_v2"
-    },
-    {
-      "agent_annotation": null,
-      "from_node_id": "CARRY_STAKED_BASIS",
-      "gap_type": null,
-      "readiness": "live-proven",
-      "reason": "3-leg ATOMIC (stake + lending + perp). Ethereum (Lido/RocketPool + Aave + HL/GMX) and Solana (Jito/Marinade + Kamino + CeFi-perp hedge \u2014 native Solana perp DEX hedge leg (Drift) removed 2026-07-16, operator ruling: all Solana perp DEXes dropped except Jupiter, not integrated). CeFi-perp hedge legs (Binance/Bybit/Deribit/OKX) added 2026-05-08 for May-23 cutover (master_to_live_defi_2026_05_23 \u00a71 \u2014 6-venue hedge universe). Aster pending venue onboarding \u2014 track in defi_master.",
+      "reason": "3-leg ATOMIC (stake + lending + perp). Ethereum (Lido/RocketPool + Aave + HL; GMX removed 2026-08-04, see defi_gmx_venue_removal_2026_07_25.md) and Solana (Jito/Marinade + Kamino + CeFi-perp hedge \u2014 native Solana perp DEX hedge leg (Drift) removed 2026-07-16, operator ruling: all Solana perp DEXes dropped except Jupiter, not integrated). CeFi-perp hedge legs (Binance/Bybit/Deribit/OKX) added 2026-05-08 for May-23 cutover (master_to_live_defi_2026_05_23 \u00a71 \u2014 6-venue hedge universe). Aster pending venue onboarding \u2014 track in defi_master.",
       "relation": "supports",
       "status": "available",
       "to_node_id": "venue:hyperliquid"
@@ -3805,7 +4095,7 @@
       "from_node_id": "CARRY_STAKED_BASIS",
       "gap_type": null,
       "readiness": "live-proven",
-      "reason": "3-leg ATOMIC (stake + lending + perp). Ethereum (Lido/RocketPool + Aave + HL/GMX) and Solana (Jito/Marinade + Kamino + CeFi-perp hedge \u2014 native Solana perp DEX hedge leg (Drift) removed 2026-07-16, operator ruling: all Solana perp DEXes dropped except Jupiter, not integrated). CeFi-perp hedge legs (Binance/Bybit/Deribit/OKX) added 2026-05-08 for May-23 cutover (master_to_live_defi_2026_05_23 \u00a71 \u2014 6-venue hedge universe). Aster pending venue onboarding \u2014 track in defi_master.",
+      "reason": "3-leg ATOMIC (stake + lending + perp). Ethereum (Lido/RocketPool + Aave + HL; GMX removed 2026-08-04, see defi_gmx_venue_removal_2026_07_25.md) and Solana (Jito/Marinade + Kamino + CeFi-perp hedge \u2014 native Solana perp DEX hedge leg (Drift) removed 2026-07-16, operator ruling: all Solana perp DEXes dropped except Jupiter, not integrated). CeFi-perp hedge legs (Binance/Bybit/Deribit/OKX) added 2026-05-08 for May-23 cutover (master_to_live_defi_2026_05_23 \u00a71 \u2014 6-venue hedge universe). Aster pending venue onboarding \u2014 track in defi_master.",
       "relation": "supports",
       "status": "available",
       "to_node_id": "venue:jito"
@@ -3815,7 +4105,7 @@
       "from_node_id": "CARRY_STAKED_BASIS",
       "gap_type": null,
       "readiness": "live-proven",
-      "reason": "3-leg ATOMIC (stake + lending + perp). Ethereum (Lido/RocketPool + Aave + HL/GMX) and Solana (Jito/Marinade + Kamino + CeFi-perp hedge \u2014 native Solana perp DEX hedge leg (Drift) removed 2026-07-16, operator ruling: all Solana perp DEXes dropped except Jupiter, not integrated). CeFi-perp hedge legs (Binance/Bybit/Deribit/OKX) added 2026-05-08 for May-23 cutover (master_to_live_defi_2026_05_23 \u00a71 \u2014 6-venue hedge universe). Aster pending venue onboarding \u2014 track in defi_master.",
+      "reason": "3-leg ATOMIC (stake + lending + perp). Ethereum (Lido/RocketPool + Aave + HL; GMX removed 2026-08-04, see defi_gmx_venue_removal_2026_07_25.md) and Solana (Jito/Marinade + Kamino + CeFi-perp hedge \u2014 native Solana perp DEX hedge leg (Drift) removed 2026-07-16, operator ruling: all Solana perp DEXes dropped except Jupiter, not integrated). CeFi-perp hedge legs (Binance/Bybit/Deribit/OKX) added 2026-05-08 for May-23 cutover (master_to_live_defi_2026_05_23 \u00a71 \u2014 6-venue hedge universe). Aster pending venue onboarding \u2014 track in defi_master.",
       "relation": "supports",
       "status": "available",
       "to_node_id": "venue:kamino"
@@ -3825,7 +4115,7 @@
       "from_node_id": "CARRY_STAKED_BASIS",
       "gap_type": null,
       "readiness": "live-proven",
-      "reason": "3-leg ATOMIC (stake + lending + perp). Ethereum (Lido/RocketPool + Aave + HL/GMX) and Solana (Jito/Marinade + Kamino + CeFi-perp hedge \u2014 native Solana perp DEX hedge leg (Drift) removed 2026-07-16, operator ruling: all Solana perp DEXes dropped except Jupiter, not integrated). CeFi-perp hedge legs (Binance/Bybit/Deribit/OKX) added 2026-05-08 for May-23 cutover (master_to_live_defi_2026_05_23 \u00a71 \u2014 6-venue hedge universe). Aster pending venue onboarding \u2014 track in defi_master.",
+      "reason": "3-leg ATOMIC (stake + lending + perp). Ethereum (Lido/RocketPool + Aave + HL; GMX removed 2026-08-04, see defi_gmx_venue_removal_2026_07_25.md) and Solana (Jito/Marinade + Kamino + CeFi-perp hedge \u2014 native Solana perp DEX hedge leg (Drift) removed 2026-07-16, operator ruling: all Solana perp DEXes dropped except Jupiter, not integrated). CeFi-perp hedge legs (Binance/Bybit/Deribit/OKX) added 2026-05-08 for May-23 cutover (master_to_live_defi_2026_05_23 \u00a71 \u2014 6-venue hedge universe). Aster pending venue onboarding \u2014 track in defi_master.",
       "relation": "supports",
       "status": "available",
       "to_node_id": "venue:lido"
@@ -3835,7 +4125,7 @@
       "from_node_id": "CARRY_STAKED_BASIS",
       "gap_type": null,
       "readiness": "live-proven",
-      "reason": "3-leg ATOMIC (stake + lending + perp). Ethereum (Lido/RocketPool + Aave + HL/GMX) and Solana (Jito/Marinade + Kamino + CeFi-perp hedge \u2014 native Solana perp DEX hedge leg (Drift) removed 2026-07-16, operator ruling: all Solana perp DEXes dropped except Jupiter, not integrated). CeFi-perp hedge legs (Binance/Bybit/Deribit/OKX) added 2026-05-08 for May-23 cutover (master_to_live_defi_2026_05_23 \u00a71 \u2014 6-venue hedge universe). Aster pending venue onboarding \u2014 track in defi_master.",
+      "reason": "3-leg ATOMIC (stake + lending + perp). Ethereum (Lido/RocketPool + Aave + HL; GMX removed 2026-08-04, see defi_gmx_venue_removal_2026_07_25.md) and Solana (Jito/Marinade + Kamino + CeFi-perp hedge \u2014 native Solana perp DEX hedge leg (Drift) removed 2026-07-16, operator ruling: all Solana perp DEXes dropped except Jupiter, not integrated). CeFi-perp hedge legs (Binance/Bybit/Deribit/OKX) added 2026-05-08 for May-23 cutover (master_to_live_defi_2026_05_23 \u00a71 \u2014 6-venue hedge universe). Aster pending venue onboarding \u2014 track in defi_master.",
       "relation": "supports",
       "status": "available",
       "to_node_id": "venue:marinade"
@@ -3845,7 +4135,7 @@
       "from_node_id": "CARRY_STAKED_BASIS",
       "gap_type": null,
       "readiness": "live-proven",
-      "reason": "3-leg ATOMIC (stake + lending + perp). Ethereum (Lido/RocketPool + Aave + HL/GMX) and Solana (Jito/Marinade + Kamino + CeFi-perp hedge \u2014 native Solana perp DEX hedge leg (Drift) removed 2026-07-16, operator ruling: all Solana perp DEXes dropped except Jupiter, not integrated). CeFi-perp hedge legs (Binance/Bybit/Deribit/OKX) added 2026-05-08 for May-23 cutover (master_to_live_defi_2026_05_23 \u00a71 \u2014 6-venue hedge universe). Aster pending venue onboarding \u2014 track in defi_master.",
+      "reason": "3-leg ATOMIC (stake + lending + perp). Ethereum (Lido/RocketPool + Aave + HL; GMX removed 2026-08-04, see defi_gmx_venue_removal_2026_07_25.md) and Solana (Jito/Marinade + Kamino + CeFi-perp hedge \u2014 native Solana perp DEX hedge leg (Drift) removed 2026-07-16, operator ruling: all Solana perp DEXes dropped except Jupiter, not integrated). CeFi-perp hedge legs (Binance/Bybit/Deribit/OKX) added 2026-05-08 for May-23 cutover (master_to_live_defi_2026_05_23 \u00a71 \u2014 6-venue hedge universe). Aster pending venue onboarding \u2014 track in defi_master.",
       "relation": "supports",
       "status": "available",
       "to_node_id": "venue:okx"
@@ -3865,7 +4155,7 @@
       "from_node_id": "CARRY_STAKED_BASIS",
       "gap_type": null,
       "readiness": "live-proven",
-      "reason": "3-leg ATOMIC (stake + lending + perp). Ethereum (Lido/RocketPool + Aave + HL/GMX) and Solana (Jito/Marinade + Kamino + CeFi-perp hedge \u2014 native Solana perp DEX hedge leg (Drift) removed 2026-07-16, operator ruling: all Solana perp DEXes dropped except Jupiter, not integrated). CeFi-perp hedge legs (Binance/Bybit/Deribit/OKX) added 2026-05-08 for May-23 cutover (master_to_live_defi_2026_05_23 \u00a71 \u2014 6-venue hedge universe). Aster pending venue onboarding \u2014 track in defi_master.",
+      "reason": "3-leg ATOMIC (stake + lending + perp). Ethereum (Lido/RocketPool + Aave + HL; GMX removed 2026-08-04, see defi_gmx_venue_removal_2026_07_25.md) and Solana (Jito/Marinade + Kamino + CeFi-perp hedge \u2014 native Solana perp DEX hedge leg (Drift) removed 2026-07-16, operator ruling: all Solana perp DEXes dropped except Jupiter, not integrated). CeFi-perp hedge legs (Binance/Bybit/Deribit/OKX) added 2026-05-08 for May-23 cutover (master_to_live_defi_2026_05_23 \u00a71 \u2014 6-venue hedge universe). Aster pending venue onboarding \u2014 track in defi_master.",
       "relation": "supports",
       "status": "available",
       "to_node_id": "venue:rocketpool"
@@ -5025,7 +5315,7 @@
       "from_node_id": "EVENT_DRIVEN",
       "gap_type": null,
       "readiness": "backtest-only",
-      "reason": "Governance-vote reactive path; adapter ready.",
+      "reason": "Governance-vote reactive path; adapter ready. gmx_v2 removed 2026-08-04 (unreliable historical funding data, see defi_gmx_venue_removal_2026_07_25.md).",
       "relation": "trades_instrument",
       "status": "partial",
       "to_node_id": "instrument_type:perp"
@@ -5079,6 +5369,86 @@
       "relation": "has_leg",
       "status": "available",
       "to_node_id": "leg:EVENT_DRIVEN:directional"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "EVENT_DRIVEN",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals iv_dispersion \u2192 targets volatility (cefi,tradfi)",
+      "relation": "uses_model",
+      "status": "partial",
+      "to_node_id": "ml_model:catboost"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "EVENT_DRIVEN",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals iv_dispersion \u2192 targets volatility (cefi,tradfi)",
+      "relation": "uses_model",
+      "status": "partial",
+      "to_node_id": "ml_model:ensemble"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "EVENT_DRIVEN",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals iv_dispersion \u2192 targets volatility (cefi,tradfi)",
+      "relation": "uses_model",
+      "status": "partial",
+      "to_node_id": "ml_model:huber"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "EVENT_DRIVEN",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals iv_dispersion \u2192 targets volatility (cefi,tradfi)",
+      "relation": "uses_model",
+      "status": "partial",
+      "to_node_id": "ml_model:lightgbm"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "EVENT_DRIVEN",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals iv_dispersion \u2192 targets volatility (cefi,tradfi)",
+      "relation": "uses_model",
+      "status": "partial",
+      "to_node_id": "ml_model:poisson_glm"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "EVENT_DRIVEN",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals iv_dispersion \u2192 targets volatility (cefi,tradfi)",
+      "relation": "uses_model",
+      "status": "partial",
+      "to_node_id": "ml_model:random_forest"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "EVENT_DRIVEN",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals iv_dispersion \u2192 targets volatility (cefi,tradfi)",
+      "relation": "uses_model",
+      "status": "partial",
+      "to_node_id": "ml_model:ridge"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "EVENT_DRIVEN",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals iv_dispersion \u2192 targets volatility (cefi,tradfi)",
+      "relation": "uses_model",
+      "status": "partial",
+      "to_node_id": "ml_model:xgboost"
     },
     {
       "agent_annotation": null,
@@ -5155,16 +5525,6 @@
       "from_node_id": "EVENT_DRIVEN",
       "gap_type": null,
       "readiness": "backtest-only",
-      "reason": "Governance-vote reactive path; adapter ready.",
-      "relation": "supports",
-      "status": "partial",
-      "to_node_id": "venue:gmx_v2"
-    },
-    {
-      "agent_annotation": null,
-      "from_node_id": "EVENT_DRIVEN",
-      "gap_type": null,
-      "readiness": "backtest-only",
       "reason": "Same calendar gap.",
       "relation": "supports",
       "status": "partial",
@@ -5175,7 +5535,7 @@
       "from_node_id": "EVENT_DRIVEN",
       "gap_type": null,
       "readiness": "backtest-only",
-      "reason": "Governance-vote reactive path; adapter ready.",
+      "reason": "Governance-vote reactive path; adapter ready. gmx_v2 removed 2026-08-04 (unreliable historical funding data, see defi_gmx_venue_removal_2026_07_25.md).",
       "relation": "supports",
       "status": "partial",
       "to_node_id": "venue:hyperliquid"
@@ -5433,11 +5793,11 @@
     {
       "agent_annotation": null,
       "from_node_id": "LIQUIDATION_CAPTURE",
-      "gap_type": null,
+      "gap_type": "logical_dead_end",
       "readiness": "backtest-only",
-      "reason": "GMX perp liquidations have different economics than lending liquidations.",
+      "reason": "No DeFi perp-liquidation venue. Was gmx_v2-only (perp liquidations have different economics than lending liquidations); GMX removed 2026-08-04 (unreliable historical funding data, see defi_gmx_venue_removal_2026_07_25.md) leaves this cell with no remaining venue.",
       "relation": "trades_instrument",
-      "status": "partial",
+      "status": "not_available",
       "to_node_id": "instrument_type:perp"
     },
     {
@@ -5499,16 +5859,6 @@
       "relation": "supports",
       "status": "available",
       "to_node_id": "venue:aave_v3"
-    },
-    {
-      "agent_annotation": null,
-      "from_node_id": "LIQUIDATION_CAPTURE",
-      "gap_type": null,
-      "readiness": "backtest-only",
-      "reason": "GMX perp liquidations have different economics than lending liquidations.",
-      "relation": "supports",
-      "status": "partial",
-      "to_node_id": "venue:gmx_v2"
     },
     {
       "agent_annotation": null,
@@ -5799,6 +6149,86 @@
       "relation": "has_leg",
       "status": "available",
       "to_node_id": "leg:MARKET_MAKING_CONTINUOUS:quote"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "MARKET_MAKING_CONTINUOUS",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals odds,spread_capture,vol_metric \u2192 targets clv,clv_meta,cross_venue_spread,ht_delta (cefi,sports,tradfi)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:catboost"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "MARKET_MAKING_CONTINUOUS",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals spread_capture,vol_metric \u2192 targets cross_venue_spread,volatility (cefi,tradfi)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:ensemble"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "MARKET_MAKING_CONTINUOUS",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals odds,spread_capture,vol_metric \u2192 targets clv,clv_meta,cross_venue_spread,ht_delta (cefi,sports,tradfi)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:huber"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "MARKET_MAKING_CONTINUOUS",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals odds,spread_capture,vol_metric \u2192 targets clv,clv_meta,cross_venue_spread,ht_delta (cefi,sports,tradfi)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:lightgbm"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "MARKET_MAKING_CONTINUOUS",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals spread_capture,vol_metric \u2192 targets cross_venue_spread,volatility (cefi,tradfi)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:poisson_glm"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "MARKET_MAKING_CONTINUOUS",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals spread_capture,vol_metric \u2192 targets cross_venue_spread,volatility (cefi,tradfi)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:random_forest"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "MARKET_MAKING_CONTINUOUS",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals odds,spread_capture,vol_metric \u2192 targets clv,clv_meta,cross_venue_spread,ht_delta (cefi,sports,tradfi)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:ridge"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "MARKET_MAKING_CONTINUOUS",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals odds,spread_capture,vol_metric \u2192 targets clv,clv_meta,cross_venue_spread,ht_delta (cefi,sports,tradfi)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:xgboost"
     },
     {
       "agent_annotation": null,
@@ -6249,6 +6679,56 @@
       "relation": "has_leg",
       "status": "available",
       "to_node_id": "leg:MARKET_MAKING_EVENT_SETTLED:quote"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "MARKET_MAKING_EVENT_SETTLED",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals odds \u2192 targets clv,clv_meta,ht_delta,xg (sports)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:catboost"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "MARKET_MAKING_EVENT_SETTLED",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals odds \u2192 targets clv,clv_meta,ht_delta,xg (sports)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:huber"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "MARKET_MAKING_EVENT_SETTLED",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals odds \u2192 targets clv,clv_meta,ht_delta,xg (sports)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:lightgbm"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "MARKET_MAKING_EVENT_SETTLED",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals odds \u2192 targets clv,clv_meta,ht_delta,xg (sports)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:ridge"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "MARKET_MAKING_EVENT_SETTLED",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals odds \u2192 targets clv,clv_meta,ht_delta,xg (sports)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:xgboost"
     },
     {
       "agent_annotation": null,
@@ -8085,7 +8565,7 @@
       "from_node_id": "ML_DIRECTIONAL_CONTINUOUS",
       "gap_type": null,
       "readiness": "backtest-only",
-      "reason": null,
+      "reason": "gmx_v2 removed 2026-07-25 (unreliable historical funding data) then purged from this manifest's own JSON 2026-08-04 (the earlier code-registry removal missed this file, which is loaded directly as source-of-truth, not generated) \u2014 see unified-trading-pm/plans/active/defi_gmx_venue_removal_2026_07_25.md.",
       "relation": "trades_instrument",
       "status": "available",
       "to_node_id": "instrument_type:perp"
@@ -8129,6 +8609,86 @@
       "relation": "has_leg",
       "status": "available",
       "to_node_id": "leg:ML_DIRECTIONAL_CONTINUOUS:directional"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "ML_DIRECTIONAL_CONTINUOUS",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals price \u2192 targets direction,swing_high,swing_low (cefi,tradfi)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:catboost"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "ML_DIRECTIONAL_CONTINUOUS",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals price \u2192 targets direction,swing_high,swing_low (cefi,tradfi)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:ensemble"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "ML_DIRECTIONAL_CONTINUOUS",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals price \u2192 targets direction,swing_high,swing_low (cefi,tradfi)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:huber"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "ML_DIRECTIONAL_CONTINUOUS",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals price \u2192 targets direction,swing_high,swing_low (cefi,tradfi)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:lightgbm"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "ML_DIRECTIONAL_CONTINUOUS",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals price \u2192 targets direction,swing_high,swing_low (cefi,tradfi)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:poisson_glm"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "ML_DIRECTIONAL_CONTINUOUS",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals price \u2192 targets direction,swing_high,swing_low (cefi,tradfi)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:random_forest"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "ML_DIRECTIONAL_CONTINUOUS",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals price \u2192 targets direction,swing_high,swing_low (cefi,tradfi)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:ridge"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "ML_DIRECTIONAL_CONTINUOUS",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals price \u2192 targets direction,swing_high,swing_low (cefi,tradfi)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:xgboost"
     },
     {
       "agent_annotation": null,
@@ -8238,16 +8798,6 @@
       "reason": null,
       "relation": "supports",
       "status": "available",
-      "to_node_id": "venue:gmx_v2"
-    },
-    {
-      "agent_annotation": null,
-      "from_node_id": "ML_DIRECTIONAL_CONTINUOUS",
-      "gap_type": null,
-      "readiness": "backtest-only",
-      "reason": null,
-      "relation": "supports",
-      "status": "available",
       "to_node_id": "venue:hyperliquid"
     },
     {
@@ -8265,7 +8815,7 @@
       "from_node_id": "ML_DIRECTIONAL_CONTINUOUS",
       "gap_type": null,
       "readiness": "backtest-only",
-      "reason": null,
+      "reason": "gmx_v2 removed 2026-07-25 (unreliable historical funding data) then purged from this manifest's own JSON 2026-08-04 (the earlier code-registry removal missed this file, which is loaded directly as source-of-truth, not generated) \u2014 see unified-trading-pm/plans/active/defi_gmx_venue_removal_2026_07_25.md.",
       "relation": "supports",
       "status": "available",
       "to_node_id": "venue:hyperliquid"
@@ -8539,6 +9089,56 @@
       "relation": "has_leg",
       "status": "available",
       "to_node_id": "leg:ML_DIRECTIONAL_EVENT_SETTLED:directional"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "ML_DIRECTIONAL_EVENT_SETTLED",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals odds \u2192 targets clv,clv_meta,ht_delta,xg (sports)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:catboost"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "ML_DIRECTIONAL_EVENT_SETTLED",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals odds \u2192 targets clv,clv_meta,ht_delta,xg (sports)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:huber"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "ML_DIRECTIONAL_EVENT_SETTLED",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals odds \u2192 targets clv,clv_meta,ht_delta,xg (sports)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:lightgbm"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "ML_DIRECTIONAL_EVENT_SETTLED",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals odds \u2192 targets clv,clv_meta,ht_delta,xg (sports)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:ridge"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "ML_DIRECTIONAL_EVENT_SETTLED",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals odds \u2192 targets clv,clv_meta,ht_delta,xg (sports)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:xgboost"
     },
     {
       "agent_annotation": null,
@@ -9635,7 +10235,7 @@
       "from_node_id": "RULES_DIRECTIONAL_CONTINUOUS",
       "gap_type": null,
       "readiness": "backtest-only",
-      "reason": "No codex instance examples yet.",
+      "reason": "No codex instance examples yet. gmx_v2 removed 2026-08-04 (unreliable historical funding data, see defi_gmx_venue_removal_2026_07_25.md).",
       "relation": "trades_instrument",
       "status": "partial",
       "to_node_id": "instrument_type:perp"
@@ -9679,6 +10279,86 @@
       "relation": "has_leg",
       "status": "available",
       "to_node_id": "leg:RULES_DIRECTIONAL_CONTINUOUS:directional"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "RULES_DIRECTIONAL_CONTINUOUS",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals funding_rate,price \u2192 targets direction,funding_rate,swing_high,swing_low (cefi,defi,tradfi)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:catboost"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "RULES_DIRECTIONAL_CONTINUOUS",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals funding_rate,price \u2192 targets direction,funding_rate,swing_high,swing_low (cefi,defi,tradfi)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:ensemble"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "RULES_DIRECTIONAL_CONTINUOUS",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals funding_rate,price \u2192 targets direction,funding_rate,swing_high,swing_low (cefi,defi,tradfi)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:huber"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "RULES_DIRECTIONAL_CONTINUOUS",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals funding_rate,price \u2192 targets direction,funding_rate,swing_high,swing_low (cefi,defi,tradfi)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:lightgbm"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "RULES_DIRECTIONAL_CONTINUOUS",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals funding_rate,price \u2192 targets direction,funding_rate,swing_high,swing_low (cefi,defi,tradfi)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:poisson_glm"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "RULES_DIRECTIONAL_CONTINUOUS",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals funding_rate,price \u2192 targets direction,funding_rate,swing_high,swing_low (cefi,defi,tradfi)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:random_forest"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "RULES_DIRECTIONAL_CONTINUOUS",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals funding_rate,price \u2192 targets direction,funding_rate,swing_high,swing_low (cefi,defi,tradfi)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:ridge"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "RULES_DIRECTIONAL_CONTINUOUS",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals funding_rate,price \u2192 targets direction,funding_rate,swing_high,swing_low (cefi,defi,tradfi)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:xgboost"
     },
     {
       "agent_annotation": null,
@@ -9745,16 +10425,6 @@
       "from_node_id": "RULES_DIRECTIONAL_CONTINUOUS",
       "gap_type": null,
       "readiness": "backtest-only",
-      "reason": "No codex instance examples yet.",
-      "relation": "supports",
-      "status": "partial",
-      "to_node_id": "venue:gmx_v2"
-    },
-    {
-      "agent_annotation": null,
-      "from_node_id": "RULES_DIRECTIONAL_CONTINUOUS",
-      "gap_type": null,
-      "readiness": "backtest-only",
       "reason": null,
       "relation": "supports",
       "status": "available",
@@ -9775,7 +10445,7 @@
       "from_node_id": "RULES_DIRECTIONAL_CONTINUOUS",
       "gap_type": null,
       "readiness": "backtest-only",
-      "reason": "No codex instance examples yet.",
+      "reason": "No codex instance examples yet. gmx_v2 removed 2026-08-04 (unreliable historical funding data, see defi_gmx_venue_removal_2026_07_25.md).",
       "relation": "supports",
       "status": "partial",
       "to_node_id": "venue:hyperliquid"
@@ -10035,6 +10705,56 @@
       "from_node_id": "RULES_DIRECTIONAL_EVENT_SETTLED",
       "gap_type": null,
       "readiness": "backtest-only",
+      "reason": "signals odds \u2192 targets clv,clv_meta,ht_delta,xg (sports)",
+      "relation": "uses_model",
+      "status": "partial",
+      "to_node_id": "ml_model:catboost"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "RULES_DIRECTIONAL_EVENT_SETTLED",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals odds \u2192 targets clv,clv_meta,ht_delta,xg (sports)",
+      "relation": "uses_model",
+      "status": "partial",
+      "to_node_id": "ml_model:huber"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "RULES_DIRECTIONAL_EVENT_SETTLED",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals odds \u2192 targets clv,clv_meta,ht_delta,xg (sports)",
+      "relation": "uses_model",
+      "status": "partial",
+      "to_node_id": "ml_model:lightgbm"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "RULES_DIRECTIONAL_EVENT_SETTLED",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals odds \u2192 targets clv,clv_meta,ht_delta,xg (sports)",
+      "relation": "uses_model",
+      "status": "partial",
+      "to_node_id": "ml_model:ridge"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "RULES_DIRECTIONAL_EVENT_SETTLED",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals odds \u2192 targets clv,clv_meta,ht_delta,xg (sports)",
+      "relation": "uses_model",
+      "status": "partial",
+      "to_node_id": "ml_model:xgboost"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "RULES_DIRECTIONAL_EVENT_SETTLED",
+      "gap_type": null,
+      "readiness": "backtest-only",
       "reason": "Engine code complete; docs + example instances minor gap.",
       "relation": "supports",
       "status": "partial",
@@ -10265,7 +10985,7 @@
       "from_node_id": "STAT_ARB_CROSS_SECTIONAL",
       "gap_type": null,
       "readiness": "backtest-only",
-      "reason": null,
+      "reason": "gmx_v2 removed 2026-08-04 (unreliable historical funding data, see defi_gmx_venue_removal_2026_07_25.md).",
       "relation": "trades_instrument",
       "status": "partial",
       "to_node_id": "instrument_type:perp"
@@ -10325,6 +11045,86 @@
       "from_node_id": "STAT_ARB_CROSS_SECTIONAL",
       "gap_type": null,
       "readiness": "backtest-only",
+      "reason": "signals momentum_ranking \u2192 targets direction,swing_high,swing_low (cefi,tradfi)",
+      "relation": "uses_model",
+      "status": "partial",
+      "to_node_id": "ml_model:catboost"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "STAT_ARB_CROSS_SECTIONAL",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals momentum_ranking \u2192 targets direction,swing_high,swing_low (cefi,tradfi)",
+      "relation": "uses_model",
+      "status": "partial",
+      "to_node_id": "ml_model:ensemble"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "STAT_ARB_CROSS_SECTIONAL",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals momentum_ranking \u2192 targets direction,swing_high,swing_low (cefi,tradfi)",
+      "relation": "uses_model",
+      "status": "partial",
+      "to_node_id": "ml_model:huber"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "STAT_ARB_CROSS_SECTIONAL",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals momentum_ranking \u2192 targets direction,swing_high,swing_low (cefi,tradfi)",
+      "relation": "uses_model",
+      "status": "partial",
+      "to_node_id": "ml_model:lightgbm"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "STAT_ARB_CROSS_SECTIONAL",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals momentum_ranking \u2192 targets direction,swing_high,swing_low (cefi,tradfi)",
+      "relation": "uses_model",
+      "status": "partial",
+      "to_node_id": "ml_model:poisson_glm"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "STAT_ARB_CROSS_SECTIONAL",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals momentum_ranking \u2192 targets direction,swing_high,swing_low (cefi,tradfi)",
+      "relation": "uses_model",
+      "status": "partial",
+      "to_node_id": "ml_model:random_forest"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "STAT_ARB_CROSS_SECTIONAL",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals momentum_ranking \u2192 targets direction,swing_high,swing_low (cefi,tradfi)",
+      "relation": "uses_model",
+      "status": "partial",
+      "to_node_id": "ml_model:ridge"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "STAT_ARB_CROSS_SECTIONAL",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals momentum_ranking \u2192 targets direction,swing_high,swing_low (cefi,tradfi)",
+      "relation": "uses_model",
+      "status": "partial",
+      "to_node_id": "ml_model:xgboost"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "STAT_ARB_CROSS_SECTIONAL",
+      "gap_type": null,
+      "readiness": "backtest-only",
       "reason": "Basket execution via sequential TRADE; batch-order path not tested.",
       "relation": "supports",
       "status": "partial",
@@ -10348,16 +11148,6 @@
       "reason": null,
       "relation": "supports",
       "status": "partial",
-      "to_node_id": "venue:gmx_v2"
-    },
-    {
-      "agent_annotation": null,
-      "from_node_id": "STAT_ARB_CROSS_SECTIONAL",
-      "gap_type": null,
-      "readiness": "backtest-only",
-      "reason": null,
-      "relation": "supports",
-      "status": "partial",
       "to_node_id": "venue:hyperliquid"
     },
     {
@@ -10365,7 +11155,7 @@
       "from_node_id": "STAT_ARB_CROSS_SECTIONAL",
       "gap_type": null,
       "readiness": "backtest-only",
-      "reason": null,
+      "reason": "gmx_v2 removed 2026-08-04 (unreliable historical funding data, see defi_gmx_venue_removal_2026_07_25.md).",
       "relation": "supports",
       "status": "partial",
       "to_node_id": "venue:hyperliquid"
@@ -10575,7 +11365,7 @@
       "from_node_id": "STAT_ARB_PAIRS_FIXED",
       "gap_type": null,
       "readiness": "backtest-only",
-      "reason": null,
+      "reason": "gmx_v2 removed 2026-08-04 (unreliable historical funding data, see defi_gmx_venue_removal_2026_07_25.md).",
       "relation": "trades_instrument",
       "status": "partial",
       "to_node_id": "instrument_type:perp"
@@ -10635,6 +11425,86 @@
       "from_node_id": "STAT_ARB_PAIRS_FIXED",
       "gap_type": null,
       "readiness": "backtest-only",
+      "reason": "signals zscore_reversion \u2192 targets direction,swing_high,swing_low (cefi,tradfi)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:catboost"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "STAT_ARB_PAIRS_FIXED",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals zscore_reversion \u2192 targets direction,swing_high,swing_low (cefi,tradfi)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:ensemble"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "STAT_ARB_PAIRS_FIXED",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals zscore_reversion \u2192 targets direction,swing_high,swing_low (cefi,tradfi)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:huber"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "STAT_ARB_PAIRS_FIXED",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals zscore_reversion \u2192 targets direction,swing_high,swing_low (cefi,tradfi)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:lightgbm"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "STAT_ARB_PAIRS_FIXED",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals zscore_reversion \u2192 targets direction,swing_high,swing_low (cefi,tradfi)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:poisson_glm"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "STAT_ARB_PAIRS_FIXED",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals zscore_reversion \u2192 targets direction,swing_high,swing_low (cefi,tradfi)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:random_forest"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "STAT_ARB_PAIRS_FIXED",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals zscore_reversion \u2192 targets direction,swing_high,swing_low (cefi,tradfi)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:ridge"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "STAT_ARB_PAIRS_FIXED",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals zscore_reversion \u2192 targets direction,swing_high,swing_low (cefi,tradfi)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:xgboost"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "STAT_ARB_PAIRS_FIXED",
+      "gap_type": null,
+      "readiness": "backtest-only",
       "reason": null,
       "relation": "supports",
       "status": "available",
@@ -10687,16 +11557,6 @@
       "readiness": "backtest-only",
       "reason": null,
       "relation": "supports",
-      "status": "partial",
-      "to_node_id": "venue:gmx_v2"
-    },
-    {
-      "agent_annotation": null,
-      "from_node_id": "STAT_ARB_PAIRS_FIXED",
-      "gap_type": null,
-      "readiness": "backtest-only",
-      "reason": null,
-      "relation": "supports",
       "status": "available",
       "to_node_id": "venue:hyperliquid"
     },
@@ -10705,7 +11565,7 @@
       "from_node_id": "STAT_ARB_PAIRS_FIXED",
       "gap_type": null,
       "readiness": "backtest-only",
-      "reason": null,
+      "reason": "gmx_v2 removed 2026-08-04 (unreliable historical funding data, see defi_gmx_venue_removal_2026_07_25.md).",
       "relation": "supports",
       "status": "partial",
       "to_node_id": "venue:hyperliquid"
@@ -10959,6 +11819,86 @@
       "relation": "has_leg",
       "status": "available",
       "to_node_id": "leg:TSMOM_BTC_CTA:directional"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "TSMOM_BTC_CTA",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals price \u2192 targets direction,swing_high,swing_low (cefi)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:catboost"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "TSMOM_BTC_CTA",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals price \u2192 targets direction,swing_high,swing_low (cefi)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:ensemble"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "TSMOM_BTC_CTA",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals price \u2192 targets direction,swing_high,swing_low (cefi)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:huber"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "TSMOM_BTC_CTA",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals price \u2192 targets direction,swing_high,swing_low (cefi)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:lightgbm"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "TSMOM_BTC_CTA",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals price \u2192 targets direction,swing_high,swing_low (cefi)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:poisson_glm"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "TSMOM_BTC_CTA",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals price \u2192 targets direction,swing_high,swing_low (cefi)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:random_forest"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "TSMOM_BTC_CTA",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals price \u2192 targets direction,swing_high,swing_low (cefi)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:ridge"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "TSMOM_BTC_CTA",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals price \u2192 targets direction,swing_high,swing_low (cefi)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:xgboost"
     },
     {
       "agent_annotation": null,
@@ -15505,6 +16445,86 @@
       "from_node_id": "VOL_TRADING_OPTIONS",
       "gap_type": null,
       "readiness": "backtest-only",
+      "reason": "signals iv_dispersion,vol_metric \u2192 targets volatility (cefi,tradfi)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:catboost"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "VOL_TRADING_OPTIONS",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals iv_dispersion,vol_metric \u2192 targets volatility (cefi,tradfi)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:ensemble"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "VOL_TRADING_OPTIONS",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals iv_dispersion,vol_metric \u2192 targets volatility (cefi,tradfi)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:huber"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "VOL_TRADING_OPTIONS",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals iv_dispersion,vol_metric \u2192 targets volatility (cefi,tradfi)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:lightgbm"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "VOL_TRADING_OPTIONS",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals iv_dispersion,vol_metric \u2192 targets volatility (cefi,tradfi)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:poisson_glm"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "VOL_TRADING_OPTIONS",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals iv_dispersion,vol_metric \u2192 targets volatility (cefi,tradfi)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:random_forest"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "VOL_TRADING_OPTIONS",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals iv_dispersion,vol_metric \u2192 targets volatility (cefi,tradfi)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:ridge"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "VOL_TRADING_OPTIONS",
+      "gap_type": null,
+      "readiness": "backtest-only",
+      "reason": "signals iv_dispersion,vol_metric \u2192 targets volatility (cefi,tradfi)",
+      "relation": "uses_model",
+      "status": "available",
+      "to_node_id": "ml_model:xgboost"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "VOL_TRADING_OPTIONS",
+      "gap_type": null,
+      "readiness": "backtest-only",
       "reason": "CME options-on-futures not declared.",
       "relation": "supports",
       "status": "partial",
@@ -17349,6 +18369,46 @@
       "relation": "supports_mode:replay",
       "status": "available",
       "to_node_id": "data_source:hyperliquid"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "data_source:ibkr",
+      "gap_type": null,
+      "readiness": null,
+      "reason": "default transport for ibkr",
+      "relation": "over_transport:rest",
+      "status": "available",
+      "to_node_id": "data_source:ibkr"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "data_source:ibkr",
+      "gap_type": null,
+      "readiness": null,
+      "reason": "SOURCE_MODE_CAPABILITY[ibkr] includes batch",
+      "relation": "supports_mode:batch",
+      "status": "available",
+      "to_node_id": "data_source:ibkr"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "data_source:ibkr",
+      "gap_type": null,
+      "readiness": null,
+      "reason": "SOURCE_MODE_CAPABILITY[ibkr] does not include live (ratified source_mode_capability_matrix_2026_06_07.md; honest absence, not a gap)",
+      "relation": "supports_mode:live",
+      "status": "not_available",
+      "to_node_id": "data_source:ibkr"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "data_source:ibkr",
+      "gap_type": null,
+      "readiness": null,
+      "reason": "SOURCE_MODE_CAPABILITY[ibkr] does not include replay (ratified source_mode_capability_matrix_2026_06_07.md; honest absence, not a gap)",
+      "relation": "supports_mode:replay",
+      "status": "not_available",
+      "to_node_id": "data_source:ibkr"
     },
     {
       "agent_annotation": null,
@@ -25792,26 +26852,6 @@
     },
     {
       "agent_annotation": null,
-      "from_node_id": "service_registry:execution_algos",
-      "gap_type": "missing_extraction",
-      "readiness": null,
-      "reason": "execution_algos: no .venv at ../../../execution-service/.venv/bin/python",
-      "relation": "registry_gap",
-      "status": "not_registered",
-      "to_node_id": "service_registry:execution_algos"
-    },
-    {
-      "agent_annotation": null,
-      "from_node_id": "service_registry:ml_models",
-      "gap_type": "missing_extraction",
-      "readiness": null,
-      "reason": "ml_models: no .venv at ../../../ml-service/.venv/bin/python",
-      "relation": "registry_gap",
-      "status": "not_registered",
-      "to_node_id": "service_registry:ml_models"
-    },
-    {
-      "agent_annotation": null,
       "from_node_id": "signing_surface:CLOUD_KMS_ENCRYPTED",
       "gap_type": null,
       "readiness": null,
@@ -27794,16 +28834,16 @@
   "gaps": {
     "annotation_orphans": 0,
     "broker_classed_venues": 0,
-    "logical_dead_end": 467,
-    "logical_dead_ends": 16,
-    "missing_extraction": 3,
+    "logical_dead_end": 468,
+    "logical_dead_ends": 17,
+    "missing_extraction": 1,
     "missing_registry": 102,
     "needs_code_scan": 1,
-    "not_registered_total": 105,
-    "orphan_nodes": 81,
+    "not_registered_total": 103,
+    "orphan_nodes": 82,
     "unbuilt_dead_ends": 168
   },
-  "generated_from_commit": "3a8c845b799cd5eb3c5067d860a62dabb520eb99",
+  "generated_from_commit": "16a5d162b892e9da0b5d354781a00fa0248ffd4e",
   "manifest_version": "1.0.0",
   "nodes": [
     {
@@ -28435,6 +29475,14 @@
     },
     {
       "kind": "chain",
+      "label": "Plasma",
+      "metadata": {
+        "chain_id": "9745"
+      },
+      "node_id": "chain:PLASMA"
+    },
+    {
+      "kind": "chain",
       "label": "Polygon",
       "metadata": {
         "chain_id": "137"
@@ -28636,6 +29684,12 @@
       "label": "Hyperliquid",
       "metadata": {},
       "node_id": "data_source:hyperliquid"
+    },
+    {
+      "kind": "data_source",
+      "label": "Ibkr",
+      "metadata": {},
+      "node_id": "data_source:ibkr"
     },
     {
       "kind": "data_source",
@@ -28914,8 +29968,8 @@
       "kind": "execution_algo",
       "label": "Selector contradiction: heuristic_selector_bypasses_instruction_type",
       "metadata": {
-        "citation": "engine/live/algo_selector.py:31 (quantity heuristic) vs selector.py:126-167 (canonical chain)",
-        "summary": "engine/live/algo_selector.py applies a quantity-threshold heuristic (>=10 \u2192 TWAP else MARKET) that ignores InstructionType entirely \u2014 when active it bypasses ALL the canonical SWAP/TRADE/ZERO_ALPHA rules."
+        "citation": "DELETED 2026-07-30 (was engine/live/algo_selector.py:31, quantity heuristic) vs selector.py:126-167 (canonical chain, unaffected)",
+        "summary": "engine/live/algo_selector.py applied a quantity-threshold heuristic (>=10 \u2192 TWAP else MARKET) that ignored InstructionType entirely \u2014 when active it would have bypassed ALL the canonical SWAP/TRADE/ZERO_ALPHA rules."
       },
       "node_id": "selector_contradiction:heuristic_selector_bypasses_instruction_type"
     },
@@ -28923,8 +29977,8 @@
       "kind": "execution_algo",
       "label": "Selector contradiction: iceberg_path_split",
       "metadata": {
-        "citation": "selector.py:30 (ICEBERG removed comment) vs api/manual_instruction_helpers.py:70 (_SUPPORTED_ALGOS includes ICEBERG) + engine/live/algo_selector.py:31 + adapters/algorithm_factory.py (_ALGO_MAP 'iceberg')",
-        "summary": "ICEBERG is a valid algo on the manual-instruction API + engine/live selector + adapters factory, but is EXCLUDED from the canonical ALGORITHMS_BY_INSTRUCTION_TYPE \u2014 requesting it through select_algorithm() falls back / would not validate, while the manual API accepts it."
+        "citation": "selector.py:30-35 (ICEBERG removed comment) vs api/manual_instruction_helpers.py:70-75 (_SUPPORTED_ALGOS includes ICEBERG) + adapters/algorithm_factory.py (_ALGO_MAP 'iceberg')",
+        "summary": "ICEBERG is a valid algo on the manual-instruction API + adapters factory, but is EXCLUDED from the canonical ALGORITHMS_BY_INSTRUCTION_TYPE \u2014 requesting it through select_algorithm() falls back / would not validate, while the manual API accepts it."
       },
       "node_id": "selector_contradiction:iceberg_path_split"
     },
@@ -28933,7 +29987,7 @@
       "label": "Selector contradiction: missing_ssot_doc",
       "metadata": {
         "citation": "selector.py:7 (docstring 'Based on UNIFIED_EXECUTION_DELTA.md') vs no such file",
-        "summary": "selector.py cites UNIFIED_EXECUTION_DELTA.md as its taxonomy SSOT, but that document does not exist anywhere in the workspace \u2014 the selector code is the de-facto SSOT (this registry now transcribes it)."
+        "summary": "selector.py cited UNIFIED_EXECUTION_DELTA.md as its taxonomy SSOT, but that document does not exist anywhere in the workspace \u2014 the selector code was the de-facto SSOT (this registry transcribes it declaratively)."
       },
       "node_id": "selector_contradiction:missing_ssot_doc"
     },
@@ -28942,7 +29996,7 @@
       "label": "Selector contradiction: sor_naming_mismatch",
       "metadata": {
         "citation": "adapters/algorithm_factory.py (_ALGO_MAP 'sor') vs selector.py:39 ('SMART_ORDER_ROUTER')",
-        "summary": "The adapters factory keys the smart-order-router as 'sor' (lowercase) while the canonical selector knows it only as 'SMART_ORDER_ROUTER' \u2014 a request for 'SOR' through select_algorithm() raises AlgorithmNotSupportedError."
+        "summary": "The adapters factory keys the smart-order-router as 'sor' (lowercase) while the canonical selector knows it only as 'SMART_ORDER_ROUTER' \u2014 a caller forwarding select_algorithm()'s output into the factory would fail to resolve."
       },
       "node_id": "selector_contradiction:sor_naming_mismatch"
     },
@@ -29365,22 +30419,6 @@
         "registry": "trading_agent"
       },
       "node_id": "gap_registry:trading_agent"
-    },
-    {
-      "kind": "gap_registry",
-      "label": "Execution algorithms",
-      "metadata": {
-        "registry": "execution_algos"
-      },
-      "node_id": "service_registry:execution_algos"
-    },
-    {
-      "kind": "gap_registry",
-      "label": "ML model registry",
-      "metadata": {
-        "registry": "ml_models"
-      },
-      "node_id": "service_registry:ml_models"
     },
     {
       "kind": "instrument_type",
@@ -30986,6 +32024,94 @@
       "node_id": "leg:YIELD_STAKING_SIMPLE:stake"
     },
     {
+      "kind": "ml_model",
+      "label": "ML Model: Catboost",
+      "metadata": {
+        "model_type": "catboost",
+        "serves_asset_groups": "cefi,defi,sports,tradfi",
+        "target_types": "clv,clv_meta,cross_venue_spread,direction,ht_delta,swing_high,swing_low,volatility,xg,xg_meta",
+        "variant_fields": "instrument_id,target_params,target_type,timeframe"
+      },
+      "node_id": "ml_model:catboost"
+    },
+    {
+      "kind": "ml_model",
+      "label": "ML Model: Ensemble",
+      "metadata": {
+        "model_type": "ensemble",
+        "serves_asset_groups": "cefi,defi,tradfi",
+        "target_types": "clv,clv_meta,cross_venue_spread,direction,ht_delta,swing_high,swing_low,volatility,xg,xg_meta",
+        "variant_fields": "instrument_id,target_params,target_type,timeframe"
+      },
+      "node_id": "ml_model:ensemble"
+    },
+    {
+      "kind": "ml_model",
+      "label": "ML Model: Huber",
+      "metadata": {
+        "model_type": "huber",
+        "serves_asset_groups": "cefi,defi,sports,tradfi",
+        "target_types": "clv,clv_meta,cross_venue_spread,direction,ht_delta,swing_high,swing_low,volatility,xg,xg_meta",
+        "variant_fields": "instrument_id,target_params,target_type,timeframe"
+      },
+      "node_id": "ml_model:huber"
+    },
+    {
+      "kind": "ml_model",
+      "label": "ML Model: Lightgbm",
+      "metadata": {
+        "model_type": "lightgbm",
+        "serves_asset_groups": "cefi,defi,sports,tradfi",
+        "target_types": "clv,clv_meta,cross_venue_spread,direction,ht_delta,swing_high,swing_low,volatility,xg,xg_meta",
+        "variant_fields": "instrument_id,target_params,target_type,timeframe"
+      },
+      "node_id": "ml_model:lightgbm"
+    },
+    {
+      "kind": "ml_model",
+      "label": "ML Model: Poisson Glm",
+      "metadata": {
+        "model_type": "poisson_glm",
+        "serves_asset_groups": "cefi,defi,tradfi",
+        "target_types": "clv,clv_meta,cross_venue_spread,direction,ht_delta,swing_high,swing_low,volatility,xg,xg_meta",
+        "variant_fields": "instrument_id,target_params,target_type,timeframe"
+      },
+      "node_id": "ml_model:poisson_glm"
+    },
+    {
+      "kind": "ml_model",
+      "label": "ML Model: Random Forest",
+      "metadata": {
+        "model_type": "random_forest",
+        "serves_asset_groups": "cefi,defi,tradfi",
+        "target_types": "clv,clv_meta,cross_venue_spread,direction,ht_delta,swing_high,swing_low,volatility,xg,xg_meta",
+        "variant_fields": "instrument_id,target_params,target_type,timeframe"
+      },
+      "node_id": "ml_model:random_forest"
+    },
+    {
+      "kind": "ml_model",
+      "label": "ML Model: Ridge",
+      "metadata": {
+        "model_type": "ridge",
+        "serves_asset_groups": "cefi,defi,sports,tradfi",
+        "target_types": "clv,clv_meta,cross_venue_spread,direction,ht_delta,swing_high,swing_low,volatility,xg,xg_meta",
+        "variant_fields": "instrument_id,target_params,target_type,timeframe"
+      },
+      "node_id": "ml_model:ridge"
+    },
+    {
+      "kind": "ml_model",
+      "label": "ML Model: Xgboost",
+      "metadata": {
+        "model_type": "xgboost",
+        "serves_asset_groups": "cefi,defi,sports,tradfi",
+        "target_types": "clv,clv_meta,cross_venue_spread,direction,ht_delta,swing_high,swing_low,volatility,xg,xg_meta",
+        "variant_fields": "instrument_id,target_params,target_type,timeframe"
+      },
+      "node_id": "ml_model:xgboost"
+    },
+    {
       "kind": "risk_gate_layer",
       "label": "Risk Gate: Execution Pretrade",
       "metadata": {},
@@ -32554,14 +33680,6 @@
         "asset_group": "DEFI"
       },
       "node_id": "venue:gamma"
-    },
-    {
-      "kind": "venue",
-      "label": "Gmx V2",
-      "metadata": {
-        "asset_group": "DEFI"
-      },
-      "node_id": "venue:gmx_v2"
     },
     {
       "kind": "venue",

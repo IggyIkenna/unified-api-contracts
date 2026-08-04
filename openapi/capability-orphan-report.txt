@@ -1,6 +1,6 @@
 # Capability Manifest — Orphan + Dead-End Report
 # manifest_version: 1.0.0
-# generated_from_commit: 3a8c845b799cd5eb3c5067d860a62dabb520eb99
+# generated_from_commit: 16a5d162b892e9da0b5d354781a00fa0248ffd4e
 #
 # Orphan nodes have no edges. Unbuilt dead-ends are registry-available
 # archetype/instrument combos with no supporting venue (build gap).
@@ -12,7 +12,7 @@
 
 (none — all declared brokers correctly classified as broker nodes)
 
-## Orphan nodes (81)
+## Orphan nodes (82)
 
 ORPHAN: chain:1101
 ORPHAN: chain:11155111
@@ -40,6 +40,7 @@ ORPHAN: chain:MANTLE
 ORPHAN: chain:METIS
 ORPHAN: chain:MODE
 ORPHAN: chain:MOONBEAM
+ORPHAN: chain:PLASMA
 ORPHAN: chain:POLYGON
 ORPHAN: chain:SCROLL
 ORPHAN: chain:ZKSYNC
@@ -267,11 +268,12 @@ UNBUILT: leg:VOL_VARIANCE_SWAP:option_strip x option (CEFI) — capability regis
 UNBUILT: leg:YIELD_ROTATION_LENDING:lend x lending (CEFI) — capability registry marks (archetype, instrument_type) available, but no CEFI venue lists this instrument type — unbuilt dead-end (missing adapter/registry)
 UNBUILT: leg:YIELD_STAKING_SIMPLE:stake x staking (DEFI) — capability registry marks (archetype, instrument_type) available, but no DEFI venue lists this instrument type — unbuilt dead-end (missing adapter/registry)
 
-## Logical dead-ends (16)
+## Logical dead-ends (17)
 
 LOGICAL: ARBITRAGE_PRICE_DISPERSION x option (CEFI) — No supported DeFi options venue.
 LOGICAL: CARRY_BASIS_DATED x dated_future (CEFI) — No DeFi dated-future venue.
 LOGICAL: CARRY_BASIS_DATED_INV x dated_future (CEFI) — No DeFi dated-future venue available — mirrors CARRY_BASIS_DATED DeFi BLOCKED cell.
+LOGICAL: LIQUIDATION_CAPTURE x perp (CEFI) — No DeFi perp-liquidation venue. Was gmx_v2-only (perp liquidations have different economics than lending liquidations); GMX removed 2026-08-04 (unreliable historical funding data, see defi_gmx_venue_removal_2026_07_25.md) leaves this cell with no remaining venue.
 LOGICAL: MARKET_MAKING_CONTINUOUS x option (CEFI) — No supported DeFi options venue.
 LOGICAL: MARKET_MAKING_CONTINUOUS x perp (CEFI) — DeFi perp MM not exposed as third-party role.
 LOGICAL: MARKET_MAKING_EVENT_SETTLED x event_settled (SPORTS) — Unity Feed Connector is place-only, not quoting.
@@ -292,12 +294,3 @@ LOGICAL: YIELD_ROTATION_LENDING x lending (CEFI) — CeFi lending out-of-scope: 
 # edge in the current manifest. They are listed here for triage.
 
 # (none)
-
-=== VERDICT MATRIX SUMMARY (Phase 6A) ===
-Exhaustive cross-join: archetype x venue x instrument_type x (instruction_action x algo).
-  total cells:    31168
-  available:      22517 (72.2%)
-  blocked:        8203 (26.3%)
-  not_registered: 448 (1.4%)
-Output: openapi/capability-verdict-matrix.json
-=== END VERDICT MATRIX SUMMARY ===
