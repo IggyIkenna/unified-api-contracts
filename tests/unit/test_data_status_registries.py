@@ -249,25 +249,6 @@ class TestRegistryConsistencyWithCapabilities:
                     )
 
 
-class TestOkxOptionsChainCapability:
-    """Regression for cefi_deribit_combo_and_okx_bare_venue_gaps_2026_07_12.md Bug C.
-
-    Before this fix, ``VENUE_DATA_TYPE_CAPABILITIES`` had no ``options_chain``
-    key for ``OKX`` — the MTDS preflight silently dropped the (only) requested
-    data_type on every date, with zero rows captured despite the underlying
-    Tardis routing being wired correctly.
-
-    (Bug D's DERIBIT-COMBO coverage was removed from this class 2026-07-21 —
-    operator decision: legacy venue deregistered, migrated to split
-    venue+instrument_type. See market_data_categories.py's
-    VENUES_BY_ASSET_GROUP["cefi"] comment.)
-    """
-
-    def test_okx_declares_options_chain(self) -> None:
-        assert "options_chain" in VENUE_DATA_TYPE_CAPABILITIES["OKX"]
-        assert VENUE_DATA_TYPE_CAPABILITIES["OKX"]["options_chain"] == "2020-02-01"
-
-
 class TestKrxVenueDataTypeCapabilitiesRegistryGap:
     """Regression for a real registry-gap bug (2026-07-13 pipeline_e2e_check
     TRADFI diagnostic pass): KRX had NO entry at all in

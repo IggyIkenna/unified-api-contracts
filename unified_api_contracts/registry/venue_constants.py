@@ -12,6 +12,7 @@ BINANCE_SPOT = "BINANCE-SPOT"
 BINANCE_FUTURES = "BINANCE-FUTURES"
 OKX_SPOT = "OKX-SPOT"
 OKX_FUTURES = "OKX-FUTURES"
+OKX_SWAP = "OKX-SWAP"
 BYBIT_SPOT = "BYBIT-SPOT"
 BYBIT_FUTURES = "BYBIT-FUTURES"
 COINBASE_SPOT = "COINBASE-SPOT"
@@ -406,20 +407,34 @@ INSTRUMENT_TYPES_BY_VENUE: dict[str, set[str]] = {
     BINANCE_SPOT: {"SPOT_PAIR"},
     COINBASE_SPOT: {"SPOT_PAIR"},
     OKX_SPOT: {"SPOT_PAIR"},
-    OKX_FUTURES: {"PERPETUAL", "FUTURE", "OPTION"},
-    # bare "OKX" DROPS SPOT_PAIR again (Option A follow-through, 2026-07-10):
-    # OKX-SPOT is now declared its own distinct cefi venue in
-    # VENUES_BY_ASSET_GROUP["cefi"] (market_data_categories.py, 2026-07-10
-    # operator decision) with its own VENUE_DATA_TYPE_CAPABILITIES entry, so
-    # bare-OKX SPOT_PAIR is a duplicate EXPECTED cell (production-verified:
-    # bare OKX has ZERO real SPOT_PAIR rows — see the 2026-07-07 23fa3a99
-    # rationale). The 2026-07-08 revert (1771d59a) that restored this entry
-    # predates OKX-SPOT's venue declaration; now that OKX-SPOT exists as its
-    # own venue, restoring bare-OKX SPOT_PAIR would double-count instead of
-    # filling a real hole. See
-    # plans/active/issues/instruments_service_cefi_qg_red_on_ldr_head_2026_07_08.md
-    # Option A + plans/active/issues/instruments_service_qg_red_golden_drift_2026_07_10.md.
-    "OKX": {"PERPETUAL", "FUTURE", "OPTION"},
+    # OPTION member REMOVED 2026-08-04 (with bare "OKX" — see below): zero real
+    # captured/attempted options_chain data was ever tagged venue=OKX-FUTURES
+    # (confirmed via the live honest-coverage rollup — only FUTURE/PERPETUAL/
+    # futures_chain have real rows), so it was a phantom EXPECTED cell with
+    # nothing to match, not a genuine capability.
+    OKX_FUTURES: {"PERPETUAL", "FUTURE"},
+    # bare "OKX" REMOVED from the CeFi capture-universe role 2026-08-04
+    # (operator decision): its OPTION member (options_chain bundle) never
+    # reached MVP — 0 real captured rows, 6/6 attempted_failed live — and its
+    # PERPETUAL member was a redundant proxy for OKX-SWAP's real data
+    # (trades/book_snapshot_5/derivative_ticker/liquidations), which now
+    # generates its own Layer-1 EXPECTED tuples directly via OKX_SWAP below
+    # (see CEFI_VENUE_FOLD in market_data_categories.py for the matching
+    # fold-table cleanup). It was ALSO regularly attempting (and permanently
+    # failing) real capture for dozens of perp/spot symbols across every
+    # regular data_type — 2,475+ attempted_failed manifest rows as of
+    # 2026-08-04, growing daily, since bare OKX has no unambiguous Tardis
+    # exchange (splits across 4 real exchanges) — that waste stops once this
+    # ships. The KEY ENTRY IS KEPT (PERPETUAL only, OPTION dropped) purely
+    # because CLOB_VENUES (execution/trading-context venue set, a DIFFERENT
+    # concept from VENUES_BY_ASSET_GROUP["cefi"]'s capture-universe) still
+    # lists bare "OKX" and requires an INSTRUMENT_TYPES_BY_VENUE entry
+    # (test_all_clob_venues_in_instrument_types) — this entry is UNREACHABLE
+    # from build_expected("cefi") because _get_cefi_venue_itypes() only
+    # consults INSTRUMENT_TYPES_BY_VENUE for venues that are ALSO members of
+    # VENUES_BY_ASSET_GROUP["cefi"], which bare "OKX" no longer is.
+    "OKX": {"PERPETUAL"},
+    OKX_SWAP: {"PERPETUAL"},
     BYBIT_SPOT: {"SPOT_PAIR"},
     BYBIT_FUTURES: {"PERPETUAL", "FUTURE"},
     # bare "BYBIT" DROPS SPOT_PAIR too (same Option A follow-through) —

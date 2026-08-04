@@ -906,20 +906,18 @@ class VenueMapping:
             # both live on this endpoint (2026-06-24).
             ("BINANCE-DELIVERY", "PERPETUAL"): "binance-delivery",
             ("BINANCE-DELIVERY", "FUTURE"): "binance-delivery",
-            # OKX mappings (CRITICAL: instrument_type determines endpoint)
+            # OKX mappings (CRITICAL: instrument_type determines endpoint).
+            # ("OKX", "OPTION"): "okex-options" REMOVED 2026-08-04 — OKX
+            # options never reached MVP (0 real captured rows, 6/6
+            # attempted_failed in production) and bare "OKX" itself was
+            # removed as a venue (see market_data_categories.py
+            # VENUES_BY_ASSET_GROUP["cefi"]); these 3 SPOT_PAIR/PERPETUAL/
+            # FUTURE entries are untouched (still consumed by
+            # instruments-service's multi-exchange bare-OKX resolution +
+            # possibly the OKX-SPOT/-SWAP/-FUTURES suffix fallback).
             ("OKX", "SPOT_PAIR"): "okex",
             ("OKX", "PERPETUAL"): "okex-swap",
             ("OKX", "FUTURE"): "okex-futures",
-            # OKX options — distinct Tardis exchange "okex-options" (247,539
-            # real option symbols since 2020-02-01, confirmed live 2026-07-12).
-            # NOTE: this dict entry alone is not sufficient to route real
-            # options_chain bulk-download requests — the call site
-            # (market_tick_data_service umi_tick_provider._route_tardis) uses
-            # the venue-only VenueMapping.get_tardis_exchange_for_venue(),
-            # which is not instrument-type-aware, so it will NOT pick this up
-            # until that call site is made itype-aware (see
-            # cefi_deribit_combo_and_okx_bare_venue_gaps_2026_07_12.md todo 2).
-            ("OKX", "OPTION"): "okex-options",
             # Bybit mappings
             ("BYBIT", "SPOT_PAIR"): "bybit-spot",
             ("BYBIT", "PERPETUAL"): "bybit",

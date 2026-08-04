@@ -78,15 +78,6 @@ class TestVenueInstrumentTypeToTardisNewEntries:
     migrated to split venue+instrument_type).
     """
 
-    def test_okx_option_entry_present(self, vm: VenueMapping) -> None:
-        assert vm.venue_instrument_type_to_tardis.get(("OKX", "OPTION")) == "okex-options"
-
-    def test_okx_options_suffixed_venue_resolves(self, vm: VenueMapping) -> None:
-        """Reachable today via the suffixed-venue lookup path; whether the
-        real options_chain call site constructs a suffixed venue string like
-        this is the open question in todo 2 of the issue doc."""
-        assert vm.get_tardis_exchange_for_venue("OKX-OPTIONS") == "okex-options"
-
     def test_okx_bare_venue_still_unresolved(self, vm: VenueMapping) -> None:
         """Confirms the real gap for OKX: bare "OKX" (no instrument-type
         suffix) still can't resolve to an exchange at all, because OKX maps
@@ -263,8 +254,11 @@ class TestGetAllTardisExchangesForVenue:
     """
 
     def test_okx_returns_all_itype_exchanges(self, vm: VenueMapping) -> None:
+        # okex-options DROPPED 2026-08-04 — OKX options never reached MVP
+        # (0 real captured rows, 6/6 attempted_failed) and bare "OKX" itself
+        # was removed as a canonical cefi venue.
         result = vm.get_all_tardis_exchanges_for_venue("OKX")
-        assert set(result) == {"okex", "okex-swap", "okex-futures", "okex-options"}
+        assert set(result) == {"okex", "okex-swap", "okex-futures"}
 
     def test_single_exchange_venue_returns_one_element_list(self, vm: VenueMapping) -> None:
         # DERIBIT has a direct tardis_to_venue match — must stay a 1-element list,

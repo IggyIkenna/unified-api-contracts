@@ -347,19 +347,26 @@ VENUES_BY_ASSET_GROUP: dict[str, list[str]] = {
         # from BINANCE-FUTURES (USDT-M linear). cefi_universe_capture_rule 2026-06-24.
         "BINANCE-DELIVERY",
         "BYBIT",
-        "OKX",
+        # Bare "OKX" REMOVED ENTIRELY (operator decision 2026-08-04, folds the
+        # 2026-07-10/07-21 splits below to their conclusion): OKX-SPOT/OKX-SWAP/
+        # OKX-FUTURES are each real, actively-captured venues in their own right
+        # and cover every MVP OKX product; bare "OKX" survived only as (a) the
+        # OPTION/options_chain capability — never MVP, 0 real captured rows, 6/6
+        # attempted_failed in production — and (b) the Layer-1 fold target
+        # OKX-SWAP's real PERPETUAL rows compared against
+        # (INSTRUMENT_TYPES_BY_VENUE[OKX_SWAP] in venue_constants.py now carries
+        # that role directly). Both are gone with no accounting regression — see
+        # CEFI_VENUE_FOLD below for the matching dialect-repoint.
         # OKX-SPOT declared its own distinct cefi venue (Option A,
         # 2026-07-10 operator decision — mirrors the BYBIT-SPOT precedent
-        # below): bare "OKX" has ZERO real SPOT_PAIR captures in production
+        # below): bare "OKX" had ZERO real SPOT_PAIR captures in production
         # (confirmed via a direct GCS availability_index read,
         # unified-api-contracts@23fa3a99) — Tardis's own routing table
         # already sends (OKX, SPOT_PAIR) to the same "okex" source as
         # canonical OKX-SPOT, so the bare-OKX capability was a redundant
         # alias, not a distinct real capability. Declaring OKX-SPOT here
-        # (instead of relying on instruments-service's _CEFI_VENUE_FOLD to
-        # fold captured OKX-SPOT rows up to bare "OKX") makes the real
-        # captured OKX spot data visible to Layer-1/Layer-2 honest-coverage
-        # directly, matching BYBIT/BYBIT-SPOT's shape. SSOT:
+        # makes the real captured OKX spot data visible to Layer-1/Layer-2
+        # honest-coverage directly, matching BYBIT/BYBIT-SPOT's shape. SSOT:
         # unified-trading-pm/plans/active/issues/
         # instruments_service_cefi_qg_red_on_ldr_head_2026_07_08.md,
         # cefi_layer1_denominator_gaps_2026_07_03.md.
@@ -628,26 +635,26 @@ TRADFI_CHAIN_SNAPSHOT_ACCEPTED_NONCANONICAL_DATA_TYPES: frozenset[str] = frozens
 # CeFi venue-dialect fold (honest_coverage_uac_writer_matrix_reconciliation
 # Decision 6): the writer captures under Tardis-grain suffixed venues
 # (OKX-SWAP/-FUTURES from expand_cefi_tardis_endpoints; legacy raw Tardis
-# exchange ids on older rows) while this registry keys those venues at the
-# bare canonical grain (OKX). Maps each known dialect spelling to its
-# canonical venue. Venues that are themselves canonical suffixed forms
-# (OKX-SPOT, BYBIT-SPOT, KRAKEN-FUTURES, BITFINEX-*, ...) are deliberately
-# NOT present here — OKX-SPOT was REMOVED 2026-07-10 (Option A follow-
-# through: OKX-SPOT is its own declared cefi venue with its own EXPECTED
-# entry now; folding it to bare OKX would make real captured OKX-SPOT rows
-# compare against the wrong EXPECTED tuple). COINBASE is the exception: the
-# canonical EXPECTED token for spot Coinbase is COINBASE-SPOT (not bare
-# COINBASE), so that entry folds legacy bare-COINBASE tokens UP instead of
-# down. Moved here from instruments-service's `check_enumeration_completeness.py`
+# exchange ids on older rows) while some dialects still need folding to the
+# real canonical venue. Maps each known dialect spelling to its canonical
+# venue. Venues that are themselves canonical suffixed forms (OKX-SPOT,
+# OKX-SWAP, OKX-FUTURES, BYBIT-SPOT, KRAKEN-FUTURES, BITFINEX-*, ...) are
+# deliberately NOT present here — OKX-SPOT was REMOVED 2026-07-10 (Option A
+# follow-through), OKX-SWAP/OKX-FUTURES REMOVED 2026-08-04 (bare "OKX" the
+# fold previously targeted no longer exists as a venue — see
+# VENUES_BY_ASSET_GROUP["cefi"] above): each is its own declared cefi venue
+# with its own EXPECTED entry now; folding it to another venue would make
+# its real captured rows compare against the wrong EXPECTED tuple. COINBASE
+# is the exception: the canonical EXPECTED token for spot Coinbase is
+# COINBASE-SPOT (not bare COINBASE), so that entry folds legacy
+# bare-COINBASE tokens UP instead of down. Moved here from
+# instruments-service's `check_enumeration_completeness.py`
 # (audit follow-up 2026-07-22, distinct-values D2) so instruments-service's
 # canonicalisation AND deployment-api's distinct-values detector share ONE
 # source of truth instead of instruments-service hardcoding its own copy that
 # deployment-api could never see — see
-# `plans/active/distinct_values_noncanonical_audit_2026_07_20.md` "D2".
+# `plans/active/distinct_values_noncanonical_audit_2026_07-20.md` "D2".
 CEFI_VENUE_FOLD: dict[str, str] = {
-    # Tardis-grain splits emitted by expand_cefi_tardis_endpoints()
-    "OKX-SWAP": "OKX",
-    "OKX-FUTURES": "OKX",
     # INVERTED (coinbase_bare_name_migration_2026_07_06 S1): COINBASE-SPOT is
     # now the canonical EXPECTED token; legacy manifest rows that stamped bare
     # COINBASE fold UP to COINBASE-SPOT so they still match EXPECTED instead
@@ -656,26 +663,24 @@ CEFI_VENUE_FOLD: dict[str, str] = {
     # Writer-side names for venues UAC keys differently
     "BYBIT-FUTURES": "BYBIT",
     "COINBASE-INTERNATIONAL": "COINBASE-FUTURES",
-    # Legacy raw Tardis exchange ids (pre-canonicalisation manifest rows)
-    "OKEX": "OKX",
-    "OKEX-SWAP": "OKX",
-    "OKEX-FUTURES": "OKX",
+    # Legacy raw Tardis exchange ids (pre-canonicalisation manifest rows).
+    # Repointed to the specific product-typed canonical venue 2026-08-04
+    # (previously all three folded to bare "OKX", now removed — see above).
+    "OKEX": "OKX-SPOT",
+    "OKEX-SWAP": "OKX-SWAP",
+    "OKEX-FUTURES": "OKX-FUTURES",
     "CRYPTOFACILITIES": "KRAKEN-FUTURES",
     "BITFINEX-DERIVATIVES": "BITFINEX-FUTURES",
 }
 
 # The dialect spellings above are real manifest values (writers genuinely
-# stamp them), not junk. Most are also not members of
-# VENUES_BY_ASSET_GROUP["cefi"] (the bare-canonical grain), so the
-# distinct-values panel badges them non-canonical every run despite them
-# being fully understood, folded, honest data. TWO entries (OKX-SWAP,
-# OKX-FUTURES) were SEPARATELY promoted to direct VENUES_BY_ASSET_GROUP
-# membership 2026-07-21 (real, actively-captured cefi venues in their own
-# right) — excluded here via the set difference so they keep badging
-# canonical=True (visibly correct) rather than being silently dropped from
-# the panel's enumeration entirely, which is what accepted-exception
-# treatment does (see `enumerate_distinct_values` — a value here is REMOVED
-# from output, not just marked canonical). Mirrors
+# stamp them), not junk. None are members of VENUES_BY_ASSET_GROUP["cefi"]
+# (the bare-canonical grain), so the distinct-values panel badges them
+# non-canonical every run despite them being fully understood, folded,
+# honest data. (OKX-SWAP/OKX-FUTURES were previously excluded from this
+# fold dict via a set-difference so they'd badge canonical=True directly —
+# 2026-08-04 simplified that: they're no longer fold TARGETS at all, since
+# bare "OKX" is gone, so there's nothing to exclude.) Mirrors
 # SPORTS_ODDS_API_ACCEPTED_NONCANONICAL_BOOKMAKERS /
 # TRADFI_CHAIN_SNAPSHOT_ACCEPTED_NONCANONICAL_DATA_TYPES exactly for the
 # genuinely-still-non-canonical remainder: consumed by deployment-api's
@@ -829,29 +834,26 @@ TRADFI_CHAIN_AXIS_ACCEPTED_DEAD_RESIDUE: frozenset[str] = frozenset(
 # NOT fully confirmed, flagged here for a deeper trace, not a closed finding. NOT a
 # canonical set — consumed by `_ACCEPTED_EXCEPTIONS[("instrument_types", "tradfi")]`.
 #
-# `OPTION`/`FUTURE`/`COMBO`/`EQUITY`/`ETF`/`INDEX` added 2026-08-03
-# (tradfi_bare_instrument_type_phantom_manifest_rows_2026_08_03.md). All 6 share ONE
-# confirmed root cause with `UD` (unlike UD, this one IS confirmed, not residual-unknown):
-# 13,923 manifest rows, 100% `service_name=market-data-processing-service`,
-# `source=databento`, `capture_status=captured`, written in a single 9-second batch
-# (2026-07-27T16:46:31-40Z), every row `instrument_id IS NULL` AND `underlying IS NULL`.
-# Traced to `market-data-processing-service/.../canonical_writer.py::write_candle_parquet`
-# omitting `instrument_id`/`underlying` from the row_key on its "aggregated" (non-per-
-# instrument) write path — legitimate for a genuine venue/underlying rollup, but these 6
-# instrument_type values have no chain/underlying-aggregation concept, so the write is
-# phantom bookkeeping with zero backing GCS object (directly GCS-confirmed for
-# OPTION/FUTURE/COMBO at 3 sampled dates; EQUITY/ETF/INDEX share the identical batch +
-# null-id+underlying signature). Exact upstream caller not fully traced — see the issue doc
-# for the honest boundary of that investigation.
+# `OPTION`/`FUTURE`/`COMBO`/`EQUITY`/`ETF`/`INDEX` were added here 2026-08-03
+# (tradfi_bare_instrument_type_phantom_manifest_rows_2026_08_03.md) to quarantine 13,923
+# PHANTOM rows sharing one signature (instrument_id IS NULL AND underlying IS NULL, written
+# in a single 9-second batch 2026-07-27T16:46:31-40Z by market-data-processing-service) —
+# but REVERTED 2026-08-04 (live-evidence regression: deployment-ui's distinct-values panel
+# stopped showing FUTURE/OPTION at all for tradfi). Root cause: `_ACCEPTED_EXCEPTIONS`
+# operates on the raw distinct VALUE across the whole axis, not per-row — quarantining the
+# STRING "OPTION" hides every row with instrument_type=OPTION from the panel, including the
+# millions of legitimate captured rows, not just the 13,923 phantom ones. Unlike `UD` (whose
+# ENTIRE population is the unresolved residue — no other writer stamps bare "UD"), these 6
+# are real, heavily-populated `InstrumentType` enum members with the phantom batch as a tiny
+# minority of their rows — quarantining the value was never the right tool for a row-level
+# defect. The phantom rows themselves remain a real, separate, already-tracked
+# data-correctness issue (zero backing GCS object, `capture_status=captured` is a false
+# claim) — see the issue doc's own root-cause trace
+# (`market-data-processing-service/.../canonical_writer.py::write_candle_parquet`) — but
+# fixing THAT needs a row-level manifest repair, not an axis-value quarantine.
 TRADFI_INSTRUMENT_TYPE_ACCEPTED_UNRESOLVED_RESIDUE: frozenset[str] = frozenset(
     {
         "UD",
-        "OPTION",
-        "FUTURE",
-        "COMBO",
-        "EQUITY",
-        "ETF",
-        "INDEX",
     }
 )
 
@@ -892,7 +894,9 @@ SPORTS_DATA_TYPE_ACCEPTED_STALE_UPPERCASE_RESIDUE: frozenset[str] = frozenset(
 )
 
 # Sports MDPS market-token instrument_type values (sports_instrument_type_market_token_
-# ssot_gap_2026_07_28.md). These 30 values are real, DELIBERATELY-produced MDPS output —
+# ssot_gap_2026_07_28.md; 4 more added 2026-08-04 per data_pipeline_reconciliation_sports_
+# 2026_08_04.md's census — same MDPS output, just not yet observed in the manifest as of
+# the original 30-value draft). These 34 values are real, DELIBERATELY-produced MDPS output —
 # `canonical_writer_shaping.py::_type_token_from_canonical_id` resolves a sports candle
 # row's instrument_type from the market segment of the canonical id via
 # ODDS_API_MARKET_TO_CANONICAL (the operator's "branch the OHLCV mapping by instrument
@@ -903,8 +907,29 @@ SPORTS_DATA_TYPE_ACCEPTED_STALE_UPPERCASE_RESIDUE: frozenset[str] = frozenset(
 # exception over global enum growth, avoiding cross-asset-group enum bloat + denominator
 # blast radius). NOT a canonical set — consumed by
 # `_ACCEPTED_EXCEPTIONS[("instrument_types", "sports")]`.
+#
+# 5 more added 2026-08-04 (live distinct-values panel review, sports asset_group):
+# - "ASIAN_HANDICAP" / "OVER_UNDER" (bare, no point suffix): `canonical_ids.py::
+#   build_instrument_id` only appends the point suffix (`_2_5` etc.) when
+#   `outcome.point is not None` — a spreads/totals market row with a null point
+#   from the ODDS_API vendor response legitimately produces the bare market
+#   token. Same market-grain shape as the suffixed siblings above, not a
+#   distinct writer bug.
+# - "exchange_odds" / "fixed_odds": the deliberate venue-based split target of
+#   the 2026-07-27 migration (`market-tick-data-service/scripts/sports/
+#   exchange_fixed_odds_fork/`) — Betfair-Exchange-style venues (BETFAIR_EX_UK/
+#   BETFAIR_EX_EU/SMARKETS/MATCHBOOK) stamp "exchange_odds", sportsbook-style
+#   venues (BETFAIR_SB_UK/BETMGM/PINNACLE/ODDS_API) stamp "fixed_odds" — both
+#   already registered UAC `CONTRACT_REGISTRY[("sports", "exchange_odds"/
+#   "fixed_odds", "trades")]` keys, not ad hoc strings.
+# - "odds" (lowercase, generic): the pre-fork residual instrument_type for
+#   venues the 2026-07-27 migration didn't (yet) cover.
+# All 5 are real `data_type=trades`/bundle-grain MTDS/MDPS output, never
+# members of the per-CONTRACT-grain `InstrumentType` enum for the same reason
+# as the rest of this set.
 SPORTS_MARKET_TOKEN_ACCEPTED_NONCANONICAL_INSTRUMENT_TYPES: frozenset[str] = frozenset(
     {
+        "ASIAN_HANDICAP",
         "ASIAN_HANDICAP_-0",
         "ASIAN_HANDICAP_0",
         "ASIAN_HANDICAP_0_25",
@@ -915,6 +940,7 @@ SPORTS_MARKET_TOKEN_ACCEPTED_NONCANONICAL_INSTRUMENT_TYPES: frozenset[str] = fro
         "ASIAN_HANDICAP_1_5",
         "ASIAN_HANDICAP_1_75",
         "ASIAN_HANDICAP_2",
+        "ASIAN_HANDICAP_2_25",
         "ASIAN_HANDICAP_M0_25",
         "ASIAN_HANDICAP_M0_5",
         "ASIAN_HANDICAP_M0_75",
@@ -923,8 +949,10 @@ SPORTS_MARKET_TOKEN_ACCEPTED_NONCANONICAL_INSTRUMENT_TYPES: frozenset[str] = fro
         "ASIAN_HANDICAP_M1_5",
         "ASIAN_HANDICAP_M1_75",
         "ASIAN_HANDICAP_M2",
+        "ASIAN_HANDICAP_M2_25",
         "MATCH_ODDS",
         "MATCH_ODDS_LAY",
+        "OVER_UNDER",
         "OVER_UNDER_1_5",
         "OVER_UNDER_1_75",
         "OVER_UNDER_2",
@@ -934,7 +962,12 @@ SPORTS_MARKET_TOKEN_ACCEPTED_NONCANONICAL_INSTRUMENT_TYPES: frozenset[str] = fro
         "OVER_UNDER_3",
         "OVER_UNDER_3_25",
         "OVER_UNDER_3_5",
+        "OVER_UNDER_3_75",
+        "OVER_UNDER_8_5",
         "SPORT",
+        "exchange_odds",
+        "fixed_odds",
+        "odds",
     }
 )
 
@@ -1849,40 +1882,16 @@ VENUE_DATA_TYPE_CAPABILITIES: dict[str, dict[str, str]] = {
         "trades": "2021-12-04",
         "book_snapshot_5": "2021-12-04",
     },
-    "OKX": {
-        "trades": "2020-01-01",
-        "book_snapshot_5": "2020-01-01",
-        "derivative_ticker": "2020-01-01",
-        "liquidations": "2020-01-01",
-        # ``liquidations`` KEPT on bare OKX (2026-07-15, cefi_completion_program
-        # workstream E — CORRECTION to the initial removal): bare ``OKX`` is the
-        # canonical Layer-1 EXPECTED token for the OKX perp. The Layer-1
-        # completeness checker FOLDS the writer's Tardis-grain ``OKX-SWAP`` /
-        # ``OKX-FUTURES`` / ``OKEX-SWAP`` rows UP to bare ``OKX``
-        # (check_enumeration_completeness.py ``_CEFI_VENUE_FOLD``), so OKX-SWAP's
-        # 191,923 captured liquidations rows compare against the bare-``OKX``
-        # EXPECTED tuple. ``build_expected`` (expected_universe.py) iterates
-        # ``VENUES_BY_ASSET_GROUP["cefi"]`` which carries bare ``OKX`` (NOT
-        # OKX-SWAP) — dropping liquidations here would silently zero OKX out of
-        # the honest-coverage BATCH denominator even though it is one of the 6
-        # real-feed liquidations venues. (The catalogue-driven enumerator
-        # ``enumerate_expected_universe.py`` uses the OKX-SWAP sub-venue directly,
-        # which retains its own ``liquidations`` entry below — so BOTH producers
-        # now agree that OKX perp liquidations IS expected.)
-        # options_chain added 2026-07-12 (cefi_deribit_combo_and_okx_bare_venue_gaps_2026_07_12.md
-        # Bug C) — real Tardis okex-options data confirmed live (247,540 option
-        # symbols, availableSince verified via api.tardis.dev/v1/exchanges/okex-options
-        # this session, NOT assumed). This closes the UAC-capability half of Bug C;
-        # the venue->adapter-class routing half (bare OKX resolving to OKXAdapter,
-        # which has no download_batch) still needs a fix in
-        # market_tick_data_service/adapters/umi_tick_provider.py.
-        "options_chain": "2020-02-01",
-    },
+    # Bare "OKX" REMOVED ENTIRELY (operator decision 2026-08-04): its
+    # trades/book_snapshot_5/derivative_ticker/liquidations entry was a proxy
+    # for OKX-SWAP's real PERPETUAL data (see venue_constants.py's
+    # INSTRUMENT_TYPES_BY_VENUE[OKX_SWAP], which now carries this role
+    # directly) and its options_chain entry (added 2026-07-12,
+    # cefi_deribit_combo_and_okx_bare_venue_gaps_2026_07_12.md Bug C) never
+    # reached MVP — 0 real captured rows, 6/6 attempted_failed in production.
     # Canonical suffixed variants (VenueMapping.tardis_to_venue returns
     # these forms — OKX-SPOT/OKX-FUTURES/OKX-SWAP — to disambiguate market
-    # types). Bare "OKX" kept above for execution-context / client-config
-    # callers that don't split by market. MTDS per-venue lookups hit the
-    # suffixed form.
+    # types). MTDS per-venue lookups hit the suffixed form directly.
     "OKX-SPOT": {
         "trades": "2020-01-01",
         "book_snapshot_5": "2020-01-01",
