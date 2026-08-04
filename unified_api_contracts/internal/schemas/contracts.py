@@ -1376,12 +1376,6 @@ from unified_api_contracts.internal.schemas._defi_v2_contracts import (
     DEFI_LENDING_POSITION_DATA as DEFI_LENDING_POSITION_DATA,
 )
 from unified_api_contracts.internal.schemas._defi_v2_contracts import (
-    DEFI_POOL_DEX_POOLS as DEFI_POOL_DEX_POOLS,
-)
-from unified_api_contracts.internal.schemas._defi_v2_contracts import (
-    DEFI_POOL_DEX_SWAPS as DEFI_POOL_DEX_SWAPS,
-)
-from unified_api_contracts.internal.schemas._defi_v2_contracts import (
     DEFI_SPOT_ASSET_AGGREGATOR_ROUTE as DEFI_SPOT_ASSET_AGGREGATOR_ROUTE,
 )
 from unified_api_contracts.internal.schemas._defi_v2_contracts import (
@@ -1512,9 +1506,7 @@ __all__ = [
     "DEFI_LST_LST_RATES",
     "DEFI_PERPETUAL_DERIVATIVE_TICKER",
     "DEFI_PERPETUAL_PERP_FUNDING",
-    "DEFI_POOL_DEX_POOLS",
     "DEFI_POOL_DEX_POOL_SWAPS",
-    "DEFI_POOL_DEX_SWAPS",
     "DEFI_SPOT_ASSET_BRIDGE_EVENTS",
     "DEFI_SPOT_ASSET_GAS_FEES",
     "DEFI_SPOT_ASSET_GOVERNANCE_EVENTS",

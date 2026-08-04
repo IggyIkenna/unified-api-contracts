@@ -233,109 +233,6 @@ DEFI_SPOT_ASSET_GOVERNANCE_EVENTS = SchemaContract(
     required_row_count_min=0,
 )
 
-# ---------------------------------------------------------------------------
-# DEX pool + swap DataType enum coverage (data_status_institutional_drilldown).
-# Distinct from ``dex_pool_state`` / ``dex_pool_swaps`` (canonical MTDS write
-# path — see contracts.py): ``dex_pools`` / ``dex_swaps`` here are the raw
-# handler-side data-type labels from UAC ``DataType`` enum, matching the
-# availability-manifest row emitted by ``dex_pools_handler`` /
-# ``dex_swaps_handler`` in market-tick-data-service. Columns mirror the raw
-# subgraph-parsed DataFrame before it is rewritten to the canonical
-# ``dex_pool_state`` / ``dex_pool_swaps`` schema. UniV3-family pools publish
-# ``tick`` / ``sqrt_price_x96`` / ``liquidity``; V2-era pools do not.
-# ---------------------------------------------------------------------------
-
-_UNIV3_VENUES: frozenset[str] = frozenset(
-    {
-        "UNISWAP_V3-ETHEREUM",
-        "UNISWAP_V3-ARBITRUM",
-        "UNISWAP_V3-BASE",
-        "UNISWAP_V3-POLYGON",
-        "UNISWAP_V3-OPTIMISM",
-        "PANCAKESWAP_V3-BSC",
-        "SUSHISWAP_V3-ETHEREUM",
-        "SUSHISWAP_V3-ARBITRUM",
-    }
-)
-
-DEFI_POOL_DEX_POOLS = SchemaContract(
-    asset_group="defi",
-    instrument_type="pool",
-    data_type="dex_pools",
-    columns=[
-        _INSTRUMENT_ID,
-        _VENUE,
-        _CHAIN,
-        _TS_EVENT,
-        ColumnSpec(name="pool_id", dtype="string", nullable=False),
-        ColumnSpec(name="protocol", dtype="string", nullable=False),
-        ColumnSpec(name="token_a", dtype="string", nullable=True),
-        ColumnSpec(name="token_b", dtype="string", nullable=True),
-        ColumnSpec(name="price_a", dtype="float64", nullable=True),
-        ColumnSpec(name="price_b", dtype="float64", nullable=True),
-        ColumnSpec(name="fee_rate_bps", dtype="int64", nullable=True),
-        ColumnSpec(name="tvl_usd", dtype="float64", nullable=True),
-        ColumnSpec(name="volume_usd", dtype="float64", nullable=True),
-        ColumnSpec(name="fees_usd", dtype="float64", nullable=True),
-        ColumnSpec(name="tx_count", dtype="int64", nullable=True),
-        ColumnSpec(
-            name="liquidity",
-            dtype="string",
-            nullable=True,
-            required=False,
-            provided_by_venues=_UNIV3_VENUES,
-            description="UniV3/Algebra-fork pools publish raw liquidity; V2 / Messari-basic pools do not.",
-        ),
-    ],
-    symbol_column="pool_id",
-    required_row_count_min=0,
-)
-
-DEFI_POOL_DEX_SWAPS = SchemaContract(
-    asset_group="defi",
-    instrument_type="pool",
-    data_type="dex_swaps",
-    columns=[
-        _INSTRUMENT_ID,
-        _VENUE,
-        _CHAIN,
-        _TS_EVENT,
-        ColumnSpec(name="swap_id", dtype="string", nullable=False),
-        ColumnSpec(name="pool_id", dtype="string", nullable=False),
-        ColumnSpec(name="protocol", dtype="string", nullable=False),
-        ColumnSpec(name="amount0", dtype="float64", nullable=True),
-        ColumnSpec(name="amount1", dtype="float64", nullable=True),
-        ColumnSpec(name="amount_usd", dtype="float64", nullable=True),
-        ColumnSpec(name="sender", dtype="string", nullable=True),
-        ColumnSpec(name="recipient", dtype="string", nullable=True),
-        # V3-family pools publish tick / sqrt_price_x96 / liquidity per swap;
-        # V2-era (Balancer, Curve) swaps carry token_in / token_out / amount_in / amount_out instead.
-        ColumnSpec(
-            name="tick",
-            dtype="int64",
-            nullable=True,
-            required=False,
-            provided_by_venues=_UNIV3_VENUES,
-        ),
-        ColumnSpec(
-            name="sqrt_price_x96",
-            dtype="string",
-            nullable=True,
-            required=False,
-            provided_by_venues=_UNIV3_VENUES,
-        ),
-        ColumnSpec(
-            name="liquidity",
-            dtype="string",
-            nullable=True,
-            required=False,
-            provided_by_venues=_UNIV3_VENUES,
-        ),
-    ],
-    symbol_column="pool_id",
-    required_row_count_min=0,
-)
-
 # DEX aggregator route capture — Jupiter / 1inch / 0x / ParaSwap.
 # Captured at decision time; ``route_json`` holds the full RouteLeg list
 # serialized to JSON (see execution-service ``aggregator.py`` ``RouteLeg``
@@ -467,8 +364,6 @@ CONTRACT_REGISTRY.update(
         ("defi", "lending", "position_data"): DEFI_LENDING_POSITION_DATA,
         ("defi", "spot_asset", "mev_events"): DEFI_SPOT_ASSET_MEV_EVENTS,
         ("defi", "spot_asset", "governance_events"): DEFI_SPOT_ASSET_GOVERNANCE_EVENTS,
-        ("defi", "pool", "dex_pools"): DEFI_POOL_DEX_POOLS,
-        ("defi", "pool", "dex_swaps"): DEFI_POOL_DEX_SWAPS,
         ("defi", "debt_token", "lending_indices"): DEFI_DEBT_TOKEN_LENDING_INDICES,
         ("defi", "yield_bearing", "yield_snapshots"): DEFI_YIELD_BEARING_YIELD_SNAPSHOTS,
         ("defi", "spot_asset", "aggregator_route"): DEFI_SPOT_ASSET_AGGREGATOR_ROUTE,
