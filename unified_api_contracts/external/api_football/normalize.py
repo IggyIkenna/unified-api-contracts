@@ -23,6 +23,8 @@ from unified_api_contracts.canonical.domain.sports import (
     build_season_id,
     build_team_id,
     build_venue_id,
+    canonicalize_league_id,
+    get_league_by_api_football_id,
 )
 from unified_api_contracts.normalize_utils._helpers import iso, to_decimal, ts_ms_to_datetime
 
@@ -84,13 +86,45 @@ def _extract_referee(raw: ApiFootballFixture) -> CanonicalReferee | None:
     )
 
 
+def _resolve_league_id(country: str | None, name: str | None, api_football_id: int | None) -> str:
+    """Resolve a league's canonical ``league_id``, registry-first.
+
+    Root-caused 2026-08-04 (sports_peripheral_bucket_league_vocabulary_contamination_2026_07_20):
+    this function used to be a bare ``build_league_id(country, name)`` call, which
+    slugifies the raw api-football COUNTRY NAME verbatim (e.g. "England" ->
+    "ENGLAND_PREMIER_LEAGUE", "Argentina" -> "ARGENTINA_PRIMERA_NACIONAL") instead of
+    the registry's canonical slug ("EPL", "PRIMERA_DIVISION" f.e.) — a completely
+    different, ungoverned vocabulary from the one every other sports write path uses.
+    Every downstream consumer of ``CanonicalLeague.league_id`` inherited this leak;
+    ``instruments-service`` happens to mask it behind a separate write-universe gate
+    (``_is_in_canonical_write_universe``), but ``features-service``'s per-league GCS
+    write has no equivalent gate, so the contamination was live there as of
+    2026-07-11.
+
+    Mirrors instruments-service's own ``_canonical_league_id`` two-pass, non-lossy
+    design (``instruments_service/engine/orchestrator/sports.py``): resolve via the
+    numeric ``api_football_id`` through the UAC league registry first (this is
+    authoritative — the same id ``get_league_by_api_football_id`` uses everywhere
+    else), falling back to the raw country/name slug ONLY when there is no registry
+    entry (an out-of-universe league we don't track) — non-lossy by design, never
+    raises, never blanks a field the caller can still use for display/logging.
+    """
+    if api_football_id is not None:
+        league = get_league_by_api_football_id(api_football_id)
+        if league is not None:
+            return league.league_id
+    return canonicalize_league_id(build_league_id(country or "", name or ""))
+
+
 def normalize_api_football_fixture(raw: ApiFootballFixture, venue: str = "api_football") -> CanonicalFixture:
     """Convert ApiFootballFixture to CanonicalFixture.
 
     Uses canonical ID builders for human-readable IDs:
-      - league_id: build_league_id(country, name) → "ENG_PREMIER_LEAGUE"
+      - league_id: registry lookup via api_football_id, falling back to
+        build_league_id(country, name) for an out-of-universe league — see
+        :func:`_resolve_league_id`.
       - team_id: build_team_id(name) → "ARSENAL"
-      - fixture_id: build_fixture_id(league, home, away, date) → "ENG_PREMIER_LEAGUE:ARSENAL_v_CHELSEA:20260322"
+      - fixture_id: build_fixture_id(league, home, away, date) → "EPL:ARSENAL_v_CHELSEA:20260322"
     """
     raw_fixture_id = str(raw.id or "")
     kickoff_utc: datetime
@@ -134,7 +168,7 @@ def normalize_api_football_fixture(raw: ApiFootballFixture, venue: str = "api_fo
     league = CanonicalLeague(league_id="", name="", country="", league_type=None, logo_url=None)
     if raw.league:
         league = CanonicalLeague(
-            league_id=build_league_id(raw.league.country or "", raw.league.name or ""),
+            league_id=_resolve_league_id(raw.league.country, raw.league.name, raw.league.id),
             name=raw.league.name or "",
             country=raw.league.country or "",
             league_type=raw.league.type,
