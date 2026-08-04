@@ -786,6 +786,36 @@ DEFI_PERPETUAL_PERP_FUNDING = SchemaContract(
     required_row_count_min=1,
 )
 
+# perp_daily_ctx (2026-08-04, defi_perp_daily_ctx_manifest_gap_reader_risk issue):
+# daily-close context sibling of perp_funding — mark_price (the tick mid),
+# day_ntl_vlm (day notional volume), open_interest. CanonicalPerpFundingProvider
+# (strategy-service engine/core/canonical_perp_funding_provider.py) reads this
+# data_type from the SAME shared defi tick-data bucket TODAY for the funding-
+# driven archetypes' mark price — this registration adds the missing
+# data_type/SchemaContract so its already-real, already-migrated production rows
+# stop being structurally invisible to the honest-coverage manifest. Mirrors
+# DEFI_PERPETUAL_PERP_FUNDING's shape exactly (same 4 common columns); day_ntl_vlm
+# / open_interest are nullable because one of the two current writers
+# (features-service cefi/calculators/perp_funding_corpus.py) does not populate
+# them (it only ever writes mark_price) while the other (MTDS HL backfill script)
+# does — nullable keeps both writers' existing row shape valid unchanged.
+DEFI_PERPETUAL_PERP_DAILY_CTX = SchemaContract(
+    asset_group="defi",
+    instrument_type="perpetual",
+    data_type="perp_daily_ctx",
+    columns=[
+        _INSTRUMENT_ID,
+        _VENUE,
+        _CHAIN,
+        _TS_EVENT,
+        ColumnSpec(name="mark_price", dtype="float64", nullable=False),
+        ColumnSpec(name="day_ntl_vlm", dtype="float64", nullable=True),
+        ColumnSpec(name="open_interest", dtype="float64", nullable=True),
+    ],
+    symbol_column="symbol",
+    required_row_count_min=1,
+)
+
 # derivative_ticker (2026-07-15, defi_perp_funding_canonicalisation_derivative_ticker_all_perps
 # issue, operator ruling): the canonical RAW-funding home for ALL DeFi perp venues, captured
 # at the highest resolution each source offers — even where the source genuinely has no OI
@@ -1082,6 +1112,7 @@ CONTRACT_REGISTRY: dict[tuple[str, str, str], SchemaContract] = {
     ("defi", "spot_asset", "gas_fees"): DEFI_SPOT_ASSET_GAS_FEES,
     ("defi", "spot_asset", "oracle_prices"): DEFI_SPOT_ASSET_ORACLE_PRICES,
     ("defi", "perpetual", "perp_funding"): DEFI_PERPETUAL_PERP_FUNDING,
+    ("defi", "perpetual", "perp_daily_ctx"): DEFI_PERPETUAL_PERP_DAILY_CTX,
     ("defi", "perpetual", "derivative_ticker"): DEFI_PERPETUAL_DERIVATIVE_TICKER,
     # Solana basis MVP (plans/active/solana_basis_trading_mvp_2026_06_01.md)
     ("defi", "perpetual", "perp_trades"): DEFI_PERPETUAL_PERP_TRADES,
