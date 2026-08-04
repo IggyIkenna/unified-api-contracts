@@ -127,7 +127,38 @@ SUBGRAPH_IDS: dict[str, dict[str, str]] = {
         "ETHEREUM": "5zvR82QoaXYFyDEKLZ9t6v9adgnptxYpKpSbxtgVENFV",
         "ARBITRUM": "FbCGRftH4a3yZugY7TnbYgPJVEv2LvMT6oF1fxPe9aJM",
         "BASE": "HMuAwufqZ1YCRmzL2SfHTVkzZovC9VL2UAKhjvRqKiR1",  # UniV3-Base (official schema)
-        "OPTIMISM": "Cghf4LfVqPiFw6fp6Y5X5Ubc8UpmUhSfJL82zwiBFLaj",
+        # OPTIMISM subgraph swapped 2026-08-04 (slot-12): the prior deployment
+        # (Cghf4LfVqPiFw6fp6Y5X5Ubc8UpmUhSfJL82zwiBFLaj) has been persistently
+        # broken for 4+ days (3 bad indexers:
+        # 0xeccdf823.../0xf92f430d.../0xfeff9093... — "too far behind" /
+        # "no attestation: indexing_error"). The replacement
+        # (EgnS9YE1avupkvCNj9fHnJxppfEmNNywYJtghqiu2pd9, "Uniswap V3 Optimism"
+        # on The Graph Explorer) was vetted 2026-08-04 on all 3 required axes:
+        #   (a) Schema-compatible via cascade self-heal: the candidate uses the
+        #       Messari schema (pool { id name }) rather than the UniV3-native
+        #       schema (pool { id token0 { symbol } token1 { symbol } feeTier }).
+        #       _UNIV3_SWAPS_QUERY fails (schema drift) → cascade falls through
+        #       to _MESSARI_SWAPS_QUERY which succeeds. Same cascade self-heal
+        #       pattern as AAVE_V3-OPTIMISM (Messari → reserialized as Aave-V3
+        #       shape at the handler level).
+        #   (b) Historical coverage confirmed back to 2023-01-01 (all 7
+        #       checkpoints at 6-month intervals 2023-01 through 2026-07
+        #       returned swaps). Full backfill window covered.
+        #   (c) Currently healthy: head lag ~1s, hasIndexingErrors=false,
+        #       deployment QmdAoDVjfSByKvTW1HrCDK1eJJKRRZxdj8bcqVqQLCofN4.
+        #       Stability-over-time is unproven (single point-in-time probe)
+        #       but the current subgraph is 100% non-functional — this is a
+        #       strict improvement. If the replacement later degrades, the
+        #       subgraph health probe catches it.
+        # NOTE: poolDayDatas entity does NOT exist on this deployment (Messari
+        # schema lacks it). The dex_pools_handler path for UNISWAP_V3/OPTIMISM
+        # was already broken on the prior subgraph (same bad-indexers error
+        # blocks ALL queries, not just swaps). This swap fixes swaps; pool
+        # state for UNISWAP_V3/OPTIMISM will need a separate deployment or
+        # fallback path.
+        # Plan-of-record: plans/active/defi_satellite_ao_dispatch_batch6_2026_07_30.md
+        #   (todo: defi_satellite_ao_dispatch_batch6-021).
+        "OPTIMISM": "EgnS9YE1avupkvCNj9fHnJxppfEmNNywYJtghqiu2pd9",
         "POLYGON": "3hCPRGf4z88VC5rsBKU5AA9FBBq5nF3jbKJG7VZCbhjm",
     },
     "uniswap_v4": {
