@@ -109,18 +109,15 @@
           "instrument_type": "perp",
           "status": "SUPPORTED",
           "venue_ids": [
-            "hyperliquid",
-            "gmx_v2"
+            "hyperliquid"
           ],
           "signal_variants": [
             "price"
           ],
           "roll_mode": "n/a",
           "block_list_refs": [],
-          "representative_slot_labels": [
-            "ML_DIRECTIONAL_CONTINUOUS@gmx-arbitrum-eth-perp-5m-usdc-prod"
-          ],
-          "notes": ""
+          "representative_slot_labels": [],
+          "notes": "gmx_v2 removed 2026-07-25 (unreliable historical funding data) then purged from this manifest's own JSON 2026-08-04 (the earlier code-registry removal missed this file, which is loaded directly as source-of-truth, not generated) \u2014 see unified-trading-pm/plans/active/defi_gmx_venue_removal_2026_07_25.md."
         },
         {
           "asset_group": "DEFI",
@@ -365,7 +362,6 @@
           "instrument_type": "perp",
           "status": "PARTIAL",
           "venue_ids": [
-            "gmx_v2",
             "hyperliquid"
           ],
           "signal_variants": [
@@ -374,10 +370,8 @@
           ],
           "roll_mode": "n/a",
           "block_list_refs": [],
-          "representative_slot_labels": [
-            "RULES_DIRECTIONAL_CONTINUOUS@gmx-arbitrum-eth-perp-1h-ta-usdc-prod"
-          ],
-          "notes": "No codex instance examples yet."
+          "representative_slot_labels": [],
+          "notes": "No codex instance examples yet. gmx_v2 removed 2026-08-04 (unreliable historical funding data, see defi_gmx_venue_removal_2026_07_25.md)."
         },
         {
           "asset_group": "TRADFI",
@@ -641,7 +635,6 @@
           "venue_ids": [
             "uniswap_v3",
             "hyperliquid",
-            "gmx_v2",
             "lido"
           ],
           "signal_variants": [
@@ -676,7 +669,6 @@
             "aave_v3",
             "kamino",
             "hyperliquid",
-            "gmx_v2",
             "binance",
             "bybit",
             "deribit",
@@ -697,7 +689,7 @@
             "CARRY_STAKED_BASIS@lido-aave-okx-eth-usdt-prod",
             "CARRY_STAKED_BASIS@jito-kamino-bybit-sol-usdt-prod"
           ],
-          "notes": "3-leg ATOMIC (stake + lending + perp). Ethereum (Lido/RocketPool + Aave + HL/GMX) and Solana (Jito/Marinade + Kamino + CeFi-perp hedge \u2014 native Solana perp DEX hedge leg (Drift) removed 2026-07-16, operator ruling: all Solana perp DEXes dropped except Jupiter, not integrated). CeFi-perp hedge legs (Binance/Bybit/Deribit/OKX) added 2026-05-08 for May-23 cutover (master_to_live_defi_2026_05_23 \u00a71 \u2014 6-venue hedge universe). Aster pending venue onboarding \u2014 track in defi_master."
+          "notes": "3-leg ATOMIC (stake + lending + perp). Ethereum (Lido/RocketPool + Aave + HL; GMX removed 2026-08-04, see defi_gmx_venue_removal_2026_07_25.md) and Solana (Jito/Marinade + Kamino + CeFi-perp hedge \u2014 native Solana perp DEX hedge leg (Drift) removed 2026-07-16, operator ruling: all Solana perp DEXes dropped except Jupiter, not integrated). CeFi-perp hedge legs (Binance/Bybit/Deribit/OKX) added 2026-05-08 for May-23 cutover (master_to_live_defi_2026_05_23 \u00a71 \u2014 6-venue hedge universe). Aster pending venue onboarding \u2014 track in defi_master."
         },
         {
           "asset_group": "CEFI",
@@ -920,8 +912,7 @@
           "instrument_type": "perp",
           "status": "SUPPORTED",
           "venue_ids": [
-            "hyperliquid",
-            "gmx_v2"
+            "hyperliquid"
           ],
           "signal_variants": [
             "price",
@@ -929,10 +920,8 @@
           ],
           "roll_mode": "n/a",
           "block_list_refs": [],
-          "representative_slot_labels": [
-            "ARBITRAGE_PRICE_DISPERSION@hyperliquid-gmx-eth-perp-usdc-prod"
-          ],
-          "notes": ""
+          "representative_slot_labels": [],
+          "notes": "gmx_v2 removed 2026-08-04 (unreliable historical funding data, see defi_gmx_venue_removal_2026_07_25.md)."
         },
         {
           "asset_group": "DEFI",
@@ -1107,19 +1096,15 @@
         {
           "asset_group": "DEFI",
           "instrument_type": "perp",
-          "status": "PARTIAL",
-          "venue_ids": [
-            "gmx_v2"
-          ],
-          "signal_variants": [
-            "liquidation_bonus"
-          ],
+          "status": "BLOCKED",
+          "venue_ids": [],
+          "signal_variants": [],
           "roll_mode": "n/a",
-          "block_list_refs": [],
-          "representative_slot_labels": [
-            "LIQUIDATION_CAPTURE@gmx-arbitrum-eth-perp-usdc-prod"
+          "block_list_refs": [
+            "BL-12"
           ],
-          "notes": "GMX perp liquidations have different economics than lending liquidations."
+          "representative_slot_labels": [],
+          "notes": "No DeFi perp-liquidation venue. Was gmx_v2-only (perp liquidations have different economics than lending liquidations); GMX removed 2026-08-04 (unreliable historical funding data, see defi_gmx_venue_removal_2026_07_25.md) leaves this cell with no remaining venue."
         }
       ]
     },
@@ -1467,8 +1452,7 @@
           "instrument_type": "perp",
           "status": "PARTIAL",
           "venue_ids": [
-            "hyperliquid",
-            "gmx_v2"
+            "hyperliquid"
           ],
           "signal_variants": [
             "event_surprise"
@@ -1476,7 +1460,7 @@
           "roll_mode": "n/a",
           "block_list_refs": [],
           "representative_slot_labels": [],
-          "notes": "Governance-vote reactive path; adapter ready."
+          "notes": "Governance-vote reactive path; adapter ready. gmx_v2 removed 2026-08-04 (unreliable historical funding data, see defi_gmx_venue_removal_2026_07_25.md)."
         },
         {
           "asset_group": "DEFI",
@@ -1727,8 +1711,7 @@
           "instrument_type": "perp",
           "status": "PARTIAL",
           "venue_ids": [
-            "hyperliquid",
-            "gmx_v2"
+            "hyperliquid"
           ],
           "signal_variants": [
             "zscore_reversion"
@@ -1738,7 +1721,7 @@
           "representative_slot_labels": [
             "STAT_ARB_PAIRS_FIXED@hyperliquid-sol-eth-perp-usdc-prod"
           ],
-          "notes": ""
+          "notes": "gmx_v2 removed 2026-08-04 (unreliable historical funding data, see defi_gmx_venue_removal_2026_07_25.md)."
         },
         {
           "asset_group": "TRADFI",
@@ -1841,8 +1824,7 @@
           "instrument_type": "perp",
           "status": "PARTIAL",
           "venue_ids": [
-            "hyperliquid",
-            "gmx_v2"
+            "hyperliquid"
           ],
           "signal_variants": [
             "momentum_ranking"
@@ -1852,7 +1834,7 @@
           "representative_slot_labels": [
             "STAT_ARB_CROSS_SECTIONAL@hyperliquid-dex-alt-perp-momentum-usdc-prod"
           ],
-          "notes": ""
+          "notes": "gmx_v2 removed 2026-08-04 (unreliable historical funding data, see defi_gmx_venue_removal_2026_07_25.md)."
         },
         {
           "asset_group": "TRADFI",

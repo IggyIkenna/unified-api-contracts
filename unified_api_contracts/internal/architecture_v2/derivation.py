@@ -436,6 +436,7 @@ _BL_PREDICATES: tuple[tuple[str, str], ...] = (
     ("BL-7", "DeFi perp market-making — venue latency > tick generator"),
     ("BL-8", "DeFi cross-sectional — basket gas-cost blowup"),
     ("BL-10", "Dated-future rolls — representative_future_service not deployed"),
+    ("BL-12", "DeFi perp liquidation capture — no venue (gmx_v2 was sole venue, removed 2026-07-25)"),
     ("BL-11", "Signals-only package lacks block-6 research/promote"),
     ("BL-14", "CLIENT_EXCLUSIVE slot not in viewer org scope"),
     ("BL-15", "RETIRED lock_state — no new allocation"),
