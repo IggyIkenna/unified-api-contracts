@@ -275,6 +275,35 @@ VENUE_ERRORS_TRADFI: dict[str, list[VenueErrorClassification]] = {
                 "fix the request scope. SSOT: registry/databento_subscription_allowlist.py."
             ),
         ),
+        ve(
+            "databento",
+            "DATABENTO_LOOKBACK_EXCEEDED",
+            retry=False,
+            reconnect=False,
+            action=ErrorAction.SKIP,
+            desc=(
+                "DatabentoLookbackExceededError — pre-request billing guard: the "
+                "requested (data_type, start) falls outside the schema's free "
+                "included-history window (L2/L3: 1 month, L1: 1 year). The shard is "
+                "structurally (permanently) unavailable at our subscription tier, not "
+                "a transient fetch failure — classify as honest-absence (SKIP), never "
+                "attempted_failed. SSOT: registry/databento_subscription_allowlist.py."
+            ),
+        ),
+        ve(
+            "databento",
+            "DATABENTO_SUBSCRIPTION_GUARD",
+            retry=False,
+            reconnect=False,
+            action=ErrorAction.SKIP,
+            desc=(
+                "DatabentoSubscriptionError (non-lookback) — pre-request billing guard: "
+                "request's (dataset, schema, api) fell outside the paid subscription "
+                "allowlist (wrong dataset, banned schema, or banned API). Structurally "
+                "unavailable at our tier, not a transient failure — SKIP (honest absence). "
+                "SSOT: registry/databento_subscription_allowlist.py."
+            ),
+        ),
     ],
     # "barchart" error table RETIRED 2026-06-24 — Barchart removed (VIX 15m now
     # aggregates from VX futures via Databento XCBF.PITCH). No shim.
