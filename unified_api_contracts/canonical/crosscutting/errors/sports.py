@@ -795,5 +795,13 @@ VENUE_ERRORS_SPORTS: dict[str, list[VenueErrorClassification]] = {
             action=ErrorAction.FAIL,
             desc="Account balance insufficient for order",
         ),
+        ve(
+            "kalshi",
+            "TRADES_FETCH_FAILED",
+            retry=True,
+            reconnect=False,
+            action=ErrorAction.RETRY,
+            desc="Transport error during trades fetch — connection/timeout/OS error",
+        ),
     ],
 }
