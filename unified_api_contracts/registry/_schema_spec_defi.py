@@ -12,13 +12,23 @@ physical name already matches the convention carry no alias.
 
 Sampled shapes covered:
 
-- ``dex_pool_state`` / ``dex_pool_swaps`` — legacy ``category=`` corpus:
-  CURVE (pool-balance window), UNISWAP_V2 (pair hourly window), UNISWAP_V3
-  (pool-hour candle + fee growth), UNISWAP_V4 (pool-hour candle + pool_id).
-  One shared union: the legacy writer emitted the same frame to both paths.
-- ``dex_pools`` / ``dex_swaps`` — current Solana/EVM writers (ORCA, RAYDIUM,
-  AERODROME_V3, BALANCER, CAMELOT_V3, CURVE, PANCAKESWAP_V3, SUSHISWAP,
-  SUSHISWAP_V3, UNISWAP_V3), already snake_case.
+- ``dex_pool_state`` / ``dex_pool_swaps`` — CANONICAL data_type names at every
+  layer (operator-locked 2026-06-01, see
+  ``/codex/02-data/defi-canonical-naming-ssot.md``): CURVE (pool-balance
+  window), UNISWAP_V2 (pair hourly window), UNISWAP_V3 (pool-hour candle +
+  fee growth), UNISWAP_V4 (pool-hour candle + pool_id), plus the current
+  Solana/EVM writers (ORCA, RAYDIUM, AERODROME_V3, BALANCER, CAMELOT_V3,
+  CURVE, PANCAKESWAP_V3, SUSHISWAP, SUSHISWAP_V3, UNISWAP_V3). One shared
+  union across sources.
+- ``dex_pools`` / ``dex_swaps`` — RETIRED legacy manifest data_type names
+  (corrected 2026-08-04: this docstring previously and incorrectly described
+  these bare forms as "current" writers; the naming SSOT above is explicit
+  that the legacy 2-layer split is retired and ``dex_pool_state``/
+  ``dex_pool_swaps`` are canonical everywhere). Sampled here only because the
+  CF-18 audit (2026-06-11) read footers off already-existing historical
+  objects, not because any writer emits these names today. See
+  ``/plans/active/issues/defi_legacy_data_type_names_manifest_migration_scope_2026_08_04.md``
+  for the pending manifest-residue migration.
 - ``lending_indices`` — Solana lenders (KAMINO, MARGINFI, SOLEND) on top of
   the original EVM a_token index shape.
 - ``lst_rates`` — MARINADE.
