@@ -727,7 +727,6 @@ PROTOCOL_CAPABILITIES: dict[str, _ProtocolCapability] = {
         data_types=[
             *_YIELD_DATA,
             "staking_yields",  # stETH APY daily rate (LIDO-ETHEREUM 2020-12-18)
-            "rewards",
         ],
         mtds_operations=["collect-lst-rates", "collect-oracle-prices", "collect-staking-yields"],
         required_tokens=frozenset({"LDO", "STETH", "WSTETH"}),
@@ -739,7 +738,6 @@ PROTOCOL_CAPABILITIES: dict[str, _ProtocolCapability] = {
         data_types=[
             *_YIELD_DATA,
             "staking_yields",  # weETH APY (ETHERFI-ETHEREUM 2023-11-01)
-            "rewards",
         ],
         mtds_operations=["collect-lst-rates", "collect-oracle-prices", "collect-staking-yields"],
         required_tokens=frozenset({"ETHFI", "EETH", "WEETH"}),
