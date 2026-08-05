@@ -2261,10 +2261,14 @@ VENUE_DATA_TYPE_CAPABILITIES: dict[str, dict[str, str]] = {
     "POLYMARKET": {
         "trades": "2024-06-01",
         "book_snapshot_5": "2026-06-22",
+        "market_metadata": "2024-06-01",
+        "fills": "2024-06-01",
     },
     "KALSHI": {
         "trades": "2024-06-01",
         "book_snapshot_5": "2026-06-22",
+        "market_metadata": "2024-06-01",
+        "fills": "2024-06-01",
     },
 }
 

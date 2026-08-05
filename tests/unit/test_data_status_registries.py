@@ -186,6 +186,10 @@ class TestExpectedCoverageByAssetGroup:
         assert ("POLYMARKET", "prediction_canonical_question_group") in pairs
         assert ("KALSHI", "trades") in pairs
         assert ("KALSHI", "book_snapshot_5") in pairs  # re-added 2026-06-23
+        # market_metadata / fills are declared in VENUE_DATA_TYPE_CAPABILITIES
+        # (2026-08-05, finding 5 fix) but not yet in EXPECTED_COVERAGE_BY_ASSET_GROUP —
+        # intentionally kept out of the honest-coverage denominator until the
+        # deployment-api PREDICTION_DATA_TYPE_META retirement is complete.
         assert len(pairs) == 5
 
     def test_returned_list_is_a_copy(self) -> None:
