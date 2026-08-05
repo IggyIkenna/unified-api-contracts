@@ -1237,21 +1237,6 @@ def validate_data_type_for_venue(venue: str, data_type: str, *, strict: bool = F
 # DATA_TYPES_BY_ASSET_GROUP with VenueMapping.venue_start_dates as the start date.
 # Only venues with non-default data type availability need explicit entries.
 #
-# ── MVP Data Type Overrides ──
-# In MVP mode, we limit downloads to reduce cost and API calls.
-# Key decision: Deribit options — only download options_chain (IV/greeks, bulk 1-call)
-# not trades/book_snapshot_5/derivative_ticker/liquidations per individual option strike
-# (~12,000 API calls/day → 1 call/day). Full tick data for individual options is
-# only needed for execution quality analysis, not for strategy/ML.
-# Perpetuals still get all data types (trades, book, deriv_ticker, liquidations).
-
-MVP_VENUE_DATA_TYPES: dict[str, list[str]] = {
-    # Deribit: perpetual data types + only bulk-downloadable chain types (no per-strike tick data)
-    "DERIBIT": ["trades", "book_snapshot_5", "derivative_ticker", "liquidations", "options_chain", "futures_chain"],
-    # For other CeFi venues, perpetuals get all data types (same as full mode)
-    # TradFi: controlled by tick_windows + MVP_CME_EXCHANGE_CODES (ES-only)
-}
-
 # Deribit MVP: which instrument types get which data types.
 # Options/futures only get chain data types (bulk download).
 # Perpetuals get all data types (per-symbol download, but only ~20 perps).
@@ -1444,22 +1429,6 @@ VALID_DATA_TYPES_BY_AG_AND_INSTRUMENT_TYPE: dict[tuple[str, str], frozenset[str]
     # WHOLE vocabulary, no UPPER exception — K1/K2 are being reverted, not kept.
     # The lowercase "odds"/"trades" pair is the sole canonical form again.
     ("sports", "odds"): frozenset({"trades"}),
-    # ── Prediction ────────────────────────────────────────────────────────────
-    # Prediction uses per-row data_type GRAIN BINDING (instr.data_type field): the
-    # enumerator's _row_data_types step-1 returns [instr.data_type] and NEVER
-    # consults this matrix for a grain-bound prediction catalogue row. The grain
-    # guard (per-market leaf vs per-cqg bundle) lives in grain-binding, NOT here —
-    # the matrix filters impossible (instrument_type x data_type) cross-products,
-    # which is orthogonal to grain. The row below is therefore a DEFENSE-IN-DEPTH /
-    # documentation stub (slice-parity with cefi/tradfi/sports): it only takes
-    # effect for a hypothetical NON-grain-bound prediction row, where it suppresses
-    # the "unmapped instrument_type → fall back to all + WARN" path. Valid set =
-    # the canonical prediction data_types (DATA_TYPES_BY_ASSET_GROUP["prediction"]);
-    # all are legitimately attachable to a prediction market, so this never filters
-    # a real cell — it is purely WARN-suppression + an explicit, audited slice.
-    ("prediction", "prediction_market"): frozenset(
-        {"trades", "prediction_canonical_question_group", "market_lifecycle", "MARKET_LIFECYCLE"}
-    ),
 }
 
 

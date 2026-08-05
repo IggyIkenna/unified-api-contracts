@@ -124,6 +124,8 @@ _REFERENCE_NOT_INSTRUMENT_GRAIN = "REFERENCE_NOT_INSTRUMENT_GRAIN"
 _CEFI_MATRIX_GAP = "CEFI_MATRIX_GAP"
 _SOURCE_PRIORITY_CASE_FALLBACK_KEY = "SOURCE_PRIORITY_CASE_FALLBACK_KEY"
 _TRADFI_VENDOR_DATA_TYPE_NOT_IN_VALIDITY_MATRIX = "TRADFI_VENDOR_DATA_TYPE_NOT_IN_VALIDITY_MATRIX"
+# Resolved via instr.data_type; excluded from matrix per scope exclusion
+_PREDICTION_GRAIN_BOUND = "PREDICTION_GRAIN_BOUND"
 # PENDING_SNAPSHOT_SLICE — options_chain / futures_chain SOURCE_PRIORITY entries
 #     retained for cefi/tradfi pending the per-AG instrument_type snapshot slice
 #     widening (slot-3 widens cefi futures_chain to admit data_type=options_chain;
@@ -226,9 +228,16 @@ _SOURCE_PRIORITY_EXCLUSION_REASONS: dict[tuple[str, str], str] = {
     ("tradfi", "ohlcv_1d"): _TRADFI_VENDOR_DATA_TYPE_NOT_IN_VALIDITY_MATRIX,
     ("tradfi", "cds_spread"): _TRADFI_VENDOR_DATA_TYPE_NOT_IN_VALIDITY_MATRIX,
     # ── Prediction ──
-    # "book_snapshot_5" is the canonical prediction depth key in SOURCE_PRIORITY
-    # (upgraded from the legacy "book_snapshot" bare name — item 69/75-prediction).
+    # Prediction is grain-bound (the enumerator short-circuits on instr.data_type
+    # and NEVER consults the validity matrix). The ("prediction", "prediction_market")
+    # matrix row was deleted per the uac_data_type_validity_combinator_fragmentation
+    # 2026_07_07.md scope exclusion — Prediction is excluded from the combinator
+    # redesign; its scope exclusion in the plan header is the authoritative record.
+    # SOURCE_PRIORITY entries for prediction resolve via instr.data_type directly.
     ("prediction", "book_snapshot_5"): _CEFI_LEGACY_KEY,
+    ("prediction", "MARKET_LIFECYCLE"): _PREDICTION_GRAIN_BOUND,
+    ("prediction", "prediction_canonical_question_group"): _PREDICTION_GRAIN_BOUND,
+    ("prediction", "trades"): _PREDICTION_GRAIN_BOUND,
     # ── Sports reference/classification data_types in SOURCE_PRIORITY
     #    that are NOT in SPORTS_DATA_TYPE_TO_SOURCE (not reachable via the
     #    "league" instrument_type's derived valid set).
@@ -305,12 +314,6 @@ def _build_reachable_set_for_ag(asset_group: str) -> set[str]:
         league_valid = valid_data_types_for_instrument_type("sports", "league")
         if league_valid:
             reachable.update(league_valid)
-
-    # Prediction: the static dict has "prediction_market" row
-    if asset_group == "prediction":
-        pm_valid = valid_data_types_for_instrument_type("prediction", "prediction_market")
-        if pm_valid:
-            reachable.update(pm_valid)
 
     return reachable
 
@@ -391,6 +394,7 @@ class TestSourcePriorityReachability:
             _PENDING_SNAPSHOT_SLICE,
             _SOURCE_PRIORITY_CASE_FALLBACK_KEY,
             _TRADFI_VENDOR_DATA_TYPE_NOT_IN_VALIDITY_MATRIX,
+            _PREDICTION_GRAIN_BOUND,
         }
 
         # Every exclusion key must appear in the reasons dict.
