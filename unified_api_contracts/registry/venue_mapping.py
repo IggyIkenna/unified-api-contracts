@@ -295,6 +295,12 @@ class VenueMapping:
             # Binance COIN-M (inverse/delivery) — Tardis ``binance-delivery``
             # availableSince 2020-01-01 (Binance COIN-M launched 2019-09-13;
             # Tardis archive starts 2020-01-01 for this endpoint).
+            # UNVERIFIABLE: venue excluded from cefi MVP (operator decision #3,
+            # mvp_scope.py v10, 2026-06-27) — ZERO real captured rows exist,
+            # only 7 attempted_failed rows from a one-off probe (2026-07-26).
+            # This date is Tardis metadata, NOT measured reality.
+            # If re-enabling, probe the manifest min(captured) first.
+            # See: /plans/active/issues/coverage_floor_registries_no_cross_propagation_2026_07_17.md
             "BINANCE-DELIVERY": "2020-01-01",
             # Corrected 2026-07-27 (same issue doc) — was "2019-03-30".
             # Measured min(captured) = 2019-05-08 (real `trades` rows,
