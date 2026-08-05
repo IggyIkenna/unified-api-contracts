@@ -1831,6 +1831,23 @@ VENUE_DATA_TYPE_CAPABILITIES: dict[str, dict[str, str]] = {
         "liquidations": "2019-11-17",
         "futures_chain": "2019-11-17",
     },
+    # BINANCE-DELIVERY (coin-margined futures) — mirrors BINANCE-FUTURES (USDT-M
+    # linear) data_type set. NO perp_funding / options_chain / ohlcv_1m /
+    # volatility_index — these are NOT produced by any BINANCE-DELIVERY writer
+    # (perp_funding_handler.py protocol set = hyperliquid/kalshi_perp/
+    # polymarket_perp; BINANCE-DELIVERY not a registered funding-cadence venue in
+    # UAC perp_funding_cadence). Added 2026-08-05 (features_smoke_matrix_p2_rerun
+    # findings-009): before this entry, the fallback to get_valid_data_types_for_venue
+    # seeded phantom EXPECTED perp_funding cells for every instrument-day, producing
+    # permanent attempted_failed/empty_confirmed noise. (Narrowed caps also fix the
+    # ohlcv_1m phantom — BINANCE-DELIVERY has no OHLCV writer either.)
+    "BINANCE-DELIVERY": {
+        "trades": "2020-01-01",
+        "book_snapshot_5": "2020-01-01",
+        "derivative_ticker": "2020-01-01",
+        "liquidations": "2020-01-01",
+        "futures_chain": "2020-01-01",
+    },
     # ``liquidations`` REMOVED 2026-07-15 (cefi_completion_program workstream E,
     # operator ruling): only 3 ``captured`` DERIBIT liquidation rows exist in the
     # live manifest (noise, not a real feed) — DERIBIT is NOT one of the 6
