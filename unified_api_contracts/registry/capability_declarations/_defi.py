@@ -908,7 +908,11 @@ PROTOCOL_CAPABILITIES: dict[str, _ProtocolCapability] = {
         venue_prefix="YEARN_V3",
         protocol_class=ProtocolClass.YIELD,
         instrument_types=_YIELD,
-        data_types=["staking_yields", "oracle_prices"],  # vault APY time-series (YEARN_V3-ETHEREUM 2024-03-20)
+        data_types=[
+            "staking_yields",
+            "oracle_prices",
+            "lst_rates",
+        ],  # vault APY time-series (YEARN_V3-ETHEREUM 2024-03-20)
         mtds_operations=["collect-staking-yields", "collect-oracle-prices"],
         required_tokens=frozenset({"YFI"}),
     ),
