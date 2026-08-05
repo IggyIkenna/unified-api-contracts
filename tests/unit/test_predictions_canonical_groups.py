@@ -1101,3 +1101,240 @@ def test_classify_kalshi_weather_kxhigh_routes_to_weather_temp_daily() -> None:
         assert group == CanonicalQuestionGroup.WEATHER_TEMP_DAILY, (
             f"Expected WEATHER_TEMP_DAILY for ticker={ticker!r}, got {group!r}"
         )
+
+
+# ── Politics/geo cross-venue canonicalization (batch6, 2026-08-05) ──────────
+
+
+def test_classify_kalshi_trump_approval_routes_to_trump_approval_rating() -> None:
+    """Kalshi Trump approval tickers route to TRUMP_APPROVAL_RATING.
+
+    Shared real-world referent with Polymarket's TRUMP_APPROVAL_RATING group
+    (decision 338 pass 2). Different cadences (daily/weekly/annual/custom) are
+    different contract instances within the same group.
+    """
+    cases = [
+        "KXTRUMPAPPROVALBELOW",  # annual: how low will Trump's approval get
+        "KXTRUMPAPPROVALYEAR",  # annual: how high
+        "KXTRUMPFAV",  # weekly favorability
+        "KXTRUMPFAVINAUG",  # custom: inauguration favorability
+        "KXTRUMPNETFAVINAUG",  # custom: net favorability
+        "KXTRUMPPOLLDAILY",  # daily poll
+        "KXAPRPOTUS",  # weekly RCP approval
+        "KXAPRPOTUSEOY",  # end-of-year RCP approval
+        "KX538APPROVE",  # weekly 538 approval
+        "KX538APPROVEMAX",  # custom: highest 538 approval
+        "KX538APPROVEMIN",  # custom: lowest 538 approval
+        "KX538APPROVEY",  # annual 538 approval
+        "APRPOTUS",  # non-KX form
+        "538APPROVE",  # non-KX form
+    ]
+    for ticker in cases:
+        group = classify_kalshi_to_canonical_group(ticker=ticker)
+        assert group == CanonicalQuestionGroup.TRUMP_APPROVAL_RATING, (
+            f"Expected TRUMP_APPROVAL_RATING for ticker={ticker!r}, got {group!r}"
+        )
+
+
+def test_classify_kalshi_trump_exec_order_pardon_routes_correctly() -> None:
+    """Kalshi executive-action / pardon tickers route to TRUMP_EXEC_ORDER.
+
+    Pardons are an Art. II executive power — same category as executive orders.
+    KXCRYPTOEO, KXABORTION, KXDEPORTATION, KXBIRTHRIGHT are all executive actions.
+    """
+    cases = [
+        "KXTRUMPPARDON",  # custom: Trump pardons
+        "KXTRUMPPARDONS",  # one_off: who will Trump pardon
+        "KXTRUMPPARDONFAMILY",  # one_off: Trump pardons his family
+        "KXTRUMPPARDONMONTH",  # one_off: Trump pardon anyone in November
+        "KXCRYPTOEO",  # custom: crypto executive order
+        "KXABORTION",  # custom: abortion executive action
+        "KXDEPORTATION",  # custom: deportation executive action
+        "KXBIRTHRIGHT",  # custom: birthright citizenship
+    ]
+    for ticker in cases:
+        group = classify_kalshi_to_canonical_group(ticker=ticker)
+        assert group == CanonicalQuestionGroup.TRUMP_EXEC_ORDER, (
+            f"Expected TRUMP_EXEC_ORDER for ticker={ticker!r}, got {group!r}"
+        )
+
+
+def test_classify_kalshi_geo_russia_ukraine_routes_correctly() -> None:
+    """Kalshi Russia/Ukraine/Putin tickers route to GEO_RUSSIA_UKRAINE.
+
+    Shared geopolitical topic with Polymarket's GEO_RUSSIA_UKRAINE group
+    (decision 338 pass 2). The arb layer pairs same-settlement-event instruments
+    within the group — a Trump-Putin meeting market and a Ukraine-conflict
+    market share the topic but differ in settlement, so no false arb pair.
+    """
+    cases = [
+        "KXUKRAINE",  # one_off: Ukraine agreements
+        "KXUKRAINEEU",  # one_off: Ukraine EU associate member
+        "KXUKRAINERESIGN",  # custom: Ukraine President resign
+        "KXPUTINUSA",  # one_off: Putin visits USA
+        "KXPUTINZELENSKYY",  # one_off: Putin and Zelenskyy meet
+        "KXSANCTIONRUSSIA",  # one_off: bill sanctioning Russia
+        "KXSANCTIONRUS",  # one_off: Russia Sanction
+        "KXTRUMPPUTIN",  # one_off: Trump-Putin meeting attendees
+        "KXTRUMPPUTINTALK",  # one_off: Trump talks to Putin
+        "KXTRUMPPUTINMEET",  # one_off: Trump and Putin meet
+        "KXTRUMPPUTIN2",  # one_off: Trump Putin meet again
+        "KXTRUMPZELENSKYBILAT",  # one_off: Trump-Zelenskyy bilateral at G7
+    ]
+    for ticker in cases:
+        group = classify_kalshi_to_canonical_group(ticker=ticker)
+        assert group == CanonicalQuestionGroup.GEO_RUSSIA_UKRAINE, (
+            f"Expected GEO_RUSSIA_UKRAINE for ticker={ticker!r}, got {group!r}"
+        )
+
+
+def test_classify_kalshi_geo_israel_iran_routes_correctly() -> None:
+    """Kalshi Israel/Iran/Abraham-Accords tickers route to GEO_ISRAEL_IRAN.
+
+    Shared geopolitical topic with Polymarket's GEO_ISRAEL_IRAN group.
+    Abraham Accords series (Israel normalization with other countries) share
+    the Israel topic. Trump-Netanyahu/Khamenei meetings share the same region.
+    """
+    cases = [
+        "KXIRANEMBASSY",  # one_off: US reopen embassy in Iran
+        "KXIRANVISITUSA",  # one_off: Iranian official visits White House
+        "KXIRANMEET",  # custom: US Iran meet
+        "KXISRAELRESIGN",  # custom: Israeli minister resigning
+        "KXABRAHAMINDO",  # one_off: Israel-Indonesia normalize relations
+        "KXABRAHAMKAZ",  # one_off: Israel-Kazakhstan normalize relations
+        "KXABRAHAMNEW",  # one_off: new country normalize with Israel
+        "KXABRAHAMSY",  # custom: Syria recognition
+        "KXTRUMPNETANYAHU",  # one_off: Trump-Netanyahu meet July 2026
+        "KXTRUMPBIBIMEET",  # one_off: Trump-Bibi meet July 2026
+        "KXTRUMPKHAMENEIMEET",  # one_off: Trump meet Khamenei
+        "KXTRUMPSUPREMELEADER",  # one_off: Trump meet Supreme Leader of Iran
+        "KXTRUMPIRAN",  # one_off: Trump visit Iran
+    ]
+    for ticker in cases:
+        group = classify_kalshi_to_canonical_group(ticker=ticker)
+        assert group == CanonicalQuestionGroup.GEO_ISRAEL_IRAN, (
+            f"Expected GEO_ISRAEL_IRAN for ticker={ticker!r}, got {group!r}"
+        )
+
+
+def test_classify_kalshi_politics_geo_prefix_precedence() -> None:
+    """Longer Kalshi politics prefixes win over shorter ones (correct precedence).
+
+    KXTRUMPAPPROVAL (16 chars) must beat a hypothetical shorter KXTRUMP prefix
+    so Trump approval markets don't fall to a catch-all. Same for
+    KXTRUMPPUTIN vs KXTRUMP, KXTRUMPPARDON vs KXTRUMP, etc.
+    """
+    # KXTRUMPAPPROVALBELOW must match KXTRUMPAPPROVAL (longest prefix),
+    # not a hypothetical KXTRUMP catch-all.
+    group = classify_kalshi_to_canonical_group(ticker="KXTRUMPAPPROVALBELOW")
+    assert group == CanonicalQuestionGroup.TRUMP_APPROVAL_RATING
+
+    # KXTRUMPPUTINTALK must match KXTRUMPPUTIN → GEO_RUSSIA_UKRAINE
+    group = classify_kalshi_to_canonical_group(ticker="KXTRUMPPUTINTALK")
+    assert group == CanonicalQuestionGroup.GEO_RUSSIA_UKRAINE
+
+    # KXTRUMPPARDONFAMILY must match KXTRUMPPARDON → TRUMP_EXEC_ORDER
+    group = classify_kalshi_to_canonical_group(ticker="KXTRUMPPARDONFAMILY")
+    assert group == CanonicalQuestionGroup.TRUMP_EXEC_ORDER
+
+    # KXTRUMPNETANYAHU must match → GEO_ISRAEL_IRAN
+    group = classify_kalshi_to_canonical_group(ticker="KXTRUMPNETANYAHU")
+    assert group == CanonicalQuestionGroup.GEO_ISRAEL_IRAN
+
+
+def test_classify_kalshi_unmapped_trump_novelty_stays_other() -> None:
+    """Kalshi Trump novelty/sports/unmatched tickers stay OTHER (honest absence).
+
+    Markets like "Trump attend UFC," "Trump go to Space," "Trump on money" have
+    NO Polymarket counterpart — mapping them to TRUMP_STATEMENTS or any other
+    group would create false arb pairs. The classifier correctly leaves them as
+    OTHER (honest classification, not a gap).
+    """
+    novelty_cases = [
+        "KXTRUMPUFC",  # Trump attend UFC
+        "KXTRUMPUFC322",  # Trump attends UFC 322
+        "KXTRUMPSPACE",  # Trump go to Space
+        "KXTRUMPNBAFINALS",  # Trump NBA finals
+        "KXTRUMPFOOTBALL",  # Trump attend football game
+        "KXTRUMPDOLLAR",  # Trump-faced dollar bill
+        "KXTRUMP250BILL",  # $250 Trump bill
+        "KXTRUMPMONEY",  # Trump on money
+        "KXTRUMPPHOTO",  # Trump photos
+        "KXTRUMPBALLROOM",  # White House ballroom
+        "KXTRUMPTRICKORTREAT",  # Halloween event
+        "KXTRUMPARCH",  # triumphal arch construction
+        "KXTRUMPPASSPORT",  # Trump passport
+        "KXTRUMPSBA",  # Small Business Administration (not exec order — appointment)
+    ]
+    for ticker in novelty_cases:
+        group = classify_kalshi_to_canonical_group(ticker=ticker)
+        assert group == CanonicalQuestionGroup.OTHER, f"Expected OTHER for novelty ticker={ticker!r}, got {group!r}"
+
+
+def test_classify_kalshi_unmapped_historical_electoral_stays_other() -> None:
+    """Historical Kalshi Electoral College markets stay OTHER.
+
+    KXECDJT* / KXECKH* / KXSWINGSTATES* were one_off / custom markets for the
+    2024 US presidential election. They have no current Polymarket counterpart
+    and no recurring canonical group. Honest OTHER — not a classifier gap.
+    """
+    historical_cases = [
+        "KXECDJT312",
+        "KXECDJT270",
+        "KXECKH287",
+        "KXECKH276",
+        "KXSWINGSTATES24DJT",
+        "KXSWINGSTATES24KH",
+        "KXMAG7DONATE",
+        "KXMAG7DONATES",
+    ]
+    for ticker in historical_cases:
+        group = classify_kalshi_to_canonical_group(ticker=ticker)
+        assert group == CanonicalQuestionGroup.OTHER, f"Expected OTHER for historical ticker={ticker!r}, got {group!r}"
+
+
+def test_classify_kalshi_politics_geo_cross_venue_same_group() -> None:
+    """Kalshi and Polymarket politics/geo markets resolve to the SAME group.
+
+    Cross-venue arb premise: both venues must map to the identical
+    CanonicalQuestionGroup so the arb engine can compare fair values without
+    a venue-translation layer (same contract as crypto/equity/sports groups).
+    """
+    # Trump approval: both venues → TRUMP_APPROVAL_RATING
+    kalshi_trump_approval = classify_kalshi_to_canonical_group(ticker="KXTRUMPAPPROVALBELOW")
+    assert kalshi_trump_approval == CanonicalQuestionGroup.TRUMP_APPROVAL_RATING
+
+    polymarket_trump_approval = classify_polymarket_to_canonical_group(
+        title="Will Trump's approval rating be above 50% on June 1?",
+        slug="trump-approval-rating-above-50-june-1",
+        event_slug="trump-approval-rating",
+        outcome="Yes",
+    )
+    assert polymarket_trump_approval == CanonicalQuestionGroup.TRUMP_APPROVAL_RATING
+    assert kalshi_trump_approval == polymarket_trump_approval
+
+    # Geo Russia-Ukraine: both venues → GEO_RUSSIA_UKRAINE
+    kalshi_ukraine = classify_kalshi_to_canonical_group(ticker="KXUKRAINE")
+    assert kalshi_ukraine == CanonicalQuestionGroup.GEO_RUSSIA_UKRAINE
+
+    polymarket_ukraine = classify_polymarket_to_canonical_group(
+        title="Will Ukraine join NATO by 2027?",
+        slug="ukraine-join-nato-2027",
+        event_slug="ukraine-defense",
+        outcome="Yes",
+    )
+    assert polymarket_ukraine == CanonicalQuestionGroup.GEO_RUSSIA_UKRAINE
+    assert kalshi_ukraine == polymarket_ukraine
+
+    # Geo Israel-Iran: both venues → GEO_ISRAEL_IRAN
+    kalshi_iran = classify_kalshi_to_canonical_group(ticker="KXIRANEMBASSY")
+    assert kalshi_iran == CanonicalQuestionGroup.GEO_ISRAEL_IRAN
+
+    polymarket_israel = classify_polymarket_to_canonical_group(
+        title="Will Israel strike Iranian nuclear facilities?",
+        slug="israel-strike-iran-nuclear",
+        event_slug="israel-iran-conflict",
+        outcome="Yes",
+    )
+    assert polymarket_israel == CanonicalQuestionGroup.GEO_ISRAEL_IRAN
+    assert kalshi_iran == polymarket_israel
