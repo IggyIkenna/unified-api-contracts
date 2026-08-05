@@ -975,7 +975,7 @@ PROTOCOL_CAPABILITIES: dict[str, _ProtocolCapability] = {
         venue_prefix="RENZO",
         protocol_class=ProtocolClass.RESTAKING,
         instrument_types=_RESTAKING,
-        data_types=["staking_yields", "oracle_prices"],  # RENZO-ETHEREUM 2024-04-29
+        data_types=["staking_yields", "oracle_prices", "lst_rates"],  # RENZO-ETHEREUM 2024-04-29
         mtds_operations=["collect-staking-yields", "collect-oracle-prices"],
         required_tokens=frozenset({"REZ", "EZETH"}),
     ),
