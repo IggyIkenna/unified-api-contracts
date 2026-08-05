@@ -431,6 +431,7 @@ PROTOCOL_CAPABILITIES: dict[str, _ProtocolCapability] = {
             # theoretical under-declaration) and is intentionally NOT fixed here;
             # see the issue doc's Progress Log for the full live-verified list.
             "oracle_prices",
+            "rewards",  # AAVE reward emissions (aspirational: capture not yet wired)
         ],
         mtds_operations=[
             "collect-lending-indices",
@@ -439,6 +440,7 @@ PROTOCOL_CAPABILITIES: dict[str, _ProtocolCapability] = {
             "collect-flash-loan-events",
             "collect-position-data",
             "collect-oracle-prices",
+            "collect-rewards",
         ],
         required_tokens=frozenset({"AAVE", "GHO"}),
     ),
@@ -446,16 +448,22 @@ PROTOCOL_CAPABILITIES: dict[str, _ProtocolCapability] = {
         venue_prefix="SPARK",
         protocol_class=ProtocolClass.LENDING,
         instrument_types=_LENDING_ATOKEN_DEBTTOKEN,
-        data_types=[*_LENDING_DATA],
-        mtds_operations=["collect-lending-indices", "collect-liquidations"],
+        data_types=[
+            *_LENDING_DATA,
+            "oracle_prices",  # MakerDAO oracle via SparkOracle — SPARK-ETHEREUM (aspirational: capture not yet wired)
+        ],
+        mtds_operations=["collect-lending-indices", "collect-liquidations", "collect-oracle-prices"],
         required_tokens=frozenset({"MKR", "DAI"}),
     ),
     "compound_v3": _ProtocolCapability(
         venue_prefix="COMPOUND_V3",
         protocol_class=ProtocolClass.LENDING,
         instrument_types=_LENDING_ATOKEN_DEBTTOKEN,
-        data_types=[*_LENDING_DATA],
-        mtds_operations=["collect-lending-indices", "collect-liquidations"],
+        data_types=[
+            *_LENDING_DATA,
+            "oracle_prices",  # Chainlink via Comet interface (aspirational: capture not yet wired)
+        ],
+        mtds_operations=["collect-lending-indices", "collect-liquidations", "collect-oracle-prices"],
         required_tokens=frozenset({"COMP"}),
     ),
     "morpho": _ProtocolCapability(
@@ -466,11 +474,13 @@ PROTOCOL_CAPABILITIES: dict[str, _ProtocolCapability] = {
             *_LENDING_DATA,
             "liquidation_events",  # LiquidationCall events (MORPHO-ETHEREUM 2024-01-08)
             "position_data",  # Top user positions (MORPHO-ETHEREUM 2024-01-08)
+            "oracle_prices",  # Morpho's IRM/oracle feeds (aspirational: capture not yet wired)
         ],
         mtds_operations=[
             "collect-liquidations",
             "collect-liquidation-events",
             "collect-position-data",
+            "collect-oracle-prices",
         ],
     ),
     # ── Green-venue lending adapters (2026-06-02 smoke tests; slot 7) ──
@@ -518,8 +528,11 @@ PROTOCOL_CAPABILITIES: dict[str, _ProtocolCapability] = {
         venue_prefix="RADIANT",
         protocol_class=ProtocolClass.LENDING,
         instrument_types=_LENDING,
-        data_types=[*_LENDING_DATA],
-        mtds_operations=["collect-lending-indices", "collect-liquidations"],
+        data_types=[
+            *_LENDING_DATA,
+            "oracle_prices",  # Chainlink price feeds via Radiant's lending pool (aspirational: capture not yet wired)
+        ],
+        mtds_operations=["collect-lending-indices", "collect-liquidations", "collect-oracle-prices"],
         required_tokens=frozenset({"RDNT"}),
     ),
     # Euler V2: Goldsky subgraph — eulerVaults (live state) + vaultStatuses
@@ -543,8 +556,11 @@ PROTOCOL_CAPABILITIES: dict[str, _ProtocolCapability] = {
         venue_prefix="FLUID",
         protocol_class=ProtocolClass.LENDING,
         instrument_types=_LENDING,
-        data_types=[*_LENDING_DATA],
-        mtds_operations=["collect-liquidations"],
+        data_types=[
+            *_LENDING_DATA,
+            "oracle_prices",  # Fluid's native price oracle (aspirational: capture not yet wired)
+        ],
+        mtds_operations=["collect-liquidations", "collect-oracle-prices"],
     ),
     # ── EVM DEX — Native schema ─────────────────────────────────
     "uniswap_v2": _ProtocolCapability(
@@ -848,8 +864,12 @@ PROTOCOL_CAPABILITIES: dict[str, _ProtocolCapability] = {
         venue_prefix="KAMINO",
         protocol_class=ProtocolClass.DEX,
         instrument_types=_SOLANA_VAULT,
-        data_types=["dex_pool_state", "lending_indices"],
-        mtds_operations=["collect-dex-pools", "collect-lending-indices"],
+        data_types=[
+            "dex_pool_state",
+            "lending_indices",
+            "oracle_prices",
+        ],  # oracle_prices: Kamino's native price feeds (aspirational: capture not yet wired)
+        mtds_operations=["collect-dex-pools", "collect-lending-indices", "collect-oracle-prices"],
         required_tokens=frozenset({"KMNO"}),
     ),
     "raydium": _ProtocolCapability(
@@ -1050,8 +1070,12 @@ PROTOCOL_CAPABILITIES: dict[str, _ProtocolCapability] = {
         venue_prefix="PUFFER",
         protocol_class=ProtocolClass.RESTAKING,
         instrument_types=_RESTAKING,
-        data_types=["staking_yields", "oracle_prices"],  # PUFFER-ETHEREUM 2024-05-09
-        mtds_operations=["collect-staking-yields", "collect-oracle-prices"],
+        data_types=[
+            "staking_yields",
+            "oracle_prices",
+            "lst_rates",
+        ],  # lst_rates: pufETH LST exchange rate (aspirational: capture not yet wired)
+        mtds_operations=["collect-staking-yields", "collect-oracle-prices", "collect-lst-rates"],
         required_tokens=frozenset({"PUFETH"}),
     ),
     "jitorestaking": _ProtocolCapability(
@@ -1115,8 +1139,11 @@ PROTOCOL_CAPABILITIES: dict[str, _ProtocolCapability] = {
         venue_prefix="ALCHEMY",
         protocol_class=ProtocolClass.INFRASTRUCTURE,
         instrument_types=_RESTAKING,  # SPOT_ASSET — chain-level analytics, not a protocol instrument
-        data_types=["token_transfers"],  # ERC-20 transfer events via Alchemy RPC (ALCHEMY-ONCHAIN 2020-01-01)
-        mtds_operations=["collect-token-transfers"],
+        data_types=[
+            "token_transfers",  # ERC-20 transfer events via Alchemy RPC (ALCHEMY-ONCHAIN 2020-01-01)
+            "gas_fees",  # Per-chain gas price data (aspirational: capture not yet wired)
+        ],
+        mtds_operations=["collect-token-transfers", "collect-gas-fees"],
     ),
     # ── Oracle price feeds (oracle_prices) ────────────────────────────────────
     # 2026-07-20 DeFi catalogue canonicalization. CHAINLINK = multi-chain

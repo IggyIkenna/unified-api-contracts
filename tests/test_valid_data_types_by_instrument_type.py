@@ -589,13 +589,19 @@ class TestDefiActualNotDeclaredValidJoin:
         assert "oracle_prices" not in violations.get("AAVE_V3-ARBITRUM", frozenset())
 
     def test_a_genuine_undeclared_violation_is_still_caught(self) -> None:
-        # COMPOUND_V3 was NOT part of the 2026-07-10 fix (its oracle_prices
-        # genesis date has zero real captured rows in prod — a different bug
-        # class, intentionally left alone). The join must still catch it —
-        # demonstrating the audit function actually discriminates instead of
-        # trivially passing everything.
+        # MAKER-ETHEREUM's lst_rates entry is a genuinely over-claiming cell
+        # (Maker is a CDP, not an LST — lst_rates was added to
+        # DEFI_VENUE_DATA_TYPE_CAPABILITIES in error, never actually captured).
+        # This demonstrates the audit function discriminates instead of
+        # trivially passing everything — the 2026-08-05 PROTOCOL_CAPABILITIES
+        # expansion added oracle_prices to compound_v3/morpho/spark/radiant/
+        # fluid/kamino + rewards to aave_v3 + gas_fees to alchemy_onchain +
+        # lst_rates to puffer, so the previous control case (COMPOUND_V3
+        # oracle_prices) is now reconciled. MAKER lst_rates and
+        # AAVE-ETHEREUM oracle_prices are the 2 remaining over-claiming pairs
+        # awaiting operator decision on genesis-date rollback.
         violations = defi_actual_data_types_not_declared_valid()
-        assert "oracle_prices" in violations.get("COMPOUND_V3-ETHEREUM", frozenset())
+        assert "lst_rates" in violations.get("MAKER-ETHEREUM", frozenset())
 
     def test_fully_reconciled_protocol_has_no_entry(self) -> None:
         # UNISWAP_V3-ETHEREUM's actual declaration (dex_pool_swaps/dex_pool_state/
