@@ -942,7 +942,10 @@ PROTOCOL_CAPABILITIES: dict[str, _ProtocolCapability] = {
         venue_prefix="IDLE",
         protocol_class=ProtocolClass.YIELD,
         instrument_types=_YIELD,
-        data_types=["staking_yields"],  # vault APY time-series (IDLE-ETHEREUM 2019-08-13)
+        data_types=[
+            "staking_yields",
+            "lst_rates",
+        ],  # vault APY time-series (IDLE-ETHEREUM 2019-08-13)
         mtds_operations=["collect-staking-yields"],
         required_tokens=frozenset({"IDLE"}),
     ),
