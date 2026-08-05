@@ -68,31 +68,6 @@ from datetime import date
 from unified_api_contracts.canonical import coverage_starts as _coverage_starts
 from unified_api_contracts.registry.venue_mapping import VenueMapping
 
-# ---------------------------------------------------------------------------
-# Suffix allowlists — deliberately narrow, never a blind startswith()
-# ---------------------------------------------------------------------------
-# A blind ``key.startswith(bare_key + "-")`` false-matches prediction's
-# ``KALSHI``/``POLYMARKET`` against the UNRELATED cefi ``KALSHI-PERP``/
-# ``POLYMARKET-PERP`` — a different product on a different asset_group per
-# coverage_starts.py's own comment ("Distinct from POLYMARKET/KALSHI
-# prediction YES/NO markets"). Scoping the allowed suffix per asset_group
-# closes that hole.
-
-_CEFI_INSTRUMENT_SUFFIXES: tuple[str, ...] = ("SPOT", "FUTURES", "DELIVERY", "SWAP", "CDE")
-_DEFI_CHAIN_SUFFIXES: tuple[str, ...] = (
-    "ETHEREUM",
-    "ARBITRUM",
-    "POLYGON",
-    "OPTIMISM",
-    "BASE",
-    "AVALANCHE",
-    "BSC",
-    "LINEA",
-    "SOLANA",
-    "STARKNET",
-    "ZKSYNC",
-)
-
 # sports is intentionally excluded — coverage_starts imports it directly
 # (structurally one SSOT), and it has its own dedicated falsifier already
 # (TestOddsApiFloorDerivesFromSportsSsot).
@@ -103,29 +78,39 @@ _ASSET_GROUP_REGISTRIES: dict[str, dict[str, date]] = {
     "prediction": _coverage_starts.PREDICTION_SOURCE_COVERAGE_START,
 }
 
+# ---------------------------------------------------------------------------
+# Explicit key-mapping — coverage_starts bare keys → venue_mapping suffixed keys
+# ---------------------------------------------------------------------------
+# The SSOT mapping is in ``coverage_starts.BARE_KEY_TO_VENUE_MAPPING_KEYS``,
+# published 2026-08-05 (coverage_floor_registries_no_cross_propagation_2026_07_17.md
+# [DATA] P3). A bare key absent from the mapping defaults to exact-match lookup,
+# which is correct for tradfi/prediction (keys match exactly) and for bare keys
+# with no venue_mapping counterpart at all.
+#
+# This REPLACES the earlier suffix-allowlist approach (``_CEFI_INSTRUMENT_SUFFIXES``
+# + ``_DEFI_CHAIN_SUFFIXES``) — the mapping is explicit, auditable, and the
+# falsifier validates its completeness at gate time (see
+# ``_validate_mapping_completeness``).
+
 
 def _related_venue_mapping_keys(asset_group: str, bare_key: str, venue_keys: Sequence[str]) -> list[str]:
     """``venue_mapping`` keys describing the SAME venue/protocol as ``bare_key``.
 
-    ``tradfi``/``prediction`` get exact-match only (no observed finer grain
-    there beyond the venue itself, and prediction's per-market ``VENUE:MARKET``
-    keys are a different dimension entirely, not an instrument-type/chain
-    split — excluded by construction since ``:`` never matches a ``-`` suffix).
+    Looks up the explicit ``BARE_KEY_TO_VENUE_MAPPING_KEYS`` mapping first.
+    Falls back to exact-match for asset groups / bare keys not in the mapping
+    (tradfi, prediction, and any bare key with no suffixed counterparts).
     """
-    if asset_group == "cefi":
-        suffixes = _CEFI_INSTRUMENT_SUFFIXES
-    elif asset_group == "defi":
-        suffixes = _DEFI_CHAIN_SUFFIXES
-    else:
-        suffixes = ()
+    mapping = _coverage_starts.BARE_KEY_TO_VENUE_MAPPING_KEYS.get(asset_group, {})
+    declared = mapping.get(bare_key)
+    if declared is not None:
+        return [k for k in declared if k in venue_keys]
 
-    related: list[str] = []
-    for key in venue_keys:
-        if key == bare_key:
-            related.append(key)
-        elif suffixes and any(key == f"{bare_key}-{suffix}" for suffix in suffixes):
-            related.append(key)
-    return related
+    # Exact-match fallback — correct for tradfi/prediction (keys match exactly
+    # with no instrument-type/chain suffix), and for bare keys with no
+    # venue_mapping counterpart at all (returns empty, which is honest).
+    if bare_key in venue_keys:
+        return [bare_key]
+    return []
 
 
 def _venue_mapping_combined_dates() -> dict[str, str]:
@@ -285,14 +270,73 @@ def find_cross_registry_mismatches() -> tuple[list[_Finding], list[_Finding]]:
     return new_findings, stale_findings
 
 
+def _validate_mapping_completeness() -> list[_Finding]:
+    """Verify the explicit key-mapping is complete and current.
+
+    Two checks:
+    1. Every suffixed key in the mapping MUST exist in venue_mapping — a stale
+       reference (key removed from venue_mapping but not from the mapping) is a
+       drift finding.
+    2. Every venue_mapping key that matches a coverage_starts bare key via the
+       suffix pattern MUST be declared in the mapping — an undeclared
+       relationship means the falsifier silently skips comparing that key,
+       exactly the failure class this [DATA] P3 task closes.
+    """
+    venue_dates = _venue_mapping_combined_dates()
+    findings: list[_Finding] = []
+
+    for asset_group, mapping in _coverage_starts.BARE_KEY_TO_VENUE_MAPPING_KEYS.items():
+        for bare_key, declared_keys in mapping.items():
+            for declared in declared_keys:
+                if declared not in venue_dates:
+                    findings.append(
+                        _Finding(
+                            f"STALE MAPPING: BARE_KEY_TO_VENUE_MAPPING_KEYS"
+                            f"[{asset_group!r}][{bare_key!r}] references "
+                            f"{declared!r} which does NOT exist in venue_mapping "
+                            f"venue_start_dates/source_data_start_dates. "
+                            f"Remove {declared!r} from the mapping entry."
+                        )
+                    )
+
+    # Reverse check — venue_mapping keys that SHOULD be in the mapping but aren't.
+    # For each asset_group in the mapping, collect all declared suffixed keys
+    # per bare key, then check for venue_mapping keys that match the bare-key
+    # pattern but aren't declared.
+    for asset_group, mapping in _coverage_starts.BARE_KEY_TO_VENUE_MAPPING_KEYS.items():
+        for bare_key, declared_keys in mapping.items():
+            declared_set = set(declared_keys)
+            for venue_key in venue_dates:
+                if venue_key in declared_set:
+                    continue
+                # A venue_mapping key relates to bare_key if it either matches
+                # exactly or starts with bare_key + "-".
+                if venue_key == bare_key or venue_key.startswith(bare_key + "-"):
+                    findings.append(
+                        _Finding(
+                            f"UNDECLARED MAPPING: venue_mapping key "
+                            f"{venue_key!r} matches coverage_starts bare key "
+                            f"{bare_key!r} but is NOT listed in "
+                            f"BARE_KEY_TO_VENUE_MAPPING_KEYS[{asset_group!r}]"
+                            f"[{bare_key!r}]. Add it to the mapping so the "
+                            f"falsifier compares these two keys."
+                        )
+                    )
+
+    return findings
+
+
 def main(argv: Sequence[str] | None = None) -> int:
     del argv
     new_findings, stale_findings = find_cross_registry_mismatches()
-    findings = new_findings + stale_findings
+    mapping_findings = _validate_mapping_completeness()
+    findings = mapping_findings + new_findings + stale_findings
 
     print(
         f"Checking {sum(len(r) for r in _ASSET_GROUP_REGISTRIES.values())} coverage_starts.py "
-        f"entries against venue_mapping.py ({len(KNOWN_DIVERGENCES)} tracked divergence(s) baselined)..."
+        f"entries against venue_mapping.py ({len(KNOWN_DIVERGENCES)} tracked divergence(s) baselined, "
+        f"{sum(len(v) for v in _coverage_starts.BARE_KEY_TO_VENUE_MAPPING_KEYS.values())} "
+        f"key-mapping entries)..."
     )
     if findings:
         print(f"\n✗ FAILED — {len(findings)} finding(s):\n")
@@ -300,13 +344,13 @@ def main(argv: Sequence[str] | None = None) -> int:
             print(finding.render())
         print(
             "\nA cross-registry floor disagreement that reality contradicts (or a baseline "
-            "entry that has outlived its mismatch) is exactly the failure class that made "
-            "SOURCE_COVERAGE_START wrong for months. Fix the registry or the baseline — do "
-            "not silence this check."
+            "entry that has outlived its mismatch, or an incomplete key mapping) is exactly "
+            "the failure class that made SOURCE_COVERAGE_START wrong for months. Fix the "
+            "registry, the baseline, or the mapping — do not silence this check."
         )
         return 1
 
-    print("✓ No undeclared cross-registry coverage-floor divergence; baseline is current.")
+    print("✓ No undeclared cross-registry coverage-floor divergence; baseline and mapping are current.")
     return 0
 
 

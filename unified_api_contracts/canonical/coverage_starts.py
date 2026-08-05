@@ -343,7 +343,131 @@ def coverage_start(
     return registry.get(source_key)
 
 
+# ---------------------------------------------------------------------------
+# Explicit key-mapping: coverage_starts bare keys → venue_mapping suffixed keys
+# ---------------------------------------------------------------------------
+# ``coverage_starts`` uses bare venue/protocol tokens (``BINANCE``, ``CURVE``).
+# ``venue_mapping.VenueMapping.venue_start_dates`` uses a finer instrument-type
+# or chain-suffixed grain (``BINANCE-SPOT``/``-FUTURES``/``-DELIVERY``,
+# ``CURVE-ETHEREUM``). This table is the EXPLICIT 1:N mapping between them —
+# the SSOT for the cross-registry drift falsifier
+# (``scripts/check_coverage_floor_registry_drift.py``) and a prerequisite for
+# comparing the two registries key-by-key instead of by coincidental name match.
+#
+# A bare key ABSENT from this mapping defaults to exact-match lookup
+# (e.g. TradFi ``CME`` → ``CME``, Prediction ``POLYMARKET`` → ``POLYMARKET``).
+# That convention keeps this table lean — only non-trivial mappings are listed.
+#
+# Adding a new suffixed venue to ``venue_mapping.venue_start_dates``?
+#  1. If there is a bare-key entry for this venue in THIS file's per-asset-group
+#     dict (e.g. ``CEFI_SOURCE_COVERAGE_START``), add the suffixed key to this
+#     mapping so the falsifier compares them.
+#  2. If there is NO bare-key entry here, no action needed — this mapping only
+#     covers keys present in BOTH registries.
+#
+# Updated 2026-08-05 (coverage_floor_registries_no_cross_propagation_2026_07_17.md
+# [DATA] P3).
+# fmt: off
+BARE_KEY_TO_VENUE_MAPPING_KEYS: dict[str, dict[str, tuple[str, ...]]] = {
+    "cefi": {
+        "BINANCE": (
+            "BINANCE-SPOT",
+            "BINANCE-FUTURES",
+            "BINANCE-DELIVERY",
+        ),
+        "BITFINEX": (
+            "BITFINEX-SPOT",
+            "BITFINEX-FUTURES",
+        ),
+        "BITGET": (
+            "BITGET-SPOT",
+            "BITGET-FUTURES",
+        ),
+        "BYBIT": (
+            "BYBIT",
+            "BYBIT-SPOT",
+        ),
+        # COINBASE-SPOT: the bare key IS already instrument-type-specific
+        # (spot exchange). COINBASE-FUTURES (Derivatives perps, 2024-10-31)
+        # and COINBASE-CDE (on-chain settlement, 2025-12-12) are separate
+        # venues — different products with different launch dates, not the
+        # same venue split by instrument type. Deliberately excluded from
+        # this entry so the falsifier doesn't false-flag legitimate
+        # product-launch differences as registry errors.
+        "COINBASE-SPOT": ("COINBASE-SPOT",),
+        "DERIBIT": ("DERIBIT",),
+        "HYPERLIQUID": ("HYPERLIQUID",),
+        "KALSHI-PERP": ("KALSHI-PERP",),
+        "KRAKEN": (
+            "KRAKEN-SPOT",
+            "KRAKEN-FUTURES",
+        ),
+        "OKX": (
+            "OKX-SPOT",
+            "OKX-FUTURES",
+            "OKX-SWAP",
+        ),
+        "POLYMARKET-PERP": ("POLYMARKET-PERP",),
+        # UPBIT — in venue_mapping.venue_start_dates but NOT in
+        # CEFI_SOURCE_COVERAGE_START (no bare-key entry), so no mapping needed.
+        # TARDIS — a data-source key, not a venue; no venue_mapping counterpart.
+    },
+    "defi": {
+        "AAVE_V3": (
+            "AAVE_V3-ETHEREUM",
+            "AAVE_V3-POLYGON",
+            "AAVE_V3-AVALANCHE",
+            "AAVE_V3-ARBITRUM",
+            "AAVE_V3-OPTIMISM",
+            "AAVE_V3-BASE",
+            "AAVE_V3-BSC",
+            "AAVE_V3-LINEA",
+        ),
+        "BALANCER": (
+            "BALANCER-ETHEREUM",
+            "BALANCER-POLYGON",
+            "BALANCER-ARBITRUM",
+            "BALANCER-OPTIMISM",
+            "BALANCER-AVALANCHE",
+            "BALANCER-BASE",
+        ),
+        "CURVE": (
+            "CURVE-ETHEREUM",
+            "CURVE-AVALANCHE",
+            "CURVE-OPTIMISM",
+        ),
+        "ETHENA": ("ETHENA-ETHEREUM",),
+        "ETHERFI": ("ETHERFI-ETHEREUM",),
+        "LIDO": ("LIDO-ETHEREUM",),
+        "UNISWAP_V2": ("UNISWAP_V2-ETHEREUM",),
+        "UNISWAP_V3": (
+            "UNISWAP_V3-ETHEREUM",
+            "UNISWAP_V3-ARBITRUM",
+            "UNISWAP_V3-POLYGON",
+            "UNISWAP_V3-OPTIMISM",
+            "UNISWAP_V3-BASE",
+        ),
+        "UNISWAP_V4": ("UNISWAP_V4-ETHEREUM",),
+        # AAVE_V2 — in DEFI_SOURCE_COVERAGE_START but NOT in
+        # venue_mapping.venue_start_dates (retired protocol version, no
+        # per-chain suffixed entries); exact-match finds nothing, which is
+        # correct — no comparison possible. Deliberately absent from mapping.
+    },
+    # tradfi and prediction are deliberately absent — every key in those
+    # asset groups has an exact-match counterpart in venue_mapping
+    # (CME→CME, FRED→FRED, POLYMARKET→POLYMARKET, KALSHI→KALSHI, etc.).
+    # The falsifier's exact-match fallback handles them correctly; adding
+    # 1:1 entries here would be noisy.
+    #
+    # Sports is absent by design — coverage_starts imports league_data
+    # directly (structurally one SSOT), with its own dedicated falsifier
+    # (TestOddsApiFloorDerivesFromSportsSsot).
+}
+# fmt: on
+
+
 __all__ = [
+    "BARE_KEY_TO_VENUE_MAPPING_KEYS",
     "CEFI_SOURCE_COVERAGE_START",
     "DEFI_DATA_TYPE_COVERAGE_START",
     "DEFI_SOURCE_COVERAGE_START",
