@@ -230,6 +230,68 @@ KALSHI_TICKER_PREFIX_TO_GROUP: Final[dict[str, CanonicalQuestionGroup]] = {
     # prefix was absent from this map so all Kalshi temp markets fell to OTHER. Fix:
     # axis-1 underlying = WEATHER_TEMP → both venues now share the group.
     "KXHIGH": _G.WEATHER_TEMP_DAILY,
+    # ── Politics: Trump approval rating ───────────────────────────────────────
+    # Kalshi Trump approval/favorability/poll series share the SAME real-world
+    # referent as Polymarket's TRUMP_APPROVAL_RATING group (decision 338 pass 2).
+    # Different cadences (daily/weekly/annual) are different contract instances
+    # within the same group — the arb layer pairs only same-settlement-event
+    # instruments, so a daily-approval market and a weekly-favorability market
+    # in the SAME group are NOT false-arbable (different resolution dates).
+    #
+    # KXTRUMPAPPROVAL covers KXTRUMPAPPROVALBELOW, KXTRUMPAPPROVALYEAR.
+    # KXTRUMPFAV covers KXTRUMPFAV, KXTRUMPFAVINAUG.
+    # KXTRUMPNETFAV covers KXTRUMPNETFAVINAUG.
+    # KXAPRPOTUS covers KXAPRPOTUS, KXAPRPOTUSEOY.
+    # KX538APPROVE covers KX538APPROVE, KX538APPROVEMAX, KX538APPROVEMIN, KX538APPROVEY.
+    # Non-KX forms (538APPROVE, APRPOTUS) also mapped — Kalshi lists some series
+    # with and without the KX prefix; the classifier uppercases input so both match.
+    "KXTRUMPAPPROVAL": _G.TRUMP_APPROVAL_RATING,
+    "KXTRUMPFAV": _G.TRUMP_APPROVAL_RATING,
+    "KXTRUMPNETFAV": _G.TRUMP_APPROVAL_RATING,
+    "KXTRUMPPOLLDAILY": _G.TRUMP_APPROVAL_RATING,
+    "KXAPRPOTUS": _G.TRUMP_APPROVAL_RATING,
+    "KX538APPROVE": _G.TRUMP_APPROVAL_RATING,
+    "APRPOTUS": _G.TRUMP_APPROVAL_RATING,
+    "538APPROVE": _G.TRUMP_APPROVAL_RATING,
+    # ── Politics: Trump executive orders / pardons ────────────────────────────
+    # Kalshi executive-action markets share the referent with Polymarket's
+    # TRUMP_EXEC_ORDER group. Pardons are an executive power under Art. II —
+    # same category. KXTRUMPPARDON covers KXTRUMPPARDON, KXTRUMPPARDONS,
+    # KXTRUMPPARDONFAMILY, KXTRUMPPARDONMONTH. KXBIRTHRIGHT covers both
+    # KXBIRTHRIGHT and KX14AMENDCASE (birthright citizenship = executive-order
+    # topic). KXCRYPTOEO = crypto executive order. KXABORTION = abortion
+    # executive action. KXDEPORTATION = deportation executive action.
+    "KXTRUMPPARDON": _G.TRUMP_EXEC_ORDER,
+    "KXCRYPTOEO": _G.TRUMP_EXEC_ORDER,
+    "KXABORTION": _G.TRUMP_EXEC_ORDER,
+    "KXDEPORTATION": _G.TRUMP_EXEC_ORDER,
+    "KXBIRTHRIGHT": _G.TRUMP_EXEC_ORDER,
+    # ── Geo: Russia-Ukraine conflict ──────────────────────────────────────────
+    # Kalshi Russia/Ukraine/Putin markets share the same geopolitical topic as
+    # Polymarket's GEO_RUSSIA_UKRAINE group (decision 338 pass 2). The cqg is
+    # the TOPIC (discovery layer); the arb-pairing layer matches specific
+    # same-settlement-event instruments within the group. KXTRUMPPUTIN covers
+    # KXTRUMPPUTIN, KXTRUMPPUTINTALK, KXTRUMPPUTINMEET, KXTRUMPPUTIN2.
+    # KXSANCTIONRUS covers KXSANCTIONRUSSIA, KXSANCTIONRUS, KXSANCTIONEURUSS.
+    "KXUKRAINE": _G.GEO_RUSSIA_UKRAINE,
+    "KXPUTIN": _G.GEO_RUSSIA_UKRAINE,
+    "KXSANCTIONRUS": _G.GEO_RUSSIA_UKRAINE,
+    "KXTRUMPPUTIN": _G.GEO_RUSSIA_UKRAINE,
+    "KXTRUMPZELENSKY": _G.GEO_RUSSIA_UKRAINE,
+    # ── Geo: Israel-Iran conflict ─────────────────────────────────────────────
+    # Kalshi Israel/Iran/Abraham-Accords markets share the same geopolitical
+    # topic as Polymarket's GEO_ISRAEL_IRAN group. KXABRAHAM covers the Abraham
+    # Accords series (Israel normalization with Indonesia/Kazakhstan/Syria).
+    # KXTRUMPNETANYAHU / KXTRUMPBIBIMEET = Trump-Netanyahu meetings.
+    # KXTRUMPKHAMENEIMEET / KXTRUMPSUPREMELEADER = Trump-Iran leadership meetings.
+    "KXIRAN": _G.GEO_ISRAEL_IRAN,
+    "KXISRAEL": _G.GEO_ISRAEL_IRAN,
+    "KXABRAHAM": _G.GEO_ISRAEL_IRAN,
+    "KXTRUMPNETANYAHU": _G.GEO_ISRAEL_IRAN,
+    "KXTRUMPBIBIMEET": _G.GEO_ISRAEL_IRAN,
+    "KXTRUMPKHAMENEIMEET": _G.GEO_ISRAEL_IRAN,
+    "KXTRUMPSUPREMELEADER": _G.GEO_ISRAEL_IRAN,
+    "KXTRUMPIRAN": _G.GEO_ISRAEL_IRAN,
 }
 """Kalshi event-ticker prefix → canonical group (rule-based fallback layer).
 

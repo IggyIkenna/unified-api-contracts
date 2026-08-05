@@ -149,7 +149,18 @@ FUNDING_CADENCE_SECONDS: Final[dict[str, int]] = {
     "extended-starknet": 1 * 3600,
     # DeFi — 1h figure (24/day)
     "hyperliquid": 1 * 3600,
-    "lighter": 1 * 3600,
+    # LIGHTER-ZKSYNC (zkSync Era perp DEX): 1h figure (24/day). Key is the FULL
+    # compound venue string (not "lighter") -- same key-form rule as
+    # "extended-starknet" above: the venue's canonical value is always the
+    # compound "LIGHTER-ZKSYNC" (GCS venue-dir, instrument_id, adapter venue
+    # field), and "-ZKSYNC" is a CHAIN suffix, not an instrument-type suffix,
+    # so _canonical_venue("LIGHTER-ZKSYNC") -> "lighter-zksync" with no
+    # suffix stripped. Verified ACCRUAL MODEL below is provisionally DISCRETE
+    # (grouped with other confirmed-hourly perp DEXes at registration time)
+    # but LIGHTER-ZKSYNC specifically has NOT yet had a dedicated
+    # evidence-gathering pass (official docs + real production timestamp
+    # analysis) the way extended-starknet/coinbase/deribit did.
+    "lighter-zksync": 1 * 3600,
     # DRIFT / PACIFICA (Solana) removed 2026-07-16 (operator ruling: all Solana perp
     # DEXes dropped except Jupiter, which is a swap aggregator not a perp DEX).
     # GMX removed 2026-07-25 (unreliable historical funding data — see
@@ -398,11 +409,11 @@ class FundingAccrualModel(StrEnum):
 # registered cadence) — a mismatch would be a registry bug, guarded by a unit
 # test (test_perp_funding_cadence.py::TestFundingAccrualModel).
 #
-# "lighter" is provisionally DISCRETE (grouped with the other confirmed-hourly
-# perp DEXes at registration time) but — unlike deribit/coinbase/
-# extended-starknet — has NOT yet had a dedicated evidence-gathering pass
-# (official docs + real production timestamp analysis) the way those three
-# did; re-verify with the same rigor before leaning on this entry for a
+# "lighter-zksync" is provisionally DISCRETE (grouped with the other
+# confirmed-hourly perp DEXes at registration time) but — unlike deribit/
+# coinbase/extended-starknet — has NOT yet had a dedicated evidence-gathering
+# pass (official docs + real production timestamp analysis) the way those
+# three did; re-verify with the same rigor before leaning on this entry for a
 # high-stakes decision.
 FUNDING_ACCRUAL_MODEL: Final[dict[str, FundingAccrualModel]] = {
     "binance": FundingAccrualModel.DISCRETE,
@@ -416,7 +427,7 @@ FUNDING_ACCRUAL_MODEL: Final[dict[str, FundingAccrualModel]] = {
     "coinbase": FundingAccrualModel.DISCRETE,
     "extended-starknet": FundingAccrualModel.DISCRETE,
     "hyperliquid": FundingAccrualModel.DISCRETE,
-    "lighter": FundingAccrualModel.DISCRETE,  # provisional — see comment above
+    "lighter-zksync": FundingAccrualModel.DISCRETE,  # provisional — see comment above
 }
 
 

@@ -595,10 +595,14 @@ DEFI_VENUE_PHASE: dict[str, str] = {
     "ALCHEMY-POLYGON": "pipeline",
     # AAVE-PLASMA: 2026-08-01 — flipped live. lending_indices capture verified end-to-end
     # (manifest: venue=AAVE_V3/chain=PLASMA, 18 rows, capture_status=captured, date=2026-07-30
-    # — see defi_plasma_chain_onboarding_gap_2026_07_26.md todo 3). FLUID-PLASMA stays pipeline:
-    # its PROTOCOL_LAUNCH_DATES entry is still unconfirmed (same doc's P1 todo).
+    # — see defi_plasma_chain_onboarding_gap_2026_07_26.md todo 3).
+    # FLUID-PLASMA: 2026-08-05 — flipped live. Launch date confirmed 2025-09-25 (day-1 Plasma
+    # mainnet integration partner alongside AAVE; Plasmascan token tracker +
+    # The Block/The Defiant day-1-launch coverage). FluidAdapter multi-chain support already
+    # shipped (mtds@6bcc5154, self.venue = f"FLUID-{self.chain}"; FLUID_LIQUIDITY_RESOLVER_ADDRESS
+    # CREATE2-identical across chains incl. Plasma). Flip matches AAVE-PLASMA precedent.
     "AAVE-PLASMA": "live",
-    "FLUID-PLASMA": "pipeline",
+    "FLUID-PLASMA": "live",
     # ── Live (Linea — IS-producible per _build_defi_venues()) ──
     "AAVE_V3-LINEA": "live",
     # ── Pipeline (Scroll / zkSync — NOT IS-producible) ──

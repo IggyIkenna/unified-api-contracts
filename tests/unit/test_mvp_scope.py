@@ -651,13 +651,13 @@ class TestSportsMvp:
         mvp_football = [lg for lg in LEAGUE_REGISTRY.values() if lg.sport == "FOOTBALL" and lg.in_mvp_scope]
         non_mvp_football = [lg for lg in LEAGUE_REGISTRY.values() if lg.sport == "FOOTBALL" and not lg.in_mvp_scope]
         non_football = [lg for lg in LEAGUE_REGISTRY.values() if lg.sport != "FOOTBALL"]
-        assert len(mvp_football) == 96  # China+Russia added 2026-07-21 (operator ruling: in-universe)
+        assert len(mvp_football) == 97  # +1 LA_LIGA_2 re-registration 2026-08-05 (China+Russia 2026-07-21)
         # curated-universe additions 2026-07-25 (continental cups/majors, domestic
         # top+below+cup batches for many regions), all in_mvp_scope=False. This count is
         # a live measurement, not hand-arithmetic -- many concurrent slots land batches
         # into this same registry file; re-derive from len(LEAGUE_REGISTRY) rather than
         # trust a stale comment.
-        assert len(non_mvp_football) == 287
+        assert len(non_mvp_football) == 287  # unchanged — LA_LIGA_2 is in_mvp_scope (mirrors SEGUNDA_DIVISION)
         assert len(non_football) == 7
         for lg in mvp_football:
             assert is_mvp("sports", "ODDS_API", "FIXED_ODDS", "odds", league=lg.league_id)

@@ -330,7 +330,7 @@ _SAMPLED_SOURCE_COLUMNS: dict[tuple[str, str, str], set[str]] = {
         "volumeToken1",
         "volumeUSD",
     },
-    ("defi", "dex_pools", "ORCA"): {
+    ("defi", "dex_pool_state", "ORCA"): {
         "chain",
         "data_type",
         "fee_apr_day",
@@ -353,7 +353,7 @@ _SAMPLED_SOURCE_COLUMNS: dict[tuple[str, str, str], set[str]] = {
         "volume_usd",
         "volume_week",
     },
-    ("defi", "dex_pools", "RAYDIUM"): {
+    ("defi", "dex_pool_state", "RAYDIUM"): {
         "chain",
         "data_type",
         "fee_apr_day",
@@ -372,7 +372,7 @@ _SAMPLED_SOURCE_COLUMNS: dict[tuple[str, str, str], set[str]] = {
         "venue",
         "volume_usd",
     },
-    ("defi", "dex_swaps", "AERODROME_V3"): {
+    ("defi", "dex_pool_swaps", "AERODROME_V3"): {
         "amount0",
         "amount1",
         "amount_usd",
@@ -396,7 +396,7 @@ _SAMPLED_SOURCE_COLUMNS: dict[tuple[str, str, str], set[str]] = {
         "token_b",
         "venue",
     },
-    ("defi", "dex_swaps", "BALANCER"): {
+    ("defi", "dex_pool_swaps", "BALANCER"): {
         "amount_in",
         "amount_out",
         "amount_usd",
@@ -419,7 +419,7 @@ _SAMPLED_SOURCE_COLUMNS: dict[tuple[str, str, str], set[str]] = {
         "user",
         "venue",
     },
-    ("defi", "dex_swaps", "CAMELOT_V3"): {
+    ("defi", "dex_pool_swaps", "CAMELOT_V3"): {
         "amount0",
         "amount1",
         "amount_usd",
@@ -443,31 +443,7 @@ _SAMPLED_SOURCE_COLUMNS: dict[tuple[str, str, str], set[str]] = {
         "token_b",
         "venue",
     },
-    ("defi", "dex_swaps", "CURVE"): {
-        "amount_in",
-        "amount_in_usd",
-        "amount_out",
-        "amount_out_usd",
-        "available_at",
-        "chain",
-        "data_type",
-        "instrument_id",
-        "instrument_type",
-        "pair_address",
-        "pool_address",
-        "pool_id",
-        "pool_name",
-        "protocol",
-        "sender",
-        "swap_id",
-        "symbol",
-        "timestamp",
-        "token_in",
-        "token_out",
-        "tx_hash",
-        "venue",
-    },
-    ("defi", "dex_swaps", "PANCAKESWAP_V3"): {
+    ("defi", "dex_pool_swaps", "PANCAKESWAP_V3"): {
         "amount0",
         "amount1",
         "amount_usd",
@@ -491,7 +467,7 @@ _SAMPLED_SOURCE_COLUMNS: dict[tuple[str, str, str], set[str]] = {
         "token_b",
         "venue",
     },
-    ("defi", "dex_swaps", "SUSHISWAP"): {
+    ("defi", "dex_pool_swaps", "SUSHISWAP"): {
         "amount_in",
         "amount_in_usd",
         "amount_out",
@@ -515,7 +491,7 @@ _SAMPLED_SOURCE_COLUMNS: dict[tuple[str, str, str], set[str]] = {
         "tx_hash",
         "venue",
     },
-    ("defi", "dex_swaps", "SUSHISWAP_V3"): {
+    ("defi", "dex_pool_swaps", "SUSHISWAP_V3"): {
         "amount_in",
         "amount_in_usd",
         "amount_out",
@@ -537,30 +513,6 @@ _SAMPLED_SOURCE_COLUMNS: dict[tuple[str, str, str], set[str]] = {
         "token_in",
         "token_out",
         "tx_hash",
-        "venue",
-    },
-    ("defi", "dex_swaps", "UNISWAP_V3"): {
-        "amount0",
-        "amount1",
-        "amount_usd",
-        "available_at",
-        "chain",
-        "data_type",
-        "fee_rate_bps",
-        "instrument_id",
-        "instrument_type",
-        "pair_address",
-        "pool_address",
-        "pool_id",
-        "protocol",
-        "recipient",
-        "sender",
-        "swap_id",
-        "symbol",
-        "tick",
-        "timestamp",
-        "token_a",
-        "token_b",
         "venue",
     },
     ("defi", "lending_indices", "KAMINO"): {

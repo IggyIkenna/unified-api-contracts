@@ -555,12 +555,15 @@ PROTOCOL_LAUNCH_DATES: dict[tuple[str, str], str] = {
     # _PROTOCOL_LAUNCH_PENDING_INVESTIGATION_BASE 2026-07-18 now that SOLBLAZE-SOLANA
     # is IS-producible (needs a resolvable launch floor for the coverage denominator).
     ("SOLANA", "SOLBLAZE"): "2022-10-15",  # SolBlaze bSOL stake-pool (conservative); medium
-    # PLASMA chain onboarding (defi_plasma_chain_onboarding_gap_2026_07_26.md P1) —
-    # AAVE launched same-day as chain mainnet (2025-09-25), well-sourced. FLUID's
-    # Plasma launch date is NOT yet confirmed (needs its own block-explorer/DefiLlama
-    # audit per the same doc's P2 scoping todo) — stays on
-    # _PROTOCOL_LAUNCH_PENDING_INVESTIGATION, do not add here without that audit.
+    # PLASMA chain onboarding (defi_plasma_chain_onboarding_gap_2026_07_26.md) —
+    # both AAVE and FLUID launched same-day as chain mainnet (2025-09-25).
+    # AAVE: well-sourced via Plasma announcements, >$6.5B deposits week 1.
+    # FLUID: confirmed day-1 DeFi integration partner at Plasma launch per
+    # The Block + The Defiant coverage (2026-08-05 block-explorer/DefiLlama audit
+    # — Plasmascan shows FLUID token tracker live, Fluid listed among 100+ protocols
+    # at Plasma mainnet day-1). Removed from _PROTOCOL_LAUNCH_PENDING_INVESTIGATION.
     ("PLASMA", "AAVE"): "2025-09-25",  # Aave Plasma mainnet day-1, >$6.5B deposits week 1; high
+    ("PLASMA", "FLUID"): "2025-09-25",  # Fluid Plasma mainnet day-1, day-1 integration partner; high
 }
 
 # ── Canonical underscore-name aliases for protocol names ──
@@ -631,13 +634,11 @@ _PROTOCOL_LAUNCH_PENDING_INVESTIGATION_BASE: frozenset[tuple[str, str]] = frozen
         ("POLYGON", "ALCHEMY"),
         # PLASMA chain — chain onboarded 2026-07-27 (MAINNET_CHAIN_IDS=9745,
         # CHAIN_GENESIS_DATES=2025-09-25, both web-search-reverified) per
-        # issues/defi_plasma_chain_onboarding_gap_2026_07_26.md. AAVE's launch date is
-        # well-sourced (same-day as chain mainnet) and now DECLARED in
-        # PROTOCOL_LAUNCH_DATES above — removed from this pending set. FLUID
-        # (Instadapp) has a confirmed live Plasma deployment (DefiLlama protocol
-        # listing) but its exact launch date is NOT yet confirmed — stays pending
-        # until its own block-explorer/DefiLlama audit (P2 scoping todo in the same doc).
-        ("PLASMA", "FLUID"),
+        # issues/defi_plasma_chain_onboarding_gap_2026_07_26.md. AAVE + FLUID
+        # launch dates are both well-sourced (same-day as chain mainnet, 2025-09-25)
+        # and now DECLARED in PROTOCOL_LAUNCH_DATES above — both removed from this
+        # pending set (FLUID's Plasmascan + DefiLlama + web-search audit completed
+        # 2026-08-05, confirmed day-1 integration partner per The Block/The Defiant).
         # ONCHAIN pseudo-chain — Alchemy Infrastructure data, not a real L1/L2;
         # pending operator decision on whether to keep or remove this venue.
         ("ONCHAIN", "ALCHEMY"),

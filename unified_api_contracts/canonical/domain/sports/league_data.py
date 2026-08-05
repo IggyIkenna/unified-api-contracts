@@ -574,6 +574,7 @@ LEAGUE_EXPECTED_TEAM_COUNTS: dict[str, dict[int, int]] = {
     "ENG_LEAGUE_TWO": dict.fromkeys(range(2020, 2027), 24),
     # Spain
     "LA_LIGA": dict.fromkeys(range(2020, 2027), 20),
+    "LA_LIGA_2": dict.fromkeys(range(2020, 2027), 22),
     "SEGUNDA_DIVISION": dict.fromkeys(range(2020, 2027), 22),
     # Germany
     "BUNDESLIGA": dict.fromkeys(range(2020, 2027), 18),
@@ -695,7 +696,7 @@ def get_expected_leagues_for_source(
 # ``plans/active/mvp_scope_catalogue_tagging_2026_06_08.md`` § Config versioning.
 # ---------------------------------------------------------------------------
 
-SPORTS_LEAGUES_CONFIG_VERSION: int = 1
+SPORTS_LEAGUES_CONFIG_VERSION: int = 2
 """Monotonic version of :data:`LEAGUE_REGISTRY`. Bump on any content change."""
 
 

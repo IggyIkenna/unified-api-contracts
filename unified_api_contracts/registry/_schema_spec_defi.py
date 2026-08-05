@@ -20,15 +20,6 @@ Sampled shapes covered:
   Solana/EVM writers (ORCA, RAYDIUM, AERODROME_V3, BALANCER, CAMELOT_V3,
   CURVE, PANCAKESWAP_V3, SUSHISWAP, SUSHISWAP_V3, UNISWAP_V3). One shared
   union across sources.
-- ``dex_pools`` / ``dex_swaps`` — RETIRED legacy manifest data_type names
-  (corrected 2026-08-04: this docstring previously and incorrectly described
-  these bare forms as "current" writers; the naming SSOT above is explicit
-  that the legacy 2-layer split is retired and ``dex_pool_state``/
-  ``dex_pool_swaps`` are canonical everywhere). Sampled here only because the
-  CF-18 audit (2026-06-11) read footers off already-existing historical
-  objects, not because any writer emits these names today. See
-  ``/plans/active/issues/defi_legacy_data_type_names_manifest_migration_scope_2026_08_04.md``
-  for the pending manifest-residue migration.
 - ``lending_indices`` — Solana lenders (KAMINO, MARGINFI, SOLEND) on top of
   the original EVM a_token index shape.
 - ``lst_rates`` — MARINADE.
@@ -124,59 +115,31 @@ DEFI_POOL_WINDOW_COLUMNS: tuple[ColumnSpec, ...] = (
         source_aliases=("data_source",),
         description="Row-level provenance (legacy data_source)",
     ),
-)
-
-# ---------------------------------------------------------------------------
-# Current Solana/EVM DEX writers (snake_case already)
-# ---------------------------------------------------------------------------
-
-DEFI_DEX_POOLS_COLUMNS: tuple[ColumnSpec, ...] = (
-    ColumnSpec("pool_id", "string"),
-    ColumnSpec("pool_type", "string", nullable=True, description="RAYDIUM classic vs CLMM"),
-    ColumnSpec("protocol", "string"),
-    ColumnSpec("symbol", "string"),
-    ColumnSpec("token_a", "string"),
-    ColumnSpec("token_b", "string"),
-    ColumnSpec("price", "float64", nullable=True),
-    ColumnSpec("tvl_usd", "float64", nullable=True),
-    ColumnSpec("volume_usd", "float64", nullable=True),
-    ColumnSpec("volume_week", "float64", nullable=True),
-    ColumnSpec("volume_month", "float64", nullable=True),
-    ColumnSpec("fee_rate_bps", "float64", nullable=True),
-    ColumnSpec("fee_apr_day", "float64", nullable=True),
-    ColumnSpec("fee_apr_week", "float64", nullable=True),
-    ColumnSpec("fee_apr_month", "float64", nullable=True),
-    ColumnSpec("tick_spacing", "int64", nullable=True, description="ORCA whirlpool tick spacing"),
-    ColumnSpec("timestamp", "timestamp[us, UTC]"),
-)
-
-DEFI_DEX_SWAPS_COLUMNS: tuple[ColumnSpec, ...] = (
-    ColumnSpec("swap_id", "string"),
-    ColumnSpec("timestamp", "timestamp[us, UTC]"),
-    ColumnSpec("protocol", "string"),
-    ColumnSpec("symbol", "string", nullable=True),
-    ColumnSpec("pool_id", "string", nullable=True),
-    ColumnSpec("pool_address", "string", nullable=True),
-    ColumnSpec("pool_name", "string", nullable=True),
-    ColumnSpec("pair_address", "string", nullable=True),
-    ColumnSpec("token_a", "string", nullable=True),
-    ColumnSpec("token_b", "string", nullable=True),
-    ColumnSpec("token_in", "string", nullable=True),
-    ColumnSpec("token_out", "string", nullable=True),
-    ColumnSpec("amount0", "float64", nullable=True),
-    ColumnSpec("amount1", "float64", nullable=True),
-    ColumnSpec("amount_in", "float64", nullable=True),
-    ColumnSpec("amount_in_usd", "float64", nullable=True),
-    ColumnSpec("amount_out", "float64", nullable=True),
-    ColumnSpec("amount_out_usd", "float64", nullable=True),
-    ColumnSpec("amount_usd", "float64", nullable=True),
-    ColumnSpec("fee_rate_bps", "float64", nullable=True),
-    ColumnSpec("tick", "int64", nullable=True),
-    ColumnSpec("sender", "string", nullable=True),
-    ColumnSpec("recipient", "string", nullable=True),
-    ColumnSpec("caller", "string", nullable=True, description="BALANCER vault caller"),
-    ColumnSpec("user", "string", nullable=True, description="BALANCER swap user"),
-    ColumnSpec("tx_hash", "string", nullable=True),
+    # ── Solana DEX / cross-protocol columns (nullable — EVM sources don't emit them) ──
+    ColumnSpec("protocol", "string", nullable=True, description="Source protocol slug (orca/raydium/...)"),
+    ColumnSpec("symbol", "string", nullable=True, description="Canonical instrument symbol"),
+    ColumnSpec("token_a", "string", nullable=True, description="Solana token A symbol"),
+    ColumnSpec("token_b", "string", nullable=True, description="Solana token B symbol"),
+    ColumnSpec("price", "float64", nullable=True, description="Bare pool price (Solana AMM)"),
+    ColumnSpec("pool_name", "string", nullable=True, description="Human-readable pool name (Balancer/Curve/Sushi)"),
+    ColumnSpec("pool_type", "string", nullable=True, description="RAYDIUM classic vs CLMM pool type"),
+    ColumnSpec(
+        "fee_tier_bps",
+        "int64",
+        nullable=True,
+        source_aliases=("fee_rate_bps",),
+        description="LP fee rate in basis points",
+    ),
+    ColumnSpec("fee_apr_day", "float64", nullable=True, description="Orca fee APR (24h)"),
+    ColumnSpec("fee_apr_week", "float64", nullable=True, description="Orca fee APR (7d)"),
+    ColumnSpec("fee_apr_month", "float64", nullable=True, description="Orca fee APR (30d)"),
+    ColumnSpec("tick_spacing", "int64", nullable=True, description="Orca whirlpool tick spacing"),
+    ColumnSpec("volume_week", "float64", nullable=True, description="Orca 7d volume (USD)"),
+    ColumnSpec("volume_month", "float64", nullable=True, description="Orca 30d volume (USD)"),
+    ColumnSpec("swap_id", "string", nullable=True, description="Swap event unique id"),
+    ColumnSpec("caller", "string", nullable=True, description="BALANCER vault caller address"),
+    ColumnSpec("user", "string", nullable=True, description="BALANCER swap user address"),
+    ColumnSpec("recipient", "string", nullable=True, description="Swap recipient address"),
 )
 
 # ---------------------------------------------------------------------------
@@ -297,8 +260,6 @@ DEFI_REWARDS_COLUMNS: tuple[ColumnSpec, ...] = merge_columns(
 
 __all__ = [
     "DEFI_AAVE_RESERVE_SNAPSHOT_COLUMNS",
-    "DEFI_DEX_POOLS_COLUMNS",
-    "DEFI_DEX_SWAPS_COLUMNS",
     "DEFI_LENDING_INDICES_SOLANA_COLUMNS",
     "DEFI_LST_ORACLE_COLUMNS",
     "DEFI_LST_RATES_COLUMNS",

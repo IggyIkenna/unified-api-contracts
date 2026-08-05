@@ -37,8 +37,6 @@ from unified_api_contracts.registry._schema_spec_defi import (
     DEFI_AAVE_RESERVE_SNAPSHOT_COLUMNS as _DEFI_RISK_UTILIZATION_COLUMNS,
 )
 from unified_api_contracts.registry._schema_spec_defi import (
-    DEFI_DEX_POOLS_COLUMNS,
-    DEFI_DEX_SWAPS_COLUMNS,
     DEFI_LENDING_INDICES_SOLANA_COLUMNS,
     DEFI_LST_RATES_COLUMNS,
     DEFI_ORACLE_PRICES_COLUMNS,
@@ -192,7 +190,7 @@ _DEFI_DEX_POOL_SWAPS_COLUMNS: tuple[ColumnSpec, ...] = merge_columns(
         ColumnSpec("token1", "string", nullable=True),
         ColumnSpec("amount0", "float64", nullable=True),
         ColumnSpec("amount1", "float64", nullable=True),
-        ColumnSpec("fee_tier_bps", "int64", nullable=True),
+        ColumnSpec("fee_tier_bps", "int64", nullable=True, source_aliases=("fee_rate_bps",)),
         ColumnSpec("tx_hash", "string", nullable=True),
         ColumnSpec("block_number", "int64", nullable=True),
         ColumnSpec("captured_at", "timestamp[us, UTC]", nullable=True),
@@ -324,18 +322,6 @@ SCHEMA_SPEC_REGISTRY: Final[tuple[SchemaSpec, ...]] = (
         asset_group=AssetGroup.DEFI,
         data_type="dex_pool_state",
         columns=DEFI_POOL_WINDOW_COLUMNS,
-        source="manual",
-    ),
-    SchemaSpec(
-        asset_group=AssetGroup.DEFI,
-        data_type="dex_pools",
-        columns=DEFI_DEX_POOLS_COLUMNS,
-        source="manual",
-    ),
-    SchemaSpec(
-        asset_group=AssetGroup.DEFI,
-        data_type="dex_swaps",
-        columns=DEFI_DEX_SWAPS_COLUMNS,
         source="manual",
     ),
     SchemaSpec(

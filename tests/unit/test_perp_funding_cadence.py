@@ -107,6 +107,24 @@ class TestFundingsPerYear:
         # re-added as a second, redundant key that could drift from this one).
         assert "extended" not in FUNDING_CADENCE_SECONDS
 
+    def test_lighter_zksync_one_hour(self) -> None:
+        # LIGHTER-ZKSYNC (zkSync Era perp DEX) funds every 1h. Key form is the
+        # FULL compound venue string ("lighter-zksync"), not a bare "lighter" —
+        # same key-form rule as "extended-starknet": the venue's canonical value
+        # is always the compound "LIGHTER-ZKSYNC" (GCS venue-dir, instrument_id,
+        # adapter venue field), and "-ZKSYNC" is a CHAIN suffix, not an
+        # instrument-type suffix, so _canonical_venue("LIGHTER-ZKSYNC") ->
+        # "lighter-zksync" with no suffix stripped. Fixes the SAME bug class as
+        # the EXTENDED-STARKNET fix (2026-07-28): before correction the bare
+        # "lighter" key was never found by real callers passing the compound
+        # venue string.
+        assert FUNDING_CADENCE_SECONDS["lighter-zksync"] == 1 * 3600
+        assert fundings_per_year("LIGHTER-ZKSYNC") == Decimal("8760")
+        assert is_supported_venue("LIGHTER-ZKSYNC")
+        # Regression guard: a bare "lighter" key would NOT be found by real
+        # callers, which always pass the compound venue string.
+        assert "lighter" not in FUNDING_CADENCE_SECONDS
+
     def test_fundings_per_day(self) -> None:
         # SSOT replacement for the deleted UTL FUNDING_PERIODS_PER_DAY dict.
         assert fundings_per_day("binance") == Decimal("3")
@@ -115,6 +133,7 @@ class TestFundingsPerYear:
         assert fundings_per_day("hyperliquid") == Decimal("24")
         assert fundings_per_day("coinbase") == Decimal("24")  # 1h, like Hyperliquid
         assert fundings_per_day("EXTENDED-STARKNET") == Decimal("24")  # 1h
+        assert fundings_per_day("LIGHTER-ZKSYNC") == Decimal("24")  # 1h
         assert fundings_per_day("kraken") == Decimal("6")
 
     def test_case_insensitive_lookup(self) -> None:
@@ -132,11 +151,14 @@ class TestFundingsPerYear:
         assert annualise_funding_rate_bps(Decimal("0.0001"), "OKX-SWAP") == Decimal("1095.0000")
         assert fundings_per_year("COINBASE-FUTURES") == fundings_per_year("coinbase")
         assert is_supported_venue("COINBASE-FUTURES")
-        # EXTENDED-STARKNET is the key-form exception: its "GCS venue-dir form"
-        # IS its bare canonical venue value (no instrument-type suffix to
-        # strip) -- the registry key must already be the full compound string.
+        # EXTENDED-STARKNET (and LIGHTER-ZKSYNC) are the key-form exceptions:
+        # their "GCS venue-dir form" IS their bare canonical venue value (no
+        # instrument-type suffix to strip) — the registry key must already be
+        # the full compound string.
         assert is_supported_venue("EXTENDED-STARKNET")
         assert fundings_per_day("EXTENDED-STARKNET") == Decimal("24")
+        assert is_supported_venue("LIGHTER-ZKSYNC")
+        assert fundings_per_day("LIGHTER-ZKSYNC") == Decimal("24")
 
     def test_unknown_venue_raises(self) -> None:
         with pytest.raises(KeyError):
@@ -149,9 +171,13 @@ class TestCadenceSeconds:
         assert cadence_seconds("hyperliquid") == 1 * 3600
         assert cadence_seconds("kraken") == 4 * 3600
         assert cadence_seconds("deribit") == 8 * 3600
+        assert cadence_seconds("lighter-zksync") == 1 * 3600
 
     def test_extended_starknet_gcs_venue_dir_form(self) -> None:
         assert cadence_seconds("EXTENDED-STARKNET") == 1 * 3600
+
+    def test_lighter_zksync_gcs_venue_dir_form(self) -> None:
+        assert cadence_seconds("LIGHTER-ZKSYNC") == 1 * 3600
 
     def test_case_and_dir_form_insensitive(self) -> None:
         assert cadence_seconds("BINANCE-FUTURES") == cadence_seconds("binance")
@@ -222,7 +248,7 @@ class TestFundingAccrualModel:
         # computed and transferred continuously. Every OTHER registered venue
         # is DISCRETE (a genuine charge instant, whether TWAP-then-settled at
         # 8h/4h like Binance/Bybit/OKX/Aster/Bitget/Bitfinex/Kraken, or
-        # computed-then-settled hourly like Hyperliquid/Lighter/Coinbase/
+        # computed-then-settled hourly like Hyperliquid/Lighter-ZkSync/Coinbase/
         # EXTENDED-STARKNET).
         continuous = {v for v, m in FUNDING_ACCRUAL_MODEL.items() if m is FundingAccrualModel.CONTINUOUS_TIME_WEIGHTED}
         assert continuous == {"deribit"}
@@ -232,12 +258,13 @@ class TestFundingAccrualModel:
         assert funding_accrual_model("DERIBIT") == FundingAccrualModel.CONTINUOUS_TIME_WEIGHTED
 
     def test_funding_accrual_model_discrete_venues(self) -> None:
-        for venue in ("binance", "bybit", "okx", "aster", "kraken", "hyperliquid", "coinbase"):
+        for venue in ("binance", "bybit", "okx", "aster", "kraken", "hyperliquid", "coinbase", "lighter-zksync"):
             assert funding_accrual_model(venue) == FundingAccrualModel.DISCRETE, venue
 
     def test_gcs_venue_dir_form_resolves(self) -> None:
         assert funding_accrual_model("BINANCE-FUTURES") == FundingAccrualModel.DISCRETE
         assert funding_accrual_model("EXTENDED-STARKNET") == FundingAccrualModel.DISCRETE
+        assert funding_accrual_model("LIGHTER-ZKSYNC") == FundingAccrualModel.DISCRETE
 
     def test_unknown_venue_raises(self) -> None:
         with pytest.raises(KeyError):
