@@ -983,7 +983,7 @@ PROTOCOL_CAPABILITIES: dict[str, _ProtocolCapability] = {
         venue_prefix="KELPDAO",
         protocol_class=ProtocolClass.RESTAKING,
         instrument_types=_RESTAKING,
-        data_types=["staking_yields", "oracle_prices"],  # KELPDAO-ETHEREUM 2023-11-09
+        data_types=["staking_yields", "oracle_prices", "lst_rates"],  # KELPDAO-ETHEREUM 2023-11-09
         mtds_operations=["collect-staking-yields", "collect-oracle-prices"],
         required_tokens=frozenset({"RSETH"}),
     ),
