@@ -934,7 +934,11 @@ PROTOCOL_CAPABILITIES: dict[str, _ProtocolCapability] = {
         venue_prefix="PENDLE",
         protocol_class=ProtocolClass.YIELD,
         instrument_types=_YIELD,
-        data_types=["staking_yields", "oracle_prices"],  # yield tokenisation APY (PENDLE-ETHEREUM 2021-06-15)
+        data_types=[
+            "staking_yields",
+            "oracle_prices",
+            "lst_rates",
+        ],  # yield tokenisation APY (PENDLE-ETHEREUM 2021-06-15)
         mtds_operations=["collect-staking-yields", "collect-oracle-prices"],
         required_tokens=frozenset({"PENDLE"}),
     ),
