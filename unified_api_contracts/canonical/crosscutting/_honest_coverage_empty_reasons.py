@@ -408,6 +408,49 @@ class EmptyConfirmedReason(StrEnum):
     ``unified_api_contracts.registry.capability_declarations._defi_coverage``) rather than
     continuing to hand-stamp N cases inline."""
 
+    EXPECTED_SUBGRAPH_STALLED_HEAD = "EXPECTED_SUBGRAPH_STALLED_HEAD"
+    """DeFi: the venue's Graph Protocol subgraph HAS indexer allocations and serves queries
+    successfully (200 + valid data), but the indexer head (``_meta.block.timestamp``) is
+    frozen far behind the chain tip — the subgraph returns honest-zero rows for dates past
+    the frozen head, but the zero is MISLEADING (it is not that no swaps occurred; it is
+    that the subgraph has not indexed those blocks yet). Distinct from
+    ``EXPECTED_SUBGRAPH_DEINDEXED`` (zero allocations — no query can succeed AT ALL, the
+    gateway returns a top-level ``errors[]`` with ``"no allocations"``): this subgraph
+    HAS allocations and serves historical data correctly up to its frozen head, but cannot
+    reach recent blocks — structurally similar in effect (permanently stuck) but with a
+    different fingerprint (stalled ``_meta.block.timestamp`` + ``hasIndexingErrors=true``,
+    not a query-level rejection).
+
+    Reference case (root-caused 2026-08-05): PANCAKESWAP_V3/BSC ``dex_pool_swaps``
+    (subgraph=``Hv1GncLY5docZoGtXjo4kwbTvxm3MAhVZqBZE4sUT9eZ``) — Revert Finance's
+    PancakeSwap V3 BSC subgraph, deployed ~2 years ago and never updated. BSC's high
+    block production rate makes standard The Graph subgraph indexing structurally unable
+    to keep up — the indexer head has been frozen at ~2026-04-28 (>99 days behind
+    real-time), advancing only ~1,260 blocks (~9.5 min of block time) in 3 days.
+    Different indexers serve different stale snapshots (one at 2025-09-13, another at
+    2026-04-28 — both reporting ``hasIndexingErrors=true`` inconsistently). The ecosystem
+    (PancakeSwap, Revert Finance, Messari) abandoned The Graph indexing for this chain
+    due to the fundamental throughput limitation. No replacement The Graph subgraph
+    exists.
+
+    Runtime writer-side detection in ``dex_swaps_handler.py``: when the cascade query
+    succeeds (no GraphQL errors) but returns 0 rows, the handler probes
+    ``_meta.block.timestamp`` staleness against a ``SUBGRAPH_HEAD_STALENESS_THRESHOLD``
+    (default 7 days). If the head is older than the threshold, the shard is routed to
+    ``record_empty(reason=EXPECTED_SUBGRAPH_STALLED_HEAD)`` instead of
+    ``record_zero_rows()`` (which would record ``SOURCE_RETURNED_ZERO``, a misleadingly
+    optimistic zero). The detection is generic — any subgraph that returns 0 rows with
+    a stale head is classified this way, catching future occurrences on other
+    high-throughput chains without per-(protocol, chain) configuration.
+
+    OUT-of-coverage-window (below): a subgraph whose indexer head is frozen is not
+    currently coverable for dates past the frozen head, so the cell is clipped from the
+    coverage-% denominator until the condition resolves (e.g. a replacement subgraph
+    deployment is found, or the indexer self-heals). Self-heals to real ``captured``
+    rows if the indexer resumes advancing. Issue:
+    ``defi_dex_pool_swaps_733_row_indexer_health_findings_2026_07_27.md`` (P2 todo,
+    2026-08-05)."""
+
     EXPECTED_OUTSIDE_PROCESSING_SCOPE = "EXPECTED_OUTSIDE_PROCESSING_SCOPE"
     """Instrument exists in the instruments-service catalog but is not included in the downstream
     service's subscription_list / MVP-scope configuration. The service explicitly skips it rather
@@ -647,6 +690,11 @@ OUT_OF_COVERAGE_WINDOW_REASONS: Final[frozenset[str]] = frozenset(
         # coverable by any retry (see EXPECTED_SUBGRAPH_DEINDEXED docstring). Self-heals
         # to captured if a new indexer picks the subgraph back up.
         EmptyConfirmedReason.EXPECTED_SUBGRAPH_DEINDEXED.value,
+        # DeFi Graph Protocol subgraph whose indexer head is frozen far behind chain tip —
+        # not currently coverable for dates past the frozen head (see
+        # EXPECTED_SUBGRAPH_STALLED_HEAD docstring). Self-heals to captured if the indexer
+        # resumes advancing or a replacement deployment is found.
+        EmptyConfirmedReason.EXPECTED_SUBGRAPH_STALLED_HEAD.value,
         EmptyConfirmedReason.EXPECTED_NO_FIXTURE.value,
         EmptyConfirmedReason.EXPECTED_NO_MAPPING.value,
         EmptyConfirmedReason.EXPECTED_LEGACY_MIGRATION_MISSING_EXPIRY.value,
