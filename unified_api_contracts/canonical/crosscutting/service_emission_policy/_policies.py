@@ -66,7 +66,17 @@ SERVICE_OUTPUT_POLICIES: Final[dict[tuple[str, str], ServiceEmissionPolicy]] = {
     # different markets populate different APY fields. write_gate nan_threshold=0.95
     # enforces quality; strategy tracer does its own None-guard on missing values.
     ("features-service", "lending_rates"): ServiceEmissionPolicy.PARTIAL_OK,
-    ("features-service", "lst_yields"): ServiceEmissionPolicy.STRICT_FAIL,
+    # lst_yields / lst_native_rates: PARTIAL_OK — per-token yield data is
+    # structurally partial (different LSTs populate different yield fields, same
+    # shape as lending_rates). _drop_unmapped_tokens() already filters tokens not
+    # in the UAC registry; remaining NaN cells are genuine "data not available for
+    # this token today" gaps. STRICT_FAIL's all-or-nothing semantics would suppress
+    # ALL tokens for a day when even one token is missing one field — too aggressive
+    # now that unmapped-token filtering exists as a safety net. Downstream consumer
+    # (strategy-service CARRY_* archetypes) does its own None-guard on missing values.
+    # Ruling: lst_yields_writegate_permanently_blocked_2026_07_28.md § todo 4 (P3).
+    ("features-service", "lst_yields"): ServiceEmissionPolicy.PARTIAL_OK,
+    ("features-service", "lst_native_rates"): ServiceEmissionPolicy.PARTIAL_OK,
     ("features-service", "onchain_perps"): ServiceEmissionPolicy.STRICT_FAIL,
     ("features-service", "utilization"): ServiceEmissionPolicy.STRICT_FAIL,
     ("features-service", "flash_loan_availability"): ServiceEmissionPolicy.STRICT_FAIL,
@@ -161,7 +171,8 @@ SERVICE_OUTPUT_POLICIES: Final[dict[tuple[str, str], ServiceEmissionPolicy]] = {
     # BLOCK_CRITICAL groups risk_params + health_factor that require P0 alert).
     # lending_rates: PARTIAL_OK (aligned with features-service entry update in a84e012).
     ("features-onchain-service", "lending_rates"): ServiceEmissionPolicy.PARTIAL_OK,
-    ("features-onchain-service", "lst_yields"): ServiceEmissionPolicy.STRICT_FAIL,
+    ("features-onchain-service", "lst_yields"): ServiceEmissionPolicy.PARTIAL_OK,
+    ("features-onchain-service", "lst_native_rates"): ServiceEmissionPolicy.PARTIAL_OK,
     ("features-onchain-service", "onchain_perps"): ServiceEmissionPolicy.STRICT_FAIL,
     ("features-onchain-service", "utilization"): ServiceEmissionPolicy.STRICT_FAIL,
     ("features-onchain-service", "flash_loan_availability"): ServiceEmissionPolicy.STRICT_FAIL,
