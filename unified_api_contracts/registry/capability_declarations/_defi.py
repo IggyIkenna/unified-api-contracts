@@ -794,6 +794,33 @@ PROTOCOL_CAPABILITIES: dict[str, _ProtocolCapability] = {
         data_types=["lst_rates"],
         mtds_operations=["collect-lst-rates"],
     ),
+    # ── EVM LST protocols (continued — previously missing PROTOCOL_CAPABILITIES) ───
+    # Finding B, defi_protocol_capabilities_lst_rates_audit_2026_08_05.md:
+    # BINANCE writes lst_rates for wBETH on ETHEREUM + BSC; COINBASE writes
+    # lst_rates + staking_yields for cbETH; ROCKETPOOL writes lst_rates +
+    # staking_yields for rETH. All three were missing from PROTOCOL_CAPABILITIES.
+    "binance": _ProtocolCapability(
+        venue_prefix="BINANCE",
+        protocol_class=ProtocolClass.STAKING,
+        instrument_types=_LST,
+        data_types=["lst_rates"],  # wBETH exchangeRate() — ETHEREUM + BSC
+        mtds_operations=["collect-lst-rates"],
+    ),
+    "coinbase": _ProtocolCapability(
+        venue_prefix="COINBASE",
+        protocol_class=ProtocolClass.STAKING,
+        instrument_types=_LST,
+        data_types=["lst_rates", "staking_yields"],  # cbETH LST (ETHEREUM)
+        mtds_operations=["collect-lst-rates", "collect-staking-yields"],
+    ),
+    "rocketpool": _ProtocolCapability(
+        venue_prefix="ROCKETPOOL",
+        protocol_class=ProtocolClass.STAKING,
+        instrument_types=_LST,
+        data_types=["lst_rates", "staking_yields"],  # rETH LST (ETHEREUM)
+        mtds_operations=["collect-lst-rates", "collect-staking-yields"],
+        required_tokens=frozenset({"RPL", "RETH"}),
+    ),
     # ── CeFi-style Perps (API-based, not on-chain) ─────────────
     # OPTIONS: not supported — venue does not offer listed options contracts
     "hyperliquid": _ProtocolCapability(
@@ -894,6 +921,24 @@ PROTOCOL_CAPABILITIES: dict[str, _ProtocolCapability] = {
         data_types=["lst_rates", "oracle_prices"],
         mtds_operations=["collect-lst-rates"],
         required_tokens=frozenset({"JTO", "JITOSOL", "JSOL"}),
+    ),
+    # ── Solana LST protocols (previously missing PROTOCOL_CAPABILITIES) ────────────
+    # Finding B, defi_protocol_capabilities_lst_rates_audit_2026_08_05.md:
+    # SANCTUM (jupSOL) and SOLBLAZE (bSOL) are both phase="live" Solana LST
+    # venues whose PROTOCOL_CAPABILITIES entries were never authored.
+    "sanctum": _ProtocolCapability(
+        venue_prefix="SANCTUM",
+        protocol_class=ProtocolClass.STAKING,
+        instrument_types=_STAKING,
+        data_types=["lst_rates"],  # jupSOL SPL stake-pool rate — SOLANA
+        mtds_operations=["collect-lst-rates"],
+    ),
+    "solblaze": _ProtocolCapability(
+        venue_prefix="SOLBLAZE",
+        protocol_class=ProtocolClass.STAKING,
+        instrument_types=_STAKING,
+        data_types=["lst_rates"],  # bSOL liquid staking — SOLANA
+        mtds_operations=["collect-lst-rates"],
     ),
     # SOLAYER + PICASSO + CAMBRIAN removed 2026-06-02 (operator decision): no usable/decodable
     # DeFi data source. Solayer = sSOL is a custom LRT vault with no decodable exchange-rate
@@ -1346,10 +1391,13 @@ def build_defi_venues() -> list[str]:
 
 # Static chain assignments for protocols that don't use The Graph
 _STATIC_VENUE_CHAINS: dict[str, list[str]] = {
+    "binance": ["ETHEREUM", "BSC"],
+    "coinbase": ["ETHEREUM"],
     "lido": ["ETHEREUM"],
     "etherfi": ["ETHEREUM"],
     "ethena": ["ETHEREUM"],
     "eigenlayer": ["ETHEREUM"],
+    "rocketpool": ["ETHEREUM"],
     "hyperliquid": ["HYPERLIQUID"],
     "aster": ["ASTER"],
     # "drift" entry removed 2026-07-16 (operator ruling: all Solana perp
@@ -1369,6 +1417,8 @@ _STATIC_VENUE_CHAINS: dict[str, list[str]] = {
     "solend": ["SOLANA"],
     "marinade": ["SOLANA"],
     "jito": ["SOLANA"],
+    "sanctum": ["SOLANA"],
+    "solblaze": ["SOLANA"],
     # solayer + picasso + cambrian removed 2026-06-02 (operator decision; no usable/decodable
     # DeFi data source — see PROTOCOL_CAPABILITIES header note above).
 }
