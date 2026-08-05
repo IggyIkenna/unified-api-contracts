@@ -1164,7 +1164,7 @@ _POLYMARKET_PERP = SourceCapability(
             "market_detail",  # GET /markets/{ticker}
         ],
     },
-    base_urls={"mainnet": "https://perps-api.polymarket.com"},
+    base_urls={"mainnet": "https://api.perpetuals.polymarket.com"},
     operation_details={
         "markets": OperationDetail(
             environments={
