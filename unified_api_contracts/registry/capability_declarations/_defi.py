@@ -431,7 +431,6 @@ PROTOCOL_CAPABILITIES: dict[str, _ProtocolCapability] = {
             # theoretical under-declaration) and is intentionally NOT fixed here;
             # see the issue doc's Progress Log for the full live-verified list.
             "oracle_prices",
-            "rewards",  # AAVE reward emissions (aspirational: capture not yet wired)
         ],
         mtds_operations=[
             "collect-lending-indices",
@@ -440,7 +439,6 @@ PROTOCOL_CAPABILITIES: dict[str, _ProtocolCapability] = {
             "collect-flash-loan-events",
             "collect-position-data",
             "collect-oracle-prices",
-            "collect-rewards",
         ],
         required_tokens=frozenset({"AAVE", "GHO"}),
     ),
