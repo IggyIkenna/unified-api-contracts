@@ -103,18 +103,29 @@ CEFI_SOURCE_COVERAGE_START: dict[str, date] = {
 # deployment date and our adapter's earliest indexed block. Where the
 # adapter relies on subgraphs / indexers with shorter retention, the
 # effective start is later than the on-chain deployment.
+#
+# Each value is the EARLIEST manifest-verified captured date across ALL
+# chains for that protocol (venue_mapping.py's venue_start_dates is the
+# per-chain SSOT; the flat value here is the min-across-chains, identical
+# to how the CeFi bare-venue keys work). Protocols with per-chain entries
+# in venue_mapping.py that are LATER than the flat value are gated by
+# their own per-chain floor — the flat value here clips only dates before
+# ANY chain had data. Updated 2026-08-05 to match venue_mapping.py's
+# manifest-verified dates (issue doc:
+# /plans/active/issues/coverage_floor_registries_no_cross_propagation_2026_07_17.md
+# [DATA] P3).
 
 DEFI_SOURCE_COVERAGE_START: dict[str, date] = {
-    "CURVE": date(2020, 1, 19),
-    "UNISWAP_V2": date(2020, 5, 4),
+    "CURVE": date(2020, 1, 20),
+    "UNISWAP_V2": date(2020, 5, 6),
     "AAVE_V2": date(2020, 12, 1),
     "UNISWAP_V3": date(2021, 5, 5),
-    "BALANCER": date(2021, 5, 13),
-    "AAVE_V3": date(2022, 3, 16),
-    "LIDO": date(2020, 12, 19),
+    "BALANCER": date(2021, 4, 22),
+    "AAVE_V3": date(2022, 3, 12),  # min across chains (POLYGON/AVALANCHE/ARBITRUM/OPTIMISM)
+    "LIDO": date(2020, 12, 18),
     "ETHENA": date(2024, 2, 19),
     "ETHERFI": date(2023, 11, 1),  # TODO verify
-    "UNISWAP_V4": date(2025, 1, 31),  # TODO verify
+    "UNISWAP_V4": date(2025, 1, 30),
 }
 
 

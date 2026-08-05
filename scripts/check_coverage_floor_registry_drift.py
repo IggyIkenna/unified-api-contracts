@@ -185,13 +185,44 @@ KNOWN_DIVERGENCES: tuple[_KnownDivergence, ...] = (
     # per-market GCS-parquet-verified dates), matching venue_mapping.py. Entry
     # removed — the registries now agree; the ratchet fires as intended.
     # --- [DATA] P3: small 1-21 day DeFi drifts + the AAVE_V3 chain-axis question ---
-    _KnownDivergence("defi", "CURVE", f"{_AUDIT_DOC} [DATA] P3 — small drift, unresolved"),
-    _KnownDivergence("defi", "UNISWAP_V2", f"{_AUDIT_DOC} [DATA] P3 — small drift, unresolved"),
-    _KnownDivergence("defi", "UNISWAP_V3", f"{_AUDIT_DOC} [DATA] P3 — small drift, unresolved"),
-    _KnownDivergence("defi", "BALANCER", f"{_AUDIT_DOC} [DATA] P3 — small drift, unresolved"),
-    _KnownDivergence("defi", "AAVE_V3", f"{_AUDIT_DOC} [DATA] P3 — no chain axis in coverage_starts, unresolved"),
-    _KnownDivergence("defi", "LIDO", f"{_AUDIT_DOC} [DATA] P3 — small drift, unresolved"),
-    _KnownDivergence("defi", "UNISWAP_V4", f"{_AUDIT_DOC} [DATA] P3 — small drift, unresolved"),
+    # RESOLVED 2026-08-05 (same issue doc, [DATA] P3) — the 1-21 day ETHEREUM-chain
+    # drifts for CURVE/UNISWAP_V2/UNISWAP_V4/BALANCER/LIDO are fixed (coverage_starts.py
+    # updated to match venue_mapping.py's manifest-verified ETHEREUM dates). AAVE_V3
+    # updated to 2022-03-12 (min across POLYGON/AVALANCHE/ARBITRUM/OPTIMISM), documented
+    # as min-across-chains. UNISWAP_V2/UNISWAP_V4/LIDO have only one chain (ETHEREUM) —
+    # fully resolved, no baseline entries needed. The 4 remaining entries below cover the
+    # NON-MIN chains (e.g. CURVE-AVALANCHE launches later than CURVE-ETHEREUM) — these
+    # are EXPECTED per-chain launch-date differences, not registry errors to "fix."
+    # The flat DEFI_SOURCE_COVERAGE_START value = min-across-chains by design.
+    _KnownDivergence(
+        "defi",
+        "CURVE",
+        f"{_AUDIT_DOC} [DATA] P3 — RESOLVED for ETHEREUM chain (2020-01-20, matches). "
+        "CURVE-AVALANCHE (2021-11-10) and CURVE-OPTIMISM (2022-01-13) are later per-chain "
+        "launch dates — expected, not a registry error. Flat value = min-across-chains.",
+    ),
+    _KnownDivergence(
+        "defi",
+        "UNISWAP_V3",
+        f"{_AUDIT_DOC} [DATA] P3 — ETHEREUM chain matches (2021-05-05). "
+        "ARBITRUM/POLYGON/OPTIMISM/BASE chains have later per-chain launch dates — "
+        "expected, not a registry error. Flat value = min-across-chains.",
+    ),
+    _KnownDivergence(
+        "defi",
+        "BALANCER",
+        f"{_AUDIT_DOC} [DATA] P3 — RESOLVED for ETHEREUM chain (2021-04-22, matches). "
+        "POLYGON/ARBITRUM/OPTIMISM/AVALANCHE/BASE chains have later per-chain launch "
+        "dates — expected, not a registry error. Flat value = min-across-chains.",
+    ),
+    _KnownDivergence(
+        "defi",
+        "AAVE_V3",
+        f"{_AUDIT_DOC} [DATA] P3 — RESOLVED for min chains (2022-03-12, POLYGON/AVALANCHE/"
+        "ARBITRUM/OPTIMISM match). ETHEREUM (2023-01-27)/BASE (2023-08-23)/BSC (2024-01-24)/"
+        "LINEA (2025-02-12) have later per-chain launch dates — expected, not a registry "
+        "error. Flat value = min-across-chains, explicitly documented in coverage_starts.py.",
+    ),
 )
 
 
