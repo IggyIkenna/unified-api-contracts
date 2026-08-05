@@ -1101,7 +1101,16 @@ PROTOCOL_CAPABILITIES: dict[str, _ProtocolCapability] = {
     "compound_governance": _ProtocolCapability(
         venue_prefix="COMPOUND",
         protocol_class=ProtocolClass.INFRASTRUCTURE,
-        instrument_types=_LENDING,  # governance over lending protocol
+        # governance_events is chain-level (DAO proposals/votes are not per-pool or
+        # per-lending-instrument data).  Declaring _LENDING here leaks governance_events
+        # into the instrument_type-grain union for every lending protocol
+        # (valid_data_types_for_instrument_type builds its DeFi set as the union across
+        # ALL protocols sharing an instrument_type), seeding false expected_unattempted
+        # governance_events for every lending instrument — per the same leak class the
+        # batch3-011 todo ("Tighten the defi POOL data-type validity grain from union-
+        # across-protocols to per-protocol") fixes.  Spot_asset is the established
+        # chain-level catch-all (across/stargate/flashbots/alchemy_onchain all use it).
+        instrument_types=_RESTAKING,
         data_types=["governance_events"],  # DAO proposal + vote events (COMPOUND-ETHEREUM 2020-02-26)
         mtds_operations=["collect-governance-events"],
         required_tokens=frozenset({"COMP"}),
@@ -1109,7 +1118,10 @@ PROTOCOL_CAPABILITIES: dict[str, _ProtocolCapability] = {
     "aave_governance": _ProtocolCapability(
         venue_prefix="AAVE",
         protocol_class=ProtocolClass.INFRASTRUCTURE,
-        instrument_types=_LENDING,  # governance over lending protocol
+        # Same instrument_type rationale as compound_governance above — governance
+        # events are chain-level, not per-lending-instrument; spot_asset is the
+        # established chain-level catch-all.
+        instrument_types=_RESTAKING,
         data_types=["governance_events"],  # DAO proposal + vote events (AAVE-ETHEREUM 2020-07-27)
         mtds_operations=["collect-governance-events"],
         required_tokens=frozenset({"AAVE"}),
@@ -1117,7 +1129,10 @@ PROTOCOL_CAPABILITIES: dict[str, _ProtocolCapability] = {
     "uniswap_governance": _ProtocolCapability(
         venue_prefix="UNISWAP",
         protocol_class=ProtocolClass.INFRASTRUCTURE,
-        instrument_types=_POOL,  # governance over DEX
+        # Same instrument_type rationale as compound_governance above — governance
+        # events are chain-level, not per-pool; spot_asset is the established
+        # chain-level catch-all.
+        instrument_types=_RESTAKING,
         data_types=["governance_events"],  # DAO proposal + vote events (UNISWAP-ETHEREUM 2020-09-17)
         mtds_operations=["collect-governance-events"],
         required_tokens=frozenset({"UNI"}),

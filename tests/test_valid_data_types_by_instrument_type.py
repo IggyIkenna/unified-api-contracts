@@ -291,18 +291,48 @@ class TestTradfiBundleGrainWriterAlignment:
         assert result is not None
         assert "perp_funding" not in result
 
-    def test_defi_pool_has_dex_data(self) -> None:
-        """DeFi POOL must include DEX data_types (primary pool data types).
+    def test_defi_lending_excludes_governance_events(self) -> None:
+        """DeFi LENDING must NOT include governance_events (chain-level, not per-lending).
 
-        Note: a hybrid pool-type protocol that also carries perp_funding (e.g.
-        a pool-based perp DEX) would legitimately leak perp_funding into this
-        union — POOL including perp_funding is CORRECT for such protocols. The
-        matrix is the union across all protocols using that instrument_type,
-        so we only assert DEX data is present here.
+        Governance protocols (compound_governance, aave_governance) are
+        INFRASTRUCTURE-class and their instrument_types now use spot_asset
+        (the established chain-level catch-all) — governance events should
+        never seed expected_unattempted for lending instruments.
         """
+        result = valid_data_types_for_instrument_type("defi", "lending")
+        assert result is not None
+        assert "governance_events" not in result
+
+    def test_defi_pool_has_dex_data(self) -> None:
+        """DeFi POOL must include DEX data_types (primary pool data types)."""
         result = valid_data_types_for_instrument_type("defi", "POOL")
         assert result is not None
         assert "dex_pool_state" in result or "dex_pool_swaps" in result
+
+    def test_defi_pool_excludes_governance_events(self) -> None:
+        """DeFi POOL must NOT include governance_events (chain-level, not per-pool).
+
+        Governance protocols (uniswap_governance) are INFRASTRUCTURE-class and
+        their instrument_types now use spot_asset (the established chain-level
+        catch-all) — governance events should never seed expected_unattempted
+        for pure-DEX pools like UNISWAP_V3.
+        """
+        result = valid_data_types_for_instrument_type("defi", "pool")
+        assert result is not None
+        assert "governance_events" not in result
+
+    def test_defi_spot_asset_includes_governance_events(self) -> None:
+        """DeFi spot_asset must include governance_events (chain-level catch-all).
+
+        Governance protocols (uniswap_governance, compound_governance,
+        aave_governance) are INFRASTRUCTURE-class; their instrument_types now
+        use spot_asset alongside the other chain-level protocols
+        (across/stargate/flashbots/alchemy_onchain). Governance events belong
+        in the chain-level spot_asset validity set, not in per-pool/lending.
+        """
+        result = valid_data_types_for_instrument_type("defi", "spot_asset")
+        assert result is not None
+        assert "governance_events" in result
 
     def test_defi_derivation_is_cached(self) -> None:
         """Repeated calls should return the same dict object (module-level cache)."""
