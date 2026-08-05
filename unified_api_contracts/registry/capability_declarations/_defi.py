@@ -924,7 +924,10 @@ PROTOCOL_CAPABILITIES: dict[str, _ProtocolCapability] = {
         venue_prefix="BEEFY",
         protocol_class=ProtocolClass.YIELD,
         instrument_types=_YIELD,
-        data_types=["staking_yields"],  # vault APY time-series (multi-chain; BEEFY-BSC 2020-10-08 earliest)
+        data_types=[
+            "staking_yields",
+            "lst_rates",
+        ],  # vault APY time-series (multi-chain; BEEFY-BSC 2020-10-08 earliest)
         mtds_operations=["collect-staking-yields"],
     ),
     "pendle": _ProtocolCapability(
