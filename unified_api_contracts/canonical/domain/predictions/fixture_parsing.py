@@ -41,6 +41,9 @@ from typing import Final
 from unified_api_contracts.canonical.domain.predictions.classifiers import (
     kalshi_sports_league_for_ticker,
 )
+from unified_api_contracts.external.sports.team_mappings import (
+    canonicalize_sports_participant,
+)
 
 __all__ = [
     "SportsFixtureKey",
@@ -155,10 +158,12 @@ def parse_kalshi_sports_fixture(event_ticker: str, title: str) -> SportsFixtureK
     parts = _VS_SPLIT_RE.split(title.strip(), maxsplit=1)
     if len(parts) != 2 or not parts[0].strip() or not parts[1].strip():
         return None
+    away_raw = normalize_participant(parts[0])
+    home_raw = normalize_participant(parts[1])
     return SportsFixtureKey(
         league=league,
-        away=normalize_participant(parts[0]),
-        home=normalize_participant(parts[1]),
+        away=canonicalize_sports_participant(away_raw, league),
+        home=canonicalize_sports_participant(home_raw, league),
         fixture_date=fixture_date,
         start_time=start_time,
         source_venue="KALSHI",
@@ -205,10 +210,12 @@ def parse_polymarket_sports_fixture(
         fixture_date = resolution_date
     if fixture_date is None:
         return None
+    away_raw = normalize_participant(parts[0])
+    home_raw = normalize_participant(parts[1])
     return SportsFixtureKey(
         league=league,
-        away=normalize_participant(parts[0]),
-        home=normalize_participant(parts[1]),
+        away=canonicalize_sports_participant(away_raw, league),
+        home=canonicalize_sports_participant(home_raw, league),
         fixture_date=fixture_date,
         start_time=None,
         source_venue="POLYMARKET",
