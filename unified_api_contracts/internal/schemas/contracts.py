@@ -690,56 +690,6 @@ DEFI_SOLANA_LENDING_LENDING_INDICES = SchemaContract(
     required_row_count_min=1,
 )
 
-DEFI_SOLANA_VAULT_DEX_POOLS = SchemaContract(
-    asset_group="defi",
-    instrument_type="solana_vault",
-    data_type="dex_pools",
-    columns=[
-        _INSTRUMENT_ID,
-        _VENUE,
-        _CHAIN,
-        _TS_EVENT,
-        ColumnSpec(name="vault_address", dtype="string", nullable=False),
-        ColumnSpec(name="vault_type", dtype="string", nullable=True),
-        ColumnSpec(name="token_a_symbol", dtype="string", nullable=True),
-        ColumnSpec(name="token_b_symbol", dtype="string", nullable=True),
-        ColumnSpec(name="token_a_mint", dtype="string", nullable=True),
-        ColumnSpec(name="token_b_mint", dtype="string", nullable=True),
-        ColumnSpec(name="status", dtype="string", nullable=True),
-    ],
-    symbol_column="vault_address",
-    required_row_count_min=1,
-)
-
-DEFI_SOLANA_AMM_POOL_DEX_POOLS = SchemaContract(
-    asset_group="defi",
-    instrument_type="solana_amm_pool",
-    data_type="dex_pools",
-    columns=[
-        _INSTRUMENT_ID,
-        _VENUE,
-        _CHAIN,
-        _TS_EVENT,
-        ColumnSpec(name="pool_id", dtype="string", nullable=False),
-        ColumnSpec(name="token_a", dtype="string", nullable=True),
-        ColumnSpec(name="token_b", dtype="string", nullable=True),
-        ColumnSpec(name="price", dtype="float64", nullable=True),
-        ColumnSpec(name="tvl_usd", dtype="float64", nullable=True),
-        ColumnSpec(name="volume_usd", dtype="float64", nullable=True),
-        ColumnSpec(name="fee_rate_bps", dtype="int64", nullable=True),
-        # venue-specific (Orca: tick_spacing + volume_week/month + fee_apr_*; Raydium: pool_type)
-        ColumnSpec(name="tick_spacing", dtype="int64", nullable=True, required=False),
-        ColumnSpec(name="pool_type", dtype="string", nullable=True, required=False),
-        ColumnSpec(name="volume_week", dtype="float64", nullable=True, required=False),
-        ColumnSpec(name="volume_month", dtype="float64", nullable=True, required=False),
-        ColumnSpec(name="fee_apr_day", dtype="float64", nullable=True, required=False),
-        ColumnSpec(name="fee_apr_week", dtype="float64", nullable=True, required=False),
-        ColumnSpec(name="fee_apr_month", dtype="float64", nullable=True, required=False),
-    ],
-    symbol_column="pool_id",
-    required_row_count_min=1,
-)
-
 DEFI_SPOT_ASSET_GAS_FEES = SchemaContract(
     asset_group="defi",
     instrument_type="spot_asset",
@@ -1103,8 +1053,6 @@ CONTRACT_REGISTRY: dict[tuple[str, str, str], SchemaContract] = {
     ("defi", "a_token", "liquidations"): DEFI_LENDING_LIQUIDATIONS,
     ("defi", "lending", "liquidations"): DEFI_LENDING_LIQUIDATIONS,
     ("defi", "solana_lending", "lending_indices"): DEFI_SOLANA_LENDING_LENDING_INDICES,
-    ("defi", "solana_vault", "dex_pools"): DEFI_SOLANA_VAULT_DEX_POOLS,
-    ("defi", "solana_amm_pool", "dex_pools"): DEFI_SOLANA_AMM_POOL_DEX_POOLS,
     ("defi", "pool", "dex_pool_state"): DEFI_DEX_POOL_DEX_POOL_STATE,
     ("defi", "pool", "dex_pool_swaps"): DEFI_POOL_DEX_POOL_SWAPS,
     ("defi", "dex_pool", "dex_pool_swaps"): DEFI_DEX_POOL_DEX_POOL_SWAPS,
