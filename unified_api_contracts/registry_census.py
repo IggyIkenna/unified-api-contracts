@@ -470,7 +470,7 @@ def _census_to_json(result: RegistryCensusResult) -> str:
 
 
 def _write_line(text: str = "") -> None:
-    """Write a line to stdout — QG-safe alternative to ``print()``."""
+    """Write a line to stdout — QG-safe alternative to the built-in print."""
     sys.stdout.write(text + "\n")
 
 
