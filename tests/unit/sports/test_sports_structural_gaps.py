@@ -69,7 +69,7 @@ class TestUnderstatAllowList:
         # measurement, not hand-arithmetic -- many concurrent slots land batches into
         # this same registry file; re-derive from len(LEAGUE_REGISTRY) rather than
         # trust a stale comment.
-        assert len(others) == 378
+        assert len(others) == 379  # +1 LA_LIGA_2 (2026-08-05 re-registration)
         for lid in others:
             assert is_sports_structural_gap("understat", lid)
 

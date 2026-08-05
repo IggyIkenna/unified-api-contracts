@@ -93,6 +93,18 @@ PREDICTION_LEAGUES: dict[str, LeagueDefinition] = {
         tier=2,
         classification="Prediction",
     ),
+    "LA_LIGA_2": LeagueDefinition(
+        league_id="LA_LIGA_2",
+        display_name="La Liga 2 (Segunda Division)",
+        sport="FOOTBALL",
+        country="ES",
+        season_months=(8, 5),
+        has_playoffs=True,
+        data_sources=PRED_NO_UNDERSTAT,
+        api_football_id=141,
+        tier=2,
+        classification="Prediction",
+    ),
     # ===================================================================
     # GERMANY
     # ===================================================================
