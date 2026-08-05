@@ -332,6 +332,13 @@ VENUE_TO_ADAPTER_KEY: dict[str, str] = {
     # get_supported_chains_for_protocol("aave_v3") even if the prefix matched.
     # Explicit entry, same class of gap as RADIANT-BSC above.
     "AAVE-PLASMA": "aave_v3",
+    # FLUID-PLASMA (2026-08-05): flipped defi_venues.py's DEFI_VENUE_PHASE to
+    # "live" per the day-1 Plasma launch-date audit (2025-09-25, same as AAVE).
+    # FluidAdapter is multi-chain (self.venue = f"FLUID-{self.chain}") and the
+    # FLUID_LIQUIDITY_RESOLVER_ADDRESS is CREATE2-identical across chains incl.
+    # Plasma (mtds@6bcc5154). Same class as AAVE-PLASMA above: Plasma has no
+    # subgraph_id (RPC-only), so the auto-gen loop can never discover this entry.
+    "FLUID-PLASMA": "fluid",
     # Jupiter is execution-only (swap aggregator), not instrument discovery.
     # DEX perp venues (L2 + StarkNet + Solana clone)
     "LIGHTER-ZKSYNC": "lighter",
