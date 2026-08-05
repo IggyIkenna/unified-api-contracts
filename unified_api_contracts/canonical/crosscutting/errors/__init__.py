@@ -16,6 +16,7 @@ from .defi import VENUE_ERRORS_DEFI, DefiAlertType, DefiErrorCode, OracleDeviati
 from .infra import INFRA_ERRORS
 from .internal import INTERNAL_VENUE_KEY, VENUE_ERRORS_INTERNAL
 from .onchain_perps import VENUE_ERRORS_ONCHAIN_PERPS
+from .prediction import VENUE_ERRORS_PREDICTION
 from .sports import VENUE_ERRORS_SPORTS
 from .tradfi import VENUE_ERRORS_TRADFI
 
@@ -38,6 +39,7 @@ VENUE_ERROR_MAP: dict[str, list[VenueErrorClassification]] = _merge_venue_error_
     VENUE_ERRORS_CEFI,
     VENUE_ERRORS_ALTDATA,
     VENUE_ERRORS_DEFI,
+    VENUE_ERRORS_PREDICTION,
     VENUE_ERRORS_SPORTS,
     VENUE_ERRORS_TRADFI,
     VENUE_ERRORS_ONCHAIN_PERPS,
@@ -75,6 +77,7 @@ __all__ = [
     "VENUE_ERRORS_DEFI",
     "VENUE_ERRORS_INTERNAL",
     "VENUE_ERRORS_ONCHAIN_PERPS",
+    "VENUE_ERRORS_PREDICTION",
     "VENUE_ERRORS_SPORTS",
     "VENUE_ERRORS_TRADFI",
     "VENUE_ERROR_MAP",
