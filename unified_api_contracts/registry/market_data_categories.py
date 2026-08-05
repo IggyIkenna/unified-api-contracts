@@ -205,6 +205,17 @@ DATA_TYPES_BY_ASSET_GROUP: dict[str, list[str]] = {
         # (issues/defi_perp_daily_ctx_manifest_gap_reader_risk_2026_07_22.md,
         # 2026-07-28 Progress Log entry). Zero change to the writer row shape.
         "perp_daily_ctx",
+        # perp_mark_price (2026-08-05, defi_perp_daily_ctx_manifest_gap_reader_risk
+        # issue follow-up) — the real, already-migrated HYPERLIQUID mark-price corpus
+        # (316 days, 2026-07-13 dedicated-bucket migration) sitting in the shared defi
+        # tick-data bucket TODAY with NO current reader at all (unlike perp_daily_ctx,
+        # this is a pure manifest-visibility fix, zero live-reader risk — confirmed via
+        # defi_dedicated_bucket_shared_migration_2026_07_13.md's own note that
+        # canonical_perp_funding_provider reads marks from perp_daily_ctx, not this).
+        # Registered here ONLY (never under DATA_TYPES_BY_ASSET_GROUP["cefi"]) for the
+        # same reason perp_daily_ctx's registration above is inert for HYPERLIQUID/CeFi
+        # combos — they enumerate under the separate "cefi" key.
+        "perp_mark_price",
         # derivative_ticker (2026-07-15, defi_perp_funding_canonicalisation_derivative_
         # ticker_all_perps issue, operator ruling): the canonical RAW-funding home for
         # ALL perp venues, defi-asset-group ones included — captured at the
@@ -1018,6 +1029,9 @@ NEEDS_CANDLE_PROCESSING: dict[str, bool] = {
     # it directly as raw daily context, not through MDPS-derived candles. Same class as
     # perp_funding/lending_indices/oracle_prices (pass-through, not OHLCV).
     "perp_daily_ctx": False,
+    # Raw per-tick mark-price snapshot (sibling of perp_daily_ctx above, 2026-08-05) —
+    # no MDPS candle adapter and no current reader at all; pass-through, not OHLCV.
+    "perp_mark_price": False,
     # Per-fill prints; SEMANTICALLY the same class as "trades"/"dex_pool_swaps" (True).
     # Pass-through ONLY because no defi/perp_trades candle adapter exists in MDPS and no
     # defi-asset-group venue currently emits it — the Drift V2 ingester that motivated the

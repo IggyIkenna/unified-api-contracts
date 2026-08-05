@@ -766,6 +766,29 @@ DEFI_PERPETUAL_PERP_DAILY_CTX = SchemaContract(
     required_row_count_min=1,
 )
 
+# perp_mark_price (2026-08-05, defi_perp_daily_ctx_manifest_gap_reader_risk issue follow-up): the
+# real, already-migrated HYPERLIQUID mark-price corpus (316 days) copied into the shared bucket by
+# the same 2026-07-13 dedicated-bucket migration that brought over perp_funding/perp_daily_ctx —
+# confirmed via defi_dedicated_bucket_shared_migration_2026_07_13.md: "no current reader consumes
+# it (canonical_perp_funding_provider reads marks from perp_daily_ctx)". Unlike perp_daily_ctx, this
+# registration is a PURE manifest-visibility fix with ZERO live-reader risk (nothing reads this
+# data_type today). Real file shape verified directly (one row per coin per day): instrument_id/
+# venue/chain/ts_event + a single non-nullable mark_price column, no day_ntl_vlm/open_interest.
+DEFI_PERPETUAL_PERP_MARK_PRICE = SchemaContract(
+    asset_group="defi",
+    instrument_type="perpetual",
+    data_type="perp_mark_price",
+    columns=[
+        _INSTRUMENT_ID,
+        _VENUE,
+        _CHAIN,
+        _TS_EVENT,
+        ColumnSpec(name="mark_price", dtype="float64", nullable=False),
+    ],
+    symbol_column="symbol",
+    required_row_count_min=1,
+)
+
 # derivative_ticker (2026-07-15, defi_perp_funding_canonicalisation_derivative_ticker_all_perps
 # issue, operator ruling): the canonical RAW-funding home for ALL DeFi perp venues, captured
 # at the highest resolution each source offers — even where the source genuinely has no OI
@@ -1061,6 +1084,7 @@ CONTRACT_REGISTRY: dict[tuple[str, str, str], SchemaContract] = {
     ("defi", "spot_asset", "oracle_prices"): DEFI_SPOT_ASSET_ORACLE_PRICES,
     ("defi", "perpetual", "perp_funding"): DEFI_PERPETUAL_PERP_FUNDING,
     ("defi", "perpetual", "perp_daily_ctx"): DEFI_PERPETUAL_PERP_DAILY_CTX,
+    ("defi", "perpetual", "perp_mark_price"): DEFI_PERPETUAL_PERP_MARK_PRICE,
     ("defi", "perpetual", "derivative_ticker"): DEFI_PERPETUAL_DERIVATIVE_TICKER,
     # Solana basis MVP (plans/active/solana_basis_trading_mvp_2026_06_01.md)
     ("defi", "perpetual", "perp_trades"): DEFI_PERPETUAL_PERP_TRADES,
