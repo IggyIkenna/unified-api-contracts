@@ -8,6 +8,7 @@ and the re-export surface that delegates to :mod:`unified_api_contracts.registry
 from __future__ import annotations
 
 from datetime import date
+from typing import Final
 
 import pytest
 
@@ -20,6 +21,7 @@ from unified_api_contracts.canonical.crosscutting.honest_coverage import (
     EXPECTED_BOOKMAKER_MARKET_SETS,
     EXPECTED_EMPTY_REASON_PREFIX,
     FUTURES_CHAIN_BUCKETS,
+    LEAGUE_ID_TO_TIER,
     OUT_OF_COVERAGE_WINDOW_REASONS,
     CaptureStatusCounts,
     EmptyConfirmedReason,
@@ -525,10 +527,13 @@ def test_compute_layered_coverage_missing_days_drag_day_coverage() -> None:
 
 @pytest.mark.unit
 def test_expected_bookmaker_market_sets_has_required_tiers() -> None:
-    """The three canonical league tiers must be present."""
+    """The three canonical league tiers must be present; no_expectation optional."""
     assert "tier_1_domestic" in EXPECTED_BOOKMAKER_MARKET_SETS
     assert "tier_1_international" in EXPECTED_BOOKMAKER_MARKET_SETS
     assert "tier_2_domestic" in EXPECTED_BOOKMAKER_MARKET_SETS
+    # no_expectation is an explicit sentinel — must be present so unobserved leagues
+    # don't fall through to a KeyError on cluster-validation lookup.
+    assert "no_expectation" in EXPECTED_BOOKMAKER_MARKET_SETS
 
 
 @pytest.mark.unit
@@ -552,8 +557,11 @@ def test_expected_bookmaker_market_sets_pinnacle_has_asian_handicap_in_tier_1() 
 
 @pytest.mark.unit
 def test_expected_bookmaker_market_sets_all_markets_are_nonempty() -> None:
-    """Every (tier, bookmaker) pair must list at least one market type."""
+    """Every (tier, bookmaker) pair must list at least one market type (no_expectation is explicitly empty)."""
     for tier_key, bookmaker_map in EXPECTED_BOOKMAKER_MARKET_SETS.items():
+        if tier_key == "no_expectation":
+            assert bookmaker_map == {}, f"no_expectation tier must be empty, got {bookmaker_map}"
+            continue
         assert bookmaker_map, f"tier {tier_key!r} has no bookmakers"
         for bk, markets in bookmaker_map.items():
             assert markets, f"tier {tier_key!r} bookmaker {bk!r} has empty market list"
@@ -565,3 +573,79 @@ def test_expected_bookmaker_market_sets_tier_2_domestic_is_subset_of_tier_1() ->
     tier1_bks = set(EXPECTED_BOOKMAKER_MARKET_SETS["tier_1_domestic"])
     tier2_bks = set(EXPECTED_BOOKMAKER_MARKET_SETS["tier_2_domestic"])
     assert tier2_bks <= tier1_bks, f"tier_2_domestic bookmakers {tier2_bks - tier1_bks} not in tier_1_domestic"
+
+
+# ---------------------------------------------------------------------------
+# LEAGUE_ID_TO_TIER
+# ---------------------------------------------------------------------------
+
+# The 28 league_ids that were unmapped pre-batch9 (2026-08-06) —
+# MUST now all resolve to a key in EXPECTED_BOOKMAKER_MARKET_SETS.
+_UNMAPPED_28: Final[frozenset[str]] = frozenset(
+    {
+        "A-LEAGUE",
+        "ALLSVENSKAN",
+        "EKSTRAKLASA",
+        "ELITESERIEN",
+        "J1_LEAGUE",
+        "K_LEAGUE_1",
+        "LIGA_MX",
+        "MLS",
+        "PREMIERSHIP",
+        "SOCCER_ARGENTINA_PRIMERA_DIVISION",
+        "SOCCER_AUSTRALIA_ALEAGUE",
+        "SOCCER_AUSTRIA_BUNDESLIGA",
+        "SOCCER_CHINA_SUPERLEAGUE",
+        "SOCCER_DENMARK_SUPERLIGA",
+        "SOCCER_GREECE_SUPER_LEAGUE",
+        "SOCCER_JAPAN_J_LEAGUE",
+        "SOCCER_KOREA_KLEAGUE1",
+        "SOCCER_MEXICO_LIGAMX",
+        "SOCCER_NORWAY_ELITESERIEN",
+        "SOCCER_POLAND_EKSTRAKLASA",
+        "SOCCER_RUSSIA_PREMIER_LEAGUE",
+        "SOCCER_SWEDEN_ALLSVENSKAN",
+        "SOCCER_SWITZERLAND_SUPERLEAGUE",
+        "SOCCER_TURKEY_SUPER_LEAGUE",
+        "SOCCER_USA_MLS",
+        "SUPERLIGA",
+        "SUPER_LEAGUE",
+        "SUPER_LIG",
+    }
+)
+
+
+@pytest.mark.unit
+def test_league_id_to_tier_covers_all_28_unmapped() -> None:
+    """Every one of the 28 previously-unmapped league_ids must resolve."""
+    for league_id in sorted(_UNMAPPED_28):
+        tier = LEAGUE_ID_TO_TIER[league_id]
+        assert tier in EXPECTED_BOOKMAKER_MARKET_SETS, (
+            f"LEAGUE_ID_TO_TIER[{league_id!r}] = {tier!r} — not a key in EXPECTED_BOOKMAKER_MARKET_SETS"
+        )
+
+
+@pytest.mark.unit
+def test_league_id_to_tier_has_at_least_51_entries() -> None:
+    """51 empirically-observed league_ids (2026-06-27 golden window) must be mapped."""
+    assert len(LEAGUE_ID_TO_TIER) >= 51, f"Expected >= 51 entries in LEAGUE_ID_TO_TIER, got {len(LEAGUE_ID_TO_TIER)}"
+
+
+@pytest.mark.unit
+def test_league_id_to_tier_no_expectation_leagues_all_empty() -> None:
+    """Leagues mapped to no_expectation must have an empty bookmaker set in EXPECTED_BOOKMAKER_MARKET_SETS."""
+    assert EXPECTED_BOOKMAKER_MARKET_SETS["no_expectation"] == {}
+    noexp = [lg for lg, tier in LEAGUE_ID_TO_TIER.items() if tier == "no_expectation"]
+    # sanity: at least the 13 no_expectation entries added in batch9-026
+    assert len(noexp) >= 13, f"Expected >=13 no_expectation league_ids, got {len(noexp)}"
+
+
+@pytest.mark.unit
+def test_league_id_to_tier_all_tiers_are_declared() -> None:
+    """Every tier value in LEAGUE_ID_TO_TIER must be a key in EXPECTED_BOOKMAKER_MARKET_SETS."""
+    declared_tiers = set(EXPECTED_BOOKMAKER_MARKET_SETS.keys())
+    for league_id, tier in LEAGUE_ID_TO_TIER.items():
+        assert tier in declared_tiers, (
+            f"LEAGUE_ID_TO_TIER[{league_id!r}] → {tier!r} not in "
+            f"EXPECTED_BOOKMAKER_MARKET_SETS keys {sorted(declared_tiers)}"
+        )
