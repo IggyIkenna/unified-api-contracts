@@ -44,14 +44,18 @@ _JUNK_CHARS = frozenset({"�"})  # Unicode replacement char — the canonical
 # mojibake/decode-failure marker, never a legitimate part of a real name.
 
 
-def _reject_junk_symbols(name: str) -> None:
-    """Reject genuinely corrupted input before it reaches ``_slug``.
+def _reject_junk_symbols(name: str) -> str:
+    """Reject or sanitize corrupted input before it reaches ``_slug``.
 
-    Two junk classes, both real-world decode/encoding failures rather than
-    legitimate non-ASCII content:
+    Three classes handled:
       - the Unicode replacement character (U+FFFD) — the standard signal that an
-        upstream decoder already lost the real character;
-      - C0/C1 control characters — never a legitimate part of a display name.
+        upstream decoder already lost the real character → **RAISES**;
+      - C0 control characters (U+0000-U+001F, U+007F) -- never a legitimate part of
+        a display name -> **RAISES**;
+      - C1 control characters (U+0080-U+009F) -- encoding artifacts (e.g. a UTF-8
+        multi-byte continuation byte misinterpreted as Latin-1, producing a
+        dangling ``\\x84`` in what should be ``ń`` = ``\\xc5\\x84``) → **stripped**,
+        since ``_slug``'s ``encode("ascii", "ignore")`` would drop them anyway.
     Ordinary accented Latin (or other script) characters are NOT junk and must
     keep flowing through to ``_slug``'s diacritic-stripping — only decode-failure
     markers are rejected here.
@@ -59,9 +63,12 @@ def _reject_junk_symbols(name: str) -> None:
     if any(ch in _JUNK_CHARS for ch in name):
         msg = f"junk symbol (Unicode replacement character) in name: {name!r}"
         raise JunkSymbolError(msg)
-    if any(unicodedata.category(ch) == "Cc" for ch in name):
+    # C0 control characters (U+0000-U+001F, U+007F) -- never legitimate -> raise.
+    if any(ord(ch) < 0x20 or ord(ch) == 0x7F for ch in name):
         msg = f"control character in name: {name!r}"
         raise JunkSymbolError(msg)
+    # C1 control characters (U+0080-U+009F) -- encoding artifacts -> strip.
+    return "".join(ch for ch in name if not (0x80 <= ord(ch) <= 0x9F))
 
 
 def _slug(name: str) -> str:
@@ -73,7 +80,7 @@ def _slug(name: str) -> str:
     normalising — a corrupted name should fail loudly, not silently mangle
     into a plausible-looking but wrong slug.
     """
-    _reject_junk_symbols(name)
+    name = _reject_junk_symbols(name)
     # Strip diacritics (e.g. ü → u, é → e)
     nfkd = unicodedata.normalize("NFKD", name)
     ascii_only = nfkd.encode("ascii", "ignore").decode("ascii")
