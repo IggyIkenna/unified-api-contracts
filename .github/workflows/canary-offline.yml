@@ -38,7 +38,7 @@ concurrency:
 jobs:
   canary-offline:
     name: Cassette offline structural check
-    runs-on: [self-hosted, glue]
+    runs-on: ubuntu-latest
     timeout-minutes: 10
 
     permissions:

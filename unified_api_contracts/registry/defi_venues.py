@@ -699,20 +699,13 @@ DEFI_VENUE_MTDS_ADAPTER_VERIFIED_NOT_YET_SCHEDULED: dict[str, str] = {}
 # when building hedge leg candidate universes.
 #
 # SSOT: cross_asset_group_catalogue_audit_2026_05_10.md Phase 1C
-# (revised 2026-05-13 per operator — GMX/DRIFT are DeFi-only; prior cefi-axis
-# routing via DEFI_VENUE_AXIS_OVERRIDES was incorrect).
+# (revised 2026-05-13 per operator — GMX/DRIFT are DeFi-only).
 # DRIFT (Solana) removed 2026-07-16 (operator ruling): all Solana perp DEXes
 # dropped except Jupiter (not integrated). GMX (Arbitrum/Avalanche) removed
 # 2026-07-25 (unreliable historical funding data — see
 # unified-trading-pm/plans/active/defi_gmx_venue_removal_2026_07_25.md). SSOT:
 # unified-trading-pm/codex/04-architecture/solana-defi-coverage.md.
 DEFI_PERP_VENUES: list[str] = []
-
-# Formerly routed GMX/DRIFT to the cefi axis (CLOB-style data shape reasoning).
-# Emptied 2026-05-13: operator revised — GMX/DRIFT are DeFi-only; see
-# DEFI_PERP_VENUES above. Preserved for future venue axis-override semantics.
-DEFI_VENUE_AXIS_OVERRIDES: dict[str, str] = {}
-
 
 # Curated subset of DeFi venues that MTDS actively backfills. Used as
 # ``VENUES_BY_ASSET_GROUP['defi']`` in ``market_data_categories.py``.
@@ -791,7 +784,6 @@ MTDS_DEFI_VENUES: list[str] = [
 
 __all__ = [
     "ALL_DEFI_VENUES",
-    "DEFI_VENUE_AXIS_OVERRIDES",
     "DEFI_VENUE_MTDS_ADAPTER_VERIFIED_NOT_YET_SCHEDULED",
     "DEFI_VENUE_PHASE",
     "LEGACY_DEFI_VENUE_ALIASES",

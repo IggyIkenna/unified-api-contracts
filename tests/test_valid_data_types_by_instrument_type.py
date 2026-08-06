@@ -161,17 +161,15 @@ class TestValidDataTypesByAgAndInstrumentType:
             "sports", "league"
         )
 
-    def test_prediction_market_slice_present(self) -> None:
-        # Defense-in-depth / slice-parity row (slot-5 2026-06-08). Prediction is
-        # grain-bound (the enumerator short-circuits on instr.data_type and never
-        # consults this matrix), so the row is a WARN-suppressing backstop, not the
-        # grain guard. Its valid set = the canonical prediction data_types — so it
-        # never filters a real cell (all are attachable to a prediction market).
+    def test_prediction_market_slice_absent(self) -> None:
+        # Prediction was excluded from the validity matrix per
+        # uac_data_type_validity_combinator_fragmentation_2026_07_07.md
+        # scope exclusion — Prediction is grain-bound (the enumerator
+        # short-circuits on instr.data_type and never consults this matrix).
+        # The inert ("prediction", "prediction_market") row was deleted
+        # because the plan's scope exclusion is the authoritative record.
         result = valid_data_types_for_instrument_type("prediction", "prediction_market")
-        assert result == frozenset(
-            {"trades", "prediction_canonical_question_group", "market_lifecycle", "MARKET_LIFECYCLE"}
-        )
-        assert "prediction_canonical_question_group" in result
+        assert result is None  # None = "unmapped → fall back to ALL"
 
 
 class TestValidDataTypesForInstrumentTypeAccessor:
@@ -293,18 +291,48 @@ class TestTradfiBundleGrainWriterAlignment:
         assert result is not None
         assert "perp_funding" not in result
 
-    def test_defi_pool_has_dex_data(self) -> None:
-        """DeFi POOL must include DEX data_types (primary pool data types).
+    def test_defi_lending_excludes_governance_events(self) -> None:
+        """DeFi LENDING must NOT include governance_events (chain-level, not per-lending).
 
-        Note: a hybrid pool-type protocol that also carries perp_funding (e.g.
-        a pool-based perp DEX) would legitimately leak perp_funding into this
-        union — POOL including perp_funding is CORRECT for such protocols. The
-        matrix is the union across all protocols using that instrument_type,
-        so we only assert DEX data is present here.
+        Governance protocols (compound_governance, aave_governance) are
+        INFRASTRUCTURE-class and their instrument_types now use spot_asset
+        (the established chain-level catch-all) — governance events should
+        never seed expected_unattempted for lending instruments.
         """
+        result = valid_data_types_for_instrument_type("defi", "lending")
+        assert result is not None
+        assert "governance_events" not in result
+
+    def test_defi_pool_has_dex_data(self) -> None:
+        """DeFi POOL must include DEX data_types (primary pool data types)."""
         result = valid_data_types_for_instrument_type("defi", "POOL")
         assert result is not None
         assert "dex_pool_state" in result or "dex_pool_swaps" in result
+
+    def test_defi_pool_excludes_governance_events(self) -> None:
+        """DeFi POOL must NOT include governance_events (chain-level, not per-pool).
+
+        Governance protocols (uniswap_governance) are INFRASTRUCTURE-class and
+        their instrument_types now use spot_asset (the established chain-level
+        catch-all) — governance events should never seed expected_unattempted
+        for pure-DEX pools like UNISWAP_V3.
+        """
+        result = valid_data_types_for_instrument_type("defi", "pool")
+        assert result is not None
+        assert "governance_events" not in result
+
+    def test_defi_spot_asset_includes_governance_events(self) -> None:
+        """DeFi spot_asset must include governance_events (chain-level catch-all).
+
+        Governance protocols (uniswap_governance, compound_governance,
+        aave_governance) are INFRASTRUCTURE-class; their instrument_types now
+        use spot_asset alongside the other chain-level protocols
+        (across/stargate/flashbots/alchemy_onchain). Governance events belong
+        in the chain-level spot_asset validity set, not in per-pool/lending.
+        """
+        result = valid_data_types_for_instrument_type("defi", "spot_asset")
+        assert result is not None
+        assert "governance_events" in result
 
     def test_defi_derivation_is_cached(self) -> None:
         """Repeated calls should return the same dict object (module-level cache)."""
@@ -589,13 +617,19 @@ class TestDefiActualNotDeclaredValidJoin:
         assert "oracle_prices" not in violations.get("AAVE_V3-ARBITRUM", frozenset())
 
     def test_a_genuine_undeclared_violation_is_still_caught(self) -> None:
-        # COMPOUND_V3 was NOT part of the 2026-07-10 fix (its oracle_prices
-        # genesis date has zero real captured rows in prod — a different bug
-        # class, intentionally left alone). The join must still catch it —
-        # demonstrating the audit function actually discriminates instead of
-        # trivially passing everything.
+        # MAKER-ETHEREUM's lst_rates entry is a genuinely over-claiming cell
+        # (Maker is a CDP, not an LST — lst_rates was added to
+        # DEFI_VENUE_DATA_TYPE_CAPABILITIES in error, never actually captured).
+        # This demonstrates the audit function discriminates instead of
+        # trivially passing everything — the 2026-08-05 PROTOCOL_CAPABILITIES
+        # expansion added oracle_prices to compound_v3/morpho/spark/radiant/
+        # fluid/kamino + rewards to aave_v3 + gas_fees to alchemy_onchain +
+        # lst_rates to puffer, so the previous control case (COMPOUND_V3
+        # oracle_prices) is now reconciled. MAKER lst_rates and
+        # AAVE-ETHEREUM oracle_prices are the 2 remaining over-claiming pairs
+        # awaiting operator decision on genesis-date rollback.
         violations = defi_actual_data_types_not_declared_valid()
-        assert "oracle_prices" in violations.get("COMPOUND_V3-ETHEREUM", frozenset())
+        assert "lst_rates" in violations.get("MAKER-ETHEREUM", frozenset())
 
     def test_fully_reconciled_protocol_has_no_entry(self) -> None:
         # UNISWAP_V3-ETHEREUM's actual declaration (dex_pool_swaps/dex_pool_state/

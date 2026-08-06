@@ -205,6 +205,17 @@ DATA_TYPES_BY_ASSET_GROUP: dict[str, list[str]] = {
         # (issues/defi_perp_daily_ctx_manifest_gap_reader_risk_2026_07_22.md,
         # 2026-07-28 Progress Log entry). Zero change to the writer row shape.
         "perp_daily_ctx",
+        # perp_mark_price (2026-08-05, defi_perp_daily_ctx_manifest_gap_reader_risk
+        # issue follow-up) — the real, already-migrated HYPERLIQUID mark-price corpus
+        # (316 days, 2026-07-13 dedicated-bucket migration) sitting in the shared defi
+        # tick-data bucket TODAY with NO current reader at all (unlike perp_daily_ctx,
+        # this is a pure manifest-visibility fix, zero live-reader risk — confirmed via
+        # defi_dedicated_bucket_shared_migration_2026_07_13.md's own note that
+        # canonical_perp_funding_provider reads marks from perp_daily_ctx, not this).
+        # Registered here ONLY (never under DATA_TYPES_BY_ASSET_GROUP["cefi"]) for the
+        # same reason perp_daily_ctx's registration above is inert for HYPERLIQUID/CeFi
+        # combos — they enumerate under the separate "cefi" key.
+        "perp_mark_price",
         # derivative_ticker (2026-07-15, defi_perp_funding_canonicalisation_derivative_
         # ticker_all_perps issue, operator ruling): the canonical RAW-funding home for
         # ALL perp venues, defi-asset-group ones included — captured at the
@@ -1018,6 +1029,9 @@ NEEDS_CANDLE_PROCESSING: dict[str, bool] = {
     # it directly as raw daily context, not through MDPS-derived candles. Same class as
     # perp_funding/lending_indices/oracle_prices (pass-through, not OHLCV).
     "perp_daily_ctx": False,
+    # Raw per-tick mark-price snapshot (sibling of perp_daily_ctx above, 2026-08-05) —
+    # no MDPS candle adapter and no current reader at all; pass-through, not OHLCV.
+    "perp_mark_price": False,
     # Per-fill prints; SEMANTICALLY the same class as "trades"/"dex_pool_swaps" (True).
     # Pass-through ONLY because no defi/perp_trades candle adapter exists in MDPS and no
     # defi-asset-group venue currently emits it — the Drift V2 ingester that motivated the
@@ -1223,21 +1237,6 @@ def validate_data_type_for_venue(venue: str, data_type: str, *, strict: bool = F
 # DATA_TYPES_BY_ASSET_GROUP with VenueMapping.venue_start_dates as the start date.
 # Only venues with non-default data type availability need explicit entries.
 #
-# ── MVP Data Type Overrides ──
-# In MVP mode, we limit downloads to reduce cost and API calls.
-# Key decision: Deribit options — only download options_chain (IV/greeks, bulk 1-call)
-# not trades/book_snapshot_5/derivative_ticker/liquidations per individual option strike
-# (~12,000 API calls/day → 1 call/day). Full tick data for individual options is
-# only needed for execution quality analysis, not for strategy/ML.
-# Perpetuals still get all data types (trades, book, deriv_ticker, liquidations).
-
-MVP_VENUE_DATA_TYPES: dict[str, list[str]] = {
-    # Deribit: perpetual data types + only bulk-downloadable chain types (no per-strike tick data)
-    "DERIBIT": ["trades", "book_snapshot_5", "derivative_ticker", "liquidations", "options_chain", "futures_chain"],
-    # For other CeFi venues, perpetuals get all data types (same as full mode)
-    # TradFi: controlled by tick_windows + MVP_CME_EXCHANGE_CODES (ES-only)
-}
-
 # Deribit MVP: which instrument types get which data types.
 # Options/futures only get chain data types (bulk download).
 # Perpetuals get all data types (per-symbol download, but only ~20 perps).
@@ -1430,22 +1429,6 @@ VALID_DATA_TYPES_BY_AG_AND_INSTRUMENT_TYPE: dict[tuple[str, str], frozenset[str]
     # WHOLE vocabulary, no UPPER exception — K1/K2 are being reverted, not kept.
     # The lowercase "odds"/"trades" pair is the sole canonical form again.
     ("sports", "odds"): frozenset({"trades"}),
-    # ── Prediction ────────────────────────────────────────────────────────────
-    # Prediction uses per-row data_type GRAIN BINDING (instr.data_type field): the
-    # enumerator's _row_data_types step-1 returns [instr.data_type] and NEVER
-    # consults this matrix for a grain-bound prediction catalogue row. The grain
-    # guard (per-market leaf vs per-cqg bundle) lives in grain-binding, NOT here —
-    # the matrix filters impossible (instrument_type x data_type) cross-products,
-    # which is orthogonal to grain. The row below is therefore a DEFENSE-IN-DEPTH /
-    # documentation stub (slice-parity with cefi/tradfi/sports): it only takes
-    # effect for a hypothetical NON-grain-bound prediction row, where it suppresses
-    # the "unmapped instrument_type → fall back to all + WARN" path. Valid set =
-    # the canonical prediction data_types (DATA_TYPES_BY_ASSET_GROUP["prediction"]);
-    # all are legitimately attachable to a prediction market, so this never filters
-    # a real cell — it is purely WARN-suppression + an explicit, audited slice.
-    ("prediction", "prediction_market"): frozenset(
-        {"trades", "prediction_canonical_question_group", "market_lifecycle", "MARKET_LIFECYCLE"}
-    ),
 }
 
 
@@ -1847,6 +1830,23 @@ VENUE_DATA_TYPE_CAPABILITIES: dict[str, dict[str, str]] = {
         "derivative_ticker": "2019-11-17",
         "liquidations": "2019-11-17",
         "futures_chain": "2019-11-17",
+    },
+    # BINANCE-DELIVERY (coin-margined futures) — mirrors BINANCE-FUTURES (USDT-M
+    # linear) data_type set. NO perp_funding / options_chain / ohlcv_1m /
+    # volatility_index — these are NOT produced by any BINANCE-DELIVERY writer
+    # (perp_funding_handler.py protocol set = hyperliquid/kalshi_perp/
+    # polymarket_perp; BINANCE-DELIVERY not a registered funding-cadence venue in
+    # UAC perp_funding_cadence). Added 2026-08-05 (features_smoke_matrix_p2_rerun
+    # findings-009): before this entry, the fallback to get_valid_data_types_for_venue
+    # seeded phantom EXPECTED perp_funding cells for every instrument-day, producing
+    # permanent attempted_failed/empty_confirmed noise. (Narrowed caps also fix the
+    # ohlcv_1m phantom — BINANCE-DELIVERY has no OHLCV writer either.)
+    "BINANCE-DELIVERY": {
+        "trades": "2020-01-01",
+        "book_snapshot_5": "2020-01-01",
+        "derivative_ticker": "2020-01-01",
+        "liquidations": "2020-01-01",
+        "futures_chain": "2020-01-01",
     },
     # ``liquidations`` REMOVED 2026-07-15 (cefi_completion_program workstream E,
     # operator ruling): only 3 ``captured`` DERIBIT liquidation rows exist in the

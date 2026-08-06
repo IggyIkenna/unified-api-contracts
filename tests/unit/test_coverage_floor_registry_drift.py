@@ -157,3 +157,83 @@ def test_falsifier_catches_a_stale_baseline_entry(monkeypatch: object) -> None:
     assert len(stale_findings) == 2  # every cefi KNOWN_DIVERGENCES entry (BITFINEX, BYBIT)
     assert all("STALE BASELINE" in f.message for f in stale_findings)
     assert any("BITFINEX" in f.message for f in stale_findings)
+
+
+# ---------------------------------------------------------------------------
+# KEY-MAPPING COMPLETENESS — the [DATA] P3 explicit mapping validator
+# ---------------------------------------------------------------------------
+
+
+def test_mapping_is_complete_against_the_real_registries() -> None:
+    """Every declared mapping entry must reference a real venue_mapping key,
+    and every venue_mapping key that matches a bare key must be declared."""
+    from scripts.check_coverage_floor_registry_drift import _validate_mapping_completeness
+
+    findings = _validate_mapping_completeness()
+    assert findings == [], "\n".join(f.message for f in findings)
+
+
+def test_every_bare_key_in_mapping_exists_in_coverage_starts() -> None:
+    """A bare key in the mapping with no corresponding coverage_starts entry is dead."""
+    from unified_api_contracts.canonical import coverage_starts as _cs
+
+    for asset_group, mapping in _cs.BARE_KEY_TO_VENUE_MAPPING_KEYS.items():
+        registry = {
+            "cefi": _cs.CEFI_SOURCE_COVERAGE_START,
+            "defi": _cs.DEFI_SOURCE_COVERAGE_START,
+        }.get(asset_group)
+        assert registry is not None, f"Mapping asset_group {asset_group!r} has no registry"
+        for bare_key in mapping:
+            assert bare_key in registry, (
+                f"BARE_KEY_TO_VENUE_MAPPING_KEYS[{asset_group!r}][{bare_key!r}] "
+                f"does not exist in coverage_starts {asset_group} registry"
+            )
+
+
+def test_validate_mapping_catches_stale_reference(monkeypatch: object) -> None:
+    """A mapping entry pointing to a key removed from venue_mapping must fail."""
+    import scripts.check_coverage_floor_registry_drift as mod
+
+    # Override _venue_mapping_combined_dates to simulate a removed venue_mapping key.
+    orig = mod._venue_mapping_combined_dates
+
+    def _patched_dates() -> dict[str, str]:
+        d = orig()
+        d.pop("BINANCE-DELIVERY", None)  # simulate removal
+        return d
+
+    monkeypatch.setattr(mod, "_venue_mapping_combined_dates", _patched_dates)
+    findings = mod._validate_mapping_completeness()
+    assert len(findings) == 1
+    assert "STALE MAPPING" in findings[0].message
+    assert "BINANCE-DELIVERY" in findings[0].message
+    assert "BINANCE" in findings[0].message
+
+
+def test_validate_mapping_catches_undeclared_relationship(monkeypatch: object) -> None:
+    """A venue_mapping key matching a bare key but omitted from the mapping must fail."""
+    import scripts.check_coverage_floor_registry_drift as mod
+
+    orig = mod._venue_mapping_combined_dates
+
+    def _patched_dates() -> dict[str, str]:
+        d = orig()
+        # Add a synthetic BINANCE-OPTIONS key — it matches bare BINANCE
+        # (starts with "BINANCE-") but isn't in the mapping.
+        d["BINANCE-OPTIONS"] = "2025-01-01"
+        return d
+
+    monkeypatch.setattr(mod, "_venue_mapping_combined_dates", _patched_dates)
+    findings = mod._validate_mapping_completeness()
+    assert len(findings) == 1
+    assert "UNDECLARED MAPPING" in findings[0].message
+    assert "BINANCE-OPTIONS" in findings[0].message
+    assert "BINANCE" in findings[0].message
+
+
+def test_validate_mapping_clean_with_no_drift() -> None:
+    """The real registries must pass the mapping completeness check (smoke test)."""
+    import scripts.check_coverage_floor_registry_drift as mod
+
+    findings = mod._validate_mapping_completeness()
+    assert findings == []

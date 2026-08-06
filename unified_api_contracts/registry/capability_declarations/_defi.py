@@ -446,16 +446,22 @@ PROTOCOL_CAPABILITIES: dict[str, _ProtocolCapability] = {
         venue_prefix="SPARK",
         protocol_class=ProtocolClass.LENDING,
         instrument_types=_LENDING_ATOKEN_DEBTTOKEN,
-        data_types=[*_LENDING_DATA],
-        mtds_operations=["collect-lending-indices", "collect-liquidations"],
+        data_types=[
+            *_LENDING_DATA,
+            "oracle_prices",  # MakerDAO oracle via SparkOracle — SPARK-ETHEREUM (aspirational: capture not yet wired)
+        ],
+        mtds_operations=["collect-lending-indices", "collect-liquidations", "collect-oracle-prices"],
         required_tokens=frozenset({"MKR", "DAI"}),
     ),
     "compound_v3": _ProtocolCapability(
         venue_prefix="COMPOUND_V3",
         protocol_class=ProtocolClass.LENDING,
         instrument_types=_LENDING_ATOKEN_DEBTTOKEN,
-        data_types=[*_LENDING_DATA],
-        mtds_operations=["collect-lending-indices", "collect-liquidations"],
+        data_types=[
+            *_LENDING_DATA,
+            "oracle_prices",  # Chainlink via Comet interface (aspirational: capture not yet wired)
+        ],
+        mtds_operations=["collect-lending-indices", "collect-liquidations", "collect-oracle-prices"],
         required_tokens=frozenset({"COMP"}),
     ),
     "morpho": _ProtocolCapability(
@@ -466,11 +472,13 @@ PROTOCOL_CAPABILITIES: dict[str, _ProtocolCapability] = {
             *_LENDING_DATA,
             "liquidation_events",  # LiquidationCall events (MORPHO-ETHEREUM 2024-01-08)
             "position_data",  # Top user positions (MORPHO-ETHEREUM 2024-01-08)
+            "oracle_prices",  # Morpho's IRM/oracle feeds (aspirational: capture not yet wired)
         ],
         mtds_operations=[
             "collect-liquidations",
             "collect-liquidation-events",
             "collect-position-data",
+            "collect-oracle-prices",
         ],
     ),
     # ── Green-venue lending adapters (2026-06-02 smoke tests; slot 7) ──
@@ -518,8 +526,11 @@ PROTOCOL_CAPABILITIES: dict[str, _ProtocolCapability] = {
         venue_prefix="RADIANT",
         protocol_class=ProtocolClass.LENDING,
         instrument_types=_LENDING,
-        data_types=[*_LENDING_DATA],
-        mtds_operations=["collect-lending-indices", "collect-liquidations"],
+        data_types=[
+            *_LENDING_DATA,
+            "oracle_prices",  # Chainlink price feeds via Radiant's lending pool (aspirational: capture not yet wired)
+        ],
+        mtds_operations=["collect-lending-indices", "collect-liquidations", "collect-oracle-prices"],
         required_tokens=frozenset({"RDNT"}),
     ),
     # Euler V2: Goldsky subgraph — eulerVaults (live state) + vaultStatuses
@@ -543,8 +554,11 @@ PROTOCOL_CAPABILITIES: dict[str, _ProtocolCapability] = {
         venue_prefix="FLUID",
         protocol_class=ProtocolClass.LENDING,
         instrument_types=_LENDING,
-        data_types=[*_LENDING_DATA],
-        mtds_operations=["collect-liquidations"],
+        data_types=[
+            *_LENDING_DATA,
+            "oracle_prices",  # Fluid's native price oracle (aspirational: capture not yet wired)
+        ],
+        mtds_operations=["collect-liquidations", "collect-oracle-prices"],
     ),
     # ── EVM DEX — Native schema ─────────────────────────────────
     "uniswap_v2": _ProtocolCapability(
@@ -711,7 +725,6 @@ PROTOCOL_CAPABILITIES: dict[str, _ProtocolCapability] = {
         data_types=[
             *_YIELD_DATA,
             "staking_yields",  # stETH APY daily rate (LIDO-ETHEREUM 2020-12-18)
-            "rewards",
         ],
         mtds_operations=["collect-lst-rates", "collect-oracle-prices", "collect-staking-yields"],
         required_tokens=frozenset({"LDO", "STETH", "WSTETH"}),
@@ -723,7 +736,6 @@ PROTOCOL_CAPABILITIES: dict[str, _ProtocolCapability] = {
         data_types=[
             *_YIELD_DATA,
             "staking_yields",  # weETH APY (ETHERFI-ETHEREUM 2023-11-01)
-            "rewards",
         ],
         mtds_operations=["collect-lst-rates", "collect-oracle-prices", "collect-staking-yields"],
         required_tokens=frozenset({"ETHFI", "EETH", "WEETH"}),
@@ -794,6 +806,33 @@ PROTOCOL_CAPABILITIES: dict[str, _ProtocolCapability] = {
         data_types=["lst_rates"],
         mtds_operations=["collect-lst-rates"],
     ),
+    # ── EVM LST protocols (continued — previously missing PROTOCOL_CAPABILITIES) ───
+    # Finding B, defi_protocol_capabilities_lst_rates_audit_2026_08_05.md:
+    # BINANCE writes lst_rates for wBETH on ETHEREUM + BSC; COINBASE writes
+    # lst_rates + staking_yields for cbETH; ROCKETPOOL writes lst_rates +
+    # staking_yields for rETH. All three were missing from PROTOCOL_CAPABILITIES.
+    "binance": _ProtocolCapability(
+        venue_prefix="BINANCE",
+        protocol_class=ProtocolClass.STAKING,
+        instrument_types=_LST,
+        data_types=["lst_rates"],  # wBETH exchangeRate() — ETHEREUM + BSC
+        mtds_operations=["collect-lst-rates"],
+    ),
+    "coinbase": _ProtocolCapability(
+        venue_prefix="COINBASE",
+        protocol_class=ProtocolClass.STAKING,
+        instrument_types=_LST,
+        data_types=["lst_rates", "staking_yields"],  # cbETH LST (ETHEREUM)
+        mtds_operations=["collect-lst-rates", "collect-staking-yields"],
+    ),
+    "rocketpool": _ProtocolCapability(
+        venue_prefix="ROCKETPOOL",
+        protocol_class=ProtocolClass.STAKING,
+        instrument_types=_LST,
+        data_types=["lst_rates", "staking_yields"],  # rETH LST (ETHEREUM)
+        mtds_operations=["collect-lst-rates", "collect-staking-yields"],
+        required_tokens=frozenset({"RPL", "RETH"}),
+    ),
     # ── CeFi-style Perps (API-based, not on-chain) ─────────────
     # OPTIONS: not supported — venue does not offer listed options contracts
     "hyperliquid": _ProtocolCapability(
@@ -821,8 +860,12 @@ PROTOCOL_CAPABILITIES: dict[str, _ProtocolCapability] = {
         venue_prefix="KAMINO",
         protocol_class=ProtocolClass.DEX,
         instrument_types=_SOLANA_VAULT,
-        data_types=["dex_pool_state", "lending_indices"],
-        mtds_operations=["collect-dex-pools", "collect-lending-indices"],
+        data_types=[
+            "dex_pool_state",
+            "lending_indices",
+            "oracle_prices",
+        ],  # oracle_prices: Kamino's native price feeds (aspirational: capture not yet wired)
+        mtds_operations=["collect-dex-pools", "collect-lending-indices", "collect-oracle-prices"],
         required_tokens=frozenset({"KMNO"}),
     ),
     "raydium": _ProtocolCapability(
@@ -895,6 +938,24 @@ PROTOCOL_CAPABILITIES: dict[str, _ProtocolCapability] = {
         mtds_operations=["collect-lst-rates"],
         required_tokens=frozenset({"JTO", "JITOSOL", "JSOL"}),
     ),
+    # ── Solana LST protocols (previously missing PROTOCOL_CAPABILITIES) ────────────
+    # Finding B, defi_protocol_capabilities_lst_rates_audit_2026_08_05.md:
+    # SANCTUM (jupSOL) and SOLBLAZE (bSOL) are both phase="live" Solana LST
+    # venues whose PROTOCOL_CAPABILITIES entries were never authored.
+    "sanctum": _ProtocolCapability(
+        venue_prefix="SANCTUM",
+        protocol_class=ProtocolClass.STAKING,
+        instrument_types=_STAKING,
+        data_types=["lst_rates"],  # jupSOL SPL stake-pool rate — SOLANA
+        mtds_operations=["collect-lst-rates"],
+    ),
+    "solblaze": _ProtocolCapability(
+        venue_prefix="SOLBLAZE",
+        protocol_class=ProtocolClass.STAKING,
+        instrument_types=_STAKING,
+        data_types=["lst_rates"],  # bSOL liquid staking — SOLANA
+        mtds_operations=["collect-lst-rates"],
+    ),
     # SOLAYER + PICASSO + CAMBRIAN removed 2026-06-02 (operator decision): no usable/decodable
     # DeFi data source. Solayer = sSOL is a custom LRT vault with no decodable exchange-rate
     # layout / no IDL — could not be field-verified. Picasso = IBC bridge/restaking program
@@ -908,7 +969,11 @@ PROTOCOL_CAPABILITIES: dict[str, _ProtocolCapability] = {
         venue_prefix="YEARN_V3",
         protocol_class=ProtocolClass.YIELD,
         instrument_types=_YIELD,
-        data_types=["staking_yields", "oracle_prices"],  # vault APY time-series (YEARN_V3-ETHEREUM 2024-03-20)
+        data_types=[
+            "staking_yields",
+            "oracle_prices",
+            "lst_rates",
+        ],  # vault APY time-series (YEARN_V3-ETHEREUM 2024-03-20)
         mtds_operations=["collect-staking-yields", "collect-oracle-prices"],
         required_tokens=frozenset({"YFI"}),
     ),
@@ -924,14 +989,21 @@ PROTOCOL_CAPABILITIES: dict[str, _ProtocolCapability] = {
         venue_prefix="BEEFY",
         protocol_class=ProtocolClass.YIELD,
         instrument_types=_YIELD,
-        data_types=["staking_yields"],  # vault APY time-series (multi-chain; BEEFY-BSC 2020-10-08 earliest)
+        data_types=[
+            "staking_yields",
+            "lst_rates",
+        ],  # vault APY time-series (multi-chain; BEEFY-BSC 2020-10-08 earliest)
         mtds_operations=["collect-staking-yields"],
     ),
     "pendle": _ProtocolCapability(
         venue_prefix="PENDLE",
         protocol_class=ProtocolClass.YIELD,
         instrument_types=_YIELD,
-        data_types=["staking_yields", "oracle_prices"],  # yield tokenisation APY (PENDLE-ETHEREUM 2021-06-15)
+        data_types=[
+            "staking_yields",
+            "oracle_prices",
+            "lst_rates",
+        ],  # yield tokenisation APY (PENDLE-ETHEREUM 2021-06-15)
         mtds_operations=["collect-staking-yields", "collect-oracle-prices"],
         required_tokens=frozenset({"PENDLE"}),
     ),
@@ -939,7 +1011,10 @@ PROTOCOL_CAPABILITIES: dict[str, _ProtocolCapability] = {
         venue_prefix="IDLE",
         protocol_class=ProtocolClass.YIELD,
         instrument_types=_YIELD,
-        data_types=["staking_yields"],  # vault APY time-series (IDLE-ETHEREUM 2019-08-13)
+        data_types=[
+            "staking_yields",
+            "lst_rates",
+        ],  # vault APY time-series (IDLE-ETHEREUM 2019-08-13)
         mtds_operations=["collect-staking-yields"],
         required_tokens=frozenset({"IDLE"}),
     ),
@@ -975,7 +1050,7 @@ PROTOCOL_CAPABILITIES: dict[str, _ProtocolCapability] = {
         venue_prefix="RENZO",
         protocol_class=ProtocolClass.RESTAKING,
         instrument_types=_RESTAKING,
-        data_types=["staking_yields", "oracle_prices"],  # RENZO-ETHEREUM 2024-04-29
+        data_types=["staking_yields", "oracle_prices", "lst_rates"],  # RENZO-ETHEREUM 2024-04-29
         mtds_operations=["collect-staking-yields", "collect-oracle-prices"],
         required_tokens=frozenset({"REZ", "EZETH"}),
     ),
@@ -983,7 +1058,7 @@ PROTOCOL_CAPABILITIES: dict[str, _ProtocolCapability] = {
         venue_prefix="KELPDAO",
         protocol_class=ProtocolClass.RESTAKING,
         instrument_types=_RESTAKING,
-        data_types=["staking_yields", "oracle_prices"],  # KELPDAO-ETHEREUM 2023-11-09
+        data_types=["staking_yields", "oracle_prices", "lst_rates"],  # KELPDAO-ETHEREUM 2023-11-09
         mtds_operations=["collect-staking-yields", "collect-oracle-prices"],
         required_tokens=frozenset({"RSETH"}),
     ),
@@ -991,8 +1066,12 @@ PROTOCOL_CAPABILITIES: dict[str, _ProtocolCapability] = {
         venue_prefix="PUFFER",
         protocol_class=ProtocolClass.RESTAKING,
         instrument_types=_RESTAKING,
-        data_types=["staking_yields", "oracle_prices"],  # PUFFER-ETHEREUM 2024-05-09
-        mtds_operations=["collect-staking-yields", "collect-oracle-prices"],
+        data_types=[
+            "staking_yields",
+            "oracle_prices",
+            "lst_rates",
+        ],  # lst_rates: pufETH LST exchange rate (aspirational: capture not yet wired)
+        mtds_operations=["collect-staking-yields", "collect-oracle-prices", "collect-lst-rates"],
         required_tokens=frozenset({"PUFETH"}),
     ),
     "jitorestaking": _ProtocolCapability(
@@ -1022,7 +1101,16 @@ PROTOCOL_CAPABILITIES: dict[str, _ProtocolCapability] = {
     "compound_governance": _ProtocolCapability(
         venue_prefix="COMPOUND",
         protocol_class=ProtocolClass.INFRASTRUCTURE,
-        instrument_types=_LENDING,  # governance over lending protocol
+        # governance_events is chain-level (DAO proposals/votes are not per-pool or
+        # per-lending-instrument data).  Declaring _LENDING here leaks governance_events
+        # into the instrument_type-grain union for every lending protocol
+        # (valid_data_types_for_instrument_type builds its DeFi set as the union across
+        # ALL protocols sharing an instrument_type), seeding false expected_unattempted
+        # governance_events for every lending instrument — per the same leak class the
+        # batch3-011 todo ("Tighten the defi POOL data-type validity grain from union-
+        # across-protocols to per-protocol") fixes.  Spot_asset is the established
+        # chain-level catch-all (across/stargate/flashbots/alchemy_onchain all use it).
+        instrument_types=_RESTAKING,
         data_types=["governance_events"],  # DAO proposal + vote events (COMPOUND-ETHEREUM 2020-02-26)
         mtds_operations=["collect-governance-events"],
         required_tokens=frozenset({"COMP"}),
@@ -1030,7 +1118,10 @@ PROTOCOL_CAPABILITIES: dict[str, _ProtocolCapability] = {
     "aave_governance": _ProtocolCapability(
         venue_prefix="AAVE",
         protocol_class=ProtocolClass.INFRASTRUCTURE,
-        instrument_types=_LENDING,  # governance over lending protocol
+        # Same instrument_type rationale as compound_governance above — governance
+        # events are chain-level, not per-lending-instrument; spot_asset is the
+        # established chain-level catch-all.
+        instrument_types=_RESTAKING,
         data_types=["governance_events"],  # DAO proposal + vote events (AAVE-ETHEREUM 2020-07-27)
         mtds_operations=["collect-governance-events"],
         required_tokens=frozenset({"AAVE"}),
@@ -1038,7 +1129,10 @@ PROTOCOL_CAPABILITIES: dict[str, _ProtocolCapability] = {
     "uniswap_governance": _ProtocolCapability(
         venue_prefix="UNISWAP",
         protocol_class=ProtocolClass.INFRASTRUCTURE,
-        instrument_types=_POOL,  # governance over DEX
+        # Same instrument_type rationale as compound_governance above — governance
+        # events are chain-level, not per-pool; spot_asset is the established
+        # chain-level catch-all.
+        instrument_types=_RESTAKING,
         data_types=["governance_events"],  # DAO proposal + vote events (UNISWAP-ETHEREUM 2020-09-17)
         mtds_operations=["collect-governance-events"],
         required_tokens=frozenset({"UNI"}),
@@ -1056,8 +1150,11 @@ PROTOCOL_CAPABILITIES: dict[str, _ProtocolCapability] = {
         venue_prefix="ALCHEMY",
         protocol_class=ProtocolClass.INFRASTRUCTURE,
         instrument_types=_RESTAKING,  # SPOT_ASSET — chain-level analytics, not a protocol instrument
-        data_types=["token_transfers"],  # ERC-20 transfer events via Alchemy RPC (ALCHEMY-ONCHAIN 2020-01-01)
-        mtds_operations=["collect-token-transfers"],
+        data_types=[
+            "token_transfers",  # ERC-20 transfer events via Alchemy RPC (ALCHEMY-ONCHAIN 2020-01-01)
+            "gas_fees",  # Per-chain gas price data (aspirational: capture not yet wired)
+        ],
+        mtds_operations=["collect-token-transfers", "collect-gas-fees"],
     ),
     # ── Oracle price feeds (oracle_prices) ────────────────────────────────────
     # 2026-07-20 DeFi catalogue canonicalization. CHAINLINK = multi-chain
@@ -1332,10 +1429,13 @@ def build_defi_venues() -> list[str]:
 
 # Static chain assignments for protocols that don't use The Graph
 _STATIC_VENUE_CHAINS: dict[str, list[str]] = {
+    "binance": ["ETHEREUM", "BSC"],
+    "coinbase": ["ETHEREUM"],
     "lido": ["ETHEREUM"],
     "etherfi": ["ETHEREUM"],
     "ethena": ["ETHEREUM"],
     "eigenlayer": ["ETHEREUM"],
+    "rocketpool": ["ETHEREUM"],
     "hyperliquid": ["HYPERLIQUID"],
     "aster": ["ASTER"],
     # "drift" entry removed 2026-07-16 (operator ruling: all Solana perp
@@ -1355,6 +1455,8 @@ _STATIC_VENUE_CHAINS: dict[str, list[str]] = {
     "solend": ["SOLANA"],
     "marinade": ["SOLANA"],
     "jito": ["SOLANA"],
+    "sanctum": ["SOLANA"],
+    "solblaze": ["SOLANA"],
     # solayer + picasso + cambrian removed 2026-06-02 (operator decision; no usable/decodable
     # DeFi data source — see PROTOCOL_CAPABILITIES header note above).
 }

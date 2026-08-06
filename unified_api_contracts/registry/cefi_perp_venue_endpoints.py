@@ -39,9 +39,11 @@ CEFI_PERP_VENUE_API_ENDPOINTS: Final[dict[str, str]] = {
     # SSOT: prediction-perps-sourcing.md
     "KALSHI_PERP": "https://external-api.kalshi.com/trade-api/v2",
     # Polymarket-perp: CFTC-regulated crypto perpetuals (launched 2026-04-21).
-    # BLOCKED-UPSTREAM-OUTAGE: DNS NXDOMAIN for perps-api.polymarket.com as of
-    # 2026-06-21. Endpoint registered for when the service recovers.
-    "POLYMARKET_PERP": "https://perps-api.polymarket.com",
+    # UPSTREAM RECOVERED 2026-08-05: perps-api.polymarket.com was DNS NXDOMAIN as of
+    # 2026-06-21, but the Polymarket perps API launched under a different hostname —
+    # api.perpetuals.polymarket.com (verified live, HTTP 200, 2026-08-05).
+    # See docs.polymarket.com/perps/market-data.
+    "POLYMARKET_PERP": "https://api.perpetuals.polymarket.com",
 }
 
 __all__ = [
