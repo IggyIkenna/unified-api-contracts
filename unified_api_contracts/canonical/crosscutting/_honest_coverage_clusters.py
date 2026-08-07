@@ -131,10 +131,13 @@ real consumer.
 #   - tier_1_international: EU continental tournaments (UCL)
 #   - tier_2_domestic: second-tier EU domestic (Championship, Bundesliga 2, etc.)
 #
-# 28 non-EU leagues (A-LEAGUE, MLS, J1_LEAGUE, etc.) are UNMAPPED here — they
-# are handled by the follow-up todo (plan sports_odds_bookmaker_coverage_enumeration_2026_06_20:227)
-# which will either add them to one of the existing tiers or create a tier_3_global/
-# no_expectation tier for leagues with inconsistent bookmaker coverage.
+# 28 previously-unmapped non-EU leagues (A-LEAGUE, MLS, J1_LEAGUE, etc.) are
+# NOW MAPPED (2026-08-06, sports_satellite_ao_dispatch_batch9-026) using the
+# ALL-PRESENT-bookmaker-set methodology from
+# registry/data/sports_bookmaker_league_coverage.json:
+#   - tier_1_domestic: pinnacle + betfair_ex_uk + williamhill + unibet_uk ALL present
+#   - tier_2_domestic: pinnacle + betfair_ex_uk BOTH present (subset of tier_1)
+#   - no_expectation: zero observed bookmaker coverage → empty set, no cluster gate
 #
 # Both naming conventions are present (odds_api SOCCER_* prefixed names and
 # canonical LEAGUE_REGISTRY slugs). Some leagues appear in both forms in the
@@ -143,7 +146,9 @@ real consumer.
 
 
 LEAGUE_ID_TO_TIER: Final[dict[str, LeagueTier]] = {
+    # -------------------------------------------------------------------
     # tier_1_domestic — top-5 EU domestic leagues
+    # -------------------------------------------------------------------
     # EPL
     "EPL": "tier_1_domestic",
     "PREMIER_LEAGUE": "tier_1_domestic",
@@ -160,9 +165,31 @@ LEAGUE_ID_TO_TIER: Final[dict[str, LeagueTier]] = {
     # Ligue 1 (French top-tier)
     "LIGUE_1": "tier_1_domestic",
     "SOCCER_FRANCE_LIGUE_ONE": "tier_1_domestic",
+    # Allsvenskan (Swedish top-tier — all 4 tier-1 books present)
+    "ALLSVENSKAN": "tier_1_domestic",
+    "SOCCER_SWEDEN_ALLSVENSKAN": "tier_1_domestic",
+    # Eliteserien (Norwegian top-tier — all 4 tier-1 books present)
+    "ELITESERIEN": "tier_1_domestic",
+    "SOCCER_NORWAY_ELITESERIEN": "tier_1_domestic",
+    # J1 League (Japanese top-tier — all 4 tier-1 books present)
+    "J1_LEAGUE": "tier_1_domestic",
+    "SOCCER_JAPAN_J_LEAGUE": "tier_1_domestic",
+    # K League 1 (Korean top-tier — all 4 tier-1 books present)
+    "K_LEAGUE_1": "tier_1_domestic",
+    "SOCCER_KOREA_KLEAGUE1": "tier_1_domestic",
+    # Liga MX (Mexican top-tier — all 4 tier-1 books present)
+    "LIGA_MX": "tier_1_domestic",
+    "SOCCER_MEXICO_LIGAMX": "tier_1_domestic",
+    # MLS (USA/Canada top-tier — all 4 tier-1 books present)
+    "MLS": "tier_1_domestic",
+    "SOCCER_USA_MLS": "tier_1_domestic",
+    # -------------------------------------------------------------------
     # tier_1_international — EU continental tournaments
+    # -------------------------------------------------------------------
     "SOCCER_UEFA_CHAMPS_LEAGUE": "tier_1_international",
+    # -------------------------------------------------------------------
     # tier_2_domestic — second-tier EU domestic leagues
+    # -------------------------------------------------------------------
     # Championship (English second-tier)
     "CHAMPIONSHIP": "tier_2_domestic",
     # Bundesliga 2 (German second-tier)
@@ -184,6 +211,34 @@ LEAGUE_ID_TO_TIER: Final[dict[str, LeagueTier]] = {
     "SEGUNDA_DIVISION": "tier_2_domestic",
     # Serie B (Italian second-tier)
     "SERIE_B": "tier_2_domestic",
+    # Ekstraklasa (Polish top-tier — pinnacle + betfair_ex_uk present, no
+    # williamhill → tier_2_domestic subset)
+    "EKSTRAKLASA": "tier_2_domestic",
+    "SOCCER_POLAND_EKSTRAKLASA": "tier_2_domestic",
+    # Süper Lig (Turkish top-tier — pinnacle + betfair_ex_uk + unibet_uk
+    # present, no williamhill → tier_2_domestic subset)
+    "SUPER_LIG": "tier_2_domestic",
+    # -------------------------------------------------------------------
+    # no_expectation — zero observed bookmaker coverage in the committed
+    # sports_bookmaker_league_coverage.json corpus; these leagues have
+    # never produced a captured odds row for any odds_api bookmaker, so
+    # they are explicitly excluded from cluster validation (no expected
+    # bookmaker x market set to enforce).  If future coverage data changes,
+    # re-triage these against the then-current JSON.
+    # -------------------------------------------------------------------
+    "A-LEAGUE": "no_expectation",
+    "SOCCER_AUSTRALIA_ALEAGUE": "no_expectation",
+    "SOCCER_ARGENTINA_PRIMERA_DIVISION": "no_expectation",
+    "SOCCER_AUSTRIA_BUNDESLIGA": "no_expectation",
+    "SOCCER_CHINA_SUPERLEAGUE": "no_expectation",
+    "SOCCER_DENMARK_SUPERLIGA": "no_expectation",
+    "SOCCER_GREECE_SUPER_LEAGUE": "no_expectation",
+    "SOCCER_RUSSIA_PREMIER_LEAGUE": "no_expectation",
+    "SOCCER_SWITZERLAND_SUPERLEAGUE": "no_expectation",
+    "SOCCER_TURKEY_SUPER_LEAGUE": "no_expectation",
+    "PREMIERSHIP": "no_expectation",
+    "SUPERLIGA": "no_expectation",
+    "SUPER_LEAGUE": "no_expectation",
 }
 """League ID to tier mapping for sports fixture cluster validation.
 
@@ -192,9 +247,12 @@ to a LeagueTier key in EXPECTED_BOOKMAKER_MARKET_SETS. Used at runtime by
 cluster-validation code to determine which expected bookmaker set applies
 to a given manifest row.
 
-This seed covers 23 league_ids that fit the existing 3 tiers (tier_1_domestic,
-tier_1_international, tier_2_domestic). The 28 unmapped non-EU leagues (A-LEAGUE,
-MLS, J1_LEAGUE, etc.) are handled by plan sports_odds_bookmaker_coverage_enumeration_2026_06_20:227.
+This covers all 51 league_ids (23 originally seeded + 28 added 2026-08-06 via
+sports_satellite_ao_dispatch_batch9-026) across 4 tiers: tier_1_domestic (6 new
+leagues: Allsvenskan, Eliteserien, J1_League, K_League_1, Liga_MX, MLS),
+tier_2_domestic (2 new: Ekstraklasa, Süper Lig), tier_1_international
+(unchanged), and no_expectation (13 new: leagues with zero observed bookmaker
+coverage — see the tier's docstring in EXPECTED_BOOKMAKER_MARKET_SETS).
 
 Both naming conventions are present:
   - odds_api SOCCER_* prefixed names (SOCCER_EPL, SOCCER_GERMANY_BUNDESLIGA)
@@ -249,19 +307,29 @@ EXPECTED_BOOKMAKER_MARKET_SETS: Final[dict[LeagueTier, dict[BookmakerKey, list[O
         "pinnacle": [OddsType.H2H, OddsType.OVER_UNDER],
         "betfair_ex_uk": [OddsType.H2H],
     },
+    # no_expectation — leagues with zero observed bookmaker coverage in
+    # registry/data/sports_bookmaker_league_coverage.json.  Leagues in this tier
+    # have never produced a captured odds row for any odds_api bookmaker, so
+    # there is no expected bookmaker x market set to validate against — cluster
+    # validation is a no-op (every fixture is "fully covered" by definition).
+    # If future coverage data shows a league here now has consistent bookmaker
+    # coverage, re-triage it to tier_1_domestic / tier_2_domestic.
+    "no_expectation": {},
 }
 """Per-league-tier expected bookmaker x market sets (odds_api source).
 
 Keyed by LeagueTier string. Each inner dict maps BookmakerKey -> list[OddsType]
-markets expected for every fully-covered fixture in that tier.
+markets expected for every fully-covered fixture in that tier.  The
+``no_expectation`` tier carries an empty dict — leagues with zero observed
+coverage are explicitly excluded from cluster validation.
 
 Used by MTDS ODDS NaN-fill and cluster-validation kwargs:
   expected_root_clusters = {fid: len(EXPECTED_BOOKMAKER_MARKET_SETS[tier])
                             for fid in ...}
 
-Conservative empirical seed 2026-06-27 (BLOCKED-CREDENTIALS for full
-2-week GCS baseline). Update this set after running the full empirical
-audit from a credentialed VM.
+Empirical seed 2026-06-27 (BLOCKED-CREDENTIALS for full 2-week GCS baseline);
+extended 2026-08-06 to add no_expectation tier (sports_satellite_ao_dispatch_batch9-026).
+Update this set after running the full empirical audit from a credentialed VM.
 """
 
 
