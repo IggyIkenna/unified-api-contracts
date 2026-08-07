@@ -271,6 +271,7 @@ VENUE_TO_ADAPTER_KEY: dict[str, str] = {
     # leader) is the only one kept conceptually but is NOT integrated here.
     # SSOT: unified-trading-pm/codex/04-architecture/solana-defi-coverage.md.
     # Solana DeFi (REST API, no subgraph)
+    "JUPITER-SOLANA": "jupiter",
     "KAMINO-SOLANA": "kamino",
     "RAYDIUM-SOLANA": "raydium",
     "ORCA-SOLANA": "orca",
@@ -339,7 +340,6 @@ VENUE_TO_ADAPTER_KEY: dict[str, str] = {
     # Plasma (mtds@6bcc5154). Same class as AAVE-PLASMA above: Plasma has no
     # subgraph_id (RPC-only), so the auto-gen loop can never discover this entry.
     "FLUID-PLASMA": "fluid",
-    # Jupiter is execution-only (swap aggregator), not instrument discovery.
     # DEX perp venues (L2 + StarkNet + Solana clone)
     "LIGHTER-ZKSYNC": "lighter",
     "EXTENDED-STARKNET": "extended",
