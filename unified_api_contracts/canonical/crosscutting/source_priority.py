@@ -473,6 +473,13 @@ _VENUE_SOURCE_EXCLUSIONS: dict[tuple[str, str], frozenset[str]] = {
     ("KRX", "ohlcv_1m"): frozenset({"databento", "massive"}),
     ("KRX", "ohlcv_15m"): frozenset({"databento", "massive"}),
     ("KRX", "ohlcv_24h"): frozenset({"databento", "massive"}),
+    # LIGHTER-ZKSYNC self-archives ohlcv_1m via its own REST /candles endpoint
+    # (source=lighter_api); Tardis does NOT carry LIGHTER-ZKSYNC ohlcv_1m — exclude
+    # tardis so the sentinel-path source resolution and any explicit --source tardis
+    # fail closed rather than fabricating batch_tardis provenance for this cell.
+    # derivative_ticker IS Tardis-archived (from 2026-04-17) and is NOT excluded here.
+    # SSOT: issues/onchain_venues_mislabeled_batch_tardis_lane_2026_07_20.md item 4.
+    ("LIGHTER-ZKSYNC", "ohlcv_1m"): frozenset({"tardis"}),
 }
 
 

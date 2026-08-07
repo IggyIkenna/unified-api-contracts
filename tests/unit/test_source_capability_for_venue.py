@@ -71,3 +71,22 @@ class TestSourceCapableForVenue:
         assert_source_capable_for_venue("TRADFI", "ohlcv_1m", "cboe", "DATABENTO")
         with pytest.raises(SourceNotCapableForVenueError):
             assert_source_capable_for_venue("TRADFI", "ohlcv_1m", "cboe", "MASSIVE")
+
+
+class TestLighterZkSyncOhlcvSourceExclusion:
+    """LIGHTER-ZKSYNC/ohlcv_1m: tardis is excluded; lighter_api is the first capable source.
+
+    Regression guard for issues/onchain_venues_mislabeled_batch_tardis_lane_2026_07_20.md
+    item 4: the sentinel path must NOT fabricate batch_tardis for a venue that
+    self-archives ohlcv_1m via its own REST /candles (source=lighter_api).
+    """
+
+    def test_lighter_zksync_ohlcv_1m_tardis_excluded(self) -> None:
+        assert is_source_capable_for_venue("cefi", "ohlcv_1m", "LIGHTER-ZKSYNC", "tardis") is False
+
+    def test_lighter_zksync_ohlcv_1m_lighter_api_capable(self) -> None:
+        assert is_source_capable_for_venue("cefi", "ohlcv_1m", "LIGHTER-ZKSYNC", "lighter_api") is True
+
+    def test_lighter_zksync_ohlcv_1m_tardis_assert_raises(self) -> None:
+        with pytest.raises(SourceNotCapableForVenueError, match="tardis"):
+            assert_source_capable_for_venue("cefi", "ohlcv_1m", "LIGHTER-ZKSYNC", "tardis")
