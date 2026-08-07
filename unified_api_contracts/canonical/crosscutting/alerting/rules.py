@@ -1375,6 +1375,12 @@ DATA_PIPELINE_ALERT_RULES: Final[tuple[DataPipelineAlertRule, ...]] = (
     # informational one-shot events (DP-DIGEST-001..004) — no extra action needed, Slack mirror
     # only.
     _dp_rule("DP-VM-011", _C.VM, "DP_VM_PREEMPTED_RECOVERED", _S.INFO, _E.FILE_ISSUE),
+    # DP-VM-012: Cloud Run Service terminal_condition CONDITION_FAILED
+    # (infra_health_audit_alert_coverage_gaps_2026_08_07.md finding A). DP-VM registry
+    # had zero coverage for Cloud Run Services; market-data-query-service /
+    # central-market-data-tardis-loader / uts-prod-data-status-rollup-svc were silently
+    # broken for 9.5-19 months. CRITICAL/PAGE_OPERATOR: no auto-recover actuator.
+    _dp_rule("DP-VM-012", _C.VM, "DP_CLOUD_RUN_SERVICE_DOWN", _S.CRITICAL, _E.PAGE_OPERATOR),
     # ── DP-RATE (class C5) ──────────────────────────────────────────────────
     _dp_rule("DP-RATE-001", _C.RATE, "DP_SOURCE_RATE_LIMITED", _S.WARN, _E.AUTO_RECOVER),
     _dp_rule("DP-RATE-002", _C.RATE, "DP_KEY_POOL_EXHAUSTED", _S.CRITICAL, _E.PAGE_OPERATOR),

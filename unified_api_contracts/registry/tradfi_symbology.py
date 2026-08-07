@@ -206,21 +206,49 @@ EXCHANGE_CODE_TO_NAME: dict[str, str] = {
     # CME Micro E-mini — distinct contract from the full-size ES (own bundle root,
     # never folded into SP500) — Micro E-mini S&P 500 (GLBX.MDP3, ``MESM26`` etc.).
     "MES": "MICRO-SP500",
-    # CME futures roots that classify VALID but had no human-name alias yet — a
-    # real ``instrument_type=futures_chain`` root, NOT a garbage/opaque code
-    # (tradfi_canonical_path_migration_design_2026_07_19.md category C). Mapped to
-    # themselves (identity) so ``_exchange_to_product_root`` preserves the real
-    # exchange root as the bundle key; the resolver now recognises them so the
-    # canonical-path guard no longer over-flags their chains as garbage. Replace
-    # the value with the human product name once confirmed with Databento.
-    "XAB": "XAB",
-    "XAF": "XAF",
-    "XAI": "XAI",
-    "XAK": "XAK",
-    "XAP": "XAP",
-    "XAU": "XAU",
-    "XAV": "XAV",
-    "XAY": "XAY",
+    # The other 15 CME micro-contract roots (operator ruling 2026-08-07) — ADDED here,
+    # not just fixed in `tradfi_instrument_universe.py`: THIS dict is the one
+    # `unified_api_contracts.registry.EXCHANGE_CODE_TO_NAME` actually re-exports
+    # (see `registry/__init__.py`), and `market-tick-data-service`'s
+    # `_exchange_to_product_root` writer imports exactly that symbol to build the real
+    # `underlying=` segment of every live chain-bundle GCS path. Before this, none of
+    # these 15 codes were keys here at all, so a fresh write of e.g. `underlying=M6A`
+    # fell through `.get(code, code)` unresolved (written raw, not silently collapsed
+    # into the standard-size root — a narrower bug than first suspected, but still a
+    # real gap this closes). Same "MICRO-" prefix convention as MES above, each
+    # distinct from its full-size sibling already in this dict.
+    "M6A": "MICRO-AUD",
+    "M6B": "MICRO-GBP",
+    "M6C": "MICRO-CAD",
+    "M6E": "MICRO-EUR",
+    "M6J": "MICRO-JPY",
+    "M6N": "MICRO-NZD",
+    "M6S": "MICRO-CHF",
+    "M2K": "MICRO-RUSSELL2000",
+    "MCL": "MICRO-CRUDE",
+    "MGC": "MICRO-GOLD",
+    "MHG": "MICRO-COPPER",
+    "MNG": "MICRO-NATGAS",
+    "MNQ": "MICRO-NASDAQ100",
+    "MSI": "MICRO-SILVER",
+    "MYM": "MICRO-DOW",
+    # CME sector futures roots — human names filled in (operator ruling 2026-08-07,
+    # matches the values `tradfi_instrument_universe.py::EXCHANGE_CODE_TO_NAME` already
+    # carries for these same 8 codes; not a fresh Databento re-confirmation, a convergence
+    # of the two already-live registries onto one value). Previously identity-mapped
+    # (``"XAB": "XAB"``) as a real ``instrument_type=futures_chain`` root, NOT a
+    # garbage/opaque code (tradfi_canonical_path_migration_design_2026_07_19.md category
+    # C) — that placeholder is what let ``_exchange_to_product_root`` preserve the real
+    # exchange root as the bundle key and stopped the canonical-path guard from
+    # over-flagging their chains as garbage; unaffected by this value fill-in.
+    "XAB": "MATERIALS_SECTOR",
+    "XAF": "ENERGY_SECTOR",
+    "XAI": "INDUSTRIALS_SECTOR",
+    "XAK": "TECH_SECTOR",
+    "XAP": "CONSUMER_STAPLES_SECTOR",
+    "XAU": "UTILITIES_SECTOR",
+    "XAV": "HEALTHCARE_SECTOR",
+    "XAY": "CONSUMER_DISC_SECTOR",
     # CME crypto FUTURES roots (operator 2026-07-21) — BTC/ETH full-size +
     # MBT/MET micro. Added to the MVP tradfi FUTURE download scope
     # (``_mvp_scope_rules.py`` ``underliers``) but were missing from this

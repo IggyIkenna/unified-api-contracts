@@ -550,45 +550,51 @@ YAHOO_INDICES: list[YahooIndexDef] = [
 # Exchange code → human-readable name (for display / grouping)
 # ---------------------------------------------------------------------------
 EXCHANGE_CODE_TO_NAME: dict[str, str] = {
-    # FX futures (including micro)
+    # FX futures (standard vs micro are DIFFERENT contract sizes on the same underlying --
+    # kept distinguishable, never collapsed to one value; "MICRO-" prefix convention matches
+    # the already-shipped, live-consumed `tradfi_symbology.py::EXCHANGE_CODE_TO_NAME["MES"]`
+    # value rather than inventing a second convention -- operator ruling 2026-08-07).
     "6A": "AUD",
-    "M6A": "AUD",
+    "M6A": "MICRO-AUD",
     "6B": "GBP",
-    "M6B": "GBP",
+    "M6B": "MICRO-GBP",
     "6E": "EUR",
-    "M6E": "EUR",
+    "M6E": "MICRO-EUR",
     "6J": "JPY",
-    "M6J": "JPY",
+    "M6J": "MICRO-JPY",
     "6C": "CAD",
-    "M6C": "CAD",
+    "M6C": "MICRO-CAD",
     "6N": "NZD",
-    "M6N": "NZD",
+    "M6N": "MICRO-NZD",
     "6S": "CHF",
-    "M6S": "CHF",
+    "M6S": "MICRO-CHF",
     "6M": "MXN",
     "6Z": "ZAR",
     "6L": "BRL",
-    # Energy + metals
+    # Energy + metals (same micro-vs-standard distinction as FX above)
     "CL": "CRUDE",
-    "MCL": "CRUDE",
+    "MCL": "MICRO-CRUDE",
     "GC": "GOLD",
-    "MGC": "GOLD",
+    "MGC": "MICRO-GOLD",
     "NG": "NATGAS",
-    "MNG": "NATGAS",
-    "HO": "HEATING_OIL",
+    "MNG": "MICRO-NATGAS",
+    "HO": "HEATINGOIL",
     "RB": "GASOLINE",
     "SI": "SILVER",
-    "MSI": "SILVER",
+    "MSI": "MICRO-SILVER",
     "HG": "COPPER",
-    "MHG": "COPPER",
+    "MHG": "MICRO-COPPER",
     "PL": "PLATINUM",
     "PA": "PALLADIUM",
-    # Agriculture
-    "ZS": "SOYBEANS",
+    # Agriculture -- naming style (SOYBEAN/SOYOIL/SOYMEAL, not SOYBEANS/SOYBEAN_OIL/
+    # SOYBEAN_MEAL) matches the compact convention `tradfi_symbology.py` already uses for
+    # these 3 shared codes (operator ruling 2026-08-07: adopt the existing 33-code precedent
+    # + standard market terminology over the more verbose form).
+    "ZS": "SOYBEAN",
     "ZC": "CORN",
     "ZW": "WHEAT",
-    "ZL": "SOYBEAN_OIL",
-    "ZM": "SOYBEAN_MEAL",
+    "ZL": "SOYOIL",
+    "ZM": "SOYMEAL",
     "LE": "LIVECATTLE",
     "HE": "LEANHOGS",
     # VIX / VX futures (CFE dataset)
@@ -596,15 +602,16 @@ EXCHANGE_CODE_TO_NAME: dict[str, str] = {
     # Crypto
     "BTC": "BTC",
     "ETH": "ETH",
-    # Index futures (including micro)
+    # Index futures (micro-vs-standard distinction, see FX comment above; "MICRO-SP500"
+    # exactly matches the pre-existing `tradfi_symbology.py` value for MES)
     "ES": "SP500",
-    "MES": "SP500",
+    "MES": "MICRO-SP500",
     "NQ": "NASDAQ100",
-    "MNQ": "NASDAQ100",
+    "MNQ": "MICRO-NASDAQ100",
     "RTY": "RUSSELL2000",
-    "M2K": "RUSSELL2000",
+    "M2K": "MICRO-RUSSELL2000",
     "YM": "DOW",
-    "MYM": "DOW",
+    "MYM": "MICRO-DOW",
     "NKD": "NIKKEI225",
     # Sector futures
     "XAF": "ENERGY_SECTOR",
@@ -615,11 +622,12 @@ EXCHANGE_CODE_TO_NAME: dict[str, str] = {
     "XAI": "INDUSTRIALS_SECTOR",
     "XAB": "MATERIALS_SECTOR",
     "XAU": "UTILITIES_SECTOR",
-    # Treasuries
-    "ZT": "TREASURY_2Y",
-    "ZF": "TREASURY_5Y",
-    "ZN": "TREASURY_10Y",
-    "ZB": "TREASURY_30Y",
+    # Treasuries -- TBOND/TNOTE{n}Y matches both `tradfi_symbology.py`'s existing values and
+    # standard market terminology (operator ruling 2026-08-07, see agriculture comment above)
+    "ZT": "TNOTE2Y",
+    "ZF": "TNOTE5Y",
+    "ZN": "TNOTE10Y",
+    "ZB": "TBOND",
     # Options on ES (SP500 weekly/daily roots)
     "EW": "SP500",
     "EW1": "SP500",
