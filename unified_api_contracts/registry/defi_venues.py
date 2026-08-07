@@ -629,8 +629,10 @@ DEFI_VENUE_PHASE: dict[str, str] = {
     "JITORESTAKING-SOLANA": "live",
     "SANCTUM-SOLANA": "live",
     "SOLANA-NATIVE-SOLANA": "live",
-    # ── Pipeline (Solana — JUPITER is execution-only aggregator, no IS adapter) ──
-    "JUPITER-SOLANA": "pipeline",
+    # ── Live (Solana — JUPITER-SOLANA wired 2026-08-07: JupiterReferenceDataAdapter
+    #    does real token-pair discovery; adapter key "jupiter" added to
+    #    VENUE_TO_ADAPTER_KEY + phase flipped to "live" per operator ruling) ──
+    "JUPITER-SOLANA": "live",
     # ── Pipeline (Solana DEX pools — 2026-07-20 DeFi catalogue canonicalization,
     #    narrowed back from "live" 2026-07-22: meteora.py/lifinity.py/phoenix.py
     #    adapters are correctly wired + registered in IS factory._ADAPTERS, but
