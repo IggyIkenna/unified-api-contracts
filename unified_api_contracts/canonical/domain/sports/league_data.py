@@ -696,7 +696,7 @@ def get_expected_leagues_for_source(
 # ``plans/active/mvp_scope_catalogue_tagging_2026_06_08.md`` § Config versioning.
 # ---------------------------------------------------------------------------
 
-SPORTS_LEAGUES_CONFIG_VERSION: int = 2
+SPORTS_LEAGUES_CONFIG_VERSION: int = 3
 """Monotonic version of :data:`LEAGUE_REGISTRY`. Bump on any content change."""
 
 

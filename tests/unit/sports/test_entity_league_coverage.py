@@ -123,7 +123,16 @@ class TestFootystatsSubscriptionScopedCoverage:
     and can never un-cover a league contaminated by even one pre-write-gate
     incidental captured row). Mirrors ``TestUnderstatXgLeagueScopedCoverage``
     above — the same shared (entity -> league allow-list) mechanism, a
-    different source."""
+    different source.
+
+    2026-08-07: the operator's FootyStats subscription was widened to 50
+    leagues, adding ARGENTINA_PRIMERA/CHILE_PRIMERA/LIGA_MX/K_LEAGUE_1 (moved
+    off ``PRED_NO_FOOTYSTATS`` onto ``PRED_NO_UNDERSTAT``) and dropping
+    CHINA_SUPER_LEAGUE/RUSSIA_PREMIER_LEAGUE (moved off ``FEAT_STANDARD`` onto
+    ``FEAT_NO_FOOTYSTATS`` — neither has a Prediction-tier sibling in its own
+    country, so both fall outside the new 50). A_LEAGUE stays excluded
+    regardless of subscription tier (``SPORTS_STRUCTURAL_GAPS`` — footystats
+    doesn't carry it at all)."""
 
     @pytest.mark.parametrize("entity", ["MATCHES", "PREDICTIONS", "ODDS"])
     def test_returns_a_frozenset_not_none(self, entity: str) -> None:
@@ -138,15 +147,28 @@ class TestFootystatsSubscriptionScopedCoverage:
         assert "EPL" in cov
 
     @pytest.mark.parametrize("entity", ["MATCHES", "PREDICTIONS", "ODDS"])
-    @pytest.mark.parametrize("league_id", ["CHILE_PRIMERA", "K_LEAGUE_1", "LIGA_MX", "ARGENTINA_PRIMERA"])
-    def test_pred_no_footystats_leagues_excluded(self, entity: str, league_id: str) -> None:
-        """The exact 4 leagues diagnosed as contaminating the non-covered-league
-        typing scripts' historical-capture-based covered-league check must be
-        excluded from the enumerator's own denominator too — the fix closes
-        the gap at its source (the seeder), not just the typing-script symptom."""
+    @pytest.mark.parametrize("league_id", ["A_LEAGUE", "CHINA_SUPER_LEAGUE", "RUSSIA_PREMIER_LEAGUE"])
+    def test_footystats_excluded_leagues_stay_excluded(self, entity: str, league_id: str) -> None:
+        """Leagues genuinely outside the operator's 50-league FootyStats
+        subscription must be excluded from the enumerator's own denominator
+        too — the fix closes the gap at its source (the seeder), not just the
+        typing-script symptom. A_LEAGUE is a structural gap (never available
+        on FootyStats at any tier); CHINA_SUPER_LEAGUE/RUSSIA_PREMIER_LEAGUE
+        have no Prediction-tier sibling in their own country so fell outside
+        the 2026-08-07 subscription widening."""
         cov = get_entity_league_coverage(entity)
         assert cov is not None
         assert league_id not in cov
+
+    @pytest.mark.parametrize("entity", ["MATCHES", "PREDICTIONS", "ODDS"])
+    @pytest.mark.parametrize("league_id", ["CHILE_PRIMERA", "K_LEAGUE_1", "LIGA_MX", "ARGENTINA_PRIMERA"])
+    def test_subscription_widened_leagues_now_included(self, entity: str, league_id: str) -> None:
+        """These 4 leagues were the original ``PRED_NO_FOOTYSTATS`` diagnosis
+        set (subscription-limit exclusion) until the operator's 2026-08-07
+        subscription widening added them — they must now be included."""
+        cov = get_entity_league_coverage(entity)
+        assert cov is not None
+        assert league_id in cov
 
     def test_matches_the_fetch_loop_write_gate_denominator(self) -> None:
         """MATCHES/PREDICTIONS/ODDS must all share the IDENTICAL denominator
