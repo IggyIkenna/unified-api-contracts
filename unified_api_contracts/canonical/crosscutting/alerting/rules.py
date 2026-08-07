@@ -1137,6 +1137,23 @@ LIVE_ALERT_RULES: Final[tuple[AlertRule, ...]] = (
             " dependency_id, outage_seconds, recovered_at."
         ),
     ),
+    # ── Cross-cloud IAM/STS auth failures (2026-08-07, infra_health_audit_alert_coverage_gaps) ──
+    # cost-snapshot-worker emits this when AWS AssumeRoleWithWebIdentity / GCP impersonation
+    # is denied. Per-cloud isolation keeps the Cloud Run Job exit code green even when AWS
+    # fails every run — without this rule the failure falls to the generic catch-all.
+    AlertRule(
+        code=AlertCode.CLOUD_AUTH_FAILED,
+        event_pattern="CLOUD_AUTH_FAILED",
+        severity=AlertSeverity.HIGH,
+        channels=(AlertChannel.PAGERDUTY, AlertChannel.TELEGRAM),
+        runbook_doc=_runbook("cloud_auth_failed"),
+        description=(
+            "Cross-cloud IAM/STS authentication failure — AWS AssumeRole/AssumeRoleWithWebIdentity"
+            " denied, GCP service-account impersonation refused, or equivalent."
+            " The affected cloud's snapshot is unavailable until the IAM policy gap is fixed."
+            " Investigate via orchestrator-cloud-identity-self-service.md."
+        ),
+    ),
     # ── T4 INFO — catch-all so nothing fires silently ──────────────────────
     AlertRule(
         code=AlertCode.SERVICE_DEGRADED,  # Catch-all uses SERVICE_DEGRADED as anchor code.

@@ -135,6 +135,17 @@ class AlertCode(StrEnum):
     # bug; alerting catches it).
     CROSS_CLOUD_EGRESS_DETECTED = "CROSS_CLOUD_EGRESS_DETECTED"
 
+    # ── Cross-cloud IAM/STS auth failures (2026-08-07, infra_health_audit_alert_coverage_gaps) ──
+    CLOUD_AUTH_FAILED = "CLOUD_AUTH_FAILED"
+    """Cross-cloud IAM/STS authentication failure — AWS AssumeRole/AssumeRoleWithWebIdentity
+    denied, GCP service-account impersonation refused, or equivalent per-cloud auth error.
+    The affected cloud's scheduled work silently fails under per-cloud isolation (the job's
+    exit code stays green when other clouds succeed), so without this code the AccessDenied
+    falls to the generic ``*`` catch-all. Severity HIGH — operator must investigate the IAM
+    policy gap; the affected cloud's data is unavailable until fixed.
+    Payload: ``cloud``, ``error``, ``operation``. Emitter: cost-snapshot-worker + any future
+    cross-cloud caller that performs IAM/STS authentication."""
+
     # ── ML lifecycle (2026-05-08, cefi_ml_may_23_2026.epic Tab 5 Item 6) ────
     # Live-ML signal staleness / drift / P&L deviation / inference latency /
     # model-version mismatch. Producers: ml-inference-service (signal +

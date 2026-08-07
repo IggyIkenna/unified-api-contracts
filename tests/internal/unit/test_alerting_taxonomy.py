@@ -855,6 +855,50 @@ def test_alert_code_closed_set_grew_to_at_least_64() -> None:
     )
 
 
+# ---------------------------------------------------------------------------
+# Cross-cloud IAM/STS auth failures (2026-08-07, infra_health_audit_alert_coverage_gaps)
+# ---------------------------------------------------------------------------
+
+_CLOUD_AUTH_CODES: tuple[AlertCode, ...] = (AlertCode.CLOUD_AUTH_FAILED,)
+
+
+def test_cloud_auth_codes_present_in_enum() -> None:
+    """CLOUD_AUTH_FAILED added 2026-08-07 must be in the closed AlertCode set."""
+    for code in _CLOUD_AUTH_CODES:
+        assert code in AlertCode, f"AlertCode.{code.name} missing from enum"
+
+
+def test_cloud_auth_codes_have_routing_rule() -> None:
+    """CLOUD_AUTH_FAILED must have a matching AlertRule in LIVE_ALERT_RULES."""
+    for code in _CLOUD_AUTH_CODES:
+        matches = [r for r in LIVE_ALERT_RULES if fnmatch.fnmatchcase(code.value, r.event_pattern)]
+        assert matches, f"AlertCode.{code.name} has no matching AlertRule in LIVE_ALERT_RULES"
+
+
+def test_cloud_auth_failed_severity_and_channels() -> None:
+    """CLOUD_AUTH_FAILED must be HIGH severity paging PagerDuty + Telegram.
+
+    Per-cloud isolation keeps the Cloud Run Job exit code green when one cloud fails;
+    without PagerDuty paging the operator never sees the IAM gap until billing data is stale.
+    """
+    rules = [r for r in LIVE_ALERT_RULES if r.code is AlertCode.CLOUD_AUTH_FAILED]
+    assert len(rules) == 1, f"Expected exactly one rule for CLOUD_AUTH_FAILED; found {len(rules)}"
+    rule = rules[0]
+    assert rule.severity is AlertSeverity.HIGH, f"CLOUD_AUTH_FAILED.severity={rule.severity!r} expected HIGH"
+    assert AlertChannel.PAGERDUTY in rule.channels, (
+        "CLOUD_AUTH_FAILED must include PAGERDUTY — per-cloud isolation keeps exit code green"
+    )
+    assert AlertChannel.TELEGRAM in rule.channels
+
+
+def test_alert_code_closed_set_grew_to_at_least_65() -> None:
+    """Closed-set growth ratchet: prior 64 + 1 CLOUD_AUTH_FAILED (2026-08-07) = at-least 65."""
+    assert len(list(AlertCode)) >= 65, (
+        f"AlertCode closed set has only {len(list(AlertCode))} members;"
+        " expected at-least 65 after CLOUD_AUTH_FAILED addition (2026-08-07)."
+    )
+
+
 def test_kill_switch_oracle_divergence_triggers_kill_switch() -> None:
     """KILL_SWITCH_ORACLE_DIVERGENCE must carry triggers_kill_switch=True and
     kill_switch_scope=GLOBAL — a frozen/diverged oracle must halt globally."""
