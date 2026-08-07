@@ -1381,6 +1381,14 @@ DATA_PIPELINE_ALERT_RULES: Final[tuple[DataPipelineAlertRule, ...]] = (
     # central-market-data-tardis-loader / uts-prod-data-status-rollup-svc were silently
     # broken for 9.5-19 months. CRITICAL/PAGE_OPERATOR: no auto-recover actuator.
     _dp_rule("DP-VM-012", _C.VM, "DP_CLOUD_RUN_SERVICE_DOWN", _S.CRITICAL, _E.PAGE_OPERATOR),
+    # DP-VM-013: generic Cloud Run Job per-execution failure detector
+    # (infra_health_audit_alert_coverage_gaps_2026_08_07.md todo 2). Fleet-wide —
+    # fires when the most-recent completed execution for ANY registered job in
+    # cloud_run_job_registry.CLOUD_RUN_JOBS has failed_count > 0. Generalises
+    # consolidator_oom_watcher (DP-WATCHER-005) to the full job inventory.
+    # WARN/FILE_ISSUE: Cloud Run Jobs retry on their own schedule; a failed execution
+    # is worth filing an issue but doesn't warrant an immediate page.
+    _dp_rule("DP-VM-013", _C.VM, "DP_CLOUD_RUN_JOB_EXEC_FAILED", _S.WARN, _E.FILE_ISSUE),
     # ── DP-RATE (class C5) ──────────────────────────────────────────────────
     _dp_rule("DP-RATE-001", _C.RATE, "DP_SOURCE_RATE_LIMITED", _S.WARN, _E.AUTO_RECOVER),
     _dp_rule("DP-RATE-002", _C.RATE, "DP_KEY_POOL_EXHAUSTED", _S.CRITICAL, _E.PAGE_OPERATOR),
