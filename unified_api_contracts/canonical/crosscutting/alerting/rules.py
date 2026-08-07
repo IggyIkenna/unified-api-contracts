@@ -1239,6 +1239,21 @@ class DataPipelineAlertRule(BaseModel):
     escalation: DataPipelineEscalation
     """Escalation tier (registry ``escalation``)."""
 
+    mirror_live: bool = True
+    """False for routine, non-incident telemetry that must stay TRACKED
+    (still matched by ``data_pipeline_rule_for`` so it never falls through to
+    the generic catch-all / wrong-channel bug — see DP-DIGEST-003/004's own
+    2026-07-27 fix note) but must NOT post to #data-pipeline-alerts on every
+    occurrence — e.g. DP-DIGEST-003/004's per-sweep fleet-monitor
+    STARTED/COMPLETED events, which fire every ~5min by design and are not
+    incidents (operator, 2026-08-07: "i just need to know if it failed to
+    complete... and if it doesnt start at all" — the deadman/cron-watches-cron
+    layer already covers the latter independently of this Slack post). Default
+    True preserves the documented "channels always includes SLACK" invariant
+    for every other rule; the router (not ``channels``, which a validator
+    forces to always include SLACK) is what actually gates the live post on
+    this field."""
+
     @field_validator("event", "registry_id")
     @classmethod
     def _non_empty(cls, value: str) -> str:
@@ -1281,6 +1296,7 @@ def _dp_rule(
     event: str,
     severity: AlertSeverity,
     escalation: DataPipelineEscalation,
+    mirror_live: bool = True,
 ) -> DataPipelineAlertRule:
     return DataPipelineAlertRule(
         registry_id=registry_id,
@@ -1289,6 +1305,7 @@ def _dp_rule(
         severity=severity,
         channels=_dp_channels(severity),
         escalation=escalation,
+        mirror_live=mirror_live,
     )
 
 
@@ -1403,6 +1420,15 @@ DATA_PIPELINE_ALERT_RULES: Final[tuple[DataPipelineAlertRule, ...]] = (
     # every sweep's routine telemetry falls through to the generic catch-all rule
     # (LIVE_ALERT_RULES event_pattern="*"), paging the #uts-live-alerts incident
     # channel instead of the batch #data-pipeline-alerts mirror.
-    _dp_rule("DP-DIGEST-003", _C.DIGEST, "DP_FLEET_MONITOR_RUN_STARTED", _S.INFO, _E.FILE_ISSUE),
-    _dp_rule("DP-DIGEST-004", _C.DIGEST, "DP_FLEET_MONITOR_RUN_COMPLETED", _S.INFO, _E.FILE_ISSUE),
+    # mirror_live=False (2026-08-07, alerting_service_deploy_chain_blocked_by_
+    # layered_cicd_bugs_2026_08_06.md's data-pipeline-alerts-reconcile follow-up):
+    # these still fire every ~5min sweep tick, per mode (exit-code/heartbeat/meta run
+    # independently) -- kept registered (so the wrong-channel bug above stays fixed
+    # and the event is still tracked/audited via log_event ALERT_SENT) but no longer
+    # posted live -- the operator's original, twice-stated ask was "only tell me if
+    # it FAILED to complete or didn't start at all", and the deadman/cron-watches-cron
+    # layer (DP-WATCHER-002, monitor_last_run.json sentinel freshness) already covers
+    # "didn't start" independently of this event ever reaching Slack.
+    _dp_rule("DP-DIGEST-003", _C.DIGEST, "DP_FLEET_MONITOR_RUN_STARTED", _S.INFO, _E.FILE_ISSUE, mirror_live=False),
+    _dp_rule("DP-DIGEST-004", _C.DIGEST, "DP_FLEET_MONITOR_RUN_COMPLETED", _S.INFO, _E.FILE_ISSUE, mirror_live=False),
 )

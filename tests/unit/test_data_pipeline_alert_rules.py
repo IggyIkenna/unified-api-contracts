@@ -104,6 +104,21 @@ def test_dp_fleet_monitor_lifecycle_events_registered() -> None:
     assert AlertChannel.TELEGRAM in failed.channels
 
 
+def test_dp_fleet_monitor_started_completed_do_not_mirror_live() -> None:
+    """DP_FLEET_MONITOR_RUN_STARTED/_COMPLETED must stay registered (see the test
+    above) but must NOT post to Slack on every ~5min sweep tick (operator, 2026-08-07:
+    "i just need to know if it failed to complete... and if it doesnt start at all" —
+    the deadman/cron-watches-cron sentinel layer already covers "didn't start"
+    independently). DP_FLEET_MONITOR_RUN_FAILED is a real incident and must still
+    mirror live.
+    """
+    by_event = {r.event: r for r in DATA_PIPELINE_ALERT_RULES}
+
+    assert by_event["DP_FLEET_MONITOR_RUN_STARTED"].mirror_live is False
+    assert by_event["DP_FLEET_MONITOR_RUN_COMPLETED"].mirror_live is False
+    assert by_event["DP_FLEET_MONITOR_RUN_FAILED"].mirror_live is True
+
+
 def test_consolidator_scheduler_paused_has_own_registry_id() -> None:
     """DP_CONSOLIDATOR_SCHEDULER_PAUSED must not collide with DP_FLEET_MONITOR_RUN_FAILED.
 
