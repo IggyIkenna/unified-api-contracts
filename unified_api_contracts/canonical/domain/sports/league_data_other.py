@@ -287,6 +287,8 @@ FEATURES_LEAGUES: dict[str, LeagueDefinition] = {
     # a canonical slug instead of reading as non-canonical. Resolution is by NUMERIC
     # api_football_id, so the bare display names ("Super League"/"Premier League") that
     # collide with other leagues are harmless here.
+    # footystats excluded 2026-08-07: neither league has a Prediction-tier sibling in its
+    # own country, so they fall outside the operator's 50-league FootyStats subscription.
     "CHINA_SUPER_LEAGUE": LeagueDefinition(
         league_id="CHINA_SUPER_LEAGUE",
         display_name="Chinese Super League",
@@ -294,7 +296,7 @@ FEATURES_LEAGUES: dict[str, LeagueDefinition] = {
         country="CN",
         season_months=(3, 11),
         has_playoffs=False,
-        data_sources=FEAT_STANDARD,
+        data_sources=FEAT_NO_FOOTYSTATS,
         api_football_id=169,
         tier=1,
         classification="Features",
@@ -306,7 +308,7 @@ FEATURES_LEAGUES: dict[str, LeagueDefinition] = {
         country="RU",
         season_months=(7, 5),
         has_playoffs=False,
-        data_sources=FEAT_STANDARD,
+        data_sources=FEAT_NO_FOOTYSTATS,
         api_football_id=235,
         tier=1,
         classification="Features",
