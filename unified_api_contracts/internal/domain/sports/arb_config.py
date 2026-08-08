@@ -19,12 +19,9 @@ from unified_api_contracts.registry.venue_constants import (
     BETFAIR_EX_EU,
     BETFAIR_EX_UK,
     BETFAIR_SB_UK,
-    LADBROKES,
-    LEOVEGAS,
     SMARKETS,
     UNIBET,
-    WILLIAMHILL,
-    WINAMAX,
+    UNIBET_UK,
 )
 
 
@@ -168,7 +165,6 @@ EXCHANGE_VENUES: frozenset[str] = frozenset(
     {
         "betfair_ex_uk",
         "betfair_ex_eu",
-        "betfair_ex_au",
         "matchbook",
         SMARKETS,
     }
@@ -178,7 +174,6 @@ EXCHANGE_VENUES: frozenset[str] = frozenset(
 EXCHANGE_COMMISSION_RATES: dict[str, float] = {
     "betfair_ex_uk": 0.02,
     "betfair_ex_eu": 0.02,
-    "betfair_ex_au": 0.02,
     "matchbook": 0.015,  # 1.5%
     SMARKETS: 0.02,  # 2.0% on net winnings — operator pre-specified 2026-08-08
 }
@@ -189,30 +184,27 @@ EXCHANGE_COMMISSION_RATES: dict[str, float] = {
 #
 # BETFAIR_SB (sportsbook) collapses into BETFAIR per operator ruling 2026-08-08:
 # the sportsbook and exchange products are the same counterparty for arb-independence.
-# Phantom regional venues (no UAC constant yet) are kept here until todo 4 prunes
-# any that are absent from the live sports manifest.
+# Phantom regional venues absent from the live prod manifest and from SPORTS_VENUE_FOLD
+# were pruned 2026-08-08 (todo 4): betfair_ex_au (0 manifest rows), unibet_fr/nl/se
+# (0 manifest rows), ladbrokes_au (0), williamhill_us (0), winamax_fr/de (0),
+# leovegas_se (0). UNIBET_UK retained — confirmed distinct bookmaker with a UAC constant
+# and real captured shards (see market_data_categories.py UNIBET_UK/UNIBET_EU rationale).
+# Groups that became singletons or empty after pruning were deleted (redundant with
+# get_operator()'s identity fallback).
 OPERATOR_GROUP_VENUES: dict[str, frozenset[str]] = {
     BETFAIR: frozenset(
         {
             BETFAIR_EX_UK,
             BETFAIR_EX_EU,
-            "BETFAIR_EX_AU",  # no UAC constant; pruned by todo 4 if absent from manifest
             BETFAIR_SB_UK,
         }
     ),
     UNIBET: frozenset(
         {
             UNIBET,
-            "UNIBET_UK",  # phantom regional venues; pruned by todo 4 if absent from manifest
-            "UNIBET_FR",
-            "UNIBET_NL",
-            "UNIBET_SE",
+            UNIBET_UK,
         }
     ),
-    LEOVEGAS: frozenset({LEOVEGAS, "LEOVEGAS_SE"}),
-    LADBROKES: frozenset({LADBROKES, "LADBROKES_AU"}),
-    WILLIAMHILL: frozenset({WILLIAMHILL, "WILLIAMHILL_US"}),
-    WINAMAX: frozenset({"WINAMAX_FR", "WINAMAX_DE"}),
 }
 
 # Derived from OPERATOR_GROUP_VENUES — do not restate here.
