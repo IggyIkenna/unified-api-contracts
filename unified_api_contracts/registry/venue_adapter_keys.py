@@ -242,7 +242,9 @@ VENUE_TO_ADAPTER_KEY: dict[str, str] = {
     # Sports — MTDS-owned odds venues (registry-consolidation Decision C,
     # 2026-06-29: two separate registries; odds/bookmaker market data is
     # captured by MTDS, so IS has no reference adapter for them).
-    "ODDS_API": NO_ADAPTER_YET,
+    # (ODDS_API removed 2026-08-08 — sports taxonomy P1, operator ruling 2:
+    # ODDS_API is a SOURCE, not a venue; it left VENUES_BY_ASSET_GROUP["sports"]
+    # entirely, so it no longer belongs in this venue-keyed map either.)
     "PINNACLE": NO_ADAPTER_YET,
     "BETFAIR_SB_UK": NO_ADAPTER_YET,
     "BETFAIR_EX_UK": NO_ADAPTER_YET,
@@ -255,15 +257,42 @@ VENUE_TO_ADAPTER_KEY: dict[str, str] = {
     "BET888SPORT": NO_ADAPTER_YET,
     "SMARKETS": NO_ADAPTER_YET,
     # ODDS_API fan-out bookmakers promoted into VENUES_BY_ASSET_GROUP["sports"]
-    # 2026-07-20, then REVERTED 2026-07-22 (operator ruling: "do NOT add them,
-    # in fact remove them everywhere so they don't come up in audit" —
-    # distinct_values_noncanonical_audit_2026_07_20.md). They are no longer
-    # canonical venues, so they have no entry here either — this dict only maps
-    # venues that ARE in VENUES_BY_ASSET_GROUP (the coverage-gate test enforces
-    # exactly that). See
-    # `market_data_categories.SPORTS_ODDS_API_ACCEPTED_NONCANONICAL_BOOKMAKERS`
-    # for where the 20 bookmaker names now live (audit-suppression list, not an
-    # adapter registry).
+    # 2026-07-20, REVERTED 2026-07-22 (operator ruling: "do NOT add them, in
+    # fact remove them everywhere so they don't come up in audit" —
+    # distinct_values_noncanonical_audit_2026_07_20.md), then RE-PROMOTED
+    # 2026-08-08 (sports taxonomy P1, operator ruling 1: "venue means whose
+    # price is this — keep all 27 books as venues; add a separate executable
+    # predicate" — see `is_venue_executable()` below). None has a real IS/URDI
+    # reference adapter (all MTDS-owned, captured via the ODDS_API fan-out), so
+    # every one is sentineled here exactly like PINNACLE/DRAFTKINGS/... above —
+    # being a canonical DATA-axis venue does not imply execution capability.
+    "BETMGM": NO_ADAPTER_YET,
+    "BETONLINEAG": NO_ADAPTER_YET,
+    "BETOPENLY": NO_ADAPTER_YET,
+    "BETRIVERS": NO_ADAPTER_YET,
+    "BETSSON": NO_ADAPTER_YET,
+    "BETVICTOR": NO_ADAPTER_YET,
+    "BETWAY": NO_ADAPTER_YET,
+    "BOVADA": NO_ADAPTER_YET,
+    "CASUMO": NO_ADAPTER_YET,
+    "CORAL": NO_ADAPTER_YET,
+    "LIVESCOREBET": NO_ADAPTER_YET,
+    "MATCHBOOK": NO_ADAPTER_YET,
+    "NOVIG": NO_ADAPTER_YET,
+    "ONEXBET": NO_ADAPTER_YET,
+    "PADDYPOWER": NO_ADAPTER_YET,
+    "PROPHETX": NO_ADAPTER_YET,
+    "SKYBET": NO_ADAPTER_YET,
+    "UNIBET": NO_ADAPTER_YET,
+    "UNIBET_EU": NO_ADAPTER_YET,
+    "UNIBET_UK": NO_ADAPTER_YET,
+    "VIRGINBET": NO_ADAPTER_YET,
+    "WILLIAMHILL": NO_ADAPTER_YET,
+    # FOOTYSTATS deliberately stays OUT of both VENUES_BY_ASSET_GROUP["sports"]
+    # and this map — it remains accepted-non-canonical (two-registry-disjoint
+    # collision with IS's own FOOTYSTATS reference-data-provider venue, see
+    # `market_data_categories.SPORTS_ODDS_API_ACCEPTED_NONCANONICAL_BOOKMAKERS`),
+    # unaffected by this re-promotion.
     # DRIFT (Solana) removed 2026-07-16 (operator ruling): Drift was hacked for
     # ~$280M on 2026-04-01 (Lazarus-attributed), offline 3 months, then
     # rebranded to "Velocity DEX" 2026-07-01 — a ~2-week-old private beta with
@@ -369,6 +398,27 @@ for _prefix, _protocol_slug in VENUE_PREFIX_TO_PROTOCOL.items():
 VENUES_WITH_REFERENCE_ADAPTER: frozenset[str] = frozenset(
     venue for venue, key in VENUE_TO_ADAPTER_KEY.items() if key != NO_ADAPTER_YET
 )
+
+
+def is_venue_executable(venue: str) -> bool:
+    """True only when ``venue`` resolves a real (non-sentinel) adapter key.
+
+    Sports taxonomy P1 (2026-08-08, operator ruling 1): ``venue`` on the DATA
+    axis means "whose price is this" — a venue can be a legitimate, canonical
+    DATA-axis member (real captured market data) without being EXECUTABLE
+    (able to actually place bets/orders through it). This predicate is the
+    split-out "can we act on this venue" axis, kept separate from
+    :data:`VENUES_WITH_REFERENCE_ADAPTER` (which answers the narrower,
+    reference-data-specific "does IS/URDI have an adapter CLASS for this
+    venue") even though the two happen to coincide today for every venue —
+    they answer conceptually different questions and could diverge (e.g. a
+    venue could gain execution capability via a dedicated execution-service
+    integration without ever getting a URDI reference-data adapter). An
+    unregistered venue (no entry at all in :data:`VENUE_TO_ADAPTER_KEY`) is
+    treated as not executable, same as an explicit sentinel.
+    """
+    return VENUE_TO_ADAPTER_KEY.get(venue, NO_ADAPTER_YET) != NO_ADAPTER_YET
+
 
 #: Decommissioned/removed venue BASE names — the SSOT for "this protocol has
 #: been fully retired from the tradable/reference universe" (base = the venue

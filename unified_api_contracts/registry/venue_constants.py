@@ -129,6 +129,12 @@ BETVICTOR = "BETVICTOR"
 BOYLESPORTS = "BOYLESPORTS"
 BET888SPORT = "BET888SPORT"
 UNIBET = "UNIBET"
+# UNIBET_EU / UNIBET_UK — added 2026-08-08 (sports taxonomy P1). Confirmed
+# GENUINELY DISTINCT bookmaker feeds from bare UNIBET (live content comparison,
+# market_data_categories.py's sports-bookmaker-venue-fold comment), not a
+# casing/alias variant — the vendor fans both out as separate real feeds.
+UNIBET_EU = "UNIBET_EU"
+UNIBET_UK = "UNIBET_UK"
 BETFRED = "BETFRED"
 CASUMO = "CASUMO"
 GROSVENOR = "GROSVENOR"
@@ -184,7 +190,11 @@ METABET = "METABET"
 OPTICODDS = "OPTICODDS"
 
 # Sports Venue Sub-Sets — grouped by execution semantics
-SPORTS_EXCHANGE_VENUES: set[str] = {BETFAIR, MATCHBOOK, BETFAIR_EX_UK, BETFAIR_EX_EU}
+# SMARKETS added 2026-08-08 (sports taxonomy P1) — a real UK betting exchange
+# (same shape as BETFAIR/MATCHBOOK), was canonical in VENUES_BY_ASSET_GROUP
+# ["sports"] since 2026-07-30 but missing from every classification set below
+# (SportsVenueType/auth/fee-model/alpha-profile all failed to resolve for it).
+SPORTS_EXCHANGE_VENUES: set[str] = {BETFAIR, MATCHBOOK, BETFAIR_EX_UK, BETFAIR_EX_EU, SMARKETS}
 
 SPORTS_PREDICTION_MARKET_VENUES: set[str] = {POLYMARKET, KALSHI, NOVIG, BETOPENLY, PROPHETX}
 
@@ -223,6 +233,8 @@ SPORTS_BOOKMAKER_WEB_VENUES: set[str] = {
     BOYLESPORTS,
     BET888SPORT,
     UNIBET,
+    UNIBET_EU,
+    UNIBET_UK,
     BETFRED,
     CASUMO,
     GROSVENOR,

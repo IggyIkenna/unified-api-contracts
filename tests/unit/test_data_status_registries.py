@@ -145,7 +145,8 @@ class TestExpectedCoverageByAssetGroup:
     def test_is_expected_in_scope_returns_true(self) -> None:
         assert is_expected("tradfi", "CME", "trades")
         assert is_expected("cefi", "BINANCE-FUTURES", "derivative_ticker")
-        assert is_expected("sports", "ODDS_API", "ODDS")  # uppercase ODDS — canonical manifest key
+        # (ODDS_API/ODDS removed 2026-08-08 — sports taxonomy P1: ODDS_API left
+        # VENUES_BY_ASSET_GROUP["sports"] entirely, it's a SOURCE not a venue.)
         assert is_expected("sports", "PINNACLE", "trades")
         assert is_expected("prediction", "POLYMARKET", "trades")
         assert is_expected("defi", "AAVE_V3-ETHEREUM", "lending_indices")
@@ -153,7 +154,7 @@ class TestExpectedCoverageByAssetGroup:
     def test_is_expected_out_of_scope_returns_false(self) -> None:
         # NASDAQ trades — capable but not in scope.
         assert not is_expected("tradfi", "NASDAQ", "trades")
-        # PINNACLE doesn't emit raw odds (only ODDS_API does).
+        # PINNACLE doesn't emit raw odds (that's the ODDS_API-sourced bookmakers).
         assert not is_expected("sports", "PINNACLE", "odds")
         # Unknown venue / data_type / asset_group.
         assert not is_expected("cefi", "UNKNOWN", "trades")
