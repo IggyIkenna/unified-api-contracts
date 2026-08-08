@@ -80,6 +80,34 @@ SPORTS_VENUE_TYPE_MAP.update(dict.fromkeys(SPORTS_BOOKMAKER_WEB_VENUES, SportsVe
 SPORTS_VENUE_TYPE_MAP.update(dict.fromkeys(SPORTS_DFS_VENUES, SportsVenueType.DFS_PLATFORM))
 SPORTS_VENUE_TYPE_MAP.update(dict.fromkeys(SPORTS_DATA_VENUES, SportsVenueType.DATA_ONLY))
 
+
+def sports_odds_instrument_type_for_venue(venue: str) -> str | None:
+    """Derive the raw-odds ``instrument_type`` ("exchange_odds" | "fixed_odds")
+    for a sports venue, instead of relying on the per-instrument stamp.
+
+    Retires the redundant exchange_odds/fixed_odds split (operator ruling 9,
+    ``plans/active/sports_taxonomy_p1_capture_and_contracts_2026_08_08.md``):
+    exchange-vs-sportsbook is a property of the VENUE — already encoded here via
+    :data:`SPORTS_EXCHANGE_VENUES` / :data:`SportsVenueType.EXCHANGE_API` — so
+    stamping it per-instrument is redundant. This is the CONTRACT only, same
+    P1/P2 split as ``SPORTS_IS_DATA_TYPE_LOWERCASE_FORM``
+    (``canonical/domain/sports/league_data.py``): existing manifest rows keep
+    their writer-stamped ``instrument_type`` until P2's physical re-stamp; this
+    accessor is the canonical derivation for any new read-time consumer.
+
+    Returns ``None`` for a venue that is neither an exchange nor a bookmaker
+    venue (e.g. a prediction-market/DFS/data-only venue, or a source like
+    ODDS_API/FOOTYSTATS — sources never carry this instrument_type, ruling 2 of
+    the same plan).
+    """
+    key = venue.upper()
+    if key in SPORTS_EXCHANGE_VENUES:
+        return "exchange_odds"
+    if key in SPORTS_BOOKMAKER_API_VENUES or key in SPORTS_BOOKMAKER_WEB_VENUES:
+        return "fixed_odds"
+    return None
+
+
 SPORTS_AUTH_MAP: dict[str, SportsAuthMethod] = {
     BETFAIR: SportsAuthMethod.SESSION_TOKEN,
     # BETFAIR_EX_UK/EX_EU are the same session-token-based Betfair Exchange API
