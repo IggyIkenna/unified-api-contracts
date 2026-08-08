@@ -14,6 +14,16 @@ from __future__ import annotations
 
 from pydantic import BaseModel, Field
 
+from unified_api_contracts.registry.venue_constants import (
+    BETFAIR_EX_EU,
+    BETFAIR_EX_UK,
+    BETFAIR_SB_UK,
+    LADBROKES,
+    LEOVEGAS,
+    UNIBET,
+    WILLIAMHILL,
+)
+
 
 class ArbitrageStrategyConfig(BaseModel):
     """Configuration for sports arbitrage strategy.
@@ -171,30 +181,32 @@ EXCHANGE_COMMISSION_RATES: dict[str, float] = {
 # Bookmaker operator groups — same company, different regional skins.
 # Arbs between venues in the same group are not real (same operator).
 # Strategy must ensure arb legs come from DIFFERENT groups.
+# Keys are UAC canonical venue constants (uppercase); get_operator() normalises via .upper().
 VENUE_OPERATOR_GROUPS: dict[str, str] = {
-    "betfair_ex_uk": "BETFAIR",
-    "betfair_ex_eu": "BETFAIR",
-    "betfair_ex_au": "BETFAIR",
-    "betfair_sb_uk": "BETFAIR_SB",
-    "unibet": "UNIBET",
-    "unibet_uk": "UNIBET",
-    "unibet_fr": "UNIBET",
-    "unibet_nl": "UNIBET",
-    "unibet_se": "UNIBET",
-    "leovegas": "LEOVEGAS",
-    "leovegas_se": "LEOVEGAS",
-    "ladbrokes_uk": "LADBROKES",
-    "ladbrokes_au": "LADBROKES",
-    "williamhill": "WILLIAMHILL",
-    "williamhill_us": "WILLIAMHILL",
-    "winamax_fr": "WINAMAX",
-    "winamax_de": "WINAMAX",
+    BETFAIR_EX_UK: "BETFAIR",
+    BETFAIR_EX_EU: "BETFAIR",
+    "BETFAIR_EX_AU": "BETFAIR",
+    BETFAIR_SB_UK: "BETFAIR_SB",
+    UNIBET: "UNIBET",
+    "UNIBET_UK": "UNIBET",
+    "UNIBET_FR": "UNIBET",
+    "UNIBET_NL": "UNIBET",
+    "UNIBET_SE": "UNIBET",
+    LEOVEGAS: "LEOVEGAS",
+    "LEOVEGAS_SE": "LEOVEGAS",
+    LADBROKES: "LADBROKES",
+    "LADBROKES_AU": "LADBROKES",
+    WILLIAMHILL: "WILLIAMHILL",
+    "WILLIAMHILL_US": "WILLIAMHILL",
+    "WINAMAX_FR": "WINAMAX",
+    "WINAMAX_DE": "WINAMAX",
 }
 
 
 def get_operator(venue: str) -> str:
     """Get the operator group for a venue. Ungrouped venues are their own operator."""
-    return VENUE_OPERATOR_GROUPS.get(venue, venue)
+    key = venue.upper()
+    return VENUE_OPERATOR_GROUPS.get(key, key)
 
 
 def arb_legs_are_independent(venues: list[str]) -> bool:
