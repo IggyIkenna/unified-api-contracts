@@ -255,15 +255,32 @@ VENUE_TO_ADAPTER_KEY: dict[str, str] = {
     "BET888SPORT": NO_ADAPTER_YET,
     "SMARKETS": NO_ADAPTER_YET,
     # ODDS_API fan-out bookmakers promoted into VENUES_BY_ASSET_GROUP["sports"]
-    # 2026-07-20, then REVERTED 2026-07-22 (operator ruling: "do NOT add them,
-    # in fact remove them everywhere so they don't come up in audit" —
-    # distinct_values_noncanonical_audit_2026_07_20.md). They are no longer
-    # canonical venues, so they have no entry here either — this dict only maps
-    # venues that ARE in VENUES_BY_ASSET_GROUP (the coverage-gate test enforces
-    # exactly that). See
-    # `market_data_categories.SPORTS_ODDS_API_ACCEPTED_NONCANONICAL_BOOKMAKERS`
-    # for where the 20 bookmaker names now live (audit-suppression list, not an
-    # adapter registry).
+    # 2026-08-08 (sports_taxonomy_p1_capture_and_contracts_2026_08_08.md Block B
+    # todo -004): venue = the book whose price it is; these are real bookmakers,
+    # not source artifacts. All are MTDS-owned odds venues (IS has no reference
+    # adapter — NO_ADAPTER_YET is the correct, declared-adapterless sentinel).
+    "BETMGM": NO_ADAPTER_YET,
+    "BETONLINEAG": NO_ADAPTER_YET,
+    "BETOPENLY": NO_ADAPTER_YET,
+    "BETRIVERS": NO_ADAPTER_YET,
+    "BETSSON": NO_ADAPTER_YET,
+    "BETVICTOR": NO_ADAPTER_YET,
+    "BETWAY": NO_ADAPTER_YET,
+    "BOVADA": NO_ADAPTER_YET,
+    "CASUMO": NO_ADAPTER_YET,
+    "CORAL": NO_ADAPTER_YET,
+    "LIVESCOREBET": NO_ADAPTER_YET,
+    "MATCHBOOK": NO_ADAPTER_YET,
+    "NOVIG": NO_ADAPTER_YET,
+    "ONEXBET": NO_ADAPTER_YET,
+    "PADDYPOWER": NO_ADAPTER_YET,
+    "PROPHETX": NO_ADAPTER_YET,
+    "SKYBET": NO_ADAPTER_YET,
+    "UNIBET": NO_ADAPTER_YET,
+    "UNIBET_EU": NO_ADAPTER_YET,
+    "UNIBET_UK": NO_ADAPTER_YET,
+    "VIRGINBET": NO_ADAPTER_YET,
+    "WILLIAMHILL": NO_ADAPTER_YET,
     # DRIFT (Solana) removed 2026-07-16 (operator ruling): Drift was hacked for
     # ~$280M on 2026-04-01 (Lazarus-attributed), offline 3 months, then
     # rebranded to "Velocity DEX" 2026-07-01 — a ~2-week-old private beta with
@@ -369,6 +386,16 @@ for _prefix, _protocol_slug in VENUE_PREFIX_TO_PROTOCOL.items():
 VENUES_WITH_REFERENCE_ADAPTER: frozenset[str] = frozenset(
     venue for venue, key in VENUE_TO_ADAPTER_KEY.items() if key != NO_ADAPTER_YET
 )
+
+def is_venue_executable(venue: str) -> bool:
+    """True when the venue has a real URDI reference adapter (not NO_ADAPTER_YET).
+
+    Derives the ``executable`` predicate from VENUE_TO_ADAPTER_KEY: a venue is
+    executable only when a real adapter key exists, not the sentinel sentinel
+    ``__no_adapter_yet__``. Venues absent from the map are also not executable.
+    """
+    return VENUE_TO_ADAPTER_KEY.get(venue, NO_ADAPTER_YET) != NO_ADAPTER_YET
+
 
 #: Decommissioned/removed venue BASE names — the SSOT for "this protocol has
 #: been fully retired from the tradable/reference universe" (base = the venue

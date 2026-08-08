@@ -448,6 +448,7 @@ from .venue_adapter_keys import (
     VENUE_PREFIX_TO_PROTOCOL,
     VENUE_TO_ADAPTER_KEY,
     VENUES_WITH_REFERENCE_ADAPTER,
+    is_venue_executable,
 )
 from .venue_collateral import (
     PLACEHOLDER_HAIRCUTS_PENDING_GO_LIVE,
@@ -588,6 +589,8 @@ from .venue_constants import (
     UNDERDOG,
     UNDERSTAT,
     UNIBET,
+    UNIBET_EU,
+    UNIBET_UK,
     UNISWAP_V2_ETH,
     UNISWAP_V3_ETH,
     UNISWAP_V4_ETH,
@@ -979,6 +982,8 @@ __all__ = [
     "UNDERDOG",
     "UNDERSTAT",
     "UNIBET",
+    "UNIBET_EU",
+    "UNIBET_UK",
     "UNISWAP_QUOTER_V2_BY_CHAIN",
     "UNISWAP_SWAP_ROUTER_BY_CHAIN",
     "UNISWAP_V2_ETH",
@@ -1213,6 +1218,7 @@ __all__ = [
     "is_token_equivalent",
     "is_tradfi_futures_instrument_active",
     "is_valid_shard_key",
+    "is_venue_executable",
     "is_within_venue_session_hours",
     "lst_adjusted_value",
     "maintenance_margin_for",

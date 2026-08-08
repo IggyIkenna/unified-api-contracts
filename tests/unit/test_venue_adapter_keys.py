@@ -74,6 +74,31 @@ EXPECTED_SENTINEL_VENUES: frozenset[str] = frozenset(
         "TRANSFERMARKT",
         "SOCCER_FOOTBALL_INFO",
         "OPEN_METEO",
+        # ODDS_API fan-out bookmakers promoted to VENUES_BY_ASSET_GROUP["sports"]
+        # 2026-08-08 (sports_taxonomy_p1_capture_and_contracts_2026_08_08.md Block B
+        # todo -004). All are MTDS-owned odds venues — IS has no reference adapter.
+        "BETMGM",
+        "BETONLINEAG",
+        "BETOPENLY",
+        "BETRIVERS",
+        "BETSSON",
+        "BETVICTOR",
+        "BETWAY",
+        "BOVADA",
+        "CASUMO",
+        "CORAL",
+        "LIVESCOREBET",
+        "MATCHBOOK",
+        "NOVIG",
+        "ONEXBET",
+        "PADDYPOWER",
+        "PROPHETX",
+        "SKYBET",
+        "UNIBET",
+        "UNIBET_EU",
+        "UNIBET_UK",
+        "VIRGINBET",
+        "WILLIAMHILL",
         # (FRED removed 2026-08-03 — it now has a real URDI reference-data adapter,
         #  "fred" (instruments-service/reference_data/adapters/tradfi/fred.py, a
         #  same-shape duplicate of MTDS's FredAdapter.KEY_SERIES, no vendor call).

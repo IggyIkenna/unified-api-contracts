@@ -492,32 +492,17 @@ VENUES_BY_ASSET_GROUP: dict[str, list[str]] = {
     # (check_enumeration_completeness.py) — do NOT edit that script here.
     "defi": list(dict.fromkeys(v for v in _ALL_DEFI_VENUES if _DEFI_VENUE_PHASE.get(v) == "live")),
     "sports": [
-        # Sports betting exchanges and bookmakers active in the May-23 universe.
+        # Sports betting exchanges and bookmakers — venue = the book whose price it is.
         #
-        # DEFERRED-INDEFINITELY 2026-05-12 per operator: SCRAPER bookmakers are out
-        # of the active venue universe; their venue constants + capability flags +
-        # execution adapter stubs remain as future-work scaffolding. See
-        # `unified-trading-pm/plans/epics/sports_master.md` §
-        # "Scrapers DEFERRED-INDEFINITELY 2026-05-12 per operator".
+        # ODDS_API removed 2026-08-08 (sports_taxonomy_p1_capture_and_contracts_2026_08_08.md
+        # Block B todo -004): ODDS_API is a DATA SOURCE/aggregator, not a bookmaker venue.
+        # It stays in SPORTS_DATA_VENUES (venue_constants.py) for capability/routing but is
+        # not a coverage-universe entry here.
         #
-        # ── 2026-07-20 addition REVERTED 2026-07-22 (operator, same plan,
-        # "Operator decisions — RULED 2026-07-22" § "Sports ODDS_API bookmakers"):
-        # "do NOT add them, in fact remove them everywhere so they don't come up
-        # in audit" — a stronger reversal of the 2026-07-20 add-to-registry fix
-        # below. The 20 ODDS_API fan-out bookmakers (BETMGM/BETONLINEAG/
-        # BETOPENLY/BETRIVERS/BETSSON/BETVICTOR/BETWAY/BOVADA/CASUMO/CORAL/
-        # LIVESCOREBET/MATCHBOOK/NOVIG/ONEXBET/PADDYPOWER/PROPHETX/SKYBET/UNIBET/
-        # VIRGINBET/WILLIAMHILL) are REMOVED from this canonical set again — the
-        # 2026-05-12 scraper-deferral decision (above) is UNCHANGED, this is
-        # purely about whether the registry treats them as canonical/expected.
-        # They are STILL real manifest values (ODDS_API fan-out genuinely writes
-        # venue=BETMGM etc.), so simply removing them here would reopen the exact
-        # non-canonical-value audit finding the 2026-07-20 addition existed to
-        # silence — see `SPORTS_ODDS_API_ACCEPTED_NONCANONICAL_BOOKMAKERS` below,
-        # which the distinct-values detector (deployment-api::_distinct_values.py)
-        # reads to exclude these specific values from its findings WITHOUT
-        # badging them canonical.
-        "ODDS_API",  # Multi-bookmaker odds aggregator (raw tick data source)
+        # NOTE: FOOTYSTATS is deliberately NOT here — see SPORTS_ODDS_API_ACCEPTED_NONCANONICAL_BOOKMAKERS
+        # below (IS/UAC disjointness invariant — IS owns a FOOTYSTATS reference-data-provider venue
+        # for match-stats/xG data; adding FOOTYSTATS here would break test_sports_exempt_is_disjoint_
+        # from_uac_sports in instruments-service).
         "PINNACLE",  # Bookmaker API (ODDS_API fan-out + direct)
         "BETFAIR",  # Canonical exchange venue constant (execution/reference)
         "BETFAIR_SB_UK",  # MTDS manifest sub-venue: Betfair Sportsbook UK
@@ -525,20 +510,34 @@ VENUES_BY_ASSET_GROUP: dict[str, list[str]] = {
         "BETFAIR_EX_EU",  # MTDS manifest sub-venue: Betfair Exchange EU
         "DRAFTKINGS",  # US bookmaker via ODDS_API fan-out (manifest-confirmed)
         "FANDUEL",  # US bookmaker via ODDS_API fan-out (manifest-confirmed)
-        # Added 2026-07-30 (distinct-values census review, sports_consolidated_native_ao_
-        # extract_2026_07_25.md Track C + sports_distinct_values_registry_cleanup_2026_07_30.md):
-        # real VenueConstant already existed for all 3 below, just never added here.
-        # NOTE: FOOTYSTATS is deliberately NOT here — see SPORTS_ODDS_API_ACCEPTED_NONCANONICAL_BOOKMAKERS
-        # below (two-registry-model collision with IS's own FOOTYSTATS reference-data-provider venue,
-        # ldr_qg_failure escalation agt-57430c 2026-07-30).
-        "LADBROKES",  # ODDS_API fan-out bookmaker; fold target of SPORTS_VENUE_FOLD
-        # ("ladbrokes_uk" wire spelling); raw-tick shape re-stamped + GCS-verified 2026-07-27/30.
-        "BET888SPORT",  # ODDS_API fan-out bookmaker; fold target of SPORTS_VENUE_FOLD
-        # ("sport888" wire spelling); raw-tick shape re-stamped + GCS-verified 2026-07-27/30.
-        "SMARKETS",  # UK betting exchange, ODDS_API fan-out — confirmed live production
-        # data (1.1M+ rows through 2026-07-26, GCS-path-clean); was missing a VenueConstant
-        # entirely (see venue_constants.py) — see sports_consolidated_native_ao_extract_
-        # 2026_07_25.md's explicit "SMARKETS is NOT stale/deleted-venue residue" correction.
+        "LADBROKES",  # ODDS_API fan-out bookmaker; fold target of SPORTS_VENUE_FOLD ("ladbrokes_uk")
+        "BET888SPORT",  # ODDS_API fan-out bookmaker; fold target of SPORTS_VENUE_FOLD ("sport888")
+        "SMARKETS",  # UK betting exchange, ODDS_API fan-out — 1.1M+ live captured rows
+        # ── Promoted from SPORTS_ODDS_API_ACCEPTED_NONCANONICAL_BOOKMAKERS 2026-08-08 ──
+        # venue = the book whose price it is; these are real bookmakers, not source artifacts.
+        # All are MTDS-owned odds venues (no IS reference adapter — NO_ADAPTER_YET in venue_adapter_keys.py).
+        "BETMGM",
+        "BETONLINEAG",
+        "BETOPENLY",
+        "BETRIVERS",
+        "BETSSON",
+        "BETVICTOR",
+        "BETWAY",
+        "BOVADA",
+        "CASUMO",
+        "CORAL",
+        "LIVESCOREBET",
+        "MATCHBOOK",
+        "NOVIG",
+        "ONEXBET",
+        "PADDYPOWER",
+        "PROPHETX",
+        "SKYBET",
+        "UNIBET",
+        "UNIBET_EU",  # Distinct feed from bare UNIBET (verified 2026-07-27; different odds + timestamps)
+        "UNIBET_UK",  # Distinct feed from bare UNIBET (verified 2026-07-27; different odds + timestamps)
+        "VIRGINBET",
+        "WILLIAMHILL",
     ],
     "prediction": [
         # Prediction markets (binary / multi-outcome)
@@ -553,61 +552,27 @@ ALL_DATA_TYPES: list[str] = sorted({dt for dts in DATA_TYPES_BY_ASSET_GROUP.valu
 # All supported venues (union of all asset groups)
 ALL_VENUES: list[str] = sorted({v for vs in VENUES_BY_ASSET_GROUP.values() for v in vs})
 
-# The 20 ODDS_API fan-out bookmakers reverted out of VENUES_BY_ASSET_GROUP
-# ["sports"] above (operator ruling 2026-07-22,
-# `plans/active/distinct_values_noncanonical_audit_2026_07_20.md`), PLUS 2 added
-# 2026-07-27 (UNIBET_EU/UNIBET_UK — see the SPORTS_VENUE_FOLD comment above for
-# why these are here as their OWN accepted entries rather than folded into bare
-# UNIBET: live content comparison proved them genuinely distinct bookmaker feeds,
-# not a casing/alias duplicate of it). They are
-# deliberately NOT canonical (do NOT add to any canonical venue list — the
-# 2026-05-12 scraper-deferral decision stands, no per-bookmaker capture
-# adapter exists or is planned) but ARE real raw manifest values (the
-# ODDS_API fan-out genuinely writes venue=BETMGM etc.), so a plain removal
-# would reopen the exact non-canonical-value finding this set exists to
-# suppress. Consumed by deployment-api's distinct-values detector
-# (`_distinct_values.py`) to exclude these specific, permanently-accepted
-# values from its non-canonical findings count — "known and accepted", not
-# "drift needing a fix". NOT a canonical set — never merge into
-# VENUES_BY_ASSET_GROUP/ALL_VENUES or any canonicality check.
+# Accepted non-canonical manifest values that must not be badged as "drift" by
+# deployment-api's distinct-values detector. Consumed by `_distinct_values.py`
+# `_ACCEPTED_EXCEPTIONS` — "known and accepted", not "drift needing a fix".
+# NOT a canonical set — never merge into VENUES_BY_ASSET_GROUP/ALL_VENUES.
 #
-# FOOTYSTATS (added 2026-07-30, ldr_qg_failure escalation agt-57430c) is here rather than in
-# VENUES_BY_ASSET_GROUP["sports"] above for a DIFFERENT reason than the bookmakers above: it is a
-# genuine ODDS_API fan-out bookmaker source (pipeline_mode=batch_footystats; legacy venue=ODDS_API
-# mislabel re-stamped + GCS-verified 2026-07-30, 42,476 shards) — but the literal string "FOOTYSTATS"
-# is ALREADY a canonical instruments-service reference-data-provider venue (get_venues_for_asset_
-# groups(["SPORTS"]) in instruments-service, the FootyStats match-stats/xG-adjacent API — a completely
-# different data stream). The IS/UAC sports registries are a deliberate two-registry model required to
-# stay DISJOINT (operator Decision C, 2026-06-29;
-# instruments-service::tests/unit/test_orchestrator_helpers.py::test_sports_exempt_is_disjoint_from_
-# uac_sports), so adding FOOTYSTATS to VENUES_BY_ASSET_GROUP here broke that invariant. Accepted-non-
-# canonical (this set) silences the same distinct-values finding without claiming canonical venue
-# status, mirroring the treatment of the bookmakers below.
+# The 22 ODDS_API fan-out bookmakers that previously lived here were PROMOTED to
+# VENUES_BY_ASSET_GROUP["sports"] on 2026-08-08 (sports_taxonomy_p1_capture_and_
+# contracts_2026_08_08.md Block B todo -004): venue = the book whose price it is;
+# they are real bookmakers, not source artifacts. Promoted: BETMGM, BETONLINEAG,
+# BETOPENLY, BETRIVERS, BETSSON, BETVICTOR, BETWAY, BOVADA, CASUMO, CORAL,
+# LIVESCOREBET, MATCHBOOK, NOVIG, ONEXBET, PADDYPOWER, PROPHETX, SKYBET, UNIBET,
+# UNIBET_EU, UNIBET_UK, VIRGINBET, WILLIAMHILL.
+#
+# FOOTYSTATS remains here (not promoted) due to the IS/UAC disjointness invariant:
+# "FOOTYSTATS" is already a canonical instruments-service reference-data-provider venue
+# (FootyStats match-stats/xG API), so adding it to VENUES_BY_ASSET_GROUP would break
+# test_sports_exempt_is_disjoint_from_uac_sports in instruments-service
+# (operator Decision C, 2026-06-29). FOOTYSTATS stays accepted-noncanonical.
 SPORTS_ODDS_API_ACCEPTED_NONCANONICAL_BOOKMAKERS: frozenset[str] = frozenset(
     {
-        "BETMGM",
-        "BETONLINEAG",
-        "BETOPENLY",
-        "BETRIVERS",
-        "BETSSON",
-        "BETVICTOR",
-        "BETWAY",
-        "BOVADA",
-        "CASUMO",
-        "CORAL",
         "FOOTYSTATS",
-        "LIVESCOREBET",
-        "MATCHBOOK",
-        "NOVIG",
-        "ONEXBET",
-        "PADDYPOWER",
-        "PROPHETX",
-        "SKYBET",
-        "UNIBET",
-        "UNIBET_EU",
-        "UNIBET_UK",
-        "VIRGINBET",
-        "WILLIAMHILL",
     }
 )
 
@@ -2217,20 +2182,10 @@ VENUE_DATA_TYPE_CAPABILITIES: dict[str, dict[str, str]] = {
     # are merged into this dict at module-load time (see below). Split out
     # to keep this file under the 900-line QG ceiling.
     # ── Sports ──
-    # Corrected 2026-05-20 (mega-audit R2): ODDS_API emits "ODDS" (uppercase),
-    # bookmaker venues emit "trades". Old data_types (odds_snapshot, odds_movement)
-    # were the oracle bug root cause (25,652 MISSING_EXPECTED).
-    "ODDS_API": {
-        "ODDS": "2024-01-01",  # canonical uppercase per mega-audit R2 correction
-        "odds": "2024-01-01",
-        "odds_snapshot": "2024-01-01",
-        "odds_movement": "2024-01-01",
-        "arbitrage_opportunity": "2024-01-01",
-        "odds_horizon_bucket": "2024-01-01",
-        "markets": "2024-01-01",
-        "outcomes": "2024-01-01",
-        "settlements": "2024-01-01",
-    },
+    # ODDS_API entry REMOVED 2026-08-08 (sports_taxonomy_p1_capture_and_contracts_
+    # 2026_08_08.md Block B todo -004): ODDS_API is a DATA SOURCE/aggregator, not a
+    # canonical venue. Removing from VENUES_BY_ASSET_GROUP["sports"] makes this block
+    # stale dead code per test_venue_data_type_capabilities_venues_are_declared invariant.
     "PINNACLE": {
         "odds_snapshot": "2024-01-01",
         "odds_movement": "2024-01-01",

@@ -34,6 +34,7 @@ from .venue_constants import (
     SBOBET,
     SHARPAPI,
     SKYBET,
+    SMARKETS,
     SOCCER_FOOTBALL_INFO,
     SPORTS_BOOKMAKER_API_VENUES,
     SPORTS_BOOKMAKER_WEB_VENUES,
@@ -80,6 +81,7 @@ SPORTS_VENUE_TYPE_MAP.update(dict.fromkeys(SPORTS_DATA_VENUES, SportsVenueType.D
 SPORTS_AUTH_MAP: dict[str, SportsAuthMethod] = {
     BETFAIR: SportsAuthMethod.SESSION_TOKEN,
     MATCHBOOK: SportsAuthMethod.API_KEY,
+    SMARKETS: SportsAuthMethod.API_KEY,
     POLYMARKET: SportsAuthMethod.WALLET_SIGNATURE,
     KALSHI: SportsAuthMethod.API_KEY,
     NOVIG: SportsAuthMethod.API_KEY,
