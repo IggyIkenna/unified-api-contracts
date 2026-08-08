@@ -989,15 +989,23 @@ SPORTS_DATA_TYPE_ACCEPTED_STALE_UPPERCASE_RESIDUE: frozenset[str] = frozenset(
 #   from the ODDS_API vendor response legitimately produces the bare market
 #   token. Same market-grain shape as the suffixed siblings above, not a
 #   distinct writer bug.
-# - "exchange_odds" / "fixed_odds": the deliberate venue-based split target of
-#   the 2026-07-27 migration (`market-tick-data-service/scripts/sports/
+# - "exchange_odds" / "fixed_odds": the venue-based split target of the
+#   2026-07-27 migration (`market-tick-data-service/scripts/sports/
 #   exchange_fixed_odds_fork/`) — Betfair-Exchange-style venues (BETFAIR_EX_UK/
-#   BETFAIR_EX_EU/SMARKETS/MATCHBOOK) stamp "exchange_odds", sportsbook-style
-#   venues (BETFAIR_SB_UK/BETMGM/PINNACLE/ODDS_API) stamp "fixed_odds" — both
-#   already registered UAC `CONTRACT_REGISTRY[("sports", "exchange_odds"/
-#   "fixed_odds", "trades")]` keys, not ad hoc strings.
-# - "odds" (lowercase, generic): the pre-fork residual instrument_type for
-#   venues the 2026-07-27 migration didn't (yet) cover.
+#   BETFAIR_EX_EU/SMARKETS/MATCHBOOK) stamped "exchange_odds", sportsbook-style
+#   venues (BETFAIR_SB_UK/BETMGM/PINNACLE/ODDS_API) stamped "fixed_odds". The
+#   split is RETIRED 2026-08-08 (sports_taxonomy_p1_capture_and_contracts_
+#   2026_08_08.md, operator ruling 9) — exchange-vs-sportsbook is a property of
+#   the VENUE, so it's derived at read time
+#   (`unified_api_contracts.registry.derive_sports_instrument_type(venue)`)
+#   instead of stamped per-instrument; neither token has a UAC
+#   `CONTRACT_REGISTRY` entry any more (both resolve via `lookup_contract`'s
+#   dual-read fallback to the `odds`-keyed contract). Both values remain real,
+#   still-present manifest tokens on existing GCS objects until the P2 data
+#   re-stamp, so they stay in this accepted-exception set.
+# - "odds" (lowercase, generic): the primary instrument_type the live writer
+#   (`venue_fetch.py::_build_sports_shard_path`) stamps unconditionally today,
+#   and the pre-fork residual for venues the 2026-07-27 migration didn't cover.
 # All 5 are real `data_type=trades`/bundle-grain MTDS/MDPS output, never
 # members of the per-CONTRACT-grain `InstrumentType` enum for the same reason
 # as the rest of this set.

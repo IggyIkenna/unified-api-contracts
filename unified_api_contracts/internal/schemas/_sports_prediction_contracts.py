@@ -112,31 +112,26 @@ SPORTS_ODDS_TRADES = SchemaContract(
 )
 
 # ---------------------------------------------------------------------------
-# Sports (odds) — EXCHANGE_ODDS / FIXED_ODDS fork (contracts-first migration,
-# sports_closeout_exchange_fixed_odds_fork_2026_07_25.md todo 3). Same row
-# schema as SPORTS_ODDS_TRADES — the fork splits the manifest/GCS
-# instrument_type partition by venue class (peer-to-peer exchange vs
-# sportsbook), it does not change the captured columns. The legacy ``odds``
-# contract above stays registered for the dual-read window (next todo).
+# Sports (odds) — EXCHANGE_ODDS / FIXED_ODDS fork: RETIRED 2026-08-08
+# (sports_taxonomy_p1_capture_and_contracts_2026_08_08.md, operator ruling 9).
+# The 2026-07-25 fork (sports_closeout_exchange_fixed_odds_fork_2026_07_25.md
+# todo 3) registered SPORTS_EXCHANGE_ODDS_TRADES/SPORTS_FIXED_ODDS_TRADES here
+# to split the manifest/GCS instrument_type partition by venue class
+# (peer-to-peer exchange vs sportsbook). The operator ruled exchange-vs-
+# sportsbook is a property of the VENUE (UAC ``SportsVenueType`` /
+# ``INSTRUMENT_TYPES_BY_VENUE`` already encode it), so stamping it per-
+# instrument is redundant — both contracts are removed here; a lookup for
+# ("sports", "exchange_odds"/"fixed_odds", <any data_type>, incl. "trades")
+# now resolves entirely via ``lookup_contract``'s existing
+# ``_SPORTS_ODDS_FORK_INSTRUMENT_TYPES`` dual-read fallback to the legacy
+# ``odds`` contract below — i.e. derived at READ time, not stamped at write
+# time. Existing GCS objects already partitioned under instrument_type=
+# exchange_odds/fixed_odds (~16% of the fork as of 2026-08-08) remain
+# resolvable via that same fallback until the P2 migration re-stamps them;
+# for callers that want the exchange-vs-sportsbook classification directly,
+# use ``unified_api_contracts.registry.derive_sports_instrument_type(venue)``
+# instead of reading a stamped instrument_type.
 # ---------------------------------------------------------------------------
-
-SPORTS_EXCHANGE_ODDS_TRADES = SchemaContract(
-    asset_group="sports",
-    instrument_type="exchange_odds",
-    data_type="trades",
-    columns=SPORTS_ODDS_TRADES.columns,
-    symbol_column="fixture_id",
-    required_row_count_min=1,
-)
-
-SPORTS_FIXED_ODDS_TRADES = SchemaContract(
-    asset_group="sports",
-    instrument_type="fixed_odds",
-    data_type="trades",
-    columns=SPORTS_ODDS_TRADES.columns,
-    symbol_column="fixture_id",
-    required_row_count_min=1,
-)
 
 # ---------------------------------------------------------------------------
 # Sports (odds) — Tier-1 horizon-bucketed odds (contracts-first, first-class
@@ -638,8 +633,9 @@ PREDICTION_PREDICTION_MARKET_FILLS = SchemaContract(
 # ---------------------------------------------------------------------------
 
 CONTRACT_REGISTRY[("sports", "odds", "trades")] = SPORTS_ODDS_TRADES
-CONTRACT_REGISTRY[("sports", "exchange_odds", "trades")] = SPORTS_EXCHANGE_ODDS_TRADES
-CONTRACT_REGISTRY[("sports", "fixed_odds", "trades")] = SPORTS_FIXED_ODDS_TRADES
+# ("sports", "exchange_odds"/"fixed_odds", "trades") RETIRED 2026-08-08 — see
+# the retirement comment above; resolves via lookup_contract's dual-read
+# fallback to the ("sports", "odds", "trades") entry above.
 CONTRACT_REGISTRY[("prediction", "prediction_market", "trades")] = PREDICTION_PREDICTION_MARKET_TRADES
 CONTRACT_REGISTRY[("prediction", "prediction_market", "book_snapshot_5")] = PREDICTION_PREDICTION_MARKET_BOOK_SNAPSHOT
 CONTRACT_REGISTRY[("prediction", "prediction_market", "market_metadata")] = PREDICTION_PREDICTION_MARKET_METADATA
@@ -655,8 +651,6 @@ __all__ = [
     "PREDICTION_PREDICTION_MARKET_FILLS",
     "PREDICTION_PREDICTION_MARKET_METADATA",
     "PREDICTION_PREDICTION_MARKET_TRADES",
-    "SPORTS_EXCHANGE_ODDS_TRADES",
-    "SPORTS_FIXED_ODDS_TRADES",
     "SPORTS_ODDS_ARBITRAGE",
     "SPORTS_ODDS_HORIZON_BUCKET",
     "SPORTS_ODDS_MOVEMENT",

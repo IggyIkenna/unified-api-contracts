@@ -616,6 +616,7 @@ from .venue_constants import (
     VenueCapability,
     VenueFeeModel,
     VenueOrderCapability,
+    derive_sports_instrument_type,
     get_perp_venues,
 )
 from .venue_context import (
@@ -1110,6 +1111,7 @@ __all__ = [
     "compute_max_leverage_from_spread_move",
     "databento_schema_level",
     "derive_expiry_bucket",
+    "derive_sports_instrument_type",
     "earliest_allowed_start",
     "enumerate_possible_shard_keys",
     "expected_coverage",

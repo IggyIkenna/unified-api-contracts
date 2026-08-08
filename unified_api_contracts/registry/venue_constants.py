@@ -550,6 +550,30 @@ INSTRUMENT_TYPES_BY_VENUE.update({v: {"FIXED_ODDS"} for v in SPORTS_BOOKMAKER_AP
 INSTRUMENT_TYPES_BY_VENUE.update({v: {"FIXED_ODDS"} for v in SPORTS_BOOKMAKER_WEB_VENUES})
 INSTRUMENT_TYPES_BY_VENUE.update({v: {"PROP"} for v in SPORTS_DFS_VENUES})
 
+
+def derive_sports_instrument_type(venue: str) -> str:
+    """Derive the exchange-vs-sportsbook classification for a sports venue.
+
+    Retires the per-instrument ``exchange_odds``/``fixed_odds`` manifest stamp
+    (sports_taxonomy_p1_capture_and_contracts_2026_08_08.md operator ruling 9):
+    exchange-vs-sportsbook is a property of the VENUE, not the row, so it is
+    derived here at READ time from the same venue-set membership
+    ``INSTRUMENT_TYPES_BY_VENUE`` already tracks (Layer-1 expected-universe
+    role), instead of being stamped per-instrument at write time. Returns the
+    lowercase manifest token. Venues with no exchange/sportsbook classification
+    (aggregators like ``ODDS_API``, prediction-market venues, DFS/data-only
+    vendors) fall back to the generic ``"odds"`` token, which is also what the
+    live MTDS writer (``venue_fetch.py::_build_sports_shard_path``) stamps
+    unconditionally today.
+    """
+    types = INSTRUMENT_TYPES_BY_VENUE.get(venue.upper(), set())
+    if "EXCHANGE_ODDS" in types:
+        return "exchange_odds"
+    if "FIXED_ODDS" in types:
+        return "fixed_odds"
+    return "odds"
+
+
 INSTRUMENT_TYPE_FOLDER_MAP: dict[str, str] = {
     "PERPETUAL": "perpetuals",
     "EQUITY_PERP": "equity_perps",
