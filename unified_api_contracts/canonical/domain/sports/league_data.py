@@ -224,48 +224,48 @@ SPORTS_DATA_TYPE_TO_SOURCE: dict[str, str] = {
     #   stale outlier vs the canonical SOURCE_PRIORITY[("sports","TEAMS"|"STANDINGS")]
     #   = ["api_football"] (the writer already raised MissingSourceError on footystats),
     #   which produced ~137k mis-sourced/phantom manifest rows. Aligned to the SSOT.
-    "MATCHES": "footystats",
-    "ODDS": "footystats",
-    "PREDICTIONS": "footystats",
+    "matches": "footystats",
+    "odds": "footystats",
+    "predictions": "footystats",
     # Understat — xG model + per-shot xG
-    "XG": "understat",
-    "XG_SHOTS": "understat",
+    "xg": "understat",
+    "xg_shots": "understat",
     # API-Football — fixtures + per-fixture detail + reference (teams / standings)
-    "FIXTURES": "api_football",
+    "fixtures": "api_football",
     # FIXTURES_SCHEDULE/FIXTURES_OUTCOMES are the schedule/outcome split of the same
     # api_football fixtures feed (writer cutover 2026-07-14, fixture_lifecycle.py) —
     # missing here meant is_pre_launch_date() silently returned False for them,
     # letting ~83,541 pre-2020-06-06 objects misclassify as real orphans instead of
     # the pre-launch-floor violations they are (found 2026-07-22, orphan-sweep audit).
-    "FIXTURES_SCHEDULE": "api_football",
-    "FIXTURES_OUTCOMES": "api_football",
-    "INJURIES": "api_football",
-    "FIXTURE_STATS": "api_football",
-    "FIXTURE_EVENTS": "api_football",
-    "FIXTURE_LINEUPS": "api_football",
-    "PLAYER_STATS": "api_football",
-    "TEAMS": "api_football",
-    "STANDINGS": "api_football",
+    "fixtures_schedule": "api_football",
+    "fixtures_outcomes": "api_football",
+    "injuries": "api_football",
+    "fixture_stats": "api_football",
+    "fixture_events": "api_football",
+    "fixture_lineups": "api_football",
+    "player_stats": "api_football",
+    "teams": "api_football",
+    "standings": "api_football",
     # Transfermarkt — player values.
     # TRANSFERMARKT_LEAGUES retired 2026-05-05 (was static catalog mapping;
     # lives in UAC TRANSFERMARKT_IDS as provider-id config rather than captured data).
     # TRANSFERMARKT_VALUES retired 2026-05-15 (stale alias — PLAYER_VALUES is canonical).
-    "PLAYER_VALUES": "transfermarkt",
+    "player_values": "transfermarkt",
     # SoccerFootball.info.
     # SFI_LEAGUES retired 2026-05-05 (same reason — UAC SOCCER_FOOTBALL_INFO_IDS).
     # SFI_STANDINGS retired 2026-05-05 — SFI has no standings endpoint.
-    "SFI_PROGRESSIVE_STATS": "soccer_football_info",
+    "sfi_progressive_stats": "soccer_football_info",
     # OpenMeteo — historical weather
-    "WEATHER": "open_meteo",
+    "weather": "open_meteo",
     # MDPS odds horizon bucket — derived from odds-api
-    "ODDS_HORIZON_BUCKET": "mdps_odds_horizon_bucket",
+    "odds_horizon_bucket": "mdps_odds_horizon_bucket",
 }
 
 
 def get_source_for_data_type(data_type: str) -> str | None:
     """Return the source-key for a sports manifest ``data_type``, or
     ``None`` if unknown (caller should treat as no-clip)."""
-    return SPORTS_DATA_TYPE_TO_SOURCE.get(data_type)
+    return SPORTS_DATA_TYPE_TO_SOURCE.get(data_type.lower())
 
 
 # ---------------------------------------------------------------------------
@@ -347,7 +347,7 @@ def is_pre_launch_date(data_type: str, iso_date: str) -> bool:
     Returns ``False`` if the data_type is unknown or has no coverage
     window — defensively means "we can't prove it's pre-launch".
     """
-    source = SPORTS_DATA_TYPE_TO_SOURCE.get(data_type)
+    source = SPORTS_DATA_TYPE_TO_SOURCE.get(data_type.lower())
     if source is None:
         return False
     coverage_start = get_source_coverage_start(source, data_type)

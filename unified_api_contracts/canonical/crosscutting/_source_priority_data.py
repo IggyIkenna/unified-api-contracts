@@ -26,17 +26,17 @@ SOURCE_PRIORITY: Final[dict[tuple[str, str], list[str]]] = {
     # Fixture lifecycle data — api_football is primary, footystats is the
     # multi-source merge candidate (deferred). Soccer-football-info handles
     # the SFI_PROGRESSIVE_STATS slice.
-    ("sports", "FIXTURES"): [
+    ("sports", "fixtures"): [
         "api_football",
         "footystats",
     ],  # footystats is the deferred multi-source merge candidate (see module docstring Phase 1B)
-    # FIXTURES_SCHEDULE/FIXTURES_OUTCOMES are the schedule/outcome split of FIXTURES
-    # (writer cutover 2026-07-14, fixture_lifecycle.py) — same source as legacy FIXTURES.
-    ("sports", "FIXTURES_SCHEDULE"): ["api_football", "footystats"],
-    ("sports", "FIXTURES_OUTCOMES"): ["api_football", "footystats"],
-    ("sports", "FIXTURE_LINEUPS"): ["api_football"],
-    ("sports", "FIXTURE_EVENTS"): ["api_football"],
-    ("sports", "FIXTURE_STATS"): ["api_football"],
+    # fixtures_schedule/fixtures_outcomes are the schedule/outcome split of fixtures
+    # (writer cutover 2026-07-14, fixture_lifecycle.py) — same source as legacy fixtures.
+    ("sports", "fixtures_schedule"): ["api_football", "footystats"],
+    ("sports", "fixtures_outcomes"): ["api_football", "footystats"],
+    ("sports", "fixture_lineups"): ["api_football"],
+    ("sports", "fixture_events"): ["api_football"],
+    ("sports", "fixture_stats"): ["api_football"],
     # PLAYER_STATS = api_football per-fixture player stats, captured by IS at the
     # PER_DAY_PER_LEAGUE grain. The canonical data_type name is PLAYER_STATS; the GCS
     # *entity* folder is `fixture_player_stats` — a deliberate name mismatch documented
@@ -51,14 +51,14 @@ SOURCE_PRIORITY: Final[dict[tuple[str, str], list[str]]] = {
     # (_writer_ingest.py gates it on that call) — same class as the ODDS defect below.
     # Reconciled 2026-07-15 onto the name reality uses. SSOT:
     # codex/02-data/sports-gcs-path-ssot.md + codex/02-data/sports-data-types-catalog.md.
-    ("sports", "PLAYER_STATS"): ["api_football"],
-    ("sports", "INJURIES"): ["api_football"],
-    ("sports", "RESULTS"): ["api_football"],
-    ("sports", "UNDERSTAT_XG"): ["understat"],
-    ("sports", "SFI_PROGRESSIVE_STATS"): ["soccer_football_info"],
-    ("sports", "ODDS_SNAPSHOT"): ["odds_api"],
-    ("sports", "ODDS_MOVEMENT"): ["odds_api"],
-    ("sports", "ARBITRAGE"): ["odds_api"],
+    ("sports", "player_stats"): ["api_football"],
+    ("sports", "injuries"): ["api_football"],
+    ("sports", "results"): ["api_football"],
+    ("sports", "understat_xg"): ["understat"],
+    ("sports", "sfi_progressive_stats"): ["soccer_football_info"],
+    ("sports", "odds_snapshot"): ["odds_api"],
+    ("sports", "odds_movement"): ["odds_api"],
+    ("sports", "arbitrage"): ["odds_api"],
     # TRADES = the raw MTDS per-(bookmaker,league,fixture) tick shard write shape
     # (venue_fetch.py::_build_sports_shard_path) — odds-api is the ONLY sanctioned
     # writer (api_football has no MTDS odds adapter, see
@@ -69,12 +69,10 @@ SOURCE_PRIORITY: Final[dict[tuple[str, str], list[str]]] = {
     # sports sentinel/expected-row for this shape as source=api_football — the root
     # cause of a 1.26M-row wrong-source re-accumulation found 2026-07-22/23
     # (issues/mtds_sports_api_football_wrong_source_reaccumulated_post_wipe_2026_07_22.md).
-    # KEPT UPPERCASE 2026-07-27 (K1's writer flip itself was reverted back to
-    # lower-case "trades") — derive_pipeline_mode_for_row() tries the data_type
-    # as-is FIRST, then unconditionally retries with .upper() as its documented
-    # sports fallback, so this uppercase key still resolves the now-lower-case
-    # writer's lookups. No lower-case "trades" entry is needed alongside it.
-    ("sports", "TRADES"): ["odds_api"],
+    # P1 taxonomy lowercasing (2026-08-08): UAC registry now uses lowercase keys
+    # throughout. UAC lookup functions normalize data_type via .lower(), so
+    # existing uppercase manifest data resolves correctly until P2 re-stamps.
+    ("sports", "trades"): ["odds_api"],
     # TRADES_INPLAY = the post-kickoff ("in-play") counterpart of TRADES (OR-5b(c)
     # legacy-bucket recovery, market_data_categories.py's "trades_inplay" entry) —
     # same MTDS odds_api writer family as TRADES, split off only by the
@@ -89,15 +87,15 @@ SOURCE_PRIORITY: Final[dict[tuple[str, str], list[str]]] = {
     # "trades_inplay" comment documents 3 deliberate non-registrations that keep it
     # inert for the live sports fleet; this SOURCE_PRIORITY-only entry does not touch
     # any of them.
-    ("sports", "TRADES_INPLAY"): ["odds_api"],
-    ("sports", "WEATHER_FORECAST"): ["open_meteo"],
+    ("sports", "trades_inplay"): ["odds_api"],
+    ("sports", "weather_forecast"): ["open_meteo"],
     # Sports raw data types (instruments-service manifest data_type names).
-    ("sports", "XG"): ["understat"],
-    ("sports", "XG_SHOTS"): ["understat"],
-    ("sports", "MATCHES"): ["footystats"],
-    ("sports", "STANDINGS"): ["api_football"],
-    ("sports", "WEATHER"): ["open_meteo"],
-    ("sports", "PREDICTIONS"): ["footystats"],
+    ("sports", "xg"): ["understat"],
+    ("sports", "xg_shots"): ["understat"],
+    ("sports", "matches"): ["footystats"],
+    ("sports", "standings"): ["api_football"],
+    ("sports", "weather"): ["open_meteo"],
+    ("sports", "predictions"): ["footystats"],
     # ODDS = footystats PRE-MATCH SNAPSHOT (kickoff-72h, books aggregated) — IS
     # reference data, NOT raw bookmaker ticks (those are ODDS_SNAPSHOT/ODDS_MOVEMENT/
     # ARBITRAGE → odds_api/MTDS above; the two legitimately coexist).
@@ -108,15 +106,15 @@ SOURCE_PRIORITY: Final[dict[tuple[str, str], list[str]]] = {
     # DISABLED the UTL write-time mis-stamp guard for the pair and made the IS expected-
     # universe enumerator fall through to a non-canonical source. Restored 2026-07-15 to
     # the exact pre-8fb1f54f value. SSOT: codex/02-data/sports-data-types-catalog.md:48-52.
-    ("sports", "ODDS"): ["footystats"],
-    ("sports", "ODDS_HORIZON_BUCKET"): ["mdps_odds_horizon_bucket"],
-    ("sports", "TRANSFER_RECORDS"): ["transfermarkt"],
+    ("sports", "odds"): ["footystats"],
+    ("sports", "odds_horizon_bucket"): ["mdps_odds_horizon_bucket"],
+    ("sports", "transfer_records"): ["transfermarkt"],
     # Sports reference tables.
-    ("sports", "TEAMS"): ["api_football"],
-    ("sports", "PLAYERS"): ["api_football"],
-    ("sports", "VENUES"): ["api_football"],
-    ("sports", "LEAGUES"): ["api_football"],
-    ("sports", "PLAYER_VALUES"): ["transfermarkt"],
+    ("sports", "teams"): ["api_football"],
+    ("sports", "players"): ["api_football"],
+    ("sports", "venues"): ["api_football"],
+    ("sports", "leagues"): ["api_football"],
+    ("sports", "player_values"): ["transfermarkt"],
     # ---- CeFi -----------------------------------------------------------
     # Tardis is the canonical CeFi tick source (multi-venue archive).
     # Per-venue REST/WS adapters serve live-time updates; archive falls

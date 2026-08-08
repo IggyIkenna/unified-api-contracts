@@ -425,13 +425,13 @@ SCHEMA_SPEC_REGISTRY: Final[tuple[SchemaSpec, ...]] = (
     # =====================================================================
     SchemaSpec(
         asset_group=AssetGroup.SPORTS,
-        data_type="FIXTURES",
+        data_type="fixtures",
         columns=_SPORTS_FIXTURE_COLUMNS,
         source="manual",
     ),
     SchemaSpec(
         asset_group=AssetGroup.SPORTS,
-        data_type="ODDS",
+        data_type="odds",
         columns=_SPORTS_ODDS_COLUMNS,
         source="manual",
     ),
@@ -445,7 +445,7 @@ def find_schema(
     """Return the schema spec for ``(asset_group, data_type)`` or ``None``."""
     ag = AssetGroup(asset_group) if not isinstance(asset_group, AssetGroup) else asset_group
     for spec in SCHEMA_SPEC_REGISTRY:
-        if spec.asset_group == ag and spec.data_type == data_type:
+        if spec.asset_group == ag and spec.data_type == data_type.lower():
             return spec
     return None
 
