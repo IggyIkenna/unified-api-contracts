@@ -902,22 +902,18 @@ TRADFI_INSTRUMENT_TYPE_ACCEPTED_UNRESOLVED_RESIDUE: frozenset[str] = frozenset(
     }
 )
 
-# Sports venue-axis cross-asset-group bleed (2026-07-30 census review). KALSHI is a real,
-# registered `prediction` venue (VENUES_BY_ASSET_GROUP["prediction"]) whose rows also
-# appear in the SPORTS manifest — 20,785 rows, 100% capture_status=empty_confirmed/
-# row_count=0, paired with source=polymarket_clob, dates 2020-06-06..2026-05-21.
-# GCS-confirmed 2026-07-30: zero real objects under asset_group=sports/venue=KALSHI at 3
-# dates spanning the full range — purely a manifest phantom, no data at risk. Root-cause
-# classification (fleet-wide manifest_consolidator TOCTOU vs. legacy artifact) remains open
-# on `sports_satellite_ao_dispatch_batch3_2026_07_25.md`; this only silences the panel
-# badge for the confirmed-phantom population. NOT a canonical set — never merge into
-# VENUES_BY_ASSET_GROUP["sports"] (KALSHI belongs to prediction, not sports). Consumed by
-# `_ACCEPTED_EXCEPTIONS[("venues", "sports")]`.
-SPORTS_VENUE_ACCEPTED_CROSS_AG_BLEED: frozenset[str] = frozenset(
-    {
-        "KALSHI",
-    }
-)
+# Sports venue-axis cross-asset-group bleed — RETIRED 2026-08-08 (empty).
+# Formerly held {"KALSHI"} to silence the panel badge for 20,785 empty_confirmed
+# rows (source=polymarket_clob, dates 2020-06-06..2026-05-21) in the SPORTS manifest.
+# Root causes both fixed: (1) VENUE_CATEGORY_MAP[KALSHI/POLYMARKET] corrected to
+# "prediction" (unified-api-contracts@f8e0d8d8, 2026-07-24); (2) kalshi removed from
+# MTDS sports _ADAPTER_PATHS. Defense-in-depth guard added to
+# `expected_universe.py::_expected_sports()` (is_prediction_market_venue filter).
+# The 20,785 legacy rows are a dormant fossil (classified 2026-07-31,
+# cross_ag_prediction_rows_bleed_into_sports_instruments_index_2026_07_20.md §2026-07-31);
+# manifest-row cleanup is P2. NOT a canonical set — never merge into
+# VENUES_BY_ASSET_GROUP["sports"]. Consumed by `_ACCEPTED_EXCEPTIONS[("venues", "sports")]`.
+SPORTS_VENUE_ACCEPTED_CROSS_AG_BLEED: frozenset[str] = frozenset()
 
 # Sports data_type-axis stale uppercase residue (2026-07-30 census review,
 # sports_consolidated_closeout_2026_07_19.md "K1/K2 revert"). `ODDS`/`ODDS_MOVEMENT`/
