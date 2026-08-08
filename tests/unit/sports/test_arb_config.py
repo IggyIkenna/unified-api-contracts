@@ -20,6 +20,7 @@ import pytest
 from unified_api_contracts.internal.domain.sports.arb_config import (
     EXCHANGE_COMMISSION_RATES,
     EXCHANGE_VENUES,
+    OPERATOR_GROUP_VENUES,
     arb_legs_are_independent,
     get_operator,
 )
@@ -28,6 +29,7 @@ from unified_api_contracts.registry.venue_constants import (
     BETFAIR_EX_EU,
     BETFAIR_EX_UK,
     SMARKETS,
+    SPORTS_BET_PLACEMENT_VENUES,
     UNIBET,
 )
 
@@ -100,3 +102,50 @@ class TestSmarketsCommissionBug2Regression:
     def test_smarkets_commission_rate_is_two_percent(self) -> None:
         # Operator pre-specified 0.02 on 2026-08-08.
         assert EXCHANGE_COMMISSION_RATES[SMARKETS] == 0.02
+
+
+@pytest.mark.unit
+class TestGetOperatorPropertyAllBetPlacementVenues:
+    """Property guard: get_operator must be consistent with OPERATOR_GROUP_VENUES for every venue
+    in SPORTS_BET_PLACEMENT_VENUES.
+
+    For each venue V:
+    - If V is declared in OPERATOR_GROUP_VENUES as a group member → get_operator(V) must return
+      the declared group operator (NOT the identity fallback).
+    - If V is NOT declared in any group → get_operator(V) returns V itself (standalone; correct).
+
+    This catches the pattern where a new venue is added to SPORTS_BET_PLACEMENT_VENUES and also
+    to OPERATOR_GROUP_VENUES, but the derivation of VENUE_OPERATOR_GROUPS silently fails to pick
+    it up (e.g., due to a casing mismatch or a hand-edit that deviates from the auto-derivation).
+    """
+
+    def test_bet_placement_venues_operator_resolution_consistent_with_group_declaration(
+        self,
+    ) -> None:
+        # Build expected mapping from every declared group member to its operator.
+        declared_member_to_operator: dict[str, str] = {
+            venue.upper(): operator for operator, members in OPERATOR_GROUP_VENUES.items() for venue in members
+        }
+
+        failures: list[str] = []
+        for venue in sorted(SPORTS_BET_PLACEMENT_VENUES):
+            key = venue.upper()
+            actual = get_operator(venue)
+            if key in declared_member_to_operator:
+                expected_operator = declared_member_to_operator[key]
+                if actual != expected_operator:
+                    failures.append(
+                        f"{venue!r}: declared member of operator {expected_operator!r} "
+                        f"but get_operator() returned {actual!r}"
+                    )
+            else:
+                # Genuinely standalone: identity fallback is the correct result.
+                if actual != key:
+                    failures.append(
+                        f"{venue!r}: expected standalone identity {key!r} but get_operator() returned {actual!r}"
+                    )
+
+        assert not failures, (
+            f"{len(failures)} venue(s) in SPORTS_BET_PLACEMENT_VENUES have unexpected "
+            f"get_operator() results:\n" + "\n".join(failures)
+        )
