@@ -10,6 +10,8 @@ from .venue_constants import (
     BET365,
     BET888SPORT,
     BETFAIR,
+    BETFAIR_EX_EU,
+    BETFAIR_EX_UK,
     BETMGM,
     BETOPENLY,
     BOVADA,
@@ -34,6 +36,7 @@ from .venue_constants import (
     SBOBET,
     SHARPAPI,
     SKYBET,
+    SMARKETS,
     SOCCER_FOOTBALL_INFO,
     SPORTS_BOOKMAKER_API_VENUES,
     SPORTS_BOOKMAKER_WEB_VENUES,
@@ -79,7 +82,17 @@ SPORTS_VENUE_TYPE_MAP.update(dict.fromkeys(SPORTS_DATA_VENUES, SportsVenueType.D
 
 SPORTS_AUTH_MAP: dict[str, SportsAuthMethod] = {
     BETFAIR: SportsAuthMethod.SESSION_TOKEN,
+    # BETFAIR_EX_UK/EX_EU are the same session-token-based Betfair Exchange API
+    # family as bare BETFAIR (regional market variants, not separate accounts) —
+    # closed 2026-08-08 alongside the SMARKETS gap below, same "every venue in
+    # the set must resolve an auth method" principle (sports taxonomy P1).
+    BETFAIR_EX_UK: SportsAuthMethod.SESSION_TOKEN,
+    BETFAIR_EX_EU: SportsAuthMethod.SESSION_TOKEN,
     MATCHBOOK: SportsAuthMethod.API_KEY,
+    # Best-available default pending a real integration (no adapter exists yet,
+    # same as every other 2026-08-08 re-promoted bookmaker) — API_KEY mirrors
+    # MATCHBOOK, its closest classified peer (both SPORTS_EXCHANGE_VENUES).
+    SMARKETS: SportsAuthMethod.API_KEY,
     POLYMARKET: SportsAuthMethod.WALLET_SIGNATURE,
     KALSHI: SportsAuthMethod.API_KEY,
     NOVIG: SportsAuthMethod.API_KEY,
@@ -87,7 +100,6 @@ SPORTS_AUTH_MAP: dict[str, SportsAuthMethod] = {
     PROPHETX: SportsAuthMethod.API_KEY,
     PINNACLE: SportsAuthMethod.API_KEY,
     ONEXBET: SportsAuthMethod.API_KEY,
-    ODDS_API: SportsAuthMethod.API_KEY,
     OPTICODDS: SportsAuthMethod.API_KEY,
     API_FOOTBALL: SportsAuthMethod.API_KEY,
 }

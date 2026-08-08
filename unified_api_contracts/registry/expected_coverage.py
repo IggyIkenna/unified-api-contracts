@@ -463,9 +463,15 @@ _DEFI: dict[str, list[str]] = {
 # any venue. Lives in :mod:`processed_data_dependencies` instead.
 #
 # BET365 removed — 0 manifest rows (DEFERRED-INDEFINITELY 2026-05-12).
+#
+# ODDS_API entry removed 2026-08-08 (sports taxonomy P1, operator ruling 2):
+# it left VENUES_BY_ASSET_GROUP["sports"] entirely (a SOURCE, not a venue whose
+# price this is), so an expected-coverage row keyed on it is stale. Its real
+# per-venue data_types now belong to the individual fan-out bookmakers this
+# phase re-promoted — redistributing them is the P2 data re-stamp this plan
+# phase explicitly defers (contract only, per todo 3's own scoping).
 # ---------------------------------------------------------------------------
 _SPORTS: dict[str, list[str]] = {
-    "ODDS_API": ["ODDS"],
     "PINNACLE": ["trades"],
     "BETFAIR_SB_UK": ["trades"],
     "BETFAIR_EX_UK": ["trades"],

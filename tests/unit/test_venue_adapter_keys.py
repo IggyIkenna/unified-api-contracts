@@ -37,7 +37,8 @@ EXPECTED_SENTINEL_VENUES: frozenset[str] = frozenset(
         #  unaffected — it still bypasses VENUE_TO_ADAPTER_KEY/URDI via its hardcoded
         #  Yahoo branch; this sentinel was specifically about the reference-data side.)
         # MTDS-owned sports odds venues (Decision C, 2026-06-29).
-        "ODDS_API",
+        # (ODDS_API removed 2026-08-08 — sports taxonomy P1: it left
+        #  VENUES_BY_ASSET_GROUP["sports"] entirely, it's a SOURCE not a venue.)
         "PINNACLE",
         "BETFAIR_SB_UK",
         "BETFAIR_EX_UK",
@@ -49,15 +50,42 @@ EXPECTED_SENTINEL_VENUES: frozenset[str] = frozenset(
         "LADBROKES",
         "BET888SPORT",
         "SMARKETS",
-        # The 20 ODDS_API fan-out bookmakers (BETMGM..WILLIAMHILL) that were
-        # promoted into VENUES_BY_ASSET_GROUP["sports"] + sentineled here
-        # 2026-07-20 were REVERTED 2026-07-22 (operator ruling: "do NOT add
-        # them, in fact remove them everywhere so they don't come up in audit"
-        # — distinct_values_noncanonical_audit_2026_07_20.md). They are no
-        # longer canonical venues, so they are correctly ABSENT from this set
-        # too (this set only covers canonical-but-adapterless venues). See
-        # `market_data_categories.SPORTS_ODDS_API_ACCEPTED_NONCANONICAL_BOOKMAKERS`
-        # for where they now live instead.
+        # The 22 ODDS_API fan-out bookmakers below were promoted into
+        # VENUES_BY_ASSET_GROUP["sports"] + sentineled here 2026-07-20, REVERTED
+        # 2026-07-22 (operator ruling: "do NOT add them, in fact remove them
+        # everywhere so they don't come up in audit" —
+        # distinct_values_noncanonical_audit_2026_07_20.md), then RE-PROMOTED +
+        # RE-SENTINELED 2026-08-08 (sports taxonomy P1, operator ruling 1: "venue
+        # means whose price is this... add a separate executable predicate" —
+        # `venue_adapter_keys.is_venue_executable()`; none of these 22 has a real
+        # adapter, same MTDS-owned-via-ODDS_API-fan-out shape as PINNACLE/
+        # DRAFTKINGS/... above). FOOTYSTATS is the one bookmaker that stays OUT of
+        # both this sentinel set AND VENUES_BY_ASSET_GROUP for an unrelated,
+        # still-standing reason (two-registry-disjointness with IS's own
+        # FOOTYSTATS reference-data-provider venue) — see
+        # `market_data_categories.SPORTS_ODDS_API_ACCEPTED_NONCANONICAL_BOOKMAKERS`.
+        "BETMGM",
+        "BETONLINEAG",
+        "BETOPENLY",
+        "BETRIVERS",
+        "BETSSON",
+        "BETVICTOR",
+        "BETWAY",
+        "BOVADA",
+        "CASUMO",
+        "CORAL",
+        "LIVESCOREBET",
+        "MATCHBOOK",
+        "NOVIG",
+        "ONEXBET",
+        "PADDYPOWER",
+        "PROPHETX",
+        "SKYBET",
+        "UNIBET",
+        "UNIBET_EU",
+        "UNIBET_UK",
+        "VIRGINBET",
+        "WILLIAMHILL",
         # Sports enrichment providers (2026-07-29): each has a WORKING adapter class, but
         # in instruments-service's separate sports-only sub-factory
         # (reference_data/adapters/sports/factory.py, base class
