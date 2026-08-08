@@ -53,6 +53,29 @@ def test_sports_player_values_primary_is_transfermarkt() -> None:
     assert get_primary_source("sports", "PLAYER_VALUES") == "transfermarkt"
 
 
+def test_sports_trades_primary_is_odds_api() -> None:
+    assert get_primary_source("sports", "TRADES") == "odds_api"
+
+
+def test_sports_source_priority_never_routes_to_prediction_market_source() -> None:
+    """Regression guard for the cross-AG bleed (`SPORTS_VENUE_ACCEPTED_CROSS_AG_BLEED` /
+    `cross_ag_prediction_rows_bleed_into_sports_instruments_index_2026_07_20.md`): 20,785
+    `venue=KALSHI`/`source=polymarket_clob` phantom rows landed in the sports manifest
+    because a candidate-venue enumerator once resolved KALSHI/POLYMARKET as sports venues
+    (a since-fixed `VENUE_CATEGORY_MAP` SSOT contradiction, `unified-api-contracts@f8e0d8d8`).
+    `instruments-service/scripts/enumerate_expected_universe.py::_derive_pm_source_transport`
+    derives every seeded row's `(pipeline_mode, source)` from this exact table — so no
+    `("sports", *)` entry may ever list a prediction-market source, or the enumerator would
+    seed a fresh batch of cross-AG bleed rows the moment it processed a sports cell.
+    """
+    prediction_market_sources = {"polymarket_clob", "polymarket_gamma_api", "kalshi"}
+    for (asset_group, data_type), sources in SOURCE_PRIORITY.items():
+        if asset_group != "sports":
+            continue
+        overlap = prediction_market_sources.intersection(sources)
+        assert not overlap, f"sports data_type {data_type!r} routes to prediction-market source(s) {overlap}"
+
+
 # ---------------------------------------------------------------------------
 # Market-data primary sources
 # ---------------------------------------------------------------------------
