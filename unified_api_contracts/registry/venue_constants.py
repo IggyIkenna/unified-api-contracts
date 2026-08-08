@@ -60,7 +60,9 @@ LIDO = "LIDO"
 ETHERFI = "ETHERFI"
 ETHENA = "ETHENA"
 
-# Sports Betting Exchanges — two-sided markets with API access
+# Sports Betting Exchanges — two-sided markets with API access.
+# Bare BETFAIR is an operator-group parent (see arb_config.OPERATOR_GROUP_VENUES),
+# not a data-axis venue — data-axis members are BETFAIR_EX_UK / BETFAIR_EX_EU.
 BETFAIR = "BETFAIR"
 BETFAIR_SB_UK = "BETFAIR_SB_UK"  # Betfair Sportsbook (UK)
 BETFAIR_EX_UK = "BETFAIR_EX_UK"  # Betfair Exchange (UK)
@@ -194,7 +196,7 @@ OPTICODDS = "OPTICODDS"
 # (same shape as BETFAIR/MATCHBOOK), was canonical in VENUES_BY_ASSET_GROUP
 # ["sports"] since 2026-07-30 but missing from every classification set below
 # (SportsVenueType/auth/fee-model/alpha-profile all failed to resolve for it).
-SPORTS_EXCHANGE_VENUES: set[str] = {BETFAIR, MATCHBOOK, BETFAIR_EX_UK, BETFAIR_EX_EU, SMARKETS}
+SPORTS_EXCHANGE_VENUES: set[str] = {MATCHBOOK, BETFAIR_EX_UK, BETFAIR_EX_EU, SMARKETS}
 
 SPORTS_PREDICTION_MARKET_VENUES: set[str] = {POLYMARKET, KALSHI, NOVIG, BETOPENLY, PROPHETX}
 

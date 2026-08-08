@@ -556,7 +556,9 @@ VENUES_BY_ASSET_GROUP: dict[str, list[str]] = {
         # carries `odds_api` correctly, so stamping it as a venue too was double-
         # counting the same fact on two axes.
         "PINNACLE",  # Bookmaker API (ODDS_API fan-out + direct)
-        "BETFAIR",  # Canonical exchange venue constant (execution/reference)
+        # Bare "BETFAIR" removed 2026-08-08 (sports taxonomy P1): it is an
+        # operator-group parent, not a data-axis venue; manifest venue column
+        # carries BETFAIR_EX_UK / BETFAIR_EX_EU / BETFAIR_SB_UK directly.
         "BETFAIR_SB_UK",  # MTDS manifest sub-venue: Betfair Sportsbook UK
         "BETFAIR_EX_UK",  # MTDS manifest sub-venue: Betfair Exchange UK
         "BETFAIR_EX_EU",  # MTDS manifest sub-venue: Betfair Exchange EU
@@ -2270,13 +2272,8 @@ VENUE_DATA_TYPE_CAPABILITIES: dict[str, dict[str, str]] = {
         "outcomes": "2024-01-01",
         "settlements": "2024-01-01",
     },
-    "BETFAIR": {
-        "odds_snapshot": "2024-01-01",
-        "odds_movement": "2024-01-01",
-        "markets": "2024-01-01",
-        "outcomes": "2024-01-01",
-        "settlements": "2024-01-01",
-    },
+    # Bare "BETFAIR" removed 2026-08-08 (sports taxonomy P1 — operator-group parent,
+    # not a data-axis venue; concrete sub-venues carry their own entries below).
     # DRAFTKINGS / FANDUEL / BET365 + the 14 UK/EU scraper bookmakers are
     # DEFERRED-INDEFINITELY 2026-05-12 per operator (see VENUES_BY_ASSET_GROUP
     # comment above + sports_master plan).
