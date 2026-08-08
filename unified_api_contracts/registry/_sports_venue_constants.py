@@ -9,7 +9,8 @@ from .venue_constants import (
     API_FOOTBALL,
     BET365,
     BET888SPORT,
-    BETFAIR,
+    BETFAIR_EX_EU,
+    BETFAIR_EX_UK,
     BETMGM,
     BETOPENLY,
     BOVADA,
@@ -78,7 +79,12 @@ SPORTS_VENUE_TYPE_MAP.update(dict.fromkeys(SPORTS_DFS_VENUES, SportsVenueType.DF
 SPORTS_VENUE_TYPE_MAP.update(dict.fromkeys(SPORTS_DATA_VENUES, SportsVenueType.DATA_ONLY))
 
 SPORTS_AUTH_MAP: dict[str, SportsAuthMethod] = {
-    BETFAIR: SportsAuthMethod.SESSION_TOKEN,
+    # Exchange venues use the Betfair session token API.
+    # BETFAIR (bare) is the operator-group parent — not a bookable venue, no auth entry.
+    # BETFAIR_SB_UK is a web sportsbook; it gets LOGIN_CREDENTIALS from the
+    # SPORTS_BOOKMAKER_WEB_VENUES bulk update below.
+    BETFAIR_EX_UK: SportsAuthMethod.SESSION_TOKEN,
+    BETFAIR_EX_EU: SportsAuthMethod.SESSION_TOKEN,
     MATCHBOOK: SportsAuthMethod.API_KEY,
     POLYMARKET: SportsAuthMethod.WALLET_SIGNATURE,
     KALSHI: SportsAuthMethod.API_KEY,

@@ -61,6 +61,9 @@ ETHERFI = "ETHERFI"
 ETHENA = "ETHENA"
 
 # Sports Betting Exchanges — two-sided markets with API access
+# BETFAIR is the operator-group PARENT (brand label); NOT a data-axis venue.
+# The bookable product venues — BETFAIR_EX_UK, BETFAIR_EX_EU, BETFAIR_SB_UK — roll up to it.
+# See SPORTS_VENUE_OPERATOR_PARENT below for the canonical hierarchy.
 BETFAIR = "BETFAIR"
 BETFAIR_SB_UK = "BETFAIR_SB_UK"  # Betfair Sportsbook (UK)
 BETFAIR_EX_UK = "BETFAIR_EX_UK"  # Betfair Exchange (UK)
@@ -184,7 +187,19 @@ METABET = "METABET"
 OPTICODDS = "OPTICODDS"
 
 # Sports Venue Sub-Sets — grouped by execution semantics
-SPORTS_EXCHANGE_VENUES: set[str] = {BETFAIR, MATCHBOOK, BETFAIR_EX_UK, BETFAIR_EX_EU}
+# BETFAIR (bare) is excluded — it is the operator-group parent, not a bookable data-axis venue.
+# Use BETFAIR_EX_UK / BETFAIR_EX_EU for exchange access; BETFAIR_SB_UK is in SPORTS_BOOKMAKER_WEB_VENUES.
+SPORTS_EXCHANGE_VENUES: set[str] = {MATCHBOOK, BETFAIR_EX_UK, BETFAIR_EX_EU}
+
+# Venue → operator-group parent. Source of truth for the venue hierarchy consumed by arb guards,
+# same-counterparty checks, and any other logic that needs to group product venues by brand/operator.
+# Operator ruling 2026-08-08: BETFAIR (bare) is the operator-group parent; BETFAIR_EX_UK, _EX_EU,
+# and _SB_UK are the bookable product venues that roll up to it.
+SPORTS_VENUE_OPERATOR_PARENT: dict[str, str] = {
+    BETFAIR_EX_UK: BETFAIR,
+    BETFAIR_EX_EU: BETFAIR,
+    BETFAIR_SB_UK: BETFAIR,
+}
 
 SPORTS_PREDICTION_MARKET_VENUES: set[str] = {POLYMARKET, KALSHI, NOVIG, BETOPENLY, PROPHETX}
 

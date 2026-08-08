@@ -16,12 +16,10 @@ from pydantic import BaseModel, Field
 
 from unified_api_contracts.registry.venue_constants import (
     BETFAIR,
-    BETFAIR_EX_EU,
-    BETFAIR_EX_UK,
-    BETFAIR_SB_UK,
     LADBROKES,
     LEOVEGAS,
     SMARKETS,
+    SPORTS_VENUE_OPERATOR_PARENT,
     UNIBET,
     WILLIAMHILL,
     WINAMAX,
@@ -183,22 +181,27 @@ EXCHANGE_COMMISSION_RATES: dict[str, float] = {
     SMARKETS: 0.02,  # 2.0% on net winnings — operator pre-specified 2026-08-08
 }
 
+
 # Bookmaker operator hierarchy — same company, different regional skins.
 # Arbs between venues in the same group are not real (same counterparty).
 # Strategy must ensure arb legs come from DIFFERENT groups.
 #
-# BETFAIR_SB (sportsbook) collapses into BETFAIR per operator ruling 2026-08-08:
-# the sportsbook and exchange products are the same counterparty for arb-independence.
-# Phantom regional venues (no UAC constant yet) are kept here until todo 4 prunes
+# Canonical UAC venues: derived from SPORTS_VENUE_OPERATOR_PARENT (venue_constants.py).
+# Phantom regional venues (no UAC constant yet) are added here until todo 4 prunes
 # any that are absent from the live sports manifest.
+def _invert_parent_map(parent_map: dict[str, str]) -> dict[str, set[str]]:
+    groups: dict[str, set[str]] = {}
+    for venue, parent in parent_map.items():
+        groups.setdefault(parent, set()).add(venue)
+    return groups
+
+
+_CANONICAL_GROUPS: dict[str, set[str]] = _invert_parent_map(SPORTS_VENUE_OPERATOR_PARENT)
+
 OPERATOR_GROUP_VENUES: dict[str, frozenset[str]] = {
     BETFAIR: frozenset(
-        {
-            BETFAIR_EX_UK,
-            BETFAIR_EX_EU,
-            "BETFAIR_EX_AU",  # no UAC constant; pruned by todo 4 if absent from manifest
-            BETFAIR_SB_UK,
-        }
+        _CANONICAL_GROUPS.get(BETFAIR, set())
+        | {"BETFAIR_EX_AU"}  # no UAC constant; pruned by todo 4 if absent from manifest
     ),
     UNIBET: frozenset(
         {
