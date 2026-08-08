@@ -100,6 +100,17 @@ class EmptyConfirmedReason(StrEnum):
     EXPECTED_INSTRUMENT_DELISTED = "EXPECTED_INSTRUMENT_DELISTED"
     """Instrument's ``delisted_at`` is on or before the day."""
 
+    EXPECTED_TARDIS_VENDOR_CATALOG_EXCLUDED = "EXPECTED_TARDIS_VENDOR_CATALOG_EXCLUDED"
+    """CeFi/Tardis: the (symbol, data_type, date) 3-tuple fails Tardis's own vendor catalog
+    (``GET /v1/exchanges/<venue>`` -> ``datasets.symbols[]``) — the symbol is not archived at
+    all, the data_type is not among the symbol's published ``dataTypes``, or the date falls
+    outside ``availableSince..availableTo``. Requesting one of these always returns HTTP 400
+    (``code=300``/``code=140`` — see ``TardisHTTPError.is_structural_absence``), so this is a
+    PROACTIVE, pre-fetch exclusion (never requested at all), distinct from the reactive
+    honest-absence classification the 400-handler already applies to a combo this gate missed
+    (fail-open on an empty/unreachable catalog). SSOT:
+    plans/active/issues/tardis_impossible_combinations_recorded_as_attempted_failed_2026_07_17.md."""
+
     EXPECTED_NOT_ENOUGH_TVL = "EXPECTED_NOT_ENOUGH_TVL"
     """DeFi: a pool/market EXISTS on-chain on the day but its TVL is below the MVP TVL
     threshold — so it is outside the capture universe for that day (the TVL filter IS the
@@ -670,6 +681,7 @@ OUT_OF_COVERAGE_WINDOW_REASONS: Final[frozenset[str]] = frozenset(
         EmptyConfirmedReason.EXPECTED_UPSTREAM_OUT_OF_BOUNDS.value,
         EmptyConfirmedReason.EXPECTED_INSTRUMENT_NOT_LISTED.value,
         EmptyConfirmedReason.EXPECTED_INSTRUMENT_DELISTED.value,
+        EmptyConfirmedReason.EXPECTED_TARDIS_VENDOR_CATALOG_EXCLUDED.value,
         EmptyConfirmedReason.EXPECTED_NOT_ENOUGH_TVL.value,
         EmptyConfirmedReason.EXPECTED_PRE_SEASON.value,
         EmptyConfirmedReason.EXPECTED_POST_SEASON.value,
