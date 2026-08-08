@@ -114,6 +114,37 @@ def get_valid_timeframes_for_data_type(data_type: str) -> list[str]:
     return [tf for tf in TIMEFRAMES if TIMEFRAME_SECONDS.get(tf, 0) >= base_seconds]
 
 
+# Sports Tier-1 ML horizon buckets — a first-class axis, SEPARATE from
+# ``TIMEFRAMES`` (sports_taxonomy_p1_capture_and_contracts_2026_08_08.md,
+# operator ruling 5, 2026-08-08). ``timeframe`` means candle grain only
+# (15s/1m/5m/15m/1h/4h/24h); ``horizon`` means time-to-kickoff for a
+# pre-match sports odds bucket. Overloading one column with both meanings
+# was the defect this axis exists to fix — see the plan's "operator rulings"
+# section for the live-manifest evidence. Names + ordering mirror MDPS's
+# ``bucket_assignment_adapter.TIER1_HORIZONS`` (the calibration table of
+# target-minutes/staleness-cap PAIRS stays local to that adapter — it's
+# algorithm tuning, not axis vocabulary); this list is the SSOT for the
+# horizon NAMES themselves so downstream consumers (readers, manifest,
+# honest-coverage rollup) validate against one source instead of each
+# hardcoding their own copy.
+SPORTS_HORIZONS: list[str] = [
+    "T-24h",
+    "T-18h",
+    "T-12h",
+    "T-6h",
+    "T-4h",
+    "T-2h",
+    "T-1h",
+    "T-10m",
+    "T-0",
+]
+
+
+def is_valid_horizon(value: str) -> bool:
+    """Return True if ``value`` is a canonical sports Tier-1 horizon bucket name."""
+    return value in SPORTS_HORIZONS
+
+
 # Data types per asset group
 DATA_TYPES_BY_ASSET_GROUP: dict[str, list[str]] = {
     "cefi": [
@@ -1428,7 +1459,15 @@ VALID_DATA_TYPES_BY_AG_AND_INSTRUMENT_TYPE: dict[tuple[str, str], frozenset[str]
     # target") decided sports data_type/instrument_type is LOWER-case for the
     # WHOLE vocabulary, no UPPER exception — K1/K2 are being reverted, not kept.
     # The lowercase "odds"/"trades" pair is the sole canonical form again.
-    ("sports", "odds"): frozenset({"trades"}),
+    # "odds_horizon_bucket" added 2026-08-08 (sports_taxonomy_p1_capture_and_
+    # contracts_2026_08_08.md, first-class horizon axis): CONFIRMED, not
+    # UNCERTAIN, same basis as "trades" above — CONTRACT_REGISTRY[("sports",
+    # "odds", "odds_horizon_bucket")] = SPORTS_ODDS_HORIZON_BUCKET is a real,
+    # registered SchemaContract and MDPS SportsBucketAssignmentAdapter is the
+    # live, sole writer of this data_type. Folding it into a lowercase "odds"
+    # data_type (per operator ruling 5) is the P2 data re-stamp — this entry
+    # covers the data_type as it is captured TODAY.
+    ("sports", "odds"): frozenset({"trades", "odds_horizon_bucket"}),
 }
 
 
