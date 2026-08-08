@@ -92,21 +92,13 @@ class InstrumentType(StrEnum):
     COMBO = "COMBO"
     # Sports / Prediction Markets
     PREDICTION_MARKET = "PREDICTION_MARKET"
-    # EXCHANGE_ODDS / FIXED_ODDS are LIVE in the derivation + adapter layer:
-    #   - instruments-service ``instruments_service/reference_data/adapters/sports/
-    #     adapters/betfair.py:287`` constructs ``InstrumentType.EXCHANGE_ODDS``.
-    #   - UTL ``unified_trading_library/canonical/_derive_instrument_id.py:85`` maps
-    #     ``("sports", "odds") -> InstrumentType.EXCHANGE_ODDS``.
-    # They are NOT the sports manifest's vocabulary. The sports SchemaContract
-    # registry deliberately does NOT key on InstrumentType — it keys on the declared
-    # contract value ``odds`` (see internal/schemas/_sports_prediction_contracts.py,
-    # instrument_type="odds"), which is also the physical GCS hive partition
-    # (``instrument_type=odds/``) and is still actively written.
-    # Do NOT "fix" the manifest/registry to match these enum members: renaming
-    # ``odds`` -> EXCHANGE_ODDS/FIXED_ODDS would create manifest<->disk<->registry
-    # divergence to change a value that has zero shard + display consumers
-    # (SHARD_AXIS_MATRIX keys sports on ("data_type", "league_id"), not
-    # instrument_type). Operator ruling 2026-07-17: closed as not-a-defect.
+    # ODDS is the canonical sports manifest instrument_type (2026-08-08 operator
+    # ruling 9: the EXCHANGE_ODDS/FIXED_ODDS per-venue split is retired; venue
+    # class is derivable from UAC SportsVenueType at read time).
+    ODDS = "ODDS"
+    # EXCHANGE_ODDS / FIXED_ODDS: P2 consumers (instruments-service betfair.py:287
+    # and UTL _derive_instrument_id.py:85) still reference these enum members.
+    # Kept until P2 retires them. Do NOT use for new writes — use ODDS instead.
     EXCHANGE_ODDS = "EXCHANGE_ODDS"
     FIXED_ODDS = "FIXED_ODDS"
     PROP = "PROP"

@@ -121,7 +121,7 @@ INSTRUCTION_CONSTRAINTS: dict[str, InstructionConstraint] = {
     ),
     "SPORTS_BET": InstructionConstraint(
         order_types=frozenset({"MARKET"}),
-        instrument_types=frozenset({"FIXED_ODDS", "PROP"}),
+        instrument_types=frozenset({"ODDS", "PROP"}),
         venue_categories=frozenset({"sports"}),
         operation_types=frozenset({"BUY"}),
         requires_price=True,
@@ -129,7 +129,7 @@ INSTRUCTION_CONSTRAINTS: dict[str, InstructionConstraint] = {
     ),
     "SPORTS_EXCHANGE_ORDER": InstructionConstraint(
         order_types=frozenset({"MARKET", "LIMIT"}),
-        instrument_types=frozenset({"EXCHANGE_ODDS"}),
+        instrument_types=frozenset({"ODDS"}),
         venue_categories=frozenset({"sports"}),
         operation_types=frozenset({"BUY", "SELL"}),
         requires_price=True,
