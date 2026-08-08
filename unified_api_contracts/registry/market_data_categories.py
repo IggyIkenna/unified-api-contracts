@@ -550,7 +550,6 @@ VENUES_BY_ASSET_GROUP: dict[str, list[str]] = {
         # badging them canonical.
         "ODDS_API",  # Multi-bookmaker odds aggregator (raw tick data source)
         "PINNACLE",  # Bookmaker API (ODDS_API fan-out + direct)
-        "BETFAIR",  # Canonical exchange venue constant (execution/reference)
         "BETFAIR_SB_UK",  # MTDS manifest sub-venue: Betfair Sportsbook UK
         "BETFAIR_EX_UK",  # MTDS manifest sub-venue: Betfair Exchange UK
         "BETFAIR_EX_EU",  # MTDS manifest sub-venue: Betfair Exchange EU
@@ -2277,7 +2276,21 @@ VENUE_DATA_TYPE_CAPABILITIES: dict[str, dict[str, str]] = {
         "outcomes": "2024-01-01",
         "settlements": "2024-01-01",
     },
-    "BETFAIR": {
+    "BETFAIR_EX_UK": {
+        "odds_snapshot": "2024-01-01",
+        "odds_movement": "2024-01-01",
+        "markets": "2024-01-01",
+        "outcomes": "2024-01-01",
+        "settlements": "2024-01-01",
+    },
+    "BETFAIR_EX_EU": {
+        "odds_snapshot": "2024-01-01",
+        "odds_movement": "2024-01-01",
+        "markets": "2024-01-01",
+        "outcomes": "2024-01-01",
+        "settlements": "2024-01-01",
+    },
+    "BETFAIR_SB_UK": {
         "odds_snapshot": "2024-01-01",
         "odds_movement": "2024-01-01",
         "markets": "2024-01-01",

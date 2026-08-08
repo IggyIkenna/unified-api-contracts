@@ -10,6 +10,8 @@ from .venue_constants import (
     BET365,
     BET888SPORT,
     BETFAIR,
+    BETFAIR_EX_EU,
+    BETFAIR_EX_UK,
     BETMGM,
     BETOPENLY,
     BOVADA,
@@ -78,7 +80,9 @@ SPORTS_VENUE_TYPE_MAP.update(dict.fromkeys(SPORTS_DFS_VENUES, SportsVenueType.DF
 SPORTS_VENUE_TYPE_MAP.update(dict.fromkeys(SPORTS_DATA_VENUES, SportsVenueType.DATA_ONLY))
 
 SPORTS_AUTH_MAP: dict[str, SportsAuthMethod] = {
-    BETFAIR: SportsAuthMethod.SESSION_TOKEN,
+    BETFAIR: SportsAuthMethod.SESSION_TOKEN,  # operator-group parent; auth protocol shared with sub-venues
+    BETFAIR_EX_UK: SportsAuthMethod.SESSION_TOKEN,
+    BETFAIR_EX_EU: SportsAuthMethod.SESSION_TOKEN,
     MATCHBOOK: SportsAuthMethod.API_KEY,
     POLYMARKET: SportsAuthMethod.WALLET_SIGNATURE,
     KALSHI: SportsAuthMethod.API_KEY,

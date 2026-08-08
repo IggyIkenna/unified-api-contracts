@@ -113,26 +113,30 @@ class TestResolveVenueContextWebScraper:
 
 
 class TestResolveVenueContextSportsExchange:
-    """Sports exchange: BETFAIR."""
+    """Sports exchange sub-venues: BETFAIR_EX_UK / BETFAIR_EX_EU.
 
-    def test_betfair_execution_pattern(self) -> None:
-        ctx = resolve_venue_context("BETFAIR", "place_orders", "mainnet")
+    Bare BETFAIR is now the operator-group parent, not a data-axis venue.
+    The sub-venues carry all execution semantics.
+    """
+
+    def test_betfair_ex_uk_execution_pattern(self) -> None:
+        ctx = resolve_venue_context("BETFAIR_EX_UK", "place_orders", "mainnet")
         assert ctx.execution_pattern == "clob_api"
 
-    def test_betfair_sports_venue_type(self) -> None:
-        ctx = resolve_venue_context("BETFAIR")
+    def test_betfair_ex_uk_sports_venue_type(self) -> None:
+        ctx = resolve_venue_context("BETFAIR_EX_UK")
         assert ctx.sports_venue_type == "exchange_api"
 
-    def test_betfair_supported_market_types(self) -> None:
-        ctx = resolve_venue_context("BETFAIR")
-        assert len(ctx.supported_market_types) > 0, "BETFAIR should have supported market types"
+    def test_betfair_ex_uk_supported_market_types(self) -> None:
+        ctx = resolve_venue_context("BETFAIR_EX_UK")
+        assert len(ctx.supported_market_types) > 0, "BETFAIR_EX_UK should have supported market types"
 
-    def test_betfair_venue_category(self) -> None:
-        ctx = resolve_venue_context("BETFAIR")
+    def test_betfair_ex_uk_venue_category(self) -> None:
+        ctx = resolve_venue_context("BETFAIR_EX_UK")
         assert ctx.venue_category == "sports"
 
-    def test_betfair_auth_method(self) -> None:
-        ctx = resolve_venue_context("BETFAIR")
+    def test_betfair_ex_uk_auth_method(self) -> None:
+        ctx = resolve_venue_context("BETFAIR_EX_UK")
         assert ctx.sports_auth_method == "session_token"
 
 
@@ -330,7 +334,7 @@ class TestResolveVenueContextParametrized:
             ("HYPERLIQUID", "cefi"),
             ("AAVE_V3", "defi"),
             ("UNISWAP_V3-ETHEREUM", "defi"),
-            ("BETFAIR", "sports"),
+            ("BETFAIR_EX_UK", "sports"),
             ("DRAFTKINGS", "sports"),
             ("KALSHI", "prediction"),
             ("POLYMARKET", "prediction"),
@@ -346,7 +350,7 @@ class TestResolveVenueContextParametrized:
             ("HYPERLIQUID", "clob_api"),
             ("AAVE_V3", "on_chain_tx"),
             ("DRAFTKINGS", "web_scraper"),
-            ("BETFAIR", "clob_api"),
+            ("BETFAIR_EX_UK", "clob_api"),
         ],
     )
     def test_execution_pattern_no_operation(self, venue: str, expected_pattern: str) -> None:
