@@ -359,6 +359,54 @@ def canonical_sports_odds_data_type(data_type: str) -> str | None:
     return SPORTS_ODDS_DATA_TYPE_CANONICAL_FORM.get(data_type)
 
 
+# Snapshot-vs-candle discriminator for the collapsed sports odds model
+# (plans/active/sports_taxonomy_p1_capture_and_contracts_2026_08_08.md,
+# "Decide and record the snapshot-vs-candle discriminator on the collapsed
+# model"). Once the raw vocabulary is one lowercase ``odds`` (see
+# ``SPORTS_ODDS_DATA_TYPE_CANONICAL_FORM`` above), ``timeframe`` alone cannot
+# distinguish ``odds_movement`` (an OHLC bar) from ``odds_snapshot`` (a LOCF
+# point-in-time read) — both are bucketed at the same grains. PRE-SPECIFIED
+# resolution (confirmed against
+# ``market_data_processing_service.app.core.canonical_writer_shaping
+# .mdps_data_type_key``'s real output, and the fleet-wide MDPS ruling in
+# ``registry/processed_data_dependencies.py`` that an MDPS manifest row's
+# ``data_type`` carries the RAW source token with the candle timeframe living
+# in a SEPARATE ``timeframe`` column):
+#   * ``odds_movement`` (OHLC bar) is not a distinct product — it collapses
+#     onto the SAME processed prefix a raw-odds candle would already use,
+#     ``_RAW_TO_PROCESSED_PREFIX["odds"] == "odds_ohlcv"`` — mirroring how
+#     CEFI's trades-candle adapter registers under its raw source_data_type
+#     ("trades") rather than a bespoke product name.
+#   * ``odds_snapshot`` (LOCF) is NOT an OHLC bar and keeps its own distinct
+#     processed prefix, ``odds_snapshot``, so ``mdps_data_type_key`` resolves
+#     it deterministically through the same ``{prefix}_{timeframe}``
+#     mechanism instead of an untyped ``source_data_type`` fallback.
+# Neither key is a new sports ``data_type`` in ``DATA_TYPES_BY_ASSET_GROUP`` —
+# both are MDPS-internal processed-key prefixes, same status as the existing
+# ``odds_horizon_bucket``/``arbitrage_opportunity`` adapter product names.
+# ADDITIVE ONLY this phase (P1 contracts-only; no GCS/manifest mutation) —
+# P2 re-keys the ``odds_snapshot``/``odds_movement`` adapters'
+# ``CandleAdapterRegistry`` registration + MDPS's own
+# ``_DATA_TYPE_TO_MDPS_PREFIX`` (and this table's registry-side mirror,
+# ``_RAW_TO_PROCESSED_PREFIX``) to this decision, per the consumer inventory
+# on the collapse todo this one follows.
+SPORTS_ODDS_DERIVED_PROCESSED_PREFIX: dict[str, str] = {
+    "odds_movement": "odds_ohlcv",
+    "odds_snapshot": "odds_snapshot",
+}
+
+
+def sports_odds_derived_processed_prefix(product: str) -> str | None:
+    """Return the TARGET MDPS processed-key prefix for a sports odds-derived
+    product (``odds_movement`` / ``odds_snapshot``), or ``None`` if unknown.
+
+    P1 contract only — see :data:`SPORTS_ODDS_DERIVED_PROCESSED_PREFIX`'s
+    docstring for why the adapters' registry keys + ``mdps_data_type_key``
+    wiring stay unchanged until P2.
+    """
+    return SPORTS_ODDS_DERIVED_PROCESSED_PREFIX.get(product)
+
+
 # ---------------------------------------------------------------------------
 # Structural (league x source) honest-absence gaps (operator 2026-06-27 #6)
 # ---------------------------------------------------------------------------
