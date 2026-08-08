@@ -77,6 +77,16 @@ SPORTS_VENUE_TYPE_MAP.update(dict.fromkeys(SPORTS_BOOKMAKER_WEB_VENUES, SportsVe
 SPORTS_VENUE_TYPE_MAP.update(dict.fromkeys(SPORTS_DFS_VENUES, SportsVenueType.DFS_PLATFORM))
 SPORTS_VENUE_TYPE_MAP.update(dict.fromkeys(SPORTS_DATA_VENUES, SportsVenueType.DATA_ONLY))
 
+
+def is_exchange_venue(venue: str) -> bool:
+    """Return True iff venue is a betting exchange (operator ruling 2026-08-08).
+
+    Exchange-vs-sportsbook is a property of the VENUE, not the instrument.
+    Replaces the retired EXCHANGE_ODDS / FIXED_ODDS instrument_type split.
+    """
+    return SPORTS_VENUE_TYPE_MAP.get(venue) == SportsVenueType.EXCHANGE_API
+
+
 SPORTS_AUTH_MAP: dict[str, SportsAuthMethod] = {
     BETFAIR: SportsAuthMethod.SESSION_TOKEN,
     MATCHBOOK: SportsAuthMethod.API_KEY,

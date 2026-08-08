@@ -580,18 +580,21 @@ def test_every_sports_odds_family_contract_registry_entry_is_matrix_reachable() 
     ``VALID_DATA_TYPES_BY_AG_AND_INSTRUMENT_TYPE`` entry for that
     instrument_type.
 
-    Scoped to the odds-shape family the matrix already declares
-    (fixture/exchange_odds/fixed_odds/prop/odds) rather than the whole
-    CONTRACT_REGISTRY -- most of the registry (ml_training manifests, sports
-    reference/derived/feature contracts, MDPS candle-feature families, ...)
-    is outside what this market-data validity matrix models at all.
+    Scoped to the odds-shape family the matrix currently models (fixture/prop/odds)
+    rather than the whole CONTRACT_REGISTRY -- most of the registry (ml_training
+    manifests, sports reference/derived/feature contracts, MDPS candle-feature
+    families, ...) is outside what this market-data validity matrix models at all.
+    "exchange_odds" and "fixed_odds" are EXCLUDED from this scope (operator ruling
+    2026-08-08): they stay in CONTRACT_REGISTRY for P2 migration backward-compat
+    reads of old manifest rows, but the validity matrix no longer models them
+    (both alias to "odds" in _INSTRUMENT_TYPE_ALIASES for forward-path queries).
     """
     from unified_api_contracts.registry.market_data_categories import (
         DATA_TYPES_BY_ASSET_GROUP,
         VALID_DATA_TYPES_BY_AG_AND_INSTRUMENT_TYPE,
     )
 
-    odds_family_instrument_types = {"fixture", "exchange_odds", "fixed_odds", "prop", "odds"}
+    odds_family_instrument_types = {"fixture", "prop", "odds"}
     sports_data_types = set(DATA_TYPES_BY_ASSET_GROUP["sports"])
 
     violations: list[tuple[str, str, str]] = []

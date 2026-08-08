@@ -17,6 +17,7 @@ from ._sports_venue_constants import (
     SportsAggregatorType,
     SportsAuthMethod,
     SportsVenueType,
+    is_exchange_venue,
 )
 from .archetype_capability_matrix import (
     ASSET_GROUP_ONTOLOGY,
@@ -1195,6 +1196,7 @@ __all__ = [
     "is_bookmaker_observed",
     "is_defi_force_include",
     "is_defi_force_include_pool",
+    "is_exchange_venue",
     "is_expected",
     "is_expected_for_source",
     "is_half_day_session",

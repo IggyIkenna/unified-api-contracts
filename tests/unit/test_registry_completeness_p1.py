@@ -44,6 +44,7 @@ from unified_api_contracts.external.odds_api.schemas import (
 )
 from unified_api_contracts.registry._sports_venue_constants import (
     SUPPORTED_MARKET_TYPES,
+    is_exchange_venue,
 )
 from unified_api_contracts.registry.venue_constants import (
     INSTRUMENT_TYPES_BY_VENUE,
@@ -192,25 +193,25 @@ class TestVenueExecutionProfileCommission:
 class TestSportsVenuesInInstrumentTypes:
     """All sports bet-placement venues have INSTRUMENT_TYPES_BY_VENUE entries."""
 
-    def test_exchange_venues_mapped_to_exchange_odds(self) -> None:
+    def test_exchange_venues_mapped_to_odds(self) -> None:
         for venue in SPORTS_EXCHANGE_VENUES:
             assert venue in INSTRUMENT_TYPES_BY_VENUE, f"Missing: {venue}"
-            assert "EXCHANGE_ODDS" in INSTRUMENT_TYPES_BY_VENUE[venue]
+            assert "ODDS" in INSTRUMENT_TYPES_BY_VENUE[venue]
 
     def test_prediction_market_venues_mapped(self) -> None:
         for venue in SPORTS_PREDICTION_MARKET_VENUES:
             assert venue in INSTRUMENT_TYPES_BY_VENUE, f"Missing: {venue}"
             assert "PREDICTION_MARKET" in INSTRUMENT_TYPES_BY_VENUE[venue]
 
-    def test_bookmaker_api_venues_mapped_to_fixed_odds(self) -> None:
+    def test_bookmaker_api_venues_mapped_to_odds(self) -> None:
         for venue in SPORTS_BOOKMAKER_API_VENUES:
             assert venue in INSTRUMENT_TYPES_BY_VENUE, f"Missing: {venue}"
-            assert "FIXED_ODDS" in INSTRUMENT_TYPES_BY_VENUE[venue]
+            assert "ODDS" in INSTRUMENT_TYPES_BY_VENUE[venue]
 
-    def test_bookmaker_web_venues_mapped_to_fixed_odds(self) -> None:
+    def test_bookmaker_web_venues_mapped_to_odds(self) -> None:
         for venue in SPORTS_BOOKMAKER_WEB_VENUES:
             assert venue in INSTRUMENT_TYPES_BY_VENUE, f"Missing: {venue}"
-            assert "FIXED_ODDS" in INSTRUMENT_TYPES_BY_VENUE[venue]
+            assert "ODDS" in INSTRUMENT_TYPES_BY_VENUE[venue]
 
     def test_dfs_venues_mapped_to_prop(self) -> None:
         for venue in SPORTS_DFS_VENUES:
@@ -420,3 +421,28 @@ class TestBttsCassette:
                     assert OutcomeType.YES in result.outcomes
                     assert OutcomeType.NO in result.outcomes
         assert total_btts > 0, "No BTTS outcomes normalized from cassette"
+
+
+# ---------------------------------------------------------------------------
+# 8. is_exchange_venue — derives exchange-vs-sportsbook from the venue
+# ---------------------------------------------------------------------------
+
+
+class TestIsExchangeVenue:
+    """is_exchange_venue() derives exchange-vs-sportsbook from venue identity."""
+
+    def test_exchange_venues_return_true(self) -> None:
+        for venue in SPORTS_EXCHANGE_VENUES:
+            assert is_exchange_venue(venue), f"Expected True for exchange venue: {venue}"
+
+    def test_bookmaker_api_venues_return_false(self) -> None:
+        for venue in SPORTS_BOOKMAKER_API_VENUES:
+            assert not is_exchange_venue(venue), f"Expected False for bookmaker API venue: {venue}"
+
+    def test_bookmaker_web_venues_return_false(self) -> None:
+        for venue in SPORTS_BOOKMAKER_WEB_VENUES:
+            assert not is_exchange_venue(venue), f"Expected False for bookmaker web venue: {venue}"
+
+    def test_unknown_venue_returns_false(self) -> None:
+        assert not is_exchange_venue("UNKNOWN_VENUE_XYZ")
+        assert not is_exchange_venue("")

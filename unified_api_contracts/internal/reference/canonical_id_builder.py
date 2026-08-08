@@ -171,6 +171,7 @@ SUPPORTED_INSTRUMENT_TYPES: Final[frozenset[InstrumentType]] = frozenset(
         InstrumentType.COMBO,
         # Sports / prediction
         InstrumentType.PREDICTION_MARKET,
+        InstrumentType.ODDS,
         InstrumentType.EXCHANGE_ODDS,
         InstrumentType.FIXED_ODDS,
         InstrumentType.PROP,
@@ -226,6 +227,7 @@ _TRADFI_CASH_TYPES: Final[frozenset[InstrumentType]] = frozenset(
 _SPORTS_AND_PREDICTION_TYPES: Final[frozenset[InstrumentType]] = frozenset(
     {
         InstrumentType.PREDICTION_MARKET,
+        InstrumentType.ODDS,
         InstrumentType.EXCHANGE_ODDS,
         InstrumentType.FIXED_ODDS,
         InstrumentType.PROP,

@@ -957,16 +957,12 @@ SPORTS_DATA_TYPE_ACCEPTED_STALE_UPPERCASE_RESIDUE: frozenset[str] = frozenset(
 #   from the ODDS_API vendor response legitimately produces the bare market
 #   token. Same market-grain shape as the suffixed siblings above, not a
 #   distinct writer bug.
-# - "exchange_odds" / "fixed_odds": the deliberate venue-based split target of
-#   the 2026-07-27 migration (`market-tick-data-service/scripts/sports/
-#   exchange_fixed_odds_fork/`) — Betfair-Exchange-style venues (BETFAIR_EX_UK/
-#   BETFAIR_EX_EU/SMARKETS/MATCHBOOK) stamp "exchange_odds", sportsbook-style
-#   venues (BETFAIR_SB_UK/BETMGM/PINNACLE/ODDS_API) stamp "fixed_odds" — both
-#   already registered UAC `CONTRACT_REGISTRY[("sports", "exchange_odds"/
-#   "fixed_odds", "trades")]` keys, not ad hoc strings.
-# - "odds" (lowercase, generic): the pre-fork residual instrument_type for
-#   venues the 2026-07-27 migration didn't (yet) cover.
-# All 5 are real `data_type=trades`/bundle-grain MTDS/MDPS output, never
+# - "odds" (lowercase): the canonical sports odds instrument_type (operator
+#   ruling 2026-08-08 retired the exchange_odds/fixed_odds split; exchange-vs-
+#   sportsbook is a property of the VENUE, not the instrument — derive via
+#   is_exchange_venue()). "exchange_odds" and "fixed_odds" are REMOVED from this
+#   set; both alias to "odds" in _INSTRUMENT_TYPE_ALIASES.
+# All 4 are real `data_type=trades`/bundle-grain MTDS/MDPS output, never
 # members of the per-CONTRACT-grain `InstrumentType` enum for the same reason
 # as the rest of this set.
 SPORTS_MARKET_TOKEN_ACCEPTED_NONCANONICAL_INSTRUMENT_TYPES: frozenset[str] = frozenset(
@@ -1007,8 +1003,6 @@ SPORTS_MARKET_TOKEN_ACCEPTED_NONCANONICAL_INSTRUMENT_TYPES: frozenset[str] = fro
         "OVER_UNDER_3_75",
         "OVER_UNDER_8_5",
         "SPORT",
-        "exchange_odds",
-        "fixed_odds",
         "odds",
     }
 )
@@ -1310,8 +1304,11 @@ _INSTRUMENT_TYPE_ALIASES: dict[str, str] = {
     # Sports catalogue tokens (SPORTS_LEAGUE_INSTRUMENT_TYPE = "league")
     "fixture": "fixture",
     "league": "league",
-    "exchange_odds": "exchange_odds",
-    "fixed_odds": "fixed_odds",
+    # Retired 2026-08-08: exchange-vs-sportsbook is a venue property, not an
+    # instrument type. Both alias to the canonical "odds" partition so P2
+    # migration readers of old manifest rows resolve to the unified matrix entry.
+    "exchange_odds": "odds",
+    "fixed_odds": "odds",
     "prop": "prop",
     # DeFi instrument_type values (from InstrumentType enum; already-lowercase
     # after .strip().lower() → map to themselves)
@@ -1432,42 +1429,39 @@ VALID_DATA_TYPES_BY_AG_AND_INSTRUMENT_TYPE: dict[tuple[str, str], frozenset[str]
     ("sports", "fixture"): frozenset(
         {"odds", "odds_snapshot", "odds_movement", "markets", "outcomes", "settlements"}
     ),  # UNCERTAIN — sports-owner verify
-    ("sports", "exchange_odds"): frozenset(  # UNCERTAIN — sports-owner verify
-        {"odds", "odds_snapshot", "odds_movement", "trades"}
-    ),
-    ("sports", "fixed_odds"): frozenset(  # UNCERTAIN — sports-owner verify
-        {"odds", "odds_snapshot", "odds_movement", "markets", "outcomes", "settlements", "trades"}
-    ),
+    # ("sports", "exchange_odds") and ("sports", "fixed_odds") REMOVED 2026-08-08:
+    # operator ruling retired the venue-based instrument_type split; both token
+    # forms alias to "odds" in _INSTRUMENT_TYPE_ALIASES so P2 migration readers of
+    # old manifest rows resolve to the entry below instead.
     ("sports", "prop"): frozenset(  # UNCERTAIN — sports-owner verify
         {"odds", "odds_snapshot", "odds_movement"}
     ),
-    # ("sports", "odds") — closes the matrix hole found by
-    # sports_shard_enumeration_cartesian_blowup_2026_07_20.md Part 2 item 2.3
-    # (2026-07-22). Unlike its four neighbours above, this entry is CONFIRMED,
-    # not UNCERTAIN: CONTRACT_REGISTRY[("sports","odds","trades")] =
-    # SPORTS_ODDS_TRADES is a real, registered SchemaContract
-    # (_sports_prediction_contracts.py), and prod carries 1,806,527 rows under
-    # exactly this (instrument_type=odds, data_type=trades) pair. Before this
-    # entry existed the pair had NO matrix row at all, so every one of those
-    # rows silently rode the "unmapped instrument_type" fallback path instead
-    # of an audited entry.
-    # "TRADES" (uppercase) was added to the value set 2026-07-23 when K1
-    # (mtds@2536b91c, 2026-07-22) flipped the live writer to emit
-    # instrument_type=ODDS/data_type=TRADES and K2 migrated the historical
-    # corpus to match. **REVERTED 2026-07-27**: the same-day 2026-07-23
-    # reconciliation (sports_consolidated_closeout_2026_07_19.md, "Canonical
-    # target") decided sports data_type/instrument_type is LOWER-case for the
-    # WHOLE vocabulary, no UPPER exception — K1/K2 are being reverted, not kept.
-    # The lowercase "odds"/"trades" pair is the sole canonical form again.
-    # "odds_horizon_bucket" added 2026-08-08 (sports_taxonomy_p1_capture_and_
-    # contracts_2026_08_08.md, first-class horizon axis): CONFIRMED, not
-    # UNCERTAIN, same basis as "trades" above — CONTRACT_REGISTRY[("sports",
-    # "odds", "odds_horizon_bucket")] = SPORTS_ODDS_HORIZON_BUCKET is a real,
-    # registered SchemaContract and MDPS SportsBucketAssignmentAdapter is the
-    # live, sole writer of this data_type. Folding it into a lowercase "odds"
-    # data_type (per operator ruling 5) is the P2 data re-stamp — this entry
-    # covers the data_type as it is captured TODAY.
-    ("sports", "odds"): frozenset({"trades", "odds_horizon_bucket"}),
+    # ("sports", "odds") — unified canonical sports odds instrument_type (operator
+    # ruling 2026-08-08). Absorbs the data_types from the retired exchange_odds and
+    # fixed_odds entries (both were UNCERTAIN; merged here as a superset).
+    # CONFIRMED entries (CONTRACT_REGISTRY + prod evidence):
+    #   "trades" — 1,806,527 prod rows; CONTRACT_REGISTRY[("sports","odds","trades")]
+    #              = SPORTS_ODDS_TRADES (_sports_prediction_contracts.py).
+    #   "odds_horizon_bucket" — added 2026-08-08; CONTRACT_REGISTRY[("sports","odds",
+    #              "odds_horizon_bucket")] = SPORTS_ODDS_HORIZON_BUCKET; sole writer
+    #              is MDPS SportsBucketAssignmentAdapter (P2 data re-stamp pending).
+    # UNCERTAIN entries (absorbed from retired exchange_odds/fixed_odds; sports-owner
+    # to verify against live prod before P2 path migration):
+    #   "odds", "odds_snapshot", "odds_movement" — from exchange_odds (UNCERTAIN).
+    #   "markets", "outcomes", "settlements" — from fixed_odds (UNCERTAIN); scheduled
+    #     for retirement in sports_taxonomy_p1 todo #8.
+    ("sports", "odds"): frozenset(
+        {
+            "trades",
+            "odds_horizon_bucket",
+            "odds",
+            "odds_snapshot",
+            "odds_movement",
+            "markets",
+            "outcomes",
+            "settlements",
+        }
+    ),
 }
 
 
