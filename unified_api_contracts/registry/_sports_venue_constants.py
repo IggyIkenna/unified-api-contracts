@@ -80,6 +80,46 @@ SPORTS_VENUE_TYPE_MAP.update(dict.fromkeys(SPORTS_BOOKMAKER_WEB_VENUES, SportsVe
 SPORTS_VENUE_TYPE_MAP.update(dict.fromkeys(SPORTS_DFS_VENUES, SportsVenueType.DFS_PLATFORM))
 SPORTS_VENUE_TYPE_MAP.update(dict.fromkeys(SPORTS_DATA_VENUES, SportsVenueType.DATA_ONLY))
 
+
+# Derive-at-read-time resolver for the exchange_odds/fixed_odds instrument_type
+# split (operator ruling 9, sports_taxonomy_p1_capture_and_contracts_2026_08_08.md
+# -- "exchange-vs-sportsbook is a property of the VENUE, not something to stamp
+# per-instrument; UAC SportsVenueType already encodes it"). Resolves
+# `/plans/archive/issues/sports_odds_venue_enumeration_undercount_predrain_2026_07_27.md`'s
+# "classify the unmapped bookmakers as EXCHANGE_ODDS or FIXED_ODDS" ask
+# MECHANICALLY: every venue self-classifies via SPORTS_VENUE_TYPE_MAP above, so
+# no per-venue operator judgment is needed and the doc's 19-vs-21 count
+# discrepancy (a live-manifest re-measurement, not a classification gap) is
+# moot under this model -- the resolver covers every venue in the map,
+# regardless of count, not a hand-enumerated subset.
+#
+# This is the P1 CONTRACT only, same pattern as SPORTS_IS_DATA_TYPE_LOWERCASE_FORM
+# / SPORTS_ODDS_DATA_TYPE_CANONICAL_FORM (canonical/domain/sports/league_data.py):
+# additive, NOT wired into CONTRACT_REGISTRY's ("sports", "exchange_odds"/
+# "fixed_odds", "trades") keys, the MTDS writer that still stamps the column, or
+# any existing manifest row this phase -- switching the writer/readers to derive
+# via this function instead of a stamped column, and retiring the stamped
+# column + CONTRACT_REGISTRY entries, is P2 [REVIEW] P0 scope (full consumer
+# enumeration there).
+def derive_sports_odds_instrument_type(venue: str) -> str | None:
+    """Return the exchange_odds/fixed_odds instrument_type for a sports VENUE.
+
+    Exchange-style venues (:attr:`SportsVenueType.EXCHANGE_API`) resolve to
+    ``"exchange_odds"``; bookmaker-style venues (``BOOKMAKER_API`` /
+    ``WEB_SCRAPER``) resolve to ``"fixed_odds"``. Prediction-market, DFS,
+    data-only, and unrecognised venues return ``None`` -- callers fall back to
+    the legacy generic ``"odds"`` CONTRACT_REGISTRY entry for those, the same
+    fallback :func:`unified_api_contracts.internal.schemas.contracts.lookup_contract`
+    already performs during the fork's migration window.
+    """
+    venue_type = SPORTS_VENUE_TYPE_MAP.get(venue.upper())
+    if venue_type is SportsVenueType.EXCHANGE_API:
+        return "exchange_odds"
+    if venue_type in (SportsVenueType.BOOKMAKER_API, SportsVenueType.WEB_SCRAPER):
+        return "fixed_odds"
+    return None
+
+
 SPORTS_AUTH_MAP: dict[str, SportsAuthMethod] = {
     BETFAIR: SportsAuthMethod.SESSION_TOKEN,
     # BETFAIR_EX_UK/EX_EU are the same session-token-based Betfair Exchange API
