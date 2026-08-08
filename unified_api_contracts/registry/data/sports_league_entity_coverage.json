@@ -1,5 +1,5 @@
 {
-  "FIXTURE_EVENTS": [
+  "fixture_events": [
     "ALLSVENSKAN",
     "ARGENTINA_PRIMERA",
     "ARGENTINA_PRIMERA_NACIONAL",
@@ -89,7 +89,7 @@
     "USL_CHAMPIONSHIP",
     "US_OPEN_CUP"
   ],
-  "FIXTURE_LINEUPS": [
+  "fixture_lineups": [
     "ALLSVENSKAN",
     "ARGENTINA_PRIMERA",
     "ARGENTINA_PRIMERA_NACIONAL",
@@ -178,7 +178,7 @@
     "USL_CHAMPIONSHIP",
     "US_OPEN_CUP"
   ],
-  "FIXTURE_STATS": [
+  "fixture_stats": [
     "ALLSVENSKAN",
     "ARGENTINA_PRIMERA",
     "ARGENTINA_PRIMERA_NACIONAL",
@@ -266,7 +266,7 @@
     "USL_CHAMPIONSHIP",
     "US_OPEN_CUP"
   ],
-  "INJURIES": [
+  "injuries": [
     "1",
     "100",
     "1006",
@@ -404,7 +404,7 @@
     "UEL",
     "UNKNOWN"
   ],
-  "ODDS_HORIZON_BUCKET": [
+  "odds_horizon_bucket": [
     "ALLSVENSKAN",
     "ARGENTINA_PRIMERA",
     "AUSTRIAN_BUNDESLIGA",
@@ -438,7 +438,7 @@
     "SUPER_LIG",
     "SWISS_SUPER_LEAGUE"
   ],
-  "PLAYER_STATS": [
+  "player_stats": [
     "ALLSVENSKAN",
     "ARGENTINA_PRIMERA",
     "A_LEAGUE",
@@ -500,7 +500,7 @@
     "UNKNOWN",
     "USL_CHAMPIONSHIP"
   ],
-  "PLAYER_VALUES": [
+  "player_values": [
     "A1",
     "ALLSVENSKAN",
     "ARGC",
@@ -581,7 +581,7 @@
     "TFF_FIRST_LEAGUE",
     "TR1"
   ],
-  "STANDINGS": [
+  "standings": [
     "103",
     "106",
     "113",
@@ -649,7 +649,7 @@
     "SUPER_LIG",
     "SWISS_SUPER_LEAGUE"
   ],
-  "TEAMS": [
+  "teams": [
     "ALLSVENSKAN",
     "ARGENTINA_PRIMERA",
     "AUSTRIAN_BUNDESLIGA",
@@ -685,7 +685,7 @@
     "SWISS_SUPER_LEAGUE",
     "UNKNOWN"
   ],
-  "WEATHER": [
+  "weather": [
     "ALLSVENSKAN",
     "ARGENTINA_PRIMERA",
     "ARGENTINA_PRIMERA_NACIONAL",

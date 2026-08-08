@@ -26,17 +26,17 @@ SOURCE_PRIORITY: Final[dict[tuple[str, str], list[str]]] = {
     # Fixture lifecycle data — api_football is primary, footystats is the
     # multi-source merge candidate (deferred). Soccer-football-info handles
     # the SFI_PROGRESSIVE_STATS slice.
-    ("sports", "FIXTURES"): [
+    ("sports", "fixtures"): [
         "api_football",
         "footystats",
     ],  # footystats is the deferred multi-source merge candidate (see module docstring Phase 1B)
-    # FIXTURES_SCHEDULE/FIXTURES_OUTCOMES are the schedule/outcome split of FIXTURES
-    # (writer cutover 2026-07-14, fixture_lifecycle.py) — same source as legacy FIXTURES.
-    ("sports", "FIXTURES_SCHEDULE"): ["api_football", "footystats"],
-    ("sports", "FIXTURES_OUTCOMES"): ["api_football", "footystats"],
-    ("sports", "FIXTURE_LINEUPS"): ["api_football"],
-    ("sports", "FIXTURE_EVENTS"): ["api_football"],
-    ("sports", "FIXTURE_STATS"): ["api_football"],
+    # fixtures_schedule/fixtures_outcomes are the schedule/outcome split of fixtures
+    # (writer cutover 2026-07-14, fixture_lifecycle.py) — same source as legacy fixtures.
+    ("sports", "fixtures_schedule"): ["api_football", "footystats"],
+    ("sports", "fixtures_outcomes"): ["api_football", "footystats"],
+    ("sports", "fixture_lineups"): ["api_football"],
+    ("sports", "fixture_events"): ["api_football"],
+    ("sports", "fixture_stats"): ["api_football"],
     # PLAYER_STATS = api_football per-fixture player stats, captured by IS at the
     # PER_DAY_PER_LEAGUE grain. The canonical data_type name is PLAYER_STATS; the GCS
     # *entity* folder is `fixture_player_stats` — a deliberate name mismatch documented
@@ -51,11 +51,11 @@ SOURCE_PRIORITY: Final[dict[tuple[str, str], list[str]]] = {
     # (_writer_ingest.py gates it on that call) — same class as the ODDS defect below.
     # Reconciled 2026-07-15 onto the name reality uses. SSOT:
     # codex/02-data/sports-gcs-path-ssot.md + codex/02-data/sports-data-types-catalog.md.
-    ("sports", "PLAYER_STATS"): ["api_football"],
-    ("sports", "INJURIES"): ["api_football"],
-    ("sports", "RESULTS"): ["api_football"],
-    ("sports", "UNDERSTAT_XG"): ["understat"],
-    ("sports", "SFI_PROGRESSIVE_STATS"): ["soccer_football_info"],
+    ("sports", "player_stats"): ["api_football"],
+    ("sports", "injuries"): ["api_football"],
+    ("sports", "results"): ["api_football"],
+    ("sports", "understat_xg"): ["understat"],
+    ("sports", "sfi_progressive_stats"): ["soccer_football_info"],
     ("sports", "ODDS_SNAPSHOT"): ["odds_api"],
     ("sports", "ODDS_MOVEMENT"): ["odds_api"],
     ("sports", "ARBITRAGE"): ["odds_api"],
