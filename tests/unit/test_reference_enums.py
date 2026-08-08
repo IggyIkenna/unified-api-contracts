@@ -18,6 +18,7 @@ class TestInstrumentType:
     def test_sports_instrument_types_present(self) -> None:
         from unified_api_contracts.canonical.domain.reference import InstrumentType
 
+        assert InstrumentType.ODDS == "ODDS"
         assert InstrumentType.EXCHANGE_ODDS == "EXCHANGE_ODDS"
         assert InstrumentType.FIXED_ODDS == "FIXED_ODDS"
         assert InstrumentType.PROP == "PROP"
@@ -28,7 +29,7 @@ class TestInstrumentType:
             INSTRUMENT_TYPE_FOLDER_MAP,
         )
 
-        for key in ("PREDICTION_MARKET", "EXCHANGE_ODDS", "FIXED_ODDS", "PROP"):
+        for key in ("PREDICTION_MARKET", "ODDS", "EXCHANGE_ODDS", "FIXED_ODDS", "PROP"):
             assert key in INSTRUMENT_TYPE_FOLDER_MAP, f"Missing folder mapping for {key}"
 
 

@@ -1429,12 +1429,6 @@ from unified_api_contracts.internal.schemas._sports_prediction_contracts import 
     PREDICTION_PREDICTION_MARKET_TRADES as PREDICTION_PREDICTION_MARKET_TRADES,
 )
 from unified_api_contracts.internal.schemas._sports_prediction_contracts import (
-    SPORTS_EXCHANGE_ODDS_TRADES as SPORTS_EXCHANGE_ODDS_TRADES,
-)
-from unified_api_contracts.internal.schemas._sports_prediction_contracts import (
-    SPORTS_FIXED_ODDS_TRADES as SPORTS_FIXED_ODDS_TRADES,
-)
-from unified_api_contracts.internal.schemas._sports_prediction_contracts import (
     SPORTS_ODDS_ARBITRAGE as SPORTS_ODDS_ARBITRAGE,
 )
 from unified_api_contracts.internal.schemas._sports_prediction_contracts import (
@@ -1498,8 +1492,6 @@ __all__ = [
     "OUTCOME_TO_MARKET_TYPE",
     "PREDICTION_PREDICTION_MARKET_TRADES",
     "SLUG_PREFIX_MAP",
-    "SPORTS_EXCHANGE_ODDS_TRADES",
-    "SPORTS_FIXED_ODDS_TRADES",
     "SPORTS_ODDS_ARBITRAGE",
     "SPORTS_ODDS_HORIZON_BUCKET",
     "SPORTS_ODDS_MOVEMENT",

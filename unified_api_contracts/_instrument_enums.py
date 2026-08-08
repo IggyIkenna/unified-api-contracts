@@ -92,21 +92,24 @@ class InstrumentType(StrEnum):
     COMBO = "COMBO"
     # Sports / Prediction Markets
     PREDICTION_MARKET = "PREDICTION_MARKET"
-    # EXCHANGE_ODDS / FIXED_ODDS are LIVE in the derivation + adapter layer:
-    #   - instruments-service ``instruments_service/reference_data/adapters/sports/
-    #     adapters/betfair.py:287`` constructs ``InstrumentType.EXCHANGE_ODDS``.
-    #   - UTL ``unified_trading_library/canonical/_derive_instrument_id.py:85`` maps
+    # ODDS is the canonical sports instrument type after the 2026-08-08 operator
+    # ruling (sports_taxonomy_p1_capture_and_contracts_2026_08_08.md ruling 9):
+    # the exchange-vs-sportsbook distinction is a property of the VENUE
+    # (SportsVenueType already encodes it) and is derived at read time.
+    # New MTDS writes stamp InstrumentType.ODDS; the physical GCS hive partition
+    # is ``instrument_type=odds/``.
+    ODDS = "ODDS"
+    # EXCHANGE_ODDS / FIXED_ODDS are KEPT for the derivation + adapter layer that
+    # has NOT yet been migrated to InstrumentType.ODDS (P3 scope):
+    #   - instruments-service ``adapters/sports/adapters/betfair.py`` constructs
+    #     ``InstrumentType.EXCHANGE_ODDS``.
+    #   - UTL ``canonical/_derive_instrument_id.py`` maps
     #     ``("sports", "odds") -> InstrumentType.EXCHANGE_ODDS``.
-    # They are NOT the sports manifest's vocabulary. The sports SchemaContract
-    # registry deliberately does NOT key on InstrumentType — it keys on the declared
-    # contract value ``odds`` (see internal/schemas/_sports_prediction_contracts.py,
-    # instrument_type="odds"), which is also the physical GCS hive partition
-    # (``instrument_type=odds/``) and is still actively written.
-    # Do NOT "fix" the manifest/registry to match these enum members: renaming
-    # ``odds`` -> EXCHANGE_ODDS/FIXED_ODDS would create manifest<->disk<->registry
-    # divergence to change a value that has zero shard + display consumers
-    # (SHARD_AXIS_MATRIX keys sports on ("data_type", "league_id"), not
-    # instrument_type). Operator ruling 2026-07-17: closed as not-a-defect.
+    # Historical manifest rows carry exchange_odds/fixed_odds instrument_type values;
+    # the lookup_contract backward-compat fallback in contracts.py maps them to the
+    # "odds" SchemaContract during the P1→P2 migration window.
+    # Operator ruling 2026-08-08: the CONTRACT-LEVEL split is retired; these enum
+    # members stay until instruments-service and UTL are updated in P3.
     EXCHANGE_ODDS = "EXCHANGE_ODDS"
     FIXED_ODDS = "FIXED_ODDS"
     PROP = "PROP"

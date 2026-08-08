@@ -485,8 +485,11 @@ class TestSports:
         instruments = gen.generate_sports(REF_DATE)
         types = {i.instrument_type for i in instruments}
         assert InstrumentType.PREDICTION_MARKET in types
-        assert InstrumentType.EXCHANGE_ODDS in types
-        assert InstrumentType.FIXED_ODDS in types
+        assert (
+            InstrumentType.ODDS in types
+            or InstrumentType.EXCHANGE_ODDS in types
+            or InstrumentType.FIXED_ODDS in types
+        )
 
     def test_polymarket_has_real_condition_ids(self, gen: InstrumentGenerator) -> None:
         """Polymarket instruments use real condition_ids from VCR cassettes."""

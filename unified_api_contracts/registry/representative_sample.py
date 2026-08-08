@@ -413,7 +413,7 @@ SPORTS_INSTRUMENT_SPECS: list[dict[str, str]] = [
     {
         "venue": "BETFAIR_EX_UK",  # bare BETFAIR is operator-group parent, not data-axis
         "symbol": "EPL-MCI-ARS",
-        "type": "EXCHANGE_ODDS",
+        "type": "ODDS",  # was EXCHANGE_ODDS; split retired 2026-08-08, derive from venue
         "asset_class": "sports",
         "venue_type": "football",
         "available_from": "2024-08-01",
@@ -421,7 +421,7 @@ SPORTS_INSTRUMENT_SPECS: list[dict[str, str]] = [
     {
         "venue": "PINNACLE",
         "symbol": "NBA-LAL-BOS",
-        "type": "FIXED_ODDS",
+        "type": "ODDS",  # was FIXED_ODDS; split retired 2026-08-08, derive from venue
         "asset_class": "sports",
         "venue_type": "basketball",
         "available_from": "2024-10-01",
