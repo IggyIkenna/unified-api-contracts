@@ -25,9 +25,16 @@ pytestmark = pytest.mark.unit
 
 
 def test_sports_venues_constant() -> None:
-    """SPORTS_VENUES must include canonical sports data and execution venues."""
+    """SPORTS_VENUES must include canonical sports data and execution venues.
+
+    Note: bare BETFAIR is an operator-group parent (not a data-axis venue) — operator ruling
+    2026-08-08. The bookable Betfair exchange venues (BETFAIR_EX_UK, BETFAIR_EX_EU) are in
+    SPORTS_EXCHANGE_VENUES and therefore in SPORTS_VENUES.
+    """
     assert "API_FOOTBALL" in SPORTS_VENUES
-    assert "BETFAIR" in SPORTS_VENUES
+    assert "BETFAIR_EX_UK" in SPORTS_VENUES
+    assert "BETFAIR_EX_EU" in SPORTS_VENUES
+    assert "BETFAIR" not in SPORTS_VENUES, "bare BETFAIR is operator-group parent, not a data-axis venue"
     assert "PINNACLE" in SPORTS_VENUES
     assert "ODDS_API" in SPORTS_VENUES
     assert "FOOTYSTATS" in SPORTS_VENUES
