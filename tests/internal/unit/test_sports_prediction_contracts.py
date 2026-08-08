@@ -17,8 +17,6 @@ import pytest
 from unified_api_contracts.internal.schemas.contracts import (
     CONTRACT_REGISTRY,
     PREDICTION_PREDICTION_MARKET_TRADES,
-    SPORTS_EXCHANGE_ODDS_TRADES,
-    SPORTS_FIXED_ODDS_TRADES,
     SPORTS_ODDS_HORIZON_BUCKET,
     SPORTS_ODDS_SNAPSHOT,
     SPORTS_ODDS_TRADES,
@@ -124,96 +122,10 @@ def test_sports_odds_trades_validates_sample_dataframe() -> None:
     assert violations == [], f"expected no violations, got {violations}"
 
 
-# ---------------------------------------------------------------------------
-# SPORTS_EXCHANGE_ODDS_TRADES / SPORTS_FIXED_ODDS_TRADES
-#
-# sports_closeout_exchange_fixed_odds_fork_2026_07_25.md todo 3: contracts-
-# first EXCHANGE_ODDS/FIXED_ODDS fork of the legacy "odds" instrument_type.
-# Same row schema as SPORTS_ODDS_TRADES (columns list is shared by reference —
-# both ColumnSpec and SchemaContract are frozen pydantic models). The legacy
-# "odds" entry stays registered for the dual-read window (next todo).
-# ---------------------------------------------------------------------------
-
-
-def test_sports_exchange_odds_trades_registered_in_contract_registry() -> None:
-    contract = CONTRACT_REGISTRY[("sports", "exchange_odds", "trades")]
-    assert contract is SPORTS_EXCHANGE_ODDS_TRADES
-
-
-def test_sports_fixed_odds_trades_registered_in_contract_registry() -> None:
-    contract = CONTRACT_REGISTRY[("sports", "fixed_odds", "trades")]
-    assert contract is SPORTS_FIXED_ODDS_TRADES
-
-
-def test_sports_exchange_odds_trades_lookup_returns_contract() -> None:
-    contract = lookup_contract(asset_group="sports", instrument_type="exchange_odds", data_type="trades")
-    assert contract is SPORTS_EXCHANGE_ODDS_TRADES
-
-
-def test_sports_fixed_odds_trades_lookup_returns_contract() -> None:
-    contract = lookup_contract(asset_group="sports", instrument_type="fixed_odds", data_type="trades")
-    assert contract is SPORTS_FIXED_ODDS_TRADES
-
-
-def test_sports_exchange_fixed_odds_trades_share_columns_with_legacy_odds() -> None:
-    """The fork splits the instrument_type partition, not the row schema."""
-    assert SPORTS_EXCHANGE_ODDS_TRADES.columns == SPORTS_ODDS_TRADES.columns
-    assert SPORTS_FIXED_ODDS_TRADES.columns == SPORTS_ODDS_TRADES.columns
-    assert SPORTS_EXCHANGE_ODDS_TRADES.symbol_column == SPORTS_ODDS_TRADES.symbol_column
-    assert SPORTS_FIXED_ODDS_TRADES.symbol_column == SPORTS_ODDS_TRADES.symbol_column
-
-
-def test_sports_exchange_fixed_odds_trades_declare_their_own_instrument_type() -> None:
-    assert SPORTS_EXCHANGE_ODDS_TRADES.instrument_type == "exchange_odds"
-    assert SPORTS_FIXED_ODDS_TRADES.instrument_type == "fixed_odds"
-
-
-def test_legacy_odds_trades_still_registered_during_dual_read_window() -> None:
-    """The fork adds new entries; it must not remove the legacy odds entry."""
+def test_legacy_odds_trades_still_registered() -> None:
+    """Regression lock — the odds entry must not be removed."""
     assert ("sports", "odds", "trades") in CONTRACT_REGISTRY
     assert CONTRACT_REGISTRY[("sports", "odds", "trades")] is SPORTS_ODDS_TRADES
-
-
-def test_sports_exchange_odds_trades_validates_sample_dataframe() -> None:
-    df = pd.DataFrame(
-        {
-            "instrument_id": pd.Series(
-                ["FOOTBALL:BETFAIR_EX_UK:MATCH_ODDS:EPL:2025-26:ARSENAL-CHELSEA::HOME"],
-                dtype="string",
-            ),
-            "bookmaker_key": pd.Series(["BETFAIR_EX_UK"], dtype="string"),
-            "bm_time": pd.Series(["2026-03-22T14:00:00Z"], dtype="string"),
-            "source": pd.Series(["ODDS_API"], dtype="string"),
-            "league_id": pd.Series(["EPL"], dtype="string"),
-            "fixture_id": pd.Series(["EPL:ARSENAL_v_CHELSEA:20260322"], dtype="string"),
-            "market_key": pd.Series(["h2h"], dtype="string"),
-            "outcome_name": pd.Series(["HOME"], dtype="string"),
-            "price": pd.Series([1.85], dtype="float64"),
-        }
-    )
-    violations = validate_dataframe(df, SPORTS_EXCHANGE_ODDS_TRADES)
-    assert violations == [], f"expected no violations, got {violations}"
-
-
-def test_sports_fixed_odds_trades_validates_sample_dataframe() -> None:
-    df = pd.DataFrame(
-        {
-            "instrument_id": pd.Series(
-                ["FOOTBALL:BETMGM:MATCH_ODDS:EPL:2025-26:ARSENAL-CHELSEA::HOME"],
-                dtype="string",
-            ),
-            "bookmaker_key": pd.Series(["BETMGM"], dtype="string"),
-            "bm_time": pd.Series(["2026-03-22T14:00:00Z"], dtype="string"),
-            "source": pd.Series(["ODDS_API"], dtype="string"),
-            "league_id": pd.Series(["EPL"], dtype="string"),
-            "fixture_id": pd.Series(["EPL:ARSENAL_v_CHELSEA:20260322"], dtype="string"),
-            "market_key": pd.Series(["h2h"], dtype="string"),
-            "outcome_name": pd.Series(["HOME"], dtype="string"),
-            "price": pd.Series([1.85], dtype="float64"),
-        }
-    )
-    violations = validate_dataframe(df, SPORTS_FIXED_ODDS_TRADES)
-    assert violations == [], f"expected no violations, got {violations}"
 
 
 # ---------------------------------------------------------------------------
@@ -273,14 +185,12 @@ def test_sports_odds_horizon_bucket_validates_sample_dataframe() -> None:
 
 
 # ---------------------------------------------------------------------------
-# lookup_contract dual-read: legacy "odds" + EXCHANGE_ODDS/FIXED_ODDS
-# (sports_closeout_exchange_fixed_odds_fork_2026_07_25.md todo 4). Only
-# ("sports", "exchange_odds"/"fixed_odds", "trades") has its own
-# CONTRACT_REGISTRY entry (todo 3) -- every other odds data_type
-# (sports_odds_snapshot / sports_odds_movement / sports_arbitrage) is not yet
-# forked, so a lookup for the new instrument_types against one of those
-# data_types must fall back to the legacy "odds" contract during the
-# migration window.
+# lookup_contract dual-read migration-window fallback — RETIRED fork
+# (sports_taxonomy_p1_capture_and_contracts_2026_08_08.md). The dedicated
+# CONTRACT_REGISTRY entries for ("sports","exchange_odds"/"fixed_odds","trades")
+# have been removed; all lookups now fall through step-5 to the unified "odds"
+# contract. The fallback tuple and step-5 remain until the P2 manifest restamp
+# removes all exchange_odds/fixed_odds rows.
 # ---------------------------------------------------------------------------
 
 
@@ -290,12 +200,14 @@ def test_lookup_contract_legacy_odds_path_still_resolves_directly() -> None:
     assert contract is SPORTS_ODDS_TRADES
 
 
-def test_lookup_contract_new_instrument_types_resolve_their_own_forked_entry() -> None:
-    """Where a fork-specific entry exists (trades), it wins over the odds fallback."""
+def test_lookup_contract_retired_fork_types_fall_through_to_odds_contract() -> None:
+    """RETIRED fork: exchange_odds/fixed_odds have no dedicated registry entry;
+    step-5 fallback resolves both to the unified SPORTS_ODDS_TRADES contract.
+    """
     exchange = lookup_contract(asset_group="sports", instrument_type="exchange_odds", data_type="trades")
     fixed = lookup_contract(asset_group="sports", instrument_type="fixed_odds", data_type="trades")
-    assert exchange is SPORTS_EXCHANGE_ODDS_TRADES
-    assert fixed is SPORTS_FIXED_ODDS_TRADES
+    assert exchange is SPORTS_ODDS_TRADES
+    assert fixed is SPORTS_ODDS_TRADES
 
 
 def test_lookup_contract_dual_reads_unforked_odds_data_type_via_exchange_odds() -> None:
@@ -433,8 +345,6 @@ def test_prediction_market_trades_validates_sample_dataframe() -> None:
 def test_new_contracts_require_instrument_id_non_nullable_string() -> None:
     for contract in (
         SPORTS_ODDS_TRADES,
-        SPORTS_EXCHANGE_ODDS_TRADES,
-        SPORTS_FIXED_ODDS_TRADES,
         PREDICTION_PREDICTION_MARKET_TRADES,
     ):
         id_specs = [c for c in contract.columns if c.name == "instrument_id"]
@@ -446,8 +356,6 @@ def test_new_contracts_require_instrument_id_non_nullable_string() -> None:
 def test_new_contracts_declared_symbol_columns_are_present_in_schema() -> None:
     for contract in (
         SPORTS_ODDS_TRADES,
-        SPORTS_EXCHANGE_ODDS_TRADES,
-        SPORTS_FIXED_ODDS_TRADES,
         PREDICTION_PREDICTION_MARKET_TRADES,
     ):
         names = {c.name for c in contract.columns}
@@ -580,18 +488,18 @@ def test_every_sports_odds_family_contract_registry_entry_is_matrix_reachable() 
     ``VALID_DATA_TYPES_BY_AG_AND_INSTRUMENT_TYPE`` entry for that
     instrument_type.
 
-    Scoped to the odds-shape family the matrix already declares
-    (fixture/exchange_odds/fixed_odds/prop/odds) rather than the whole
-    CONTRACT_REGISTRY -- most of the registry (ml_training manifests, sports
-    reference/derived/feature contracts, MDPS candle-feature families, ...)
+    Scoped to the odds-shape family the matrix declares (fixture/prop/odds) rather
+    than the whole CONTRACT_REGISTRY -- most of the registry (ml_training manifests,
+    sports reference/derived/feature contracts, MDPS candle-feature families, ...)
     is outside what this market-data validity matrix models at all.
+    (exchange_odds/fixed_odds removed 2026-08-08 — split retired in P1.)
     """
     from unified_api_contracts.registry.market_data_categories import (
         DATA_TYPES_BY_ASSET_GROUP,
         VALID_DATA_TYPES_BY_AG_AND_INSTRUMENT_TYPE,
     )
 
-    odds_family_instrument_types = {"fixture", "exchange_odds", "fixed_odds", "prop", "odds"}
+    odds_family_instrument_types = {"fixture", "prop", "odds"}
     sports_data_types = set(DATA_TYPES_BY_ASSET_GROUP["sports"])
 
     violations: list[tuple[str, str, str]] = []

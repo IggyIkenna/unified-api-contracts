@@ -1205,18 +1205,13 @@ _SPORTS_ODDS_DERIVED_CANDLE_PREFIXES: tuple[str, ...] = (
     "arbitrage_opportunity_",
 )
 
-# Sports EXCHANGE_ODDS/FIXED_ODDS fork instrument_types (contracts-first
-# migration, sports_closeout_exchange_fixed_odds_fork_2026_07_25.md todo 3-4).
-# Only ("sports", "exchange_odds"/"fixed_odds", "trades") has its own
-# CONTRACT_REGISTRY entry so far -- the sibling odds data_types
-# (sports_odds_snapshot / sports_odds_movement / sports_arbitrage, ...) still
-# resolve only under the legacy "odds" instrument_type. During the migration
-# window (GCS objects move venue-by-venue into exchange_odds/ or fixed_odds/
-# partitions ahead of every odds data_type getting its own fork entry), a
-# lookup for one of these instrument_types against an as-yet-unforked
-# data_type must still resolve -- the row schema is identical, only the
-# partition key differs (SPORTS_EXCHANGE_ODDS_TRADES/SPORTS_FIXED_ODDS_TRADES
-# share SPORTS_ODDS_TRADES.columns by reference).
+# RETIRED (sports_taxonomy_p1_capture_and_contracts_2026_08_08.md): the
+# exchange_odds/fixed_odds instrument_type split is being phased out —
+# exchange-vs-sportsbook is a VENUE property (UAC SportsVenueType already
+# encodes it). CONTRACT_REGISTRY entries for ("sports","exchange_odds"/"fixed_odds",
+# "trades") have been removed. This tuple and the step-5 fallback below are kept
+# for the migration window: existing manifest rows still carry these tokens until
+# the P2 GCS + manifest restamp completes. Once P2 lands, remove this and step 5.
 _SPORTS_ODDS_FORK_INSTRUMENT_TYPES: tuple[str, ...] = ("exchange_odds", "fixed_odds")
 
 
@@ -1250,17 +1245,15 @@ def lookup_contract(
            ``OVER_UNDER_2_5``, ...) — an open-ended vocabulary — but every
            market produces the identical column shape, so the single generic
            ``"odds"``-keyed contract is correct for all of them.
-        5. Dual-read for the EXCHANGE_ODDS/FIXED_ODDS fork (migration window,
-           ``sports_closeout_exchange_fixed_odds_fork_2026_07_25.md``): for
-           ``asset_group == "sports"`` and ``instrument_type`` in
-           :data:`_SPORTS_ODDS_FORK_INSTRUMENT_TYPES` (``exchange_odds`` /
-           ``fixed_odds``), fall back to
-           ``CONTRACT_REGISTRY[(asset_group, "odds", data_type)]``. Only the
-           ``trades`` data_type has its own fork-specific registry entry so
-           far — the legacy ``odds`` entry backs every other odds data_type
-           (``sports_odds_snapshot`` / ``sports_odds_movement`` /
-           ``sports_arbitrage`` / ...) under the new instrument_types too,
-           since the fork only splits the partition key, not the row schema.
+        5. RETIRED migration-window fallback for ``exchange_odds`` / ``fixed_odds``
+           (``sports_taxonomy_p1_capture_and_contracts_2026_08_08.md``): the
+           dedicated CONTRACT_REGISTRY entries for those instrument_types have
+           been removed; all sports-odds lookups now resolve under the unified
+           ``"odds"`` instrument_type. For ``asset_group == "sports"`` and
+           ``instrument_type`` in :data:`_SPORTS_ODDS_FORK_INSTRUMENT_TYPES`,
+           fall back to ``CONTRACT_REGISTRY[(asset_group, "odds", data_type)]``.
+           Remove this step once the P2 GCS + manifest restamp removes all
+           ``instrument_type=exchange_odds``/``fixed_odds`` rows.
 
     Raises:
         SchemaContractNotFoundError: If no lookup resolves. Callers are
@@ -1429,12 +1422,6 @@ from unified_api_contracts.internal.schemas._sports_prediction_contracts import 
     PREDICTION_PREDICTION_MARKET_TRADES as PREDICTION_PREDICTION_MARKET_TRADES,
 )
 from unified_api_contracts.internal.schemas._sports_prediction_contracts import (
-    SPORTS_EXCHANGE_ODDS_TRADES as SPORTS_EXCHANGE_ODDS_TRADES,
-)
-from unified_api_contracts.internal.schemas._sports_prediction_contracts import (
-    SPORTS_FIXED_ODDS_TRADES as SPORTS_FIXED_ODDS_TRADES,
-)
-from unified_api_contracts.internal.schemas._sports_prediction_contracts import (
     SPORTS_ODDS_ARBITRAGE as SPORTS_ODDS_ARBITRAGE,
 )
 from unified_api_contracts.internal.schemas._sports_prediction_contracts import (
@@ -1498,8 +1485,6 @@ __all__ = [
     "OUTCOME_TO_MARKET_TYPE",
     "PREDICTION_PREDICTION_MARKET_TRADES",
     "SLUG_PREFIX_MAP",
-    "SPORTS_EXCHANGE_ODDS_TRADES",
-    "SPORTS_FIXED_ODDS_TRADES",
     "SPORTS_ODDS_ARBITRAGE",
     "SPORTS_ODDS_HORIZON_BUCKET",
     "SPORTS_ODDS_MOVEMENT",
