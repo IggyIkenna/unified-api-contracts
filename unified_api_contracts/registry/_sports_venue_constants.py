@@ -80,6 +80,28 @@ SPORTS_VENUE_TYPE_MAP.update(dict.fromkeys(SPORTS_BOOKMAKER_WEB_VENUES, SportsVe
 SPORTS_VENUE_TYPE_MAP.update(dict.fromkeys(SPORTS_DFS_VENUES, SportsVenueType.DFS_PLATFORM))
 SPORTS_VENUE_TYPE_MAP.update(dict.fromkeys(SPORTS_DATA_VENUES, SportsVenueType.DATA_ONLY))
 
+
+def derive_sports_odds_fork_instrument_type(venue: str) -> str:
+    """Derive the legacy ``exchange_odds``/``fixed_odds`` instrument_type from the venue.
+
+    Sports taxonomy P1 (2026-08-08, operator ruling 9,
+    ``sports_taxonomy_p1_capture_and_contracts_2026_08_08.md``): exchange-vs-sportsbook is a
+    property of the VENUE, not the instrument — :class:`SportsVenueType` already encodes it via
+    :data:`SPORTS_VENUE_TYPE_MAP` — so a caller that needs the value the retired
+    ``exchange_fixed_odds_fork`` used to stamp per-instrument derives it here at read time
+    instead. This resolves the "classify N unmapped bookmaker venues" question mechanically, with
+    no per-venue operator judgment: every venue classified :attr:`SportsVenueType.EXCHANGE_API`
+    resolves ``"exchange_odds"``; every other venue (bookmaker/web-scraper/prediction-market/DFS/
+    unclassified) resolves ``"fixed_odds"`` — the same binary the original fork script used
+    ("Betfair-Exchange-style venues stamp exchange_odds, sportsbook-style venues stamp
+    fixed_odds"). CONTRACT ONLY this phase: ``CONTRACT_REGISTRY[("sports", "exchange_odds"/
+    "fixed_odds", "trades")]`` stay registered for the dual-read window and no GCS/manifest row is
+    touched — wiring this into the writer/readers that currently trust the stamped column is P2
+    scope (``sports_taxonomy_p2_migration_2026_08_08.md``).
+    """
+    return "exchange_odds" if SPORTS_VENUE_TYPE_MAP.get(venue.upper()) == SportsVenueType.EXCHANGE_API else "fixed_odds"
+
+
 SPORTS_AUTH_MAP: dict[str, SportsAuthMethod] = {
     BETFAIR: SportsAuthMethod.SESSION_TOKEN,
     # BETFAIR_EX_UK/EX_EU are the same session-token-based Betfair Exchange API
