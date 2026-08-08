@@ -567,7 +567,7 @@ def test_sports_odds_instrument_type_has_a_validity_matrix_entry() -> None:
     )
 
     assert ("sports", "odds") in VALID_DATA_TYPES_BY_AG_AND_INSTRUMENT_TYPE
-    assert "trades" in VALID_DATA_TYPES_BY_AG_AND_INSTRUMENT_TYPE[("sports", "odds")]
+    assert "odds" in VALID_DATA_TYPES_BY_AG_AND_INSTRUMENT_TYPE[("sports", "odds")]
 
 
 def test_every_sports_odds_family_contract_registry_entry_is_matrix_reachable() -> None:

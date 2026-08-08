@@ -147,15 +147,15 @@ class TestExpectedCoverageByAssetGroup:
         assert is_expected("cefi", "BINANCE-FUTURES", "derivative_ticker")
         # (ODDS_API/ODDS removed 2026-08-08 — sports taxonomy P1: ODDS_API left
         # VENUES_BY_ASSET_GROUP["sports"] entirely, it's a SOURCE not a venue.)
-        assert is_expected("sports", "PINNACLE", "trades")
+        assert is_expected("sports", "PINNACLE", "odds")
         assert is_expected("prediction", "POLYMARKET", "trades")
         assert is_expected("defi", "AAVE_V3-ETHEREUM", "lending_indices")
 
     def test_is_expected_out_of_scope_returns_false(self) -> None:
         # NASDAQ trades — capable but not in scope.
         assert not is_expected("tradfi", "NASDAQ", "trades")
-        # PINNACLE doesn't emit raw odds (that's the ODDS_API-sourced bookmakers).
-        assert not is_expected("sports", "PINNACLE", "odds")
+        # After sports taxonomy P1 (2026-08-08): "trades" is no longer a valid sports data_type.
+        assert not is_expected("sports", "PINNACLE", "trades")
         # Unknown venue / data_type / asset_group.
         assert not is_expected("cefi", "UNKNOWN", "trades")
         assert not is_expected("cefi", "BINANCE-SPOT", "options_chain")

@@ -72,7 +72,7 @@ _PINNACLE = SourceCapability(
     },
     chain=None,
     kind="sports_book",
-    coverage_start={"trades": date(2020, 6, 1)},
+    coverage_start={"odds": date(2020, 6, 1)},  # renamed from trades 2026-08-08 (P1)
 )
 
 _KALSHI = SourceCapability(

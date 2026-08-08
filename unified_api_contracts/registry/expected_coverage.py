@@ -472,12 +472,12 @@ _DEFI: dict[str, list[str]] = {
 # phase explicitly defers (contract only, per todo 3's own scoping).
 # ---------------------------------------------------------------------------
 _SPORTS: dict[str, list[str]] = {
-    "PINNACLE": ["trades"],
-    "BETFAIR_SB_UK": ["trades"],
-    "BETFAIR_EX_UK": ["trades"],
-    "BETFAIR_EX_EU": ["trades"],
-    "DRAFTKINGS": ["trades"],
-    "FANDUEL": ["trades"],
+    "PINNACLE": ["odds"],  # renamed from trades 2026-08-08 (sports taxonomy P1)
+    "BETFAIR_SB_UK": ["odds"],
+    "BETFAIR_EX_UK": ["odds"],
+    "BETFAIR_EX_EU": ["odds"],
+    "DRAFTKINGS": ["odds"],
+    "FANDUEL": ["odds"],
 }
 
 # ---------------------------------------------------------------------------
