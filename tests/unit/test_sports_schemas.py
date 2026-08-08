@@ -27,7 +27,7 @@ pytestmark = pytest.mark.unit
 def test_sports_venues_constant() -> None:
     """SPORTS_VENUES must include canonical sports data and execution venues."""
     assert "API_FOOTBALL" in SPORTS_VENUES
-    assert "BETFAIR" in SPORTS_VENUES
+    assert "BETFAIR_EX_UK" in SPORTS_VENUES  # bare BETFAIR removed 2026-08-08: operator-group parent, not data-axis
     assert "PINNACLE" in SPORTS_VENUES
     assert "ODDS_API" in SPORTS_VENUES
     assert "FOOTYSTATS" in SPORTS_VENUES

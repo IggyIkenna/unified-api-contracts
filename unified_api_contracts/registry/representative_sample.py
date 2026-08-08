@@ -411,7 +411,7 @@ SPORTS_INSTRUMENT_SPECS: list[dict[str, str]] = [
         "available_to": "2021-11-07",
     },
     {
-        "venue": "BETFAIR",
+        "venue": "BETFAIR_EX_UK",
         "symbol": "EPL-MCI-ARS",
         "type": "EXCHANGE_ODDS",
         "asset_class": "sports",

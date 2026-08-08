@@ -478,7 +478,7 @@ class TestSports:
         instruments = gen.generate_sports(REF_DATE)
         venues = {i.venue for i in instruments}
         assert "POLYMARKET" in venues
-        assert "BETFAIR" in venues
+        assert "BETFAIR_EX_UK" in venues
         assert "PINNACLE" in venues
 
     def test_instrument_types(self, gen: InstrumentGenerator) -> None:

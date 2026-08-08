@@ -14,10 +14,8 @@ from __future__ import annotations
 
 from pydantic import BaseModel, Field
 
+from unified_api_contracts.registry._sports_venue_constants import BETFAIR_VENUE_OPERATOR_MAP
 from unified_api_contracts.registry.venue_constants import (
-    BETFAIR_EX_EU,
-    BETFAIR_EX_UK,
-    BETFAIR_SB_UK,
     LADBROKES,
     LEOVEGAS,
     UNIBET,
@@ -182,11 +180,11 @@ EXCHANGE_COMMISSION_RATES: dict[str, float] = {
 # Arbs between venues in the same group are not real (same operator).
 # Strategy must ensure arb legs come from DIFFERENT groups.
 # Keys are UAC canonical venue constants (uppercase); get_operator() normalises via .upper().
+# Betfair entries derived from BETFAIR_VENUE_OPERATOR_MAP (operator ruling 2026-08-08: all
+# Betfair skins — exchange and sportsbook — roll up to a single "BETFAIR" operator parent).
 VENUE_OPERATOR_GROUPS: dict[str, str] = {
-    BETFAIR_EX_UK: "BETFAIR",
-    BETFAIR_EX_EU: "BETFAIR",
-    "BETFAIR_EX_AU": "BETFAIR",
-    BETFAIR_SB_UK: "BETFAIR_SB",
+    **BETFAIR_VENUE_OPERATOR_MAP,  # BETFAIR_EX_UK, BETFAIR_EX_EU, BETFAIR_SB_UK → "BETFAIR"
+    "BETFAIR_EX_AU": "BETFAIR",  # phantom regional venue, no UAC constant (removed by todo 4)
     UNIBET: "UNIBET",
     "UNIBET_UK": "UNIBET",
     "UNIBET_FR": "UNIBET",

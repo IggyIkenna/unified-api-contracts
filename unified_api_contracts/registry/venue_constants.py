@@ -184,7 +184,9 @@ METABET = "METABET"
 OPTICODDS = "OPTICODDS"
 
 # Sports Venue Sub-Sets — grouped by execution semantics
-SPORTS_EXCHANGE_VENUES: set[str] = {BETFAIR, MATCHBOOK, BETFAIR_EX_UK, BETFAIR_EX_EU}
+# BETFAIR removed: bare BETFAIR is the operator-group parent, not a data-axis venue
+# (operator ruling 2026-08-08). BETFAIR_EX_UK / EX_EU / SB_UK are the data-axis venues.
+SPORTS_EXCHANGE_VENUES: set[str] = {MATCHBOOK, BETFAIR_EX_UK, BETFAIR_EX_EU}
 
 SPORTS_PREDICTION_MARKET_VENUES: set[str] = {POLYMARKET, KALSHI, NOVIG, BETOPENLY, PROPHETX}
 

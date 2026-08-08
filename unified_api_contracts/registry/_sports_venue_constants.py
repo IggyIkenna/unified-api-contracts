@@ -10,6 +10,9 @@ from .venue_constants import (
     BET365,
     BET888SPORT,
     BETFAIR,
+    BETFAIR_EX_EU,
+    BETFAIR_EX_UK,
+    BETFAIR_SB_UK,
     BETMGM,
     BETOPENLY,
     BOVADA,
@@ -78,7 +81,10 @@ SPORTS_VENUE_TYPE_MAP.update(dict.fromkeys(SPORTS_DFS_VENUES, SportsVenueType.DF
 SPORTS_VENUE_TYPE_MAP.update(dict.fromkeys(SPORTS_DATA_VENUES, SportsVenueType.DATA_ONLY))
 
 SPORTS_AUTH_MAP: dict[str, SportsAuthMethod] = {
-    BETFAIR: SportsAuthMethod.SESSION_TOKEN,
+    BETFAIR: SportsAuthMethod.SESSION_TOKEN,  # operator-group parent key; retained for legacy lookups
+    BETFAIR_EX_UK: SportsAuthMethod.SESSION_TOKEN,
+    BETFAIR_EX_EU: SportsAuthMethod.SESSION_TOKEN,
+    BETFAIR_SB_UK: SportsAuthMethod.SESSION_TOKEN,
     MATCHBOOK: SportsAuthMethod.API_KEY,
     POLYMARKET: SportsAuthMethod.WALLET_SIGNATURE,
     KALSHI: SportsAuthMethod.API_KEY,
@@ -196,3 +202,12 @@ SUPPORTED_MARKET_TYPES.update(dict.fromkeys(SPORTS_PREDICTION_MARKET_VENUES, _PR
 SUPPORTED_MARKET_TYPES.update(dict.fromkeys(SPORTS_BOOKMAKER_API_VENUES, _BOOKMAKER_API_MARKET_TYPES))
 SUPPORTED_MARKET_TYPES.update(dict.fromkeys(SPORTS_BOOKMAKER_WEB_VENUES, _BOOKMAKER_WEB_MARKET_TYPES))
 SUPPORTED_MARKET_TYPES.update(dict.fromkeys(SPORTS_DFS_VENUES, _DFS_MARKET_TYPES))
+
+# Venue-to-operator hierarchy: maps each Betfair sub-venue to the bare BETFAIR operator parent.
+# Sportsbook and exchange skins are the same counterparty for arb-independence purposes
+# (operator ruling 2026-08-08). Consumed by arb_config.VENUE_OPERATOR_GROUPS.
+BETFAIR_VENUE_OPERATOR_MAP: dict[str, str] = {
+    BETFAIR_EX_UK: BETFAIR,
+    BETFAIR_EX_EU: BETFAIR,
+    BETFAIR_SB_UK: BETFAIR,
+}
