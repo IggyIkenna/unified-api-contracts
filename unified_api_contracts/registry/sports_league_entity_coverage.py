@@ -45,19 +45,19 @@ from pathlib import Path
 from typing import cast
 
 # Per-fixture + league-axis api_football enrichment entities that participate in
-# the observed (league x entity) coverage map.  Canonical UPPERCASE data_type
-# names exactly as written to the manifest by the sports_reference orchestrator.
+# the observed (league x entity) coverage map.  Canonical lowercase data_type
+# names (UAC canonical form; manifest on-disk is uppercase until P2 re-stamp).
 LEAGUE_ENTITY_COVERAGE_ENTITIES: frozenset[str] = frozenset(
     {
-        "PLAYER_STATS",
-        "FIXTURE_LINEUPS",
-        "FIXTURE_EVENTS",
-        "FIXTURE_STATS",
-        "TEAMS",
-        "STANDINGS",
-        "INJURIES",
-        "WEATHER",
-        "PLAYER_VALUES",
+        "player_stats",
+        "fixture_lineups",
+        "fixture_events",
+        "fixture_stats",
+        "teams",
+        "standings",
+        "injuries",
+        "weather",
+        "player_values",
     }
 )
 

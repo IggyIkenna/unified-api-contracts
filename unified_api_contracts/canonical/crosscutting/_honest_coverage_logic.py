@@ -313,7 +313,7 @@ def compute_layered_coverage(
 # history).
 # ---------------------------------------------------------------------------
 
-SCHEDULE_DEFINING_DATA_TYPES: Final[frozenset[str]] = frozenset({"FIXTURES", FIXTURES_SCHEDULE})
+SCHEDULE_DEFINING_DATA_TYPES: Final[frozenset[str]] = frozenset({"fixtures", FIXTURES_SCHEDULE})
 """Closed set of schedule-DEFINING data_types — the source-of-truth for whether
 anything exists to capture on a (entity, day). For these, a clean
 ``SOURCE_RETURNED_ZERO`` (200 + zero rows) means "no matches that day = complete"
@@ -362,7 +362,7 @@ def is_resolved_schedule_empty(data_type: str | None, reason: str | None) -> boo
     if not data_type or not reason:
         return False
     return (
-        data_type.strip().upper() in SCHEDULE_DEFINING_DATA_TYPES and reason.strip() == _SCHEDULE_EMPTY_RESOLVED_REASON
+        data_type.strip().lower() in SCHEDULE_DEFINING_DATA_TYPES and reason.strip() == _SCHEDULE_EMPTY_RESOLVED_REASON
     )
 
 

@@ -37,7 +37,7 @@ def get_source_priority(asset_group: str, data_type: str) -> list[str]:
         KeyError: If the pair is not registered. Failing loud is intentional
             — silent fallback would mask schema-drift bugs.
     """
-    key = (asset_group, data_type)
+    key = (asset_group, data_type.lower())
     if key not in SOURCE_PRIORITY:
         msg = (
             f"No source priority registered for "
