@@ -899,23 +899,6 @@ TRADFI_INSTRUMENT_TYPE_ACCEPTED_UNRESOLVED_RESIDUE: frozenset[str] = frozenset(
     }
 )
 
-# Sports venue-axis cross-asset-group bleed (2026-07-30 census review). KALSHI is a real,
-# registered `prediction` venue (VENUES_BY_ASSET_GROUP["prediction"]) whose rows also
-# appear in the SPORTS manifest — 20,785 rows, 100% capture_status=empty_confirmed/
-# row_count=0, paired with source=polymarket_clob, dates 2020-06-06..2026-05-21.
-# GCS-confirmed 2026-07-30: zero real objects under asset_group=sports/venue=KALSHI at 3
-# dates spanning the full range — purely a manifest phantom, no data at risk. Root-cause
-# classification (fleet-wide manifest_consolidator TOCTOU vs. legacy artifact) remains open
-# on `sports_satellite_ao_dispatch_batch3_2026_07_25.md`; this only silences the panel
-# badge for the confirmed-phantom population. NOT a canonical set — never merge into
-# VENUES_BY_ASSET_GROUP["sports"] (KALSHI belongs to prediction, not sports). Consumed by
-# `_ACCEPTED_EXCEPTIONS[("venues", "sports")]`.
-SPORTS_VENUE_ACCEPTED_CROSS_AG_BLEED: frozenset[str] = frozenset(
-    {
-        "KALSHI",
-    }
-)
-
 # Sports data_type-axis stale uppercase residue (2026-07-30 census review,
 # sports_consolidated_closeout_2026_07_19.md "K1/K2 revert"). `ODDS`/`ODDS_MOVEMENT`/
 # `ODDS_SNAPSHOT` (uppercase) are dead — the registry+writer revert shipped 2026-07-27
