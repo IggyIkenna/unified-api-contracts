@@ -20,7 +20,6 @@ from unified_api_contracts.internal.schemas.contracts import (
     SPORTS_EXCHANGE_ODDS_TRADES,
     SPORTS_FIXED_ODDS_TRADES,
     SPORTS_ODDS_HORIZON_BUCKET,
-    SPORTS_ODDS_SNAPSHOT,
     SPORTS_ODDS_TRADES,
     SchemaContractNotFoundError,
     lookup_contract,
@@ -276,11 +275,11 @@ def test_sports_odds_horizon_bucket_validates_sample_dataframe() -> None:
 # lookup_contract dual-read: legacy "odds" + EXCHANGE_ODDS/FIXED_ODDS
 # (sports_closeout_exchange_fixed_odds_fork_2026_07_25.md todo 4). Only
 # ("sports", "exchange_odds"/"fixed_odds", "trades") has its own
-# CONTRACT_REGISTRY entry (todo 3) -- every other odds data_type
-# (sports_odds_snapshot / sports_odds_movement / sports_arbitrage) is not yet
-# forked, so a lookup for the new instrument_types against one of those
-# data_types must fall back to the legacy "odds" contract during the
-# migration window.
+# CONTRACT_REGISTRY entry (todo 3) -- every other odds data_type (odds_locf_{tf},
+# odds_ohlcv_{tf}, odds_horizon_bucket_{tf}, arbitrage_opportunity_{tf}) falls
+# back to the legacy "odds" CONTRACT_REGISTRY entry during the migration window.
+# sports_taxonomy P1 (2026-08-08): sports_odds_snapshot/sports_odds_movement keys
+# removed from CONTRACT_REGISTRY; replaced with odds_locf_{tf} / odds_ohlcv_{tf}.
 # ---------------------------------------------------------------------------
 
 
@@ -299,17 +298,17 @@ def test_lookup_contract_new_instrument_types_resolve_their_own_forked_entry() -
 
 
 def test_lookup_contract_dual_reads_unforked_odds_data_type_via_exchange_odds() -> None:
-    """sports_odds_snapshot has no ("sports","exchange_odds",...) entry yet --
-    the dual-read fallback must resolve it to the legacy odds contract.
+    """odds_locf_15m has no ("sports","exchange_odds",...) entry --
+    the dual-read fallback must resolve it to the ("sports","odds","odds_locf_15m") contract.
     """
-    contract = lookup_contract(asset_group="sports", instrument_type="exchange_odds", data_type="sports_odds_snapshot")
-    assert contract is SPORTS_ODDS_SNAPSHOT
-    assert contract is CONTRACT_REGISTRY[("sports", "odds", "sports_odds_snapshot")]
+    contract = lookup_contract(asset_group="sports", instrument_type="exchange_odds", data_type="odds_locf_15m")
+    assert contract is CONTRACT_REGISTRY[("sports", "odds", "odds_locf_15m")]
 
 
 def test_lookup_contract_dual_reads_unforked_odds_data_type_via_fixed_odds() -> None:
-    contract = lookup_contract(asset_group="sports", instrument_type="fixed_odds", data_type="sports_odds_snapshot")
-    assert contract is SPORTS_ODDS_SNAPSHOT
+    """Same fallback for fixed_odds → resolves odds_locf_15m via ("sports","odds",...)."""
+    contract = lookup_contract(asset_group="sports", instrument_type="fixed_odds", data_type="odds_locf_15m")
+    assert contract is CONTRACT_REGISTRY[("sports", "odds", "odds_locf_15m")]
 
 
 def test_lookup_contract_dual_read_fallback_is_sports_only() -> None:
@@ -318,7 +317,7 @@ def test_lookup_contract_dual_read_fallback_is_sports_only() -> None:
     still raise, not silently resolve to an unrelated contract.
     """
     with pytest.raises(SchemaContractNotFoundError):
-        lookup_contract(asset_group="cefi", instrument_type="exchange_odds", data_type="sports_odds_snapshot")
+        lookup_contract(asset_group="cefi", instrument_type="exchange_odds", data_type="odds_locf_15m")
 
 
 # ---------------------------------------------------------------------------
@@ -574,9 +573,9 @@ def test_every_sports_odds_family_contract_registry_entry_is_matrix_reachable() 
     """Every CONTRACT_REGISTRY key sharing a sports market-data "odds" family
     instrument_type -- and whose data_type is a genuine
     ``DATA_TYPES_BY_ASSET_GROUP["sports"]`` member (not a schema-internal name
-    like ``SPORTS_ODDS_SNAPSHOT``'s ``sports_odds_snapshot``, a separate,
-    out-of-scope naming mismatch between CONTRACT_REGISTRY's schema keys and
-    the wire data_type vocabulary) -- must have its data_type present in the
+    like MDPS-derived candle product keys such as ``odds_locf_15m`` or
+    ``odds_ohlcv_15m`` which live in CONTRACT_REGISTRY but are not raw MTDS
+    capture vocabulary) -- must have its data_type present in the
     ``VALID_DATA_TYPES_BY_AG_AND_INSTRUMENT_TYPE`` entry for that
     instrument_type.
 

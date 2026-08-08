@@ -271,78 +271,16 @@ PREDICTION_PREDICTION_MARKET_TRADES = SchemaContract(
 
 
 # ---------------------------------------------------------------------------
-# Sports — odds snapshot / movement / arbitrage (DataType enum coverage)
+# Sports — odds arbitrage (DataType enum coverage)
 # ---------------------------------------------------------------------------
-# ``sports_odds_snapshot`` / ``sports_odds_movement`` / ``sports_arbitrage``
-# live under the canonical ``sports`` category + ``odds`` instrument_type.
-# Snapshot = point-in-time odds across venues. Movement = deltas between
-# snapshots. Arbitrage = cross-venue mispricings. Venue-specific columns
-# (``traded_volume`` on Betfair, ``max_bet`` on Pinnacle) carry
-# ``provided_by_venues``.
+# sports_taxonomy P1 (2026-08-08): SPORTS_ODDS_SNAPSHOT and SPORTS_ODDS_MOVEMENT
+# removed — they were MDPS-derived processed schemas, not raw capture schemas.
+# Collapsed onto data_type=odds + timeframe axis (see _candle_contracts.py for
+# the MDPS processed contract registrations: odds_ohlcv_{tf} and odds_locf_{tf}).
+# Raw odds tick schema = SPORTS_ODDS_TRADES (data_type="trades").
+# Arbitrage / horizon bucket schemas survive below unchanged.
 
-_SNAPSHOT_VENUES = frozenset({"BETFAIR", "MATCHBOOK", "ODDS_API", "PINNACLE_AS_LINE"})
-
-SPORTS_ODDS_SNAPSHOT = SchemaContract(
-    asset_group="sports",
-    instrument_type="odds",
-    data_type="sports_odds_snapshot",
-    columns=[
-        INSTRUMENT_ID_COL,
-        VENUE_COL,
-        TS_EVENT_COL,
-        ColumnSpec(name="league_id", dtype="string", nullable=False),
-        ColumnSpec(name="fixture_id", dtype="string", nullable=False),
-        ColumnSpec(name="market_type", dtype="string", nullable=False),
-        ColumnSpec(name="outcome", dtype="string", nullable=False),
-        ColumnSpec(name="odds_decimal", dtype="float64", nullable=False),
-        ColumnSpec(
-            name="bookmaker",
-            dtype="string",
-            nullable=True,
-            description="Provider-side bookmaker label (e.g. pinnacle, draftkings).",
-        ),
-        # Betfair exchange publishes traded volume per outcome; other books do not.
-        ColumnSpec(
-            name="traded_volume",
-            dtype="float64",
-            nullable=True,
-            required=False,
-            provided_by_venues=frozenset({"BETFAIR"}),
-        ),
-        # Pinnacle publishes max stake per market; other venues do not.
-        ColumnSpec(
-            name="max_bet",
-            dtype="float64",
-            nullable=True,
-            required=False,
-            provided_by_venues=frozenset({"PINNACLE_AS_LINE"}),
-        ),
-    ],
-    symbol_column="fixture_id",
-    required_row_count_min=0,
-)
-
-SPORTS_ODDS_MOVEMENT = SchemaContract(
-    asset_group="sports",
-    instrument_type="odds",
-    data_type="sports_odds_movement",
-    columns=[
-        INSTRUMENT_ID_COL,
-        VENUE_COL,
-        TS_EVENT_COL,
-        ColumnSpec(name="league_id", dtype="string", nullable=False),
-        ColumnSpec(name="fixture_id", dtype="string", nullable=False),
-        ColumnSpec(name="market_type", dtype="string", nullable=False),
-        ColumnSpec(name="outcome", dtype="string", nullable=False),
-        ColumnSpec(name="odds_before", dtype="float64", nullable=False),
-        ColumnSpec(name="odds_after", dtype="float64", nullable=False),
-        ColumnSpec(name="odds_delta", dtype="float64", nullable=False),
-        ColumnSpec(name="ts_before", dtype="datetime64[ns, UTC]", nullable=False),
-        ColumnSpec(name="bookmaker", dtype="string", nullable=True),
-    ],
-    symbol_column="fixture_id",
-    required_row_count_min=0,
-)
+# _SNAPSHOT_VENUES removed with SPORTS_ODDS_SNAPSHOT (was only used there).
 
 # Cross-venue arbitrage opportunities — ``venue`` and ``instrument_id`` carry
 # a composite ``<LEG_A_VENUE>_VS_<LEG_B_VENUE>`` label. Not venue-scoped.
@@ -644,8 +582,8 @@ CONTRACT_REGISTRY[("prediction", "prediction_market", "trades")] = PREDICTION_PR
 CONTRACT_REGISTRY[("prediction", "prediction_market", "book_snapshot_5")] = PREDICTION_PREDICTION_MARKET_BOOK_SNAPSHOT
 CONTRACT_REGISTRY[("prediction", "prediction_market", "market_metadata")] = PREDICTION_PREDICTION_MARKET_METADATA
 CONTRACT_REGISTRY[("prediction", "prediction_market", "fills")] = PREDICTION_PREDICTION_MARKET_FILLS
-CONTRACT_REGISTRY[("sports", "odds", "sports_odds_snapshot")] = SPORTS_ODDS_SNAPSHOT
-CONTRACT_REGISTRY[("sports", "odds", "sports_odds_movement")] = SPORTS_ODDS_MOVEMENT
+# ("sports", "odds", "sports_odds_snapshot") removed 2026-08-08 (P1 collapse)
+# ("sports", "odds", "sports_odds_movement") removed 2026-08-08 (P1 collapse)
 CONTRACT_REGISTRY[("sports", "odds", "sports_arbitrage")] = SPORTS_ODDS_ARBITRAGE
 CONTRACT_REGISTRY[("sports", "odds", "odds_horizon_bucket")] = SPORTS_ODDS_HORIZON_BUCKET
 
@@ -659,7 +597,7 @@ __all__ = [
     "SPORTS_FIXED_ODDS_TRADES",
     "SPORTS_ODDS_ARBITRAGE",
     "SPORTS_ODDS_HORIZON_BUCKET",
-    "SPORTS_ODDS_MOVEMENT",
-    "SPORTS_ODDS_SNAPSHOT",
+    # SPORTS_ODDS_MOVEMENT removed 2026-08-08 (sports taxonomy P1 collapse)
+    # SPORTS_ODDS_SNAPSHOT removed 2026-08-08 (sports taxonomy P1 collapse)
     "SPORTS_ODDS_TRADES",
 ]

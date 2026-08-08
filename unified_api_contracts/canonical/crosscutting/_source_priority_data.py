@@ -56,8 +56,12 @@ SOURCE_PRIORITY: Final[dict[tuple[str, str], list[str]]] = {
     ("sports", "RESULTS"): ["api_football"],
     ("sports", "UNDERSTAT_XG"): ["understat"],
     ("sports", "SFI_PROGRESSIVE_STATS"): ["soccer_football_info"],
-    ("sports", "ODDS_SNAPSHOT"): ["odds_api"],
-    ("sports", "ODDS_MOVEMENT"): ["odds_api"],
+    ("sports", "ODDS_SNAPSHOT"): ["odds_api"],   # legacy key, kept for pre-P1 manifest rows
+    ("sports", "ODDS_MOVEMENT"): ["odds_api"],   # legacy key, kept for pre-P1 manifest rows
+    # sports_taxonomy P1 (2026-08-08): collapsed odds_snapshot/odds_movement onto
+    # data_type=odds + timeframe axis. New MDPS dispatch keys → new SOURCE_PRIORITY entries.
+    ("sports", "ODDS_OHLCV"): ["odds_api"],      # OHLC candle (SportsOddsMovementAdapter, key="odds")
+    ("sports", "ODDS_LOCF"): ["odds_api"],       # LOCF snapshot (SportsOddsSnapshotAdapter, key="odds_locf")
     ("sports", "ARBITRAGE"): ["odds_api"],
     # TRADES = the raw MTDS per-(bookmaker,league,fixture) tick shard write shape
     # (venue_fetch.py::_build_sports_shard_path) — odds-api is the ONLY sanctioned

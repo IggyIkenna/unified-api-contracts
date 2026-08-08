@@ -93,8 +93,10 @@ class DataType(StrEnum):
     FUTURES_CHAIN = "futures_chain"
     COMBO_CHAIN = "combo_chain"
     SPORTS_ARBITRAGE = "sports_arbitrage"
-    SPORTS_ODDS_SNAPSHOT = "sports_odds_snapshot"
-    SPORTS_ODDS_MOVEMENT = "sports_odds_movement"
+    # SPORTS_ODDS_SNAPSHOT/MOVEMENT removed 2026-08-08 (sports taxonomy P1): collapsed
+    # onto odds+timeframe axis. MDPS dispatch keys are now "odds" (OHLC) and "odds_locf"
+    # (LOCF snapshot) — neither is a raw MTDS capture type.
+    SPORTS_ODDS_LOCF = "odds_locf"
     LIQUIDATION_EVENTS = "liquidation_events"
     FLASH_LOAN_EVENTS = "flash_loan_events"
     STAKING_YIELDS = "staking_yields"

@@ -452,17 +452,21 @@ def test_prediction_unknown_fallback_candles(tf: str) -> None:
 
 @pytest.mark.parametrize(
     "source_dt",
-    ("odds_movement", "odds_snapshot", "odds_horizon_bucket", "arbitrage_opportunity"),
+    # sports_taxonomy P1 (2026-08-08): odds_movement→ "odds" adapter (ohlcv, base loop);
+    # odds_snapshot→ "odds_locf" adapter (LOCF, derived loop). The base "odds_ohlcv_{tf}"
+    # contracts are tested by test_sports_odds_ohlcv_contracts_registered (above). Here
+    # we test the derived-loop contracts: odds_locf / odds_horizon_bucket / arbitrage.
+    ("odds_locf", "odds_horizon_bucket", "arbitrage_opportunity"),
 )
 @pytest.mark.parametrize("tf", MDPS_TIMEFRAMES_SPORTS)
 def test_sports_derived_candles_registered(tf: str, source_dt: str) -> None:
-    """§6E P1: odds_movement / odds_snapshot / odds_horizon_bucket /
-    arbitrage_opportunity contracts exist. ``odds_snapshot`` was missing from
-    the registration loop until 2026-07-27 — its CandleAdapterRegistry
-    adapter (SportsOddsSnapshotAdapter) existed but had no SchemaContract,
-    so every write hard-failed. Regression:
-    plans/active/issues/mdps_t1_recon_job_oom_failing_7_days_2026_07_26.md
-    Update 5."""
+    """§6E P1: odds_locf / odds_horizon_bucket / arbitrage_opportunity contracts exist.
+
+    sports_taxonomy P1 (2026-08-08): odds_movement collapsed onto "odds" key (writes
+    odds_ohlcv_{tf} — already covered by the base-loop test), odds_snapshot collapsed
+    onto "odds_locf" key (writes odds_locf_{tf}). This parametrize verifies the derived
+    loop registrations in _candle_contracts.py.
+    """
     contract = lookup_contract(
         asset_group="sports",
         instrument_type="odds",
@@ -480,7 +484,7 @@ def test_sports_derived_candles_registered(tf: str, source_dt: str) -> None:
 
 @pytest.mark.parametrize(
     "source_dt",
-    ("odds_movement", "odds_snapshot", "odds_horizon_bucket", "arbitrage_opportunity"),
+    ("odds_locf", "odds_horizon_bucket", "arbitrage_opportunity"),
 )
 @pytest.mark.parametrize("tf", MDPS_TIMEFRAMES_SPORTS)
 @pytest.mark.parametrize(
@@ -505,9 +509,11 @@ def test_sports_derived_candles_resolve_per_market_instrument_type(
     are arbitrary floats per ``build_instrument_id``'s ``point`` arg) that can
     never be fully enumerated. Every real market must still resolve to the
     single generic ``("sports", "odds", data_type)`` contract because all
-    four adapters emit the identical CandleOutput shape regardless of market.
+    three derived adapters emit the identical CandleOutput shape regardless of market.
     Deliberately includes a nonsense/never-registered market-type string to
     prove the fallback is genuinely open-ended, not a disguised enumeration.
+    (sports_taxonomy P1 2026-08-08: parametrize updated from odds_movement/odds_snapshot
+    to odds_locf — odds_ohlcv_{tf} is the base-loop registration, tested separately.)
     """
     generic = CONTRACT_REGISTRY[("sports", "odds", f"{source_dt}_{tf}")]
     contract = lookup_contract(

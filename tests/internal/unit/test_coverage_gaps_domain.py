@@ -290,8 +290,9 @@ class TestCandleSchema:
         assert DataType.DERIVATIVE_TICKER == "derivative_ticker"
         assert DataType.LIQUIDATIONS == "liquidations"
         assert DataType.SPORTS_ARBITRAGE == "sports_arbitrage"
-        assert DataType.SPORTS_ODDS_SNAPSHOT == "sports_odds_snapshot"
-        assert DataType.SPORTS_ODDS_MOVEMENT == "sports_odds_movement"
+        # sports_taxonomy P1 (2026-08-08): SPORTS_ODDS_SNAPSHOT/MOVEMENT collapsed.
+        # LOCF snapshot adapter now uses "odds_locf"; OHLC adapter uses "odds" (no new enum).
+        assert DataType.SPORTS_ODDS_LOCF == "odds_locf"
 
     def test_data_type_str_enum(self) -> None:
         from unified_api_contracts.internal.domain.market_data_processing.candle_schema import DataType

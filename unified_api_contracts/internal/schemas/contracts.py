@@ -1199,8 +1199,11 @@ class SchemaContractNotFoundError(LookupError):
 # and rejected — the missing axis is instrument_type, not venue, and it is
 # unbounded, so a finite venue x instrument_type list would recur indefinitely).
 _SPORTS_ODDS_DERIVED_CANDLE_PREFIXES: tuple[str, ...] = (
-    "odds_movement_",
-    "odds_snapshot_",
+    # odds_movement_ / odds_snapshot_ removed 2026-08-08 (sports taxonomy P1
+    # collapse): these MDPS product keys are now "odds" (OHLC, writes odds_ohlcv_{tf})
+    # and "odds_locf" (LOCF snapshot, writes odds_locf_{tf}).
+    "odds_ohlcv_",       # OHLC candle of raw odds (collapsed from odds_movement_)
+    "odds_locf_",        # LOCF snapshot of raw odds (collapsed from odds_snapshot_)
     "odds_horizon_bucket_",
     "arbitrage_opportunity_",
 )
@@ -1241,8 +1244,8 @@ def lookup_contract(
            ``xg_shots``).  The fallback ensures every case combination resolves
            without requiring a schema-version migration.
         4. For ``asset_group == "sports"`` and a ``data_type`` prefixed by one
-           of :data:`_SPORTS_ODDS_DERIVED_CANDLE_PREFIXES` (odds_movement /
-           odds_snapshot / odds_horizon_bucket / arbitrage_opportunity candles),
+           of :data:`_SPORTS_ODDS_DERIVED_CANDLE_PREFIXES` (odds_ohlcv /
+           odds_locf / odds_horizon_bucket / arbitrage_opportunity candles),
            fall back to ``CONTRACT_REGISTRY[(asset_group, "odds", data_type)]``
            regardless of ``instrument_type``. These candle writers key
            ``instrument_type`` off the per-market token embedded in the
@@ -1250,6 +1253,8 @@ def lookup_contract(
            ``OVER_UNDER_2_5``, ...) — an open-ended vocabulary — but every
            market produces the identical column shape, so the single generic
            ``"odds"``-keyed contract is correct for all of them.
+           (sports_taxonomy P1 2026-08-08: odds_movement_ / odds_snapshot_
+           prefixes collapsed to odds_ohlcv_ / odds_locf_ respectively.)
         5. Dual-read for the EXCHANGE_ODDS/FIXED_ODDS fork (migration window,
            ``sports_closeout_exchange_fixed_odds_fork_2026_07_25.md``): for
            ``asset_group == "sports"`` and ``instrument_type`` in
@@ -1258,9 +1263,9 @@ def lookup_contract(
            ``CONTRACT_REGISTRY[(asset_group, "odds", data_type)]``. Only the
            ``trades`` data_type has its own fork-specific registry entry so
            far — the legacy ``odds`` entry backs every other odds data_type
-           (``sports_odds_snapshot`` / ``sports_odds_movement`` /
-           ``sports_arbitrage`` / ...) under the new instrument_types too,
-           since the fork only splits the partition key, not the row schema.
+           (``sports_arbitrage`` / ``odds_ohlcv`` / ``odds_locf`` / ...) under
+           the new instrument_types too, since the fork only splits the
+           partition key, not the row schema.
 
     Raises:
         SchemaContractNotFoundError: If no lookup resolves. Callers are
@@ -1441,12 +1446,6 @@ from unified_api_contracts.internal.schemas._sports_prediction_contracts import 
     SPORTS_ODDS_HORIZON_BUCKET as SPORTS_ODDS_HORIZON_BUCKET,
 )
 from unified_api_contracts.internal.schemas._sports_prediction_contracts import (
-    SPORTS_ODDS_MOVEMENT as SPORTS_ODDS_MOVEMENT,
-)
-from unified_api_contracts.internal.schemas._sports_prediction_contracts import (
-    SPORTS_ODDS_SNAPSHOT as SPORTS_ODDS_SNAPSHOT,
-)
-from unified_api_contracts.internal.schemas._sports_prediction_contracts import (
     SPORTS_ODDS_TRADES as SPORTS_ODDS_TRADES,
 )
 
@@ -1502,8 +1501,8 @@ __all__ = [
     "SPORTS_FIXED_ODDS_TRADES",
     "SPORTS_ODDS_ARBITRAGE",
     "SPORTS_ODDS_HORIZON_BUCKET",
-    "SPORTS_ODDS_MOVEMENT",
-    "SPORTS_ODDS_SNAPSHOT",
+    # SPORTS_ODDS_MOVEMENT removed 2026-08-08 (sports taxonomy P1 collapse)
+    # SPORTS_ODDS_SNAPSHOT removed 2026-08-08 (sports taxonomy P1 collapse)
     "SPORTS_ODDS_TRADES",
     "TRADFI_COMBO_TRADES",
     "TRADFI_EQUITY_OHLCV_1M",

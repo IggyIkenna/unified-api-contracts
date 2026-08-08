@@ -37,8 +37,12 @@ BUNDLED_DATA_TYPES: Final[frozenset[str]] = frozenset(
         "event_contract",
         # Per-fixture sports data_types — bundle = multiple bookmakers per fixture.
         # cluster_extractor: bookmaker. Registry: SPORTS_FIXTURE_CLUSTERS.
-        "odds_snapshot",
-        "odds_movement",
+        # sports_taxonomy P1 (2026-08-08): odds_snapshot→"odds_locf" (MDPS LOCF adapter);
+        # odds_movement→"odds" (MDPS OHLC adapter). "odds" omitted here because it is
+        # also the RAW MTDS capture type — adding it would fire cluster validation on MTDS
+        # raw tick writes before MTDS cluster handling is confirmed. P2 task to add "odds"
+        # once MTDS coordination is done.
+        "odds_locf",
         "arbitrage_opportunity",
     }
 )
@@ -75,8 +79,9 @@ DATA_TYPE_TO_CLUSTER_REGISTRY: Final[dict[str, str]] = {
     "prediction_canonical_question_group": "PREDICTION_GROUPS",
     "sports_fixture_bundle": "SPORTS_FIXTURE_CLUSTERS",
     "event_contract": "EVENT_CONTRACT_ROOT_CLUSTERS",
-    "odds_snapshot": "SPORTS_FIXTURE_CLUSTERS",
-    "odds_movement": "SPORTS_FIXTURE_CLUSTERS",
+    # sports_taxonomy P1 (2026-08-08): odds_snapshot→"odds_locf", odds_movement→"odds".
+    # "odds" kept out of BUNDLED_DATA_TYPES for now (P2 task, see comment above).
+    "odds_locf": "SPORTS_FIXTURE_CLUSTERS",
     "arbitrage_opportunity": "SPORTS_FIXTURE_CLUSTERS",
 }
 

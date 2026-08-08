@@ -871,8 +871,9 @@ class TestPredictionReconcileCrossAgUnchanged:
         assert not is_mvp("tradfi", "CME", "FUTURE", "book_snapshot_5", base_ccy="ES")
 
     def test_sports_data_types_unchanged(self) -> None:
-        """Sports MVP data_types is the exact odds set — markets/outcomes/settlements/odds_snapshot/odds_movement
-        retired 2026-08-08 (sports taxonomy P1): MDPS-derived types removed from raw UAC vocabulary."""
+        """Sports MVP data_types is the exact odds set — markets/outcomes/settlements/odds_snapshot/
+        odds_movement retired 2026-08-08 (sports taxonomy P1): MDPS-derived types removed from
+        raw UAC vocabulary. Remaining raw types: odds + ODDS (case variant)."""
         rule = MVP_SCOPE["sports"]
         assert isinstance(rule, SportsMvpRule)
         assert rule.data_types == frozenset({"odds", "ODDS"})

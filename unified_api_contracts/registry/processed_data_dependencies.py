@@ -41,8 +41,15 @@ _RAW_TO_PROCESSED_PREFIX: dict[str, str] = {
 # raw stream. ``arbitrage_opportunity`` is computed by MDPS across multiple
 # bookmakers' raw odds, so the raw precondition is just ``odds`` (any
 # bookmaker shard captured).
+# ``odds_locf`` is the LOCF (last-observation-carried-forward) snapshot form
+# of raw odds, produced by SportsOddsSnapshotAdapter. sports_taxonomy P1
+# (2026-08-08): collapsed from odds_snapshot MDPS dispatch key onto odds_locf.
+# Unlike odds_ohlcv_{tf} (which has its own _RAW_TO_PROCESSED_PREFIX entry),
+# odds_locf shares the same raw precondition (data_type=odds captured by MTDS)
+# but emits a distinct processed prefix (odds_locf_{tf}, NOT odds_ohlcv_{tf}).
 _DERIVED_ONLY: dict[str, list[str]] = {
     "arbitrage_opportunity": ["odds"],
+    "odds_locf": ["odds"],
 }
 
 # TradFi pre-aggregated 1m candles can serve as the "raw" source for higher
