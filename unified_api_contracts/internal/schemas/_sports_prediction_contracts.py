@@ -10,7 +10,7 @@ performs a lookup.
 
 Sports:
     ``(category=sports, venue=BOOKMAKER, source=odds_api|sfi|footystats,
-       league_id=EPL|LALIGA|…, instrument_type=odds, data_type=trades)``
+       league_id=EPL|LALIGA|…, instrument_type=odds, data_type=odds)``
 
     ``venue`` (manifest/path dimension) is the bookmaker (BET365, PINNACLE,
     BETFAIR, MATCHBOOK, UNITY_BETFAIR). ``source`` is the provider.
@@ -63,7 +63,7 @@ from unified_api_contracts.internal.schemas.contracts import (
 SPORTS_ODDS_TRADES = SchemaContract(
     asset_group="sports",
     instrument_type="odds",
-    data_type="trades",
+    data_type="odds",
     columns=[
         INSTRUMENT_ID_COL,
         ColumnSpec(
@@ -89,7 +89,7 @@ SPORTS_ODDS_TRADES = SchemaContract(
             name="source",
             dtype="string",
             nullable=False,
-            description="Provider: ODDS_API, SFI, FOOTYSTATS.",
+            description="Provider: ODDS_API, SFI, FOOTYSTATS. Distinguishes odds_api vs footystats populations.",
         ),
         ColumnSpec(
             name="league_id",
@@ -106,6 +106,12 @@ SPORTS_ODDS_TRADES = SchemaContract(
         ),
         ColumnSpec(name="outcome_name", dtype="string", nullable=False),
         PRICE_COL,
+        ColumnSpec(
+            name="in_play",
+            dtype="bool",
+            nullable=True,
+            description="True when the bookmaker quote was captured during a live match (bm_minutes_to_kickoff < 0).",
+        ),
     ],
     symbol_column="fixture_id",
     required_row_count_min=1,
@@ -123,7 +129,7 @@ SPORTS_ODDS_TRADES = SchemaContract(
 SPORTS_EXCHANGE_ODDS_TRADES = SchemaContract(
     asset_group="sports",
     instrument_type="exchange_odds",
-    data_type="trades",
+    data_type="odds",
     columns=SPORTS_ODDS_TRADES.columns,
     symbol_column="fixture_id",
     required_row_count_min=1,
@@ -132,7 +138,7 @@ SPORTS_EXCHANGE_ODDS_TRADES = SchemaContract(
 SPORTS_FIXED_ODDS_TRADES = SchemaContract(
     asset_group="sports",
     instrument_type="fixed_odds",
-    data_type="trades",
+    data_type="odds",
     columns=SPORTS_ODDS_TRADES.columns,
     symbol_column="fixture_id",
     required_row_count_min=1,
@@ -594,6 +600,11 @@ PREDICTION_PREDICTION_MARKET_FILLS = SchemaContract(
 # Registry side-effects
 # ---------------------------------------------------------------------------
 
+CONTRACT_REGISTRY[("sports", "odds", "odds")] = SPORTS_ODDS_TRADES
+CONTRACT_REGISTRY[("sports", "exchange_odds", "odds")] = SPORTS_EXCHANGE_ODDS_TRADES
+CONTRACT_REGISTRY[("sports", "fixed_odds", "odds")] = SPORTS_FIXED_ODDS_TRADES
+# Backward-compat aliases for the P2 migration window (GCS objects written before
+# this P1 rename still carry data_type=trades in their path; remove after P2 re-stamps).
 CONTRACT_REGISTRY[("sports", "odds", "trades")] = SPORTS_ODDS_TRADES
 CONTRACT_REGISTRY[("sports", "exchange_odds", "trades")] = SPORTS_EXCHANGE_ODDS_TRADES
 CONTRACT_REGISTRY[("sports", "fixed_odds", "trades")] = SPORTS_FIXED_ODDS_TRADES

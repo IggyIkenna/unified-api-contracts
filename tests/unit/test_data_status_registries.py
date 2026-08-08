@@ -145,16 +145,16 @@ class TestExpectedCoverageByAssetGroup:
     def test_is_expected_in_scope_returns_true(self) -> None:
         assert is_expected("tradfi", "CME", "trades")
         assert is_expected("cefi", "BINANCE-FUTURES", "derivative_ticker")
-        assert is_expected("sports", "ODDS_API", "ODDS")  # uppercase ODDS — canonical manifest key
-        assert is_expected("sports", "PINNACLE", "trades")
+        assert is_expected("sports", "ODDS_API", "ODDS")  # uppercase ODDS — stale manifest residue
+        assert is_expected("sports", "PINNACLE", "odds")  # renamed from "trades" 2026-08-08
         assert is_expected("prediction", "POLYMARKET", "trades")
         assert is_expected("defi", "AAVE_V3-ETHEREUM", "lending_indices")
 
     def test_is_expected_out_of_scope_returns_false(self) -> None:
         # NASDAQ trades — capable but not in scope.
         assert not is_expected("tradfi", "NASDAQ", "trades")
-        # PINNACLE doesn't emit raw odds (only ODDS_API does).
-        assert not is_expected("sports", "PINNACLE", "odds")
+        # sports "trades" retired — bookmaker quotes are now "odds".
+        assert not is_expected("sports", "PINNACLE", "trades")
         # Unknown venue / data_type / asset_group.
         assert not is_expected("cefi", "UNKNOWN", "trades")
         assert not is_expected("cefi", "BINANCE-SPOT", "options_chain")

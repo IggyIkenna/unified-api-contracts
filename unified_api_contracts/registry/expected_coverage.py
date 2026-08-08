@@ -465,13 +465,17 @@ _DEFI: dict[str, list[str]] = {
 # BET365 removed — 0 manifest rows (DEFERRED-INDEFINITELY 2026-05-12).
 # ---------------------------------------------------------------------------
 _SPORTS: dict[str, list[str]] = {
+    # "ODDS_API" appears as venue in stale manifest rows (uppercase "ODDS" — bookkeeping residue
+    # from pre-K1-revert captures). Bookmaker venues (PINNACLE etc.) are the real path venue.
     "ODDS_API": ["ODDS"],
-    "PINNACLE": ["trades"],
-    "BETFAIR_SB_UK": ["trades"],
-    "BETFAIR_EX_UK": ["trades"],
-    "BETFAIR_EX_EU": ["trades"],
-    "DRAFTKINGS": ["trades"],
-    "FANDUEL": ["trades"],
+    # Bookmaker venues: renamed "trades" → "odds" 2026-08-08 (sports_taxonomy_p1); the
+    # ``source`` column (odds_api) distinguishes these from the footystats population.
+    "PINNACLE": ["odds"],
+    "BETFAIR_SB_UK": ["odds"],
+    "BETFAIR_EX_UK": ["odds"],
+    "BETFAIR_EX_EU": ["odds"],
+    "DRAFTKINGS": ["odds"],
+    "FANDUEL": ["odds"],
 }
 
 # ---------------------------------------------------------------------------
