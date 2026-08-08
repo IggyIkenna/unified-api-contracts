@@ -908,11 +908,31 @@ TRADFI_INSTRUMENT_TYPE_ACCEPTED_UNRESOLVED_RESIDUE: frozenset[str] = frozenset(
 # row_count=0, paired with source=polymarket_clob, dates 2020-06-06..2026-05-21.
 # GCS-confirmed 2026-07-30: zero real objects under asset_group=sports/venue=KALSHI at 3
 # dates spanning the full range — purely a manifest phantom, no data at risk. Root-cause
-# classification (fleet-wide manifest_consolidator TOCTOU vs. legacy artifact) remains open
-# on `sports_satellite_ao_dispatch_batch3_2026_07_25.md`; this only silences the panel
-# badge for the confirmed-phantom population. NOT a canonical set — never merge into
-# VENUES_BY_ASSET_GROUP["sports"] (KALSHI belongs to prediction, not sports). Consumed by
+# classification RESOLVED 2026-07-31 (`sports_satellite_ao_dispatch_batch3_2026_07_25.md`):
+# a dormant legacy artifact (all `written_at` clustered in one 80-second 2026-07-13
+# reason-taxonomy rebuild window touching pre-existing rows, zero growth before/after, the
+# live sports-fetch registry never targets Kalshi/Polymarket) — NOT the live fleet-wide
+# manifest_consolidator TOCTOU class, which reasserts continuously. No remediation
+# warranted at the time; `empty_confirmed` is excluded from the honest-coverage
+# denominator, so the population is also formula-inert. This set only silences the panel
+# badge for it. NOT a canonical set — never merge into VENUES_BY_ASSET_GROUP["sports"]
+# (KALSHI belongs to prediction, not sports). Consumed by
 # `_ACCEPTED_EXCEPTIONS[("venues", "sports")]`.
+#
+# 2026-08-08 (sports taxonomy P1, "purge the cross-AG bleed from the sports denominator"):
+# re-confirmed no CURRENT enumerator seeds KALSHI/any prediction-market venue into the
+# sports expected-universe — VENUES_BY_ASSET_GROUP["sports"], EXPECTED_COVERAGE_BY_
+# ASSET_GROUP["sports"] (expected_coverage.py), instruments-service's
+# `_enumerate_v2_sports`, and this repo's VENUE_CATEGORY_MAP (venue_constants.py, via its
+# KALSHI/POLYMARKET override) all already exclude it. Closed the residual structural risk
+# (a future hand-edit silently re-adding a prediction-market venue to a sports list) with
+# drift-guard tests asserting VENUES_BY_ASSET_GROUP/EXPECTED_COVERAGE_BY_ASSET_GROUP's
+# "sports" and "prediction" entries stay disjoint (`tests/unit/test_sports_schemas.py`).
+# This set stays NON-EMPTY and CANNOT retire yet: the 20,785 phantom manifest rows
+# themselves are untouched (this phase mutates no GCS object and no manifest row per the
+# plan's own scope) — that row-level cleanup is P2 (`sports_taxonomy_p2_migration_
+# 2026_08_08.md`); retire this set once that cleanup lands and the population is
+# genuinely, measurably zero.
 SPORTS_VENUE_ACCEPTED_CROSS_AG_BLEED: frozenset[str] = frozenset(
     {
         "KALSHI",

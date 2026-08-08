@@ -19,7 +19,13 @@ from unified_api_contracts.open_meteo.schemas import OpenMeteoRequest
 from unified_api_contracts.pinnacle.schemas import PinnacleLeague
 from unified_api_contracts.soccer_football_info.schemas import SoccerFootballMatch as SfiMatch
 
-from unified_api_contracts import SPORTS_VENUES, VENUE_CATEGORY_MAP
+from unified_api_contracts import (
+    EXPECTED_COVERAGE_BY_ASSET_GROUP,
+    SPORTS_VENUES,
+    VENUE_CATEGORY_MAP,
+    VENUE_TO_ASSET_GROUP,
+    VENUES_BY_ASSET_GROUP,
+)
 
 pytestmark = pytest.mark.unit
 
@@ -47,6 +53,47 @@ def test_sports_venue_category_map() -> None:
     for venue in SPORTS_VENUES:
         expected = "prediction" if venue in prediction_exceptions else "sports"
         assert VENUE_CATEGORY_MAP.get(venue) == expected
+
+
+def test_venues_by_asset_group_sports_and_prediction_are_disjoint() -> None:
+    """`VENUES_BY_ASSET_GROUP["sports"]` and `["prediction"]` must never share a venue.
+
+    This is the enumerator-level guard for the cross-AG bleed
+    `sports_taxonomy_p1_capture_and_contracts_2026_08_08.md` ("Purge the cross-AG bleed
+    from the sports denominator") closes: `VENUES_BY_ASSET_GROUP` is the live SSOT that
+    `VENUE_TO_ASSET_GROUP` and every expected-universe enumerator that reads it directly
+    are derived from — a future hand-edit re-adding KALSHI/POLYMARKET (or any other
+    prediction-market venue) to the sports list would silently reopen the bleed
+    `SPORTS_VENUE_ACCEPTED_CROSS_AG_BLEED` exists to suppress the panel badge for. Both
+    lists are hand-authored (not derived from a shared source), so nothing else enforces
+    this.
+    """
+    overlap = set(VENUES_BY_ASSET_GROUP["sports"]) & set(VENUES_BY_ASSET_GROUP["prediction"])
+    assert not overlap, f"venue(s) declared in BOTH sports and prediction: {sorted(overlap)}"
+
+
+def test_prediction_venues_resolve_to_prediction_not_sports() -> None:
+    """Every declared prediction venue resolves to asset_group "prediction" via the live
+    SSOT (`VENUE_TO_ASSET_GROUP`, mechanically derived from `VENUES_BY_ASSET_GROUP`) — the
+    same contradiction `cross_ag_prediction_rows_bleed_into_sports_instruments_index_
+    2026_07_20.md` root-caused for the DIFFERENT, execution-context `VENUE_CATEGORY_MAP`
+    registry in `venue_constants.py` (covered by `test_sports_venue_category_map` above).
+    """
+    for venue in VENUES_BY_ASSET_GROUP["prediction"]:
+        assert VENUE_TO_ASSET_GROUP.get(venue) == "prediction"
+
+
+def test_expected_coverage_sports_and_prediction_are_disjoint() -> None:
+    """`EXPECTED_COVERAGE_BY_ASSET_GROUP["sports"]`/`["prediction"]` keys must never
+    overlap — this feeds `is_expected`/`get_expected_data_types_for_venue_in_scope`, the
+    MTDS batch pre-flight's could-exist denominator, a second independent enumerator from
+    `VENUES_BY_ASSET_GROUP` that must not re-seed a prediction-market venue into sports
+    either.
+    """
+    sports_keys = set(EXPECTED_COVERAGE_BY_ASSET_GROUP["sports"])
+    prediction_keys = set(EXPECTED_COVERAGE_BY_ASSET_GROUP["prediction"])
+    overlap = sports_keys & prediction_keys
+    assert not overlap, f"venue(s) declared in BOTH sports and prediction expected coverage: {sorted(overlap)}"
 
 
 def test_api_football_fixture_minimal() -> None:
