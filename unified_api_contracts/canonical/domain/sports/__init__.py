@@ -85,9 +85,11 @@ from .league_data import LEAGUE_REGISTRY as LEAGUE_REGISTRY
 from .league_data import SOURCE_COVERAGE_START as SOURCE_COVERAGE_START
 from .league_data import SPORTS_DATA_TYPE_TO_SOURCE as SPORTS_DATA_TYPE_TO_SOURCE
 from .league_data import SPORTS_IS_DATA_TYPE_LOWERCASE_FORM as SPORTS_IS_DATA_TYPE_LOWERCASE_FORM
+from .league_data import SPORTS_ODDS_DATA_TYPE_CANONICAL_FORM as SPORTS_ODDS_DATA_TYPE_CANONICAL_FORM
 from .league_data import SPORTS_SOURCE_LEAGUE_ALLOWLIST as SPORTS_SOURCE_LEAGUE_ALLOWLIST
 from .league_data import SPORTS_STRUCTURAL_GAPS as SPORTS_STRUCTURAL_GAPS
 from .league_data import canonical_sports_is_data_type as canonical_sports_is_data_type
+from .league_data import canonical_sports_odds_data_type as canonical_sports_odds_data_type
 from .league_data import clip_dates_to_source_coverage as clip_dates_to_source_coverage
 from .league_data import get_all_prediction_league_ids as get_all_prediction_league_ids
 from .league_data import get_expected_leagues_for_source as get_expected_leagues_for_source

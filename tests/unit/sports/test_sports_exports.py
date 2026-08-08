@@ -201,3 +201,39 @@ class TestSportsExports:
         assert canonical_sports_is_data_type("fixtures") == "fixtures"
         assert canonical_sports_is_data_type("XG_SHOTS") == "xg_shots"
         assert canonical_sports_is_data_type("NOT_A_REAL_DATA_TYPE") is None
+
+    # ------------------------------------------------------------------
+    # P1 — raw sports odds vocabulary collapse CONTRACT
+    # (sports_taxonomy_p1_capture_and_contracts_2026_08_08.md, operator
+    # ruling 4: "trades"/"ODDS"/"odds" collapse to a single lowercase
+    # "odds"). Physical manifest re-stamp + in_play column are P2 — this
+    # only guards the target-form mapping table.
+    # ------------------------------------------------------------------
+
+    def test_sports_odds_data_type_canonical_form_exported(self) -> None:
+        from unified_api_contracts import SPORTS_ODDS_DATA_TYPE_CANONICAL_FORM
+
+        assert isinstance(SPORTS_ODDS_DATA_TYPE_CANONICAL_FORM, dict)
+        assert SPORTS_ODDS_DATA_TYPE_CANONICAL_FORM  # non-empty
+
+    def test_sports_odds_data_type_canonical_form_covers_raw_tokens(self) -> None:
+        """Drift guard: every raw MTDS sports odds token this chain identified
+        (trades, ODDS, odds) must collapse to the single target form."""
+        from unified_api_contracts import SPORTS_ODDS_DATA_TYPE_CANONICAL_FORM
+
+        for raw_token in ("trades", "ODDS", "odds"):
+            assert raw_token in SPORTS_ODDS_DATA_TYPE_CANONICAL_FORM, f"{raw_token!r} missing from the collapse map"
+
+    def test_sports_odds_data_type_canonical_form_values_are_odds(self) -> None:
+        from unified_api_contracts import SPORTS_ODDS_DATA_TYPE_CANONICAL_FORM
+
+        for key, value in SPORTS_ODDS_DATA_TYPE_CANONICAL_FORM.items():
+            assert value == "odds", f"{key!r} maps to {value!r}, expected the single collapsed target 'odds'"
+
+    def test_canonical_sports_odds_data_type_resolves_known_tokens(self) -> None:
+        from unified_api_contracts import canonical_sports_odds_data_type
+
+        assert canonical_sports_odds_data_type("trades") == "odds"
+        assert canonical_sports_odds_data_type("ODDS") == "odds"
+        assert canonical_sports_odds_data_type("odds") == "odds"
+        assert canonical_sports_odds_data_type("NOT_A_REAL_DATA_TYPE") is None
