@@ -14,6 +14,8 @@ from __future__ import annotations
 
 from pydantic import BaseModel, Field
 
+from unified_api_contracts.registry.venue_constants import SPORTS_VENUE_OPERATOR_PARENT
+
 
 class ArbitrageStrategyConfig(BaseModel):
     """Configuration for sports arbitrage strategy.
@@ -170,26 +172,9 @@ EXCHANGE_COMMISSION_RATES: dict[str, float] = {
 
 # Bookmaker operator groups — same company, different regional skins.
 # Arbs between venues in the same group are not real (same operator).
-# Strategy must ensure arb legs come from DIFFERENT groups.
-VENUE_OPERATOR_GROUPS: dict[str, str] = {
-    "betfair_ex_uk": "BETFAIR",
-    "betfair_ex_eu": "BETFAIR",
-    "betfair_ex_au": "BETFAIR",
-    "betfair_sb_uk": "BETFAIR_SB",
-    "unibet": "UNIBET",
-    "unibet_uk": "UNIBET",
-    "unibet_fr": "UNIBET",
-    "unibet_nl": "UNIBET",
-    "unibet_se": "UNIBET",
-    "leovegas": "LEOVEGAS",
-    "leovegas_se": "LEOVEGAS",
-    "ladbrokes_uk": "LADBROKES",
-    "ladbrokes_au": "LADBROKES",
-    "williamhill": "WILLIAMHILL",
-    "williamhill_us": "WILLIAMHILL",
-    "winamax_fr": "WINAMAX",
-    "winamax_de": "WINAMAX",
-}
+# Derived from UAC SSOT; keyed on canonical uppercase constants only.
+# Operator ruling 2026-08-08: BETFAIR_SB_UK → "BETFAIR" (same counterparty).
+VENUE_OPERATOR_GROUPS: dict[str, str] = dict(SPORTS_VENUE_OPERATOR_PARENT)
 
 
 def get_operator(venue: str) -> str:
@@ -201,7 +186,7 @@ def arb_legs_are_independent(venues: list[str]) -> bool:
     """Check that all arb legs come from different operators.
 
     Returns False if two legs are from the same group
-    (e.g., betfair_ex_uk and betfair_ex_eu are both BETFAIR).
+    (e.g., BETFAIR_EX_UK and BETFAIR_EX_EU are both BETFAIR).
     """
     operators = [get_operator(v) for v in venues]
     return len(operators) == len(set(operators))

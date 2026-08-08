@@ -284,6 +284,27 @@ SPORTS_BET_PLACEMENT_VENUES: set[str] = (
 
 SPORTS_VENUES: set[str] = SPORTS_BET_PLACEMENT_VENUES | SPORTS_DFS_VENUES | SPORTS_DATA_VENUES
 
+# Maps canonical venue → operator group for arb-independence checks.
+# Two venues in the same group share the same counterparty (e.g. all Betfair
+# skins route to the same book and Betfair will void cross-skin "arbs").
+# Keyed on UAC constants only — no string literals, no lowercase aliases.
+# Operator ruling 2026-08-08: BETFAIR_SB_UK rolls up to "BETFAIR" (sportsbook
+# and exchange are the same counterparty for arb-independence purposes);
+# bare BETFAIR is the group parent, not a data-axis venue.
+SPORTS_VENUE_OPERATOR_PARENT: dict[str, str] = {
+    BETFAIR: "BETFAIR",
+    BETFAIR_EX_UK: "BETFAIR",
+    BETFAIR_EX_EU: "BETFAIR",
+    BETFAIR_SB_UK: "BETFAIR",
+    MATCHBOOK: "MATCHBOOK",
+    SMARKETS: "SMARKETS",
+    UNIBET: "UNIBET",
+    LEOVEGAS: "LEOVEGAS",
+    LADBROKES: "LADBROKES",
+    WILLIAMHILL: "WILLIAMHILL",
+    WINAMAX: "WINAMAX",
+}
+
 # Venue Sets — grouped by execution semantics (non-sports)
 
 DEX_VENUES: set[str] = {
