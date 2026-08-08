@@ -84,6 +84,7 @@ class FillEventMessage(BaseModel):
     is_maker: bool | None = None
     strategy_id: str | None = None
     client_id: str | None = Field(default=None, json_schema_extra={"pii": True})
+    trade_key: str | None = None
 
 
 class OrderRequestMessage(BaseModel):
