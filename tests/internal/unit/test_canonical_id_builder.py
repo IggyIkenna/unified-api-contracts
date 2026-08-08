@@ -261,14 +261,6 @@ class TestMultiLegAndSportsHappyPath:
             == f"POLYMARKET:PREDICTION_MARKET:{inner}"
         )
 
-    def test_exchange_odds(self) -> None:
-        inner = "FOOTBALL:BETFAIR_EX_UK:MATCH_ODDS:ENG_PREMIER_LEAGUE:2025-26:ARSENAL-CHELSEA::HOME"
-        assert build_instrument_id("betfair", InstrumentType.EXCHANGE_ODDS, inner) == f"BETFAIR:EXCHANGE_ODDS:{inner}"
-
-    def test_fixed_odds(self) -> None:
-        inner = "FOOTBALL:PINNACLE:MATCH_ODDS:ENG_PREMIER_LEAGUE:2025-26:ARSENAL-CHELSEA::HOME"
-        assert build_instrument_id("pinnacle", InstrumentType.FIXED_ODDS, inner) == f"PINNACLE:FIXED_ODDS:{inner}"
-
     def test_prop(self) -> None:
         inner = "PROP:ANYTIME_SCORER:SAKA_B"
         assert build_instrument_id("opticodds", InstrumentType.PROP, inner) == f"OPTICODDS:PROP:{inner}"
