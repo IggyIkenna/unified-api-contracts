@@ -1,7 +1,7 @@
 {
   "schema_version": "1.0.0",
   "source": "unified_api_contracts.internal.architecture_v2.archetype_capability",
-  "archetype_count": 53,
+  "archetype_count": 60,
   "archetypes": [
     {
       "archetype_id": "ML_DIRECTIONAL_CONTINUOUS",
@@ -3026,6 +3026,55 @@
           "notes": "Regime-switch / Signal-weighted allocation. Cell added in the 2026-07-21 Phase-9 capability-manifest regeneration (19 VOL / 10 MM / 4 PORTFOLIO archetypes) \u2014 venue/instrument scope per scripts/enumerate_envelope.py's catalogue-envelope design; not yet confirmed by a live batch/paper instance, so PARTIAL rather than SUPPORTED (honest-absence)."
         }
       ]
+    },
+    {
+      "archetype_id": "CARRY_FUNDING_DISPERSION",
+      "family": "CARRY_AND_YIELD",
+      "uses_rolling_futures": false,
+      "bespoke_capable": false,
+      "cells": []
+    },
+    {
+      "archetype_id": "ARBITRAGE_SPORTS_DUTCHING",
+      "family": "ARBITRAGE_STRUCTURAL",
+      "uses_rolling_futures": false,
+      "bespoke_capable": false,
+      "cells": []
+    },
+    {
+      "archetype_id": "ARBITRAGE_MEV_SANDWICH",
+      "family": "ARBITRAGE_STRUCTURAL",
+      "uses_rolling_futures": false,
+      "bespoke_capable": false,
+      "cells": []
+    },
+    {
+      "archetype_id": "ARBITRAGE_MEV_JIT_LIQUIDITY",
+      "family": "ARBITRAGE_STRUCTURAL",
+      "uses_rolling_futures": false,
+      "bespoke_capable": false,
+      "cells": []
+    },
+    {
+      "archetype_id": "ARBITRAGE_MEV_BACKRUN",
+      "family": "ARBITRAGE_STRUCTURAL",
+      "uses_rolling_futures": false,
+      "bespoke_capable": false,
+      "cells": []
+    },
+    {
+      "archetype_id": "ARBITRAGE_MEV_LIQUIDATION_BUNDLE",
+      "family": "ARBITRAGE_STRUCTURAL",
+      "uses_rolling_futures": false,
+      "bespoke_capable": false,
+      "cells": []
+    },
+    {
+      "archetype_id": "ARBITRAGE_CROSS_DOMAIN_EVENT",
+      "family": "ARBITRAGE_STRUCTURAL",
+      "uses_rolling_futures": false,
+      "bespoke_capable": false,
+      "cells": []
     }
   ]
 }
