@@ -69,9 +69,8 @@ BASE_GRANULARITY_BY_DATA_TYPE: dict[str, str] = {
     "odds_movement": "15m",
     "arbitrage_opportunity": "15m",
     "odds_horizon_bucket": "15m",
-    "markets": "24h",
-    "outcomes": "24h",
-    "settlements": "24h",
+    # markets/outcomes/settlements removed 2026-08-08 (sports taxonomy P1) — 0 rows ever
+    # written; retired per operator ruling #8. ML labels come from IS fixtures_outcomes/matches.
     # Prediction — tick-level from CLOB (uses canonical "trades" / "book_snapshot_5",
     # aligned with CeFi; no category-specific data_type names).
     # DeFi adapter-produced types (canonicalized 2026-05-23).
@@ -320,10 +319,9 @@ DATA_TYPES_BY_ASSET_GROUP: dict[str, list[str]] = {
         "odds_movement",  # Odds line movement OHLC candles
         "arbitrage_opportunity",  # Cross-bookmaker arbitrage detection
         "odds_horizon_bucket",  # Time-to-event horizon bucket assignment for odds
-        # ── Exchange/market lifecycle types (in venue_data_types.yaml, canonicalized 2026-05-23) ──
-        "markets",  # Market metadata (event/market listings per bookmaker)
-        "outcomes",  # Outcome results (settled markets)
-        "settlements",  # Settlement records (payout confirmation)
+        # markets/outcomes/settlements removed 2026-08-08 (sports taxonomy P1, operator ruling
+        # #8) — 0 rows ever written, pure phantom declarations. ML labels come from IS
+        # fixtures_outcomes/matches (post-lowercasing in P1), not from these retired types.
         # ── Bet/trade events (PINNACLE, BETFAIR_SB_UK/EX_UK/EX_EU, DRAFTKINGS, FANDUEL) ──
         "trades",  # Matched bets / trade-level acceptance events (aligned with CeFi/prediction)
         # NOTE: "TRADES" (uppercase) briefly existed here 2026-07-23..2026-07-27 (K1,
@@ -924,9 +922,38 @@ SPORTS_VENUE_ACCEPTED_CROSS_AG_BLEED: frozenset[str] = frozenset(
 # and the 345,852 uppercase GCS objects were deleted+re-verified-0-remaining 2026-07-28.
 # GCS-confirmed 2026-07-30: zero uppercase data_type= objects on 2 recent dates; the
 # current writer (market-data-processing-service canonical_writer.py) correctly lowercases
-# both the path and the manifest row. The only remaining badge source is 4 stale
-# capture_status=empty_confirmed/row_count=0 manifest rows with zero backing GCS content —
-# bookkeeping residue, not a live regression. NOT a canonical set — never merge into
+# both the path and the manifest row.
+#
+# ⚠️ CORRECTION 2026-08-08 — the "only 4 stale rows" claim below was WRONG for `ODDS`, and
+# this set is being RETIRED. The original text read: "The only remaining badge source is 4
+# stale capture_status=empty_confirmed/row_count=0 manifest rows with zero backing GCS
+# content — bookkeeping residue, not a live regression." Re-measured against the live prod
+# manifest (`market-data-tick-sports-prd-.../_index/availability_index.parquet`, 615,130
+# rows, read 2026-08-08):
+#
+#   data_type       captured   empty_confirmed
+#   ODDS               6,306               136      <- NOT residue
+#   ODDS_MOVEMENT          0                 2
+#   ODDS_SNAPSHOT          0                 2
+#
+# The "4 stale rows" figure is accurate for ODDS_MOVEMENT + ODDS_SNAPSHOT (2 + 2) and was
+# wrongly generalised to `ODDS`, which carries 6,306 `captured` shards spanning 2020-06-05
+# to 2026-04-14, venue=FOOTYSTATS, source=footystats. That is a live instruments-service
+# reference-data population, not MDPS writer residue — the census conflated two different
+# systems that happen to share a token. Suppressing it here is what let the sports
+# distinct-values panel report "0 non-canonical" while hiding 6,306 real captured shards.
+#
+# DISPOSITION: operator ruled 2026-08-08 that the sports data_type vocabulary merges to ONE
+# lowercase form (footystats `ODDS` folds into `odds`; the whole 19-token uppercase IS
+# vocabulary lowercases with it), so this set is retired to EMPTY rather than corrected in
+# place. Tracked by `/plans/active/sports_taxonomy_p1_capture_and_contracts_2026_08_08.md`
+# (contract) and `/plans/active/sports_taxonomy_p2_migration_2026_08_08.md` (re-stamp).
+# Until that lands the set stays populated so the panel does not regress — but do NOT read
+# it as evidence these values are dead. See
+# `/codex/02-data/entity-rename-and-split-consumer-migration-rule.md` § "Anti-pattern: the
+# accepted-exception escape hatch".
+#
+# NOT a canonical set — never merge into
 # DATA_TYPES_BY_ASSET_GROUP["sports"] (the K1/K2 revert deliberately keeps this lowercase-
 # only). Consumed by `_ACCEPTED_EXCEPTIONS[("data_types", "sports")]`.
 SPORTS_DATA_TYPE_ACCEPTED_STALE_UPPERCASE_RESIDUE: frozenset[str] = frozenset(
@@ -1097,9 +1124,7 @@ NEEDS_CANDLE_PROCESSING: dict[str, bool] = {
     "odds_movement": True,
     "arbitrage_opportunity": True,
     "odds_horizon_bucket": True,
-    "markets": False,  # Reference/lifecycle data — pass-through
-    "outcomes": False,  # Settlement results — pass-through
-    "settlements": False,  # Settlement records — pass-through
+    # markets/outcomes/settlements removed 2026-08-08 (sports taxonomy P1) — retired.
     # Prediction — uses canonical "trades" / "book_snapshot_5" (same keys as CeFi).
     # DeFi adapter-produced types — all pass-through (snapshot/event data).
     "utilization": False,
@@ -1432,13 +1457,15 @@ VALID_DATA_TYPES_BY_AG_AND_INSTRUMENT_TYPE: dict[tuple[str, str], frozenset[str]
     # (slot-4 verified 2026-06-07 — the prior literal silently dropped "ODDS"). The fixture/odds rows
     # below are NOT consulted by the league-grain producer (kept as future fixture-grain scaffolding).
     ("sports", "fixture"): frozenset(
-        {"odds", "odds_snapshot", "odds_movement", "markets", "outcomes", "settlements"}
+        {"odds", "odds_snapshot", "odds_movement"}
+        # markets/outcomes/settlements removed 2026-08-08 (sports taxonomy P1) — retired.
     ),  # UNCERTAIN — sports-owner verify
     ("sports", "exchange_odds"): frozenset(  # UNCERTAIN — sports-owner verify
         {"odds", "odds_snapshot", "odds_movement", "trades"}
     ),
     ("sports", "fixed_odds"): frozenset(  # UNCERTAIN — sports-owner verify
-        {"odds", "odds_snapshot", "odds_movement", "markets", "outcomes", "settlements", "trades"}
+        # markets/outcomes/settlements removed 2026-08-08 (sports taxonomy P1) — retired.
+        {"odds", "odds_snapshot", "odds_movement", "trades"}
     ),
     ("sports", "prop"): frozenset(  # UNCERTAIN — sports-owner verify
         {"odds", "odds_snapshot", "odds_movement"}
@@ -2268,9 +2295,7 @@ VENUE_DATA_TYPE_CAPABILITIES: dict[str, dict[str, str]] = {
     "PINNACLE": {
         "odds_snapshot": "2024-01-01",
         "odds_movement": "2024-01-01",
-        "markets": "2024-01-01",
-        "outcomes": "2024-01-01",
-        "settlements": "2024-01-01",
+        # markets/outcomes/settlements removed 2026-08-08 (sports taxonomy P1) — retired.
     },
     # Bare "BETFAIR" removed 2026-08-08 (sports taxonomy P1 — operator-group parent,
     # not a data-axis venue; concrete sub-venues carry their own entries below).

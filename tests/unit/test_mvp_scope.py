@@ -633,7 +633,9 @@ class TestSportsMvp:
     def test_eng_championship_is_mvp(self) -> None:
         """ENG_CHAMPIONSHIP (football) IS MVP — the 96-league universe is ALL football
         leagues, not just the top tier (decision #1 BUG FIX)."""
-        assert is_mvp("sports", "ODDS_API", "FIXED_ODDS", "markets", league="ENG_CHAMPIONSHIP")
+        assert is_mvp("sports", "ODDS_API", "FIXED_ODDS", "odds", league="ENG_CHAMPIONSHIP")
+        # markets retired 2026-08-08 (sports taxonomy P1, operator ruling #8) — 0 rows ever written.
+        assert not is_mvp("sports", "ODDS_API", "FIXED_ODDS", "markets", league="ENG_CHAMPIONSHIP")
 
     def test_full_96_football_universe_is_mvp(self) -> None:
         """Every ``in_mvp_scope`` football league (the 96) is MVP; non-football are not.
@@ -869,10 +871,10 @@ class TestPredictionReconcileCrossAgUnchanged:
         assert not is_mvp("tradfi", "CME", "FUTURE", "book_snapshot_5", base_ccy="ES")
 
     def test_sports_data_types_unchanged(self) -> None:
-        """Sports MVP data_types is the exact odds/markets set — no book_snapshot_5 leak."""
+        """Sports MVP data_types is the exact odds set — markets/outcomes/settlements retired 2026-08-08."""
         rule = MVP_SCOPE["sports"]
         assert isinstance(rule, SportsMvpRule)
-        assert rule.data_types == frozenset({"odds", "ODDS", "odds_snapshot", "markets", "outcomes", "settlements"})
+        assert rule.data_types == frozenset({"odds", "ODDS", "odds_snapshot"})
 
     def test_defi_data_types_unchanged(self) -> None:
         """DeFi MVP data_types stays == the derived DATA_TYPES_BY_ASSET_GROUP['defi']."""
