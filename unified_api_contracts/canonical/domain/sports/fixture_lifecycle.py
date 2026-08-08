@@ -52,13 +52,13 @@ from .fixture_status import MatchStatus
 # the writer + GCS folders ONLY at the gated split — defining the constants now
 # lets UTL/IS build the migration against a stable name.
 # ---------------------------------------------------------------------------
-FIXTURES_SCHEDULE: str = "FIXTURES_SCHEDULE"
+FIXTURES_SCHEDULE: str = "fixtures_schedule"
 """Canonical data_type for the pre-match / scheduling half of a fixture.
 
 GCS sub-folder (post-split): ``entity=fixtures_schedule``. Per-row
 ``available_at`` floor = ``announced_at``."""
 
-FIXTURES_OUTCOMES: str = "FIXTURES_OUTCOMES"
+FIXTURES_OUTCOMES: str = "fixtures_outcomes"
 """Canonical data_type for the result half of a fixture.
 
 GCS sub-folder (post-split): ``entity=fixtures_outcomes``. Per-row

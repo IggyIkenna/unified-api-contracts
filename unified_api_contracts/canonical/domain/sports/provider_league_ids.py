@@ -843,30 +843,30 @@ _FOOTYSTATS_LEAGUE_COVERAGE: frozenset[str] = frozenset(
 
 SPORTS_ENTITY_LEAGUE_COVERAGE: dict[str, frozenset[str] | None] = {
     # Core entities — expected on all fixture dates
-    "FIXTURES": None,
+    "fixtures": None,
     "LEAGUES": None,
-    "TEAMS": None,
-    "STANDINGS": None,
-    "INJURIES": None,
+    "teams": None,
+    "standings": None,
+    "injuries": None,
     # FIXTURE_STATS (game results) / FIXTURE_LINEUPS — all leagues (operator
     # ruling 2026-07-28): match results and lineups are needed across the full
     # curated universe, not just MVP/prediction scope, same as INJURIES above.
-    "FIXTURE_STATS": None,
-    "FIXTURE_LINEUPS": None,
+    "fixture_stats": None,
+    "fixture_lineups": None,
     # FIXTURE_EVENTS / PLAYER_STATS — MVP-scoped (operator ruling: this
     # per-event/per-player-granularity enrichment fan-out must not follow the
     # wider FIXTURES curated-universe expansion, 96 leagues not 383 — see
     # get_mvp_football_league_ids() docstring).
-    "FIXTURE_EVENTS": get_mvp_football_league_ids(),
-    "PLAYER_STATS": get_mvp_football_league_ids(),
+    "fixture_events": get_mvp_football_league_ids(),
+    "player_stats": get_mvp_football_league_ids(),
     # Enrichment entities — coverage varies by source
-    "XG": _UNDERSTAT_LEAGUE_COVERAGE,  # Understat: 5 European leagues
-    "XG_SHOTS": _UNDERSTAT_LEAGUE_COVERAGE,  # Understat: per-shot xG, same leagues
+    "xg": _UNDERSTAT_LEAGUE_COVERAGE,  # Understat: 5 European leagues
+    "xg_shots": _UNDERSTAT_LEAGUE_COVERAGE,  # Understat: per-shot xG, same leagues
     # FootyStats: subscription-scoped (excludes PRED_NO_FOOTYSTATS leagues) —
     # matches the fetch-loop write-gate's expected_canonical_leagues denominator.
-    "MATCHES": _FOOTYSTATS_LEAGUE_COVERAGE,
-    "PREDICTIONS": _FOOTYSTATS_LEAGUE_COVERAGE,
-    "ODDS": _FOOTYSTATS_LEAGUE_COVERAGE,
+    "matches": _FOOTYSTATS_LEAGUE_COVERAGE,
+    "predictions": _FOOTYSTATS_LEAGUE_COVERAGE,
+    "odds": _FOOTYSTATS_LEAGUE_COVERAGE,
     # ODDS_HORIZON_BUCKET (mdps_odds_horizon_bucket): observed coverage from a
     # full-history manifest read (2026-07-25,
     # sports_post_backfill_relabel_premise_resolved_residual_gap_2026_07_25.md
@@ -877,19 +877,19 @@ SPORTS_ENTITY_LEAGUE_COVERAGE: dict[str, frozenset[str] | None] = {
     # / "A-LEAGUE" / "A_LEAGUE" all the same real league) — resolved via
     # DEFAULT_CLASSIFICATION_REGISTRY's odds_api_league_name before building
     # this allow-list, not taken from the raw manifest values verbatim.
-    "ODDS_HORIZON_BUCKET": frozenset(_ENTITY_COVERAGE.get("ODDS_HORIZON_BUCKET") or []),
+    "odds_horizon_bucket": frozenset(_ENTITY_COVERAGE.get("ODDS_HORIZON_BUCKET") or []),
     # TRANSFERMARKT_LEAGUES + SFI_LEAGUES retired 2026-05-05 — provider catalog
     # mappings live in UAC (TRANSFERMARKT_IDS / SOCCER_FOOTBALL_INFO_IDS).
     # PLAYER_VALUES: observed coverage from manifest (≥1 captured row).
     # Empty frozenset until refresh_sports_league_entity_coverage is run against prod.
-    "PLAYER_VALUES": frozenset(_ENTITY_COVERAGE.get("PLAYER_VALUES") or []),
-    "SFI_PROGRESSIVE_STATS": None,  # SFI: all mapped leagues
+    "player_values": frozenset(_ENTITY_COVERAGE.get("PLAYER_VALUES") or []),
+    "sfi_progressive_stats": None,  # SFI: all mapped leagues
     # WEATHER: open-meteo fetches by GPS coordinates — no league restriction.
     # The 33-league frozenset from sports_league_entity_coverage.json used string
     # names (EPL, LA_LIGA) while _fixture_leagues_for_date returns numeric IDs
     # (39, 140) — the intersection was always empty → weather silently skipped
     # on every fixture date since 2026-04-29. None = expected on all fixture dates.
-    "WEATHER": None,
+    "weather": None,
 }
 
 
@@ -906,7 +906,7 @@ def get_entity_league_coverage(entity: str) -> frozenset[str] | None:
     Returns:
         League coverage set, or ``None`` for all-league entities.
     """
-    return SPORTS_ENTITY_LEAGUE_COVERAGE.get(entity.upper())
+    return SPORTS_ENTITY_LEAGUE_COVERAGE.get(entity.lower())
 
 
 # ── Provider-specific start dates for sports entities ──
@@ -915,31 +915,31 @@ def get_entity_league_coverage(entity: str) -> frozenset[str] | None:
 SPORTS_ENTITY_START_DATES: dict[str, str] = {
     # SFI progressive stats — Ultra xG feature launched 2024-03-15.
     # SFI_LEAGUES retired 2026-05-05 (catalog mapping in UAC, not captured data).
-    "SFI_PROGRESSIVE_STATS": "2024-03-15",
+    "sfi_progressive_stats": "2024-03-15",
     # Understat xG — backfilled from 2019-01-01
-    "XG": "2019-01-01",
+    "xg": "2019-01-01",
     # Understat per-shot xG — same coverage window as XG
-    "XG_SHOTS": "2019-01-01",
+    "xg_shots": "2019-01-01",
     # FootyStats entities — backfilled from 2019-01-01
-    "MATCHES": "2019-01-01",
-    "PREDICTIONS": "2019-01-01",
+    "matches": "2019-01-01",
+    "predictions": "2019-01-01",
     # Weather — collection started 2024-01-01
-    "WEATHER": "2024-01-01",
+    "weather": "2024-01-01",
     # Transfermarkt entities — backfilled from 2019-01-01.
     # TRANSFERMARKT_LEAGUES retired 2026-05-05 (same reason as SFI_LEAGUES).
-    "PLAYER_VALUES": "2019-01-01",
+    "player_values": "2019-01-01",
     # API Football core entities — backfilled from 2019-01-01
-    "FIXTURES": "2019-01-01",
-    "FIXTURE_STATS": "2019-01-01",
-    "FIXTURE_EVENTS": "2019-01-01",
-    "FIXTURE_LINEUPS": "2019-01-01",
-    "PLAYER_STATS": "2019-01-01",
+    "fixtures": "2019-01-01",
+    "fixture_stats": "2019-01-01",
+    "fixture_events": "2019-01-01",
+    "fixture_lineups": "2019-01-01",
+    "player_stats": "2019-01-01",
     "LEAGUES": "2019-01-01",
-    "TEAMS": "2019-01-01",
-    "STANDINGS": "2019-01-01",
-    "INJURIES": "2019-01-01",
+    "teams": "2019-01-01",
+    "standings": "2019-01-01",
+    "injuries": "2019-01-01",
     # Odds API — collection started 2024-07-01
-    "ODDS": "2024-07-01",
+    "odds": "2024-07-01",
 }
 
 
@@ -956,7 +956,7 @@ def get_sports_entity_start_date(entity: str) -> str | None:
     Returns:
         ISO date string, or ``None`` if no start date is registered.
     """
-    return SPORTS_ENTITY_START_DATES.get(entity.upper())
+    return SPORTS_ENTITY_START_DATES.get(entity.lower())
 
 
 # ---------------------------------------------------------------------------

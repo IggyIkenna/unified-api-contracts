@@ -259,15 +259,15 @@ MVP_REQUIRED_WINDOW_REGISTRY: Final[dict[tuple[str, str], RequiredWindowSpec]] =
     # league registry via get_season_boundary. Magic numbers FORBIDDEN —
     # the registry call IS the SSOT (no per-league date literals here).
     # -----------------------------------------------------------------
-    ("sports", "FIXTURES"): RequiredWindowSpec(
+    ("sports", "fixtures"): RequiredWindowSpec(
         kind="seasonal_continuous",
         notes="API-Football fixtures by (league, season) — schedule data spans the season window.",
     ),
-    ("sports", "XG"): RequiredWindowSpec(
+    ("sports", "xg"): RequiredWindowSpec(
         kind="seasonal_continuous",
         notes="Understat xG by (league, season) — match-level xG joined to fixtures.",
     ),
-    ("sports", "ODDS"): RequiredWindowSpec(
+    ("sports", "odds"): RequiredWindowSpec(
         kind="seasonal_continuous",
         notes="Odds-API match-odds by (league, season) — fixture-pinned, full-season coverage.",
     ),
