@@ -33,12 +33,12 @@ from unified_api_contracts.internal.schemas.contracts import (
 
 
 def test_sports_odds_trades_registered_in_contract_registry() -> None:
-    contract = CONTRACT_REGISTRY[("sports", "odds", "trades")]
+    contract = CONTRACT_REGISTRY[("sports", "odds", "odds")]
     assert contract is SPORTS_ODDS_TRADES
 
 
 def test_sports_odds_trades_lookup_returns_contract() -> None:
-    contract = lookup_contract(asset_group="sports", instrument_type="odds", data_type="trades")
+    contract = lookup_contract(asset_group="sports", instrument_type="odds", data_type="odds")
     assert contract is SPORTS_ODDS_TRADES
 
 
@@ -60,6 +60,7 @@ def test_sports_odds_trades_has_required_v4_shard_columns() -> None:
     ``market_type``/``outcome``/``odds_decimal``) never matched what the
     native live writer actually persists — verified directly against a live
     ``pipeline_mode=batch_odds_api`` canonical object.
+    ``in_play`` added 2026-08-08 (trades→odds rename, operator ruling 4).
     """
     declared = {c.name for c in SPORTS_ODDS_TRADES.columns}
     required = {
@@ -72,6 +73,7 @@ def test_sports_odds_trades_has_required_v4_shard_columns() -> None:
         "market_key",
         "outcome_name",
         "price",
+        "in_play",
     }
     assert required.issubset(declared)
 
@@ -103,6 +105,7 @@ def test_sports_odds_trades_validates_sample_dataframe() -> None:
     real column names + dtypes (verified 2026-07-26 against a captured
     ``venue=WILLIAMHILL/league_id=ALLSVENSKAN`` shard) — ``bm_time`` is the
     writer's raw ISO8601 string, not a parsed datetime64 column.
+    ``in_play`` added 2026-08-08 (trades→odds rename, operator ruling 4).
     """
     df = pd.DataFrame(
         {
@@ -118,6 +121,7 @@ def test_sports_odds_trades_validates_sample_dataframe() -> None:
             "market_key": pd.Series(["h2h"], dtype="string"),
             "outcome_name": pd.Series(["HOME"], dtype="string"),
             "price": pd.Series([1.85], dtype="float64"),
+            "in_play": pd.Series([False], dtype="bool"),
         }
     )
     violations = validate_dataframe(df, SPORTS_ODDS_TRADES)
@@ -136,22 +140,22 @@ def test_sports_odds_trades_validates_sample_dataframe() -> None:
 
 
 def test_sports_exchange_odds_trades_registered_in_contract_registry() -> None:
-    contract = CONTRACT_REGISTRY[("sports", "exchange_odds", "trades")]
+    contract = CONTRACT_REGISTRY[("sports", "exchange_odds", "odds")]
     assert contract is SPORTS_EXCHANGE_ODDS_TRADES
 
 
 def test_sports_fixed_odds_trades_registered_in_contract_registry() -> None:
-    contract = CONTRACT_REGISTRY[("sports", "fixed_odds", "trades")]
+    contract = CONTRACT_REGISTRY[("sports", "fixed_odds", "odds")]
     assert contract is SPORTS_FIXED_ODDS_TRADES
 
 
 def test_sports_exchange_odds_trades_lookup_returns_contract() -> None:
-    contract = lookup_contract(asset_group="sports", instrument_type="exchange_odds", data_type="trades")
+    contract = lookup_contract(asset_group="sports", instrument_type="exchange_odds", data_type="odds")
     assert contract is SPORTS_EXCHANGE_ODDS_TRADES
 
 
 def test_sports_fixed_odds_trades_lookup_returns_contract() -> None:
-    contract = lookup_contract(asset_group="sports", instrument_type="fixed_odds", data_type="trades")
+    contract = lookup_contract(asset_group="sports", instrument_type="fixed_odds", data_type="odds")
     assert contract is SPORTS_FIXED_ODDS_TRADES
 
 
@@ -168,10 +172,12 @@ def test_sports_exchange_fixed_odds_trades_declare_their_own_instrument_type() -
     assert SPORTS_FIXED_ODDS_TRADES.instrument_type == "fixed_odds"
 
 
-def test_legacy_odds_trades_still_registered_during_dual_read_window() -> None:
-    """The fork adds new entries; it must not remove the legacy odds entry."""
-    assert ("sports", "odds", "trades") in CONTRACT_REGISTRY
-    assert CONTRACT_REGISTRY[("sports", "odds", "trades")] is SPORTS_ODDS_TRADES
+def test_sports_odds_registered_at_odds_data_type_key() -> None:
+    """After trades→odds rename, the canonical key is data_type=odds (operator ruling 4, 2026-08-08)."""
+    assert ("sports", "odds", "odds") in CONTRACT_REGISTRY
+    assert CONTRACT_REGISTRY[("sports", "odds", "odds")] is SPORTS_ODDS_TRADES
+    assert ("sports", "exchange_odds", "odds") in CONTRACT_REGISTRY
+    assert ("sports", "fixed_odds", "odds") in CONTRACT_REGISTRY
 
 
 def test_sports_exchange_odds_trades_validates_sample_dataframe() -> None:
@@ -189,6 +195,7 @@ def test_sports_exchange_odds_trades_validates_sample_dataframe() -> None:
             "market_key": pd.Series(["h2h"], dtype="string"),
             "outcome_name": pd.Series(["HOME"], dtype="string"),
             "price": pd.Series([1.85], dtype="float64"),
+            "in_play": pd.Series([False], dtype="bool"),
         }
     )
     violations = validate_dataframe(df, SPORTS_EXCHANGE_ODDS_TRADES)
@@ -210,6 +217,7 @@ def test_sports_fixed_odds_trades_validates_sample_dataframe() -> None:
             "market_key": pd.Series(["h2h"], dtype="string"),
             "outcome_name": pd.Series(["HOME"], dtype="string"),
             "price": pd.Series([1.85], dtype="float64"),
+            "in_play": pd.Series([False], dtype="bool"),
         }
     )
     violations = validate_dataframe(df, SPORTS_FIXED_ODDS_TRADES)
