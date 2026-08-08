@@ -922,9 +922,38 @@ SPORTS_VENUE_ACCEPTED_CROSS_AG_BLEED: frozenset[str] = frozenset(
 # and the 345,852 uppercase GCS objects were deleted+re-verified-0-remaining 2026-07-28.
 # GCS-confirmed 2026-07-30: zero uppercase data_type= objects on 2 recent dates; the
 # current writer (market-data-processing-service canonical_writer.py) correctly lowercases
-# both the path and the manifest row. The only remaining badge source is 4 stale
-# capture_status=empty_confirmed/row_count=0 manifest rows with zero backing GCS content —
-# bookkeeping residue, not a live regression. NOT a canonical set — never merge into
+# both the path and the manifest row.
+#
+# ⚠️ CORRECTION 2026-08-08 — the "only 4 stale rows" claim below was WRONG for `ODDS`, and
+# this set is being RETIRED. The original text read: "The only remaining badge source is 4
+# stale capture_status=empty_confirmed/row_count=0 manifest rows with zero backing GCS
+# content — bookkeeping residue, not a live regression." Re-measured against the live prod
+# manifest (`market-data-tick-sports-prd-.../_index/availability_index.parquet`, 615,130
+# rows, read 2026-08-08):
+#
+#   data_type       captured   empty_confirmed
+#   ODDS               6,306               136      <- NOT residue
+#   ODDS_MOVEMENT          0                 2
+#   ODDS_SNAPSHOT          0                 2
+#
+# The "4 stale rows" figure is accurate for ODDS_MOVEMENT + ODDS_SNAPSHOT (2 + 2) and was
+# wrongly generalised to `ODDS`, which carries 6,306 `captured` shards spanning 2020-06-05
+# to 2026-04-14, venue=FOOTYSTATS, source=footystats. That is a live instruments-service
+# reference-data population, not MDPS writer residue — the census conflated two different
+# systems that happen to share a token. Suppressing it here is what let the sports
+# distinct-values panel report "0 non-canonical" while hiding 6,306 real captured shards.
+#
+# DISPOSITION: operator ruled 2026-08-08 that the sports data_type vocabulary merges to ONE
+# lowercase form (footystats `ODDS` folds into `odds`; the whole 19-token uppercase IS
+# vocabulary lowercases with it), so this set is retired to EMPTY rather than corrected in
+# place. Tracked by `/plans/active/sports_taxonomy_p1_capture_and_contracts_2026_08_08.md`
+# (contract) and `/plans/active/sports_taxonomy_p2_migration_2026_08_08.md` (re-stamp).
+# Until that lands the set stays populated so the panel does not regress — but do NOT read
+# it as evidence these values are dead. See
+# `/codex/02-data/entity-rename-and-split-consumer-migration-rule.md` § "Anti-pattern: the
+# accepted-exception escape hatch".
+#
+# NOT a canonical set — never merge into
 # DATA_TYPES_BY_ASSET_GROUP["sports"] (the K1/K2 revert deliberately keeps this lowercase-
 # only). Consumed by `_ACCEPTED_EXCEPTIONS[("data_types", "sports")]`.
 SPORTS_DATA_TYPE_ACCEPTED_STALE_UPPERCASE_RESIDUE: frozenset[str] = frozenset(
