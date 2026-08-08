@@ -313,7 +313,11 @@ def compute_layered_coverage(
 # history).
 # ---------------------------------------------------------------------------
 
-SCHEDULE_DEFINING_DATA_TYPES: Final[frozenset[str]] = frozenset({"FIXTURES", FIXTURES_SCHEDULE})
+SCHEDULE_DEFINING_DATA_TYPES: Final[frozenset[str]] = frozenset({
+    "fixtures",       # new lowercase canonical (2026-08-08 operator ruling)
+    "FIXTURES",       # legacy manifest residue pre-P2 re-stamp; remove after P2 completes
+    FIXTURES_SCHEDULE,  # "FIXTURES_SCHEDULE" until fixture_lifecycle.py lowercases in P3
+})
 """Closed set of schedule-DEFINING data_types — the source-of-truth for whether
 anything exists to capture on a (entity, day). For these, a clean
 ``SOURCE_RETURNED_ZERO`` (200 + zero rows) means "no matches that day = complete"

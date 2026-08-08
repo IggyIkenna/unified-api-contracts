@@ -27,7 +27,10 @@ def get_source_priority(asset_group: str, data_type: str) -> list[str]:
     Args:
         asset_group: One of ``cefi`` / ``defi`` / ``tradfi`` / ``prediction``
             / ``sports`` / ``reference``.
-        data_type: Canonical data_type string.
+        data_type: Canonical data_type string. Normalised to lowercase before
+            lookup — sports keys are lowercase from 2026-08-08 (P1 operator
+            ruling); existing uppercase callers (IS writer, backfill scripts)
+            keep working through the P1→P2 transition.
 
     Returns:
         Ordered list of source keys. Top entry is primary (the
@@ -37,7 +40,7 @@ def get_source_priority(asset_group: str, data_type: str) -> list[str]:
         KeyError: If the pair is not registered. Failing loud is intentional
             — silent fallback would mask schema-drift bugs.
     """
-    key = (asset_group, data_type)
+    key = (asset_group, data_type.lower())
     if key not in SOURCE_PRIORITY:
         msg = (
             f"No source priority registered for "
@@ -59,4 +62,4 @@ def get_primary_source(asset_group: str, data_type: str) -> str:
 
 def has_source_priority(asset_group: str, data_type: str) -> bool:
     """Check whether the pair is registered (non-raising membership test)."""
-    return (asset_group, data_type) in SOURCE_PRIORITY
+    return (asset_group, data_type.lower()) in SOURCE_PRIORITY

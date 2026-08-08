@@ -58,66 +58,68 @@ AvailabilitySemantic = Literal[
 
 AVAILABILITY_AT_SEMANTICS: Final[dict[tuple[str, str], AvailabilitySemantic]] = {
     # ---- Sports ----------------------------------------------------------
-    ("sports", "FIXTURES"): "announced_at",
-    # FIXTURES_SCHEDULE/FIXTURES_OUTCOMES: schedule/outcome split of FIXTURES (writer
+    # All sports keys are LOWERCASE from 2026-08-08 (operator ruling, P1 taxonomy
+    # canonicalisation). Must stay in lockstep with SOURCE_PRIORITY —
+    # test_every_source_priority_pair_has_availability_semantic is a bidirectional
+    # closed-set, so the two registries are renamed together.
+    ("sports", "fixtures"): "announced_at",
+    # fixtures_schedule/fixtures_outcomes: schedule/outcome split of fixtures (writer
     # cutover 2026-07-14, fixture_lifecycle.py). Semantics follow the split's own
     # documented rationale — schedule is known at announcement, outcome only at
     # match end (lookahead-bias avoidance is the reason the split exists at all).
-    ("sports", "FIXTURES_SCHEDULE"): "announced_at",
-    ("sports", "FIXTURES_OUTCOMES"): "match_end_time",
-    ("sports", "FIXTURE_LINEUPS"): "kickoff_minus_60min",
-    ("sports", "FIXTURE_EVENTS"): "event_time",
-    ("sports", "INJURIES"): "report_time",
-    ("sports", "FIXTURE_STATS"): "match_end_time",
-    # PLAYER_STATS: renamed from the phantom entity-name FIXTURE_PLAYER_STATS 2026-07-15
+    ("sports", "fixtures_schedule"): "announced_at",
+    ("sports", "fixtures_outcomes"): "match_end_time",
+    ("sports", "fixture_lineups"): "kickoff_minus_60min",
+    ("sports", "fixture_events"): "event_time",
+    ("sports", "injuries"): "report_time",
+    ("sports", "fixture_stats"): "match_end_time",
+    # player_stats: renamed from the phantom entity-name fixture_player_stats 2026-07-15
     # (nothing ever wrote that name — see _source_priority_data.py for the full
     # diagnosis). Semantic UNCHANGED: player stats settle with the match, same as
-    # FIXTURE_STATS. Must stay in lockstep with SOURCE_PRIORITY —
-    # test_every_source_priority_pair_has_availability_semantic is a bidirectional
-    # closed-set, so the two registries are added/removed together or the suite fails.
-    ("sports", "PLAYER_STATS"): "match_end_time",
-    ("sports", "RESULTS"): "match_end_time",
-    ("sports", "UNDERSTAT_XG"): "match_end_time",
-    ("sports", "SFI_PROGRESSIVE_STATS"): "match_end_time",
-    ("sports", "ODDS_SNAPSHOT"): "publication_time",
-    ("sports", "ODDS_MOVEMENT"): "publication_time",
-    ("sports", "ARBITRAGE"): "publication_time",
-    # TRADES: the raw MTDS per-(bookmaker,league,fixture) tick shard (odds_api) —
-    # same publication-time semantic as its ODDS_SNAPSHOT/ODDS_MOVEMENT siblings.
+    # fixture_stats.
+    ("sports", "player_stats"): "match_end_time",
+    ("sports", "results"): "match_end_time",
+    ("sports", "understat_xg"): "match_end_time",
+    ("sports", "sfi_progressive_stats"): "match_end_time",
+    ("sports", "odds_snapshot"): "publication_time",
+    ("sports", "odds_movement"): "publication_time",
+    ("sports", "arbitrage"): "publication_time",
+    # trades: the raw MTDS per-(bookmaker,league,fixture) tick shard (odds_api) —
+    # same publication-time semantic as its odds_snapshot/odds_movement siblings.
     # Added alongside the SOURCE_PRIORITY entry (_source_priority_data.py) — see
     # that file's comment for the full root-cause diagnosis.
-    ("sports", "TRADES"): "publication_time",
-    # TRADES_INPLAY: same odds_api writer family as TRADES (post-kickoff split),
+    ("sports", "trades"): "publication_time",
+    # trades_inplay: same odds_api writer family as trades (post-kickoff split),
     # same publication-time semantic. Added alongside the SOURCE_PRIORITY entry
     # (_source_priority_data.py) — see that file's comment for the full
     # root-cause diagnosis. sports_manifest_blank_venue_captured_rows_2026_07_27.md
     # todo 2.
-    ("sports", "TRADES_INPLAY"): "publication_time",
-    ("sports", "WEATHER_FORECAST"): "forecast_issue_time",
+    ("sports", "trades_inplay"): "publication_time",
+    ("sports", "weather_forecast"): "forecast_issue_time",
     # Sports raw data types written by instruments-service (as recorded in
     # the manifest and used by features-sports-service as upstream inputs).
-    # These differ from the processed output types above (UNDERSTAT_XG,
-    # WEATHER_FORECAST, ODDS_SNAPSHOT) which represent features-service outputs.
-    ("sports", "XG"): "match_end_time",  # understat raw XG; post-match
-    ("sports", "XG_SHOTS"): "match_end_time",  # understat per-shot XG; post-match
-    ("sports", "MATCHES"): "match_end_time",  # footystats match data; post-match
-    ("sports", "STANDINGS"): "fetch_completed_at",  # api_football standings; polled
-    ("sports", "WEATHER"): "match_end_time",  # open_meteo reanalysis; post-match
-    ("sports", "PREDICTIONS"): "announced_at",  # footystats pre-match predictions
-    # ODDS removed 2026-06-25 (#6 coherent unit), RESTORED 2026-07-15: decision #6 was
-    # REVERSED by the operator 2026-06-27 (footystats ODDS = pre-match snapshot reference
+    # These differ from the processed output types above (understat_xg,
+    # weather_forecast, odds_snapshot) which represent features-service outputs.
+    ("sports", "xg"): "match_end_time",  # understat raw XG; post-match
+    ("sports", "xg_shots"): "match_end_time",  # understat per-shot XG; post-match
+    ("sports", "matches"): "match_end_time",  # footystats match data; post-match
+    ("sports", "standings"): "fetch_completed_at",  # api_football standings; polled
+    ("sports", "weather"): "match_end_time",  # open_meteo reanalysis; post-match
+    ("sports", "predictions"): "announced_at",  # footystats pre-match predictions
+    # odds removed 2026-06-25 (#6 coherent unit), RESTORED 2026-07-15: decision #6 was
+    # REVERSED by the operator 2026-06-27 (footystats odds = pre-match snapshot reference
     # data owned by IS; raw bookmaker ticks = odds_api/MTDS — they coexist), but the
     # reversal (c75101be) only restored SPORTS_DATA_TYPE_TO_SOURCE. Exact pre-8fb1f54f
     # value. SSOT: codex/02-data/sports-data-source-coverage-matrix.md §4.
-    ("sports", "ODDS"): "publication_time",  # footystats raw odds
-    ("sports", "ODDS_HORIZON_BUCKET"): "publication_time",  # MDPS bucketed odds
-    ("sports", "TRANSFER_RECORDS"): "fetch_completed_at",  # transfermarkt transfers
+    ("sports", "odds"): "publication_time",  # footystats raw odds
+    ("sports", "odds_horizon_bucket"): "publication_time",  # MDPS bucketed odds
+    ("sports", "transfer_records"): "fetch_completed_at",  # transfermarkt transfers
     # Sports reference tables.
-    ("sports", "TEAMS"): "fetch_completed_at",
-    ("sports", "PLAYERS"): "fetch_completed_at",
-    ("sports", "VENUES"): "fetch_completed_at",
-    ("sports", "LEAGUES"): "fetch_completed_at",
-    ("sports", "PLAYER_VALUES"): "fetch_completed_at",
+    ("sports", "teams"): "fetch_completed_at",
+    ("sports", "players"): "fetch_completed_at",
+    ("sports", "venues"): "fetch_completed_at",
+    ("sports", "leagues"): "fetch_completed_at",
+    ("sports", "player_values"): "fetch_completed_at",
     # ---- CeFi -----------------------------------------------------------
     ("cefi", "trades"): "tick_timestamp",
     ("cefi", "ohlcv_1m"): "tick_timestamp",
@@ -312,7 +314,7 @@ def get_availability_semantic(asset_group: str, data_type: str) -> AvailabilityS
             register here gets wrong stamping). Adding a new data_type
             requires registering it here in the same change.
     """
-    key = (asset_group, data_type)
+    key = (asset_group, data_type.lower())
     if key not in AVAILABILITY_AT_SEMANTICS:
         msg = (
             f"No availability_at semantic registered for "
@@ -325,7 +327,7 @@ def get_availability_semantic(asset_group: str, data_type: str) -> AvailabilityS
 
 def has_availability_semantic(asset_group: str, data_type: str) -> bool:
     """Check whether the pair is registered (non-raising membership test)."""
-    return (asset_group, data_type) in AVAILABILITY_AT_SEMANTICS
+    return (asset_group, data_type.lower()) in AVAILABILITY_AT_SEMANTICS
 
 
 # ---------------------------------------------------------------------------

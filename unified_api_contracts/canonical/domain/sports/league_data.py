@@ -221,51 +221,60 @@ SPORTS_DATA_TYPE_TO_SOURCE: dict[str, str] = {
     #   footystats writes ONLY footystats_matches/odds/predictions to disk — it does
     #   NOT write teams/standings. Those are written by the api_football handler under
     #   pipeline_mode=batch_api_football/entity={teams,standings}. This map was the
-    #   stale outlier vs the canonical SOURCE_PRIORITY[("sports","TEAMS"|"STANDINGS")]
+    #   stale outlier vs the canonical SOURCE_PRIORITY[("sports","teams"|"standings")]
     #   = ["api_football"] (the writer already raised MissingSourceError on footystats),
     #   which produced ~137k mis-sourced/phantom manifest rows. Aligned to the SSOT.
-    "MATCHES": "footystats",
-    "ODDS": "footystats",
-    "PREDICTIONS": "footystats",
+    # Keys are LOWERCASE per 2026-08-08 operator ruling (sports taxonomy canonicalisation
+    # P1). IS writer still stamps UPPERCASE until P2 re-stamps; get_source_for_data_type()
+    # normalises callers via .lower() so existing uppercase callers keep working.
+    "matches": "footystats",
+    "odds": "footystats",
+    "predictions": "footystats",
     # Understat — xG model + per-shot xG
-    "XG": "understat",
-    "XG_SHOTS": "understat",
+    "xg": "understat",
+    "xg_shots": "understat",
     # API-Football — fixtures + per-fixture detail + reference (teams / standings)
-    "FIXTURES": "api_football",
-    # FIXTURES_SCHEDULE/FIXTURES_OUTCOMES are the schedule/outcome split of the same
+    "fixtures": "api_football",
+    # fixtures_schedule/fixtures_outcomes are the schedule/outcome split of the same
     # api_football fixtures feed (writer cutover 2026-07-14, fixture_lifecycle.py) —
     # missing here meant is_pre_launch_date() silently returned False for them,
     # letting ~83,541 pre-2020-06-06 objects misclassify as real orphans instead of
     # the pre-launch-floor violations they are (found 2026-07-22, orphan-sweep audit).
-    "FIXTURES_SCHEDULE": "api_football",
-    "FIXTURES_OUTCOMES": "api_football",
-    "INJURIES": "api_football",
-    "FIXTURE_STATS": "api_football",
-    "FIXTURE_EVENTS": "api_football",
-    "FIXTURE_LINEUPS": "api_football",
-    "PLAYER_STATS": "api_football",
-    "TEAMS": "api_football",
-    "STANDINGS": "api_football",
+    "fixtures_schedule": "api_football",
+    "fixtures_outcomes": "api_football",
+    "injuries": "api_football",
+    "fixture_stats": "api_football",
+    "fixture_events": "api_football",
+    "fixture_lineups": "api_football",
+    "player_stats": "api_football",
+    "teams": "api_football",
+    "standings": "api_football",
     # Transfermarkt — player values.
     # TRANSFERMARKT_LEAGUES retired 2026-05-05 (was static catalog mapping;
     # lives in UAC TRANSFERMARKT_IDS as provider-id config rather than captured data).
-    # TRANSFERMARKT_VALUES retired 2026-05-15 (stale alias — PLAYER_VALUES is canonical).
-    "PLAYER_VALUES": "transfermarkt",
+    # TRANSFERMARKT_VALUES retired 2026-05-15 (stale alias — player_values is canonical).
+    "player_values": "transfermarkt",
     # SoccerFootball.info.
     # SFI_LEAGUES retired 2026-05-05 (same reason — UAC SOCCER_FOOTBALL_INFO_IDS).
     # SFI_STANDINGS retired 2026-05-05 — SFI has no standings endpoint.
-    "SFI_PROGRESSIVE_STATS": "soccer_football_info",
+    "sfi_progressive_stats": "soccer_football_info",
     # OpenMeteo — historical weather
-    "WEATHER": "open_meteo",
+    "weather": "open_meteo",
     # MDPS odds horizon bucket — derived from odds-api
-    "ODDS_HORIZON_BUCKET": "mdps_odds_horizon_bucket",
+    "odds_horizon_bucket": "mdps_odds_horizon_bucket",
 }
 
 
 def get_source_for_data_type(data_type: str) -> str | None:
     """Return the source-key for a sports manifest ``data_type``, or
-    ``None`` if unknown (caller should treat as no-clip)."""
-    return SPORTS_DATA_TYPE_TO_SOURCE.get(data_type)
+    ``None`` if unknown (caller should treat as no-clip).
+
+    Normalises ``data_type`` to lowercase before lookup so existing callers
+    that pass uppercase tokens (IS writer, backfill scripts) keep working
+    across the P1→P2 transition (IS writer still stamps UPPERCASE until P2
+    re-stamps the manifest; keys are canonical lowercase from P1 onwards).
+    """
+    return SPORTS_DATA_TYPE_TO_SOURCE.get(data_type.lower())
 
 
 # ---------------------------------------------------------------------------

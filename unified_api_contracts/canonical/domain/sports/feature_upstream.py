@@ -80,115 +80,115 @@ FEATURE_UPSTREAM_REQUIREMENTS: dict[str, list[UpstreamReq]] = {
     # Stage A — single-source calculators
     # ------------------------------------------------------------------
     "team_form": [
-        UpstreamReq(source="api_football", data_type="FIXTURES"),
+        UpstreamReq(source="api_football", data_type="fixtures"),
     ],
     "team_goals": [
-        UpstreamReq(source="api_football", data_type="FIXTURES"),
+        UpstreamReq(source="api_football", data_type="fixtures"),
     ],
     "season_context": [
-        UpstreamReq(source="api_football", data_type="FIXTURES"),
-        UpstreamReq(source="api_football", data_type="STANDINGS"),
+        UpstreamReq(source="api_football", data_type="fixtures"),
+        UpstreamReq(source="api_football", data_type="standings"),
     ],
     "goal_timing": [
-        UpstreamReq(source="api_football", data_type="FIXTURE_EVENTS"),
+        UpstreamReq(source="api_football", data_type="fixture_events"),
     ],
     "ht_features": [
-        UpstreamReq(source="footystats", data_type="MATCHES"),
+        UpstreamReq(source="footystats", data_type="matches"),
     ],
     "manager_calculator": [
-        UpstreamReq(source="api_football", data_type="FIXTURES"),
-        UpstreamReq(source="api_football", data_type="TEAMS", required=False),
+        UpstreamReq(source="api_football", data_type="fixtures"),
+        UpstreamReq(source="api_football", data_type="teams", required=False),
     ],
     "formation_calculator": [
-        UpstreamReq(source="api_football", data_type="FIXTURE_LINEUPS"),
-        UpstreamReq(source="api_football", data_type="FIXTURES"),
+        UpstreamReq(source="api_football", data_type="fixture_lineups"),
+        UpstreamReq(source="api_football", data_type="fixtures"),
     ],
     "injury_impact_calculator": [
-        UpstreamReq(source="api_football", data_type="INJURIES"),
+        UpstreamReq(source="api_football", data_type="injuries"),
     ],
     "travel_calculator": [
-        UpstreamReq(source="api_football", data_type="FIXTURES"),
-        UpstreamReq(source="api_football", data_type="VENUES", required=False),
+        UpstreamReq(source="api_football", data_type="fixtures"),
+        UpstreamReq(source="api_football", data_type="venues", required=False),
     ],
     "european_fatigue_calculator": [
-        UpstreamReq(source="api_football", data_type="FIXTURES"),
+        UpstreamReq(source="api_football", data_type="fixtures"),
     ],
     "elo_calculator": [
-        UpstreamReq(source="api_football", data_type="FIXTURES"),
+        UpstreamReq(source="api_football", data_type="fixtures"),
     ],
     "h2h_calculator": [
-        UpstreamReq(source="api_football", data_type="FIXTURES"),
+        UpstreamReq(source="api_football", data_type="fixtures"),
     ],
     "advanced_stats_calculator": [
-        UpstreamReq(source="api_football", data_type="FIXTURE_STATS"),
-        UpstreamReq(source="api_football", data_type="FIXTURES"),
+        UpstreamReq(source="api_football", data_type="fixture_stats"),
+        UpstreamReq(source="api_football", data_type="fixtures"),
     ],
     "venue_context": [
-        UpstreamReq(source="api_football", data_type="FIXTURES"),
-        UpstreamReq(source="api_football", data_type="VENUES", required=False),
+        UpstreamReq(source="api_football", data_type="fixtures"),
+        UpstreamReq(source="api_football", data_type="venues", required=False),
     ],
     "league_calculator": [
-        UpstreamReq(source="api_football", data_type="FIXTURES"),
-        UpstreamReq(source="api_football", data_type="STANDINGS"),
+        UpstreamReq(source="api_football", data_type="fixtures"),
+        UpstreamReq(source="api_football", data_type="standings"),
     ],
     "referee_features": [
-        UpstreamReq(source="api_football", data_type="FIXTURES"),
+        UpstreamReq(source="api_football", data_type="fixtures"),
     ],
     "squad_value_calculator": [
-        UpstreamReq(source="transfermarkt", data_type="PLAYER_VALUES"),
-        UpstreamReq(source="transfermarkt", data_type="TRANSFER_RECORDS", required=False),
+        UpstreamReq(source="transfermarkt", data_type="player_values"),
+        UpstreamReq(source="transfermarkt", data_type="transfer_records", required=False),
     ],
     "weather_calculator": [
-        UpstreamReq(source="open_meteo", data_type="WEATHER"),
-        UpstreamReq(source="api_football", data_type="FIXTURES"),
+        UpstreamReq(source="open_meteo", data_type="weather"),
+        UpstreamReq(source="api_football", data_type="fixtures"),
     ],
     "sfi_progressive": [
-        UpstreamReq(source="soccer_football_info", data_type="SFI_PROGRESSIVE_STATS"),
+        UpstreamReq(source="soccer_football_info", data_type="sfi_progressive_stats"),
     ],
     "footystats_predictions": [
-        UpstreamReq(source="footystats", data_type="PREDICTIONS"),
+        UpstreamReq(source="footystats", data_type="predictions"),
     ],
     # ------------------------------------------------------------------
     # Stage C — cross-source join calculators
     # ------------------------------------------------------------------
     "team_xg": [
-        UpstreamReq(source="understat", data_type="XG"),
-        UpstreamReq(source="api_football", data_type="FIXTURES"),
+        UpstreamReq(source="understat", data_type="xg"),
+        UpstreamReq(source="api_football", data_type="fixtures"),
     ],
     "halftime_calculator": [
-        UpstreamReq(source="footystats", data_type="MATCHES"),
-        UpstreamReq(source="api_football", data_type="FIXTURE_STATS"),
+        UpstreamReq(source="footystats", data_type="matches"),
+        UpstreamReq(source="api_football", data_type="fixture_stats"),
     ],
     "transfer_window_calculator": [
-        UpstreamReq(source="transfermarkt", data_type="PLAYER_VALUES"),
-        UpstreamReq(source="transfermarkt", data_type="TRANSFER_RECORDS", required=False),
-        UpstreamReq(source="api_football", data_type="FIXTURE_LINEUPS", required=False),
+        UpstreamReq(source="transfermarkt", data_type="player_values"),
+        UpstreamReq(source="transfermarkt", data_type="transfer_records", required=False),
+        UpstreamReq(source="api_football", data_type="fixture_lineups", required=False),
     ],
     "player_lineup_calculator": [
-        UpstreamReq(source="api_football", data_type="FIXTURE_LINEUPS"),
-        UpstreamReq(source="transfermarkt", data_type="PLAYER_VALUES", required=False),
+        UpstreamReq(source="api_football", data_type="fixture_lineups"),
+        UpstreamReq(source="transfermarkt", data_type="player_values", required=False),
     ],
     "bench_sub_calculator": [
-        UpstreamReq(source="api_football", data_type="FIXTURE_EVENTS"),
-        UpstreamReq(source="api_football", data_type="FIXTURE_LINEUPS"),
+        UpstreamReq(source="api_football", data_type="fixture_events"),
+        UpstreamReq(source="api_football", data_type="fixture_lineups"),
     ],
     "odds_calculator": [
-        UpstreamReq(source="footystats", data_type="ODDS"),
+        UpstreamReq(source="footystats", data_type="odds"),
         UpstreamReq(
             source="mdps_odds_horizon_bucket",
-            data_type="ODDS_HORIZON_BUCKET",
+            data_type="odds_horizon_bucket",
             required=False,
             notes="MDPS post-processed bucketed odds; complements footystats raw odds",
         ),
     ],
     "multisource_xg": [
-        UpstreamReq(source="understat", data_type="XG"),
-        UpstreamReq(source="footystats", data_type="MATCHES"),
+        UpstreamReq(source="understat", data_type="xg"),
+        UpstreamReq(source="footystats", data_type="matches"),
         UpstreamReq(source="derived", data_type="team_xg", required=False),
     ],
     "xg_decomposition": [
-        UpstreamReq(source="api_football", data_type="FIXTURE_STATS"),
-        UpstreamReq(source="understat", data_type="XG"),
+        UpstreamReq(source="api_football", data_type="fixture_stats"),
+        UpstreamReq(source="understat", data_type="xg"),
     ],
     # ------------------------------------------------------------------
     # Stage D — enriched / derived calculators
@@ -198,8 +198,8 @@ FEATURE_UPSTREAM_REQUIREMENTS: dict[str, list[UpstreamReq]] = {
         UpstreamReq(source="derived", data_type="team_goals"),
     ],
     "relative_context": [
-        UpstreamReq(source="api_football", data_type="FIXTURES"),
-        UpstreamReq(source="api_football", data_type="STANDINGS"),
+        UpstreamReq(source="api_football", data_type="fixtures"),
+        UpstreamReq(source="api_football", data_type="standings"),
         UpstreamReq(source="derived", data_type="team_form", required=False),
     ],
     "meta_features": [
@@ -212,7 +212,7 @@ FEATURE_UPSTREAM_REQUIREMENTS: dict[str, list[UpstreamReq]] = {
         UpstreamReq(source="derived", data_type="odds_calculator", required=False),
     ],
     "replacement_model": [
-        UpstreamReq(source="transfermarkt", data_type="PLAYER_VALUES"),
+        UpstreamReq(source="transfermarkt", data_type="player_values"),
     ],
     "bucketed_features": [
         UpstreamReq(
@@ -230,7 +230,7 @@ FEATURE_UPSTREAM_REQUIREMENTS: dict[str, list[UpstreamReq]] = {
             data_type="XG_SHOTS",
             notes="Per-shot xG dimensional data; same 6-league coverage as XG (2019-01-01+)",
         ),
-        UpstreamReq(source="api_football", data_type="FIXTURES"),
+        UpstreamReq(source="api_football", data_type="fixtures"),
     ],
 }
 
