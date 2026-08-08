@@ -59,36 +59,22 @@ SOURCE_PRIORITY: Final[dict[tuple[str, str], list[str]]] = {
     ("sports", "ODDS_SNAPSHOT"): ["odds_api"],
     ("sports", "ODDS_MOVEMENT"): ["odds_api"],
     ("sports", "ARBITRAGE"): ["odds_api"],
-    # TRADES = the raw MTDS per-(bookmaker,league,fixture) tick shard write shape
-    # (venue_fetch.py::_build_sports_shard_path) — odds-api is the ONLY sanctioned
-    # writer (api_football has no MTDS odds adapter, see
-    # market_tick_data_service/scripts/wipe_api_football_sports_odds_2026_06_24.py).
-    # Missing here meant read_with_source_priority("sports","TRADES"/"trades") raised
-    # KeyError, so derive_pipeline_mode_for_row() fell through to the
-    # _ASSET_GROUP_FALLBACKS["sports"]=BATCH_API_FOOTBALL default and mis-stamped every
-    # sports sentinel/expected-row for this shape as source=api_football — the root
-    # cause of a 1.26M-row wrong-source re-accumulation found 2026-07-22/23
-    # (issues/mtds_sports_api_football_wrong_source_reaccumulated_post_wipe_2026_07_22.md).
-    # KEPT UPPERCASE 2026-07-27 (K1's writer flip itself was reverted back to
-    # lower-case "trades") — derive_pipeline_mode_for_row() tries the data_type
-    # as-is FIRST, then unconditionally retries with .upper() as its documented
-    # sports fallback, so this uppercase key still resolves the now-lower-case
-    # writer's lookups. No lower-case "trades" entry is needed alongside it.
+    # odds (lowercase) = the renamed MTDS raw per-(bookmaker,league,fixture) tick shard
+    # (venue_fetch.py::_build_sports_shard_path, sports taxonomy P1 2026-08-08:
+    # data_type=trades → data_type=odds). odds_api is the ONLY sanctioned writer.
+    # Lowercase here because derive_pipeline_mode_for_row() tries as-is first (lowercase)
+    # before falling back to .upper() — and ("sports","ODDS") maps to footystats, NOT
+    # odds_api, so the uppercase fallback would return the WRONG source. The explicit
+    # lowercase entry short-circuits that path cleanly.
+    ("sports", "odds"): ["odds_api"],
+    # TRADES = retained for historical manifest row resolution (pre-2026-08-08 captured rows
+    # still have data_type="trades" in the manifest index). derive_pipeline_mode_for_row()
+    # tries lowercase "trades" first (no match), then "TRADES" → hits this entry. Kept so
+    # the backfill / orphan-sweep path can still resolve old rows correctly.
     ("sports", "TRADES"): ["odds_api"],
-    # TRADES_INPLAY = the post-kickoff ("in-play") counterpart of TRADES (OR-5b(c)
-    # legacy-bucket recovery, market_data_categories.py's "trades_inplay" entry) —
-    # same MTDS odds_api writer family as TRADES, split off only by the
-    # bm_minutes_to_kickoff<0 discriminator at write time, so odds_api is the same
-    # sanctioned source. Registered here (SOURCE_PRIORITY only) so
-    # backfill_orphan_class_e_sports.py::resolve_source_and_mode() can resolve it
-    # instead of falling through to the BATCH_INSTRUMENTS_SERVICE producer-fallback
-    # (sports_manifest_blank_venue_captured_rows_2026_07_27.md todo 2). Deliberately
-    # NOT added to SPORTS_DATA_TYPE_TO_SOURCE — that's a different registry (the v2
-    # expected-universe enumerator's iteration axis, see
-    # enumerate_expected_universe.py::_sports_data_types) — market_data_categories.py's
-    # "trades_inplay" comment documents 3 deliberate non-registrations that keep it
-    # inert for the live sports fleet; this SOURCE_PRIORITY-only entry does not touch
-    # any of them.
+    # TRADES_INPLAY retired 2026-08-08 (sports taxonomy P1): retained for historical row
+    # resolution only (backfill_orphan_class_e_sports.py::resolve_source_and_mode()).
+    # No new data ever written with this data_type.
     ("sports", "TRADES_INPLAY"): ["odds_api"],
     ("sports", "WEATHER_FORECAST"): ["open_meteo"],
     # Sports raw data types (instruments-service manifest data_type names).

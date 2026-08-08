@@ -82,8 +82,14 @@ AVAILABILITY_AT_SEMANTICS: Final[dict[tuple[str, str], AvailabilitySemantic]] = 
     ("sports", "ODDS_SNAPSHOT"): "publication_time",
     ("sports", "ODDS_MOVEMENT"): "publication_time",
     ("sports", "ARBITRAGE"): "publication_time",
+    # odds (lowercase) = renamed MTDS raw tick shard (sports taxonomy P1 2026-08-08,
+    # operator ruling #10). Lowercase key required because SOURCE_PRIORITY must use
+    # lowercase ("sports","ODDS") maps to footystats, not odds_api). publication_time
+    # semantic matches its TRADES predecessor.
+    ("sports", "odds"): "publication_time",
     # TRADES: the raw MTDS per-(bookmaker,league,fixture) tick shard (odds_api) —
     # same publication-time semantic as its ODDS_SNAPSHOT/ODDS_MOVEMENT siblings.
+    # Retained for historical manifest row resolution (pre-2026-08-08 rows).
     # Added alongside the SOURCE_PRIORITY entry (_source_priority_data.py) — see
     # that file's comment for the full root-cause diagnosis.
     ("sports", "TRADES"): "publication_time",
