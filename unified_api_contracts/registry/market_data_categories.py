@@ -349,7 +349,9 @@ DATA_TYPES_BY_ASSET_GROUP: dict[str, list[str]] = {
         # Readers are filename-scoped too: the quarantined objects are written as
         # ``inplay_ticks.parquet`` (never ``ticks.parquet``), because
         # ``reprocess_sports_odds.py::_is_consumable_trades_blob`` matches on FILENAME alone.
-        "trades_inplay",
+        # ``trades_inplay`` RETIRED 2026-08-08 (sports_taxonomy_p1_capture_and_contracts_
+        # 2026_08_08.md todo 3): in-play status is now carried by the ``in_play`` bool column
+        # stamped by the writer (bm_minutes_to_kickoff < 0), not a separate data_type.
     ],
     "prediction": [
         # Canonical names — aligned with CeFi. Legacy prediction_* names retired
@@ -1467,7 +1469,11 @@ VALID_DATA_TYPES_BY_AG_AND_INSTRUMENT_TYPE: dict[tuple[str, str], frozenset[str]
     # live, sole writer of this data_type. Folding it into a lowercase "odds"
     # data_type (per operator ruling 5) is the P2 data re-stamp — this entry
     # covers the data_type as it is captured TODAY.
-    ("sports", "odds"): frozenset({"trades", "odds_horizon_bucket"}),
+    # "odds" added 2026-08-08 (same plan, todo 3): forward-facing raw tick
+    # data_type replacing "trades" for new writes; CONTRACT_REGISTRY[("sports",
+    # "odds", "odds")] = SPORTS_ODDS is now registered (adds in_play bool column).
+    # "trades" kept for the transition window (P2 re-stamp will remove it).
+    ("sports", "odds"): frozenset({"odds", "trades", "odds_horizon_bucket"}),
 }
 
 

@@ -182,6 +182,36 @@ SPORTS_ODDS_HORIZON_BUCKET = SchemaContract(
 )
 
 # ---------------------------------------------------------------------------
+# Sports (odds) — unified ``odds`` data_type, P1 contract landing
+# (sports_taxonomy_p1_capture_and_contracts_2026_08_08.md todo 3).
+# Forward-facing: replaces ``trades`` as the raw bookmaker tick data_type for
+# new writes. Adds ``in_play`` (True when bm_minutes_to_kickoff < 0, i.e.
+# match is in progress at capture time). The legacy ``trades`` registration
+# stays for the transition window (P2 re-stamp).
+# ---------------------------------------------------------------------------
+
+SPORTS_ODDS = SchemaContract(
+    asset_group="sports",
+    instrument_type="odds",
+    data_type="odds",
+    columns=[
+        *SPORTS_ODDS_TRADES.columns,
+        ColumnSpec(
+            name="in_play",
+            dtype="bool",
+            nullable=False,
+            description=(
+                "True when the match is in progress at capture time "
+                "(bm_minutes_to_kickoff < 0). False for pre-match rows and "
+                "when bm_minutes_to_kickoff is unavailable."
+            ),
+        ),
+    ],
+    symbol_column="fixture_id",
+    required_row_count_min=1,
+)
+
+# ---------------------------------------------------------------------------
 # Prediction markets (Polymarket, Kalshi, …) — Phase 1.1
 # ---------------------------------------------------------------------------
 
@@ -637,6 +667,7 @@ PREDICTION_PREDICTION_MARKET_FILLS = SchemaContract(
 # Registry side-effects
 # ---------------------------------------------------------------------------
 
+CONTRACT_REGISTRY[("sports", "odds", "odds")] = SPORTS_ODDS
 CONTRACT_REGISTRY[("sports", "odds", "trades")] = SPORTS_ODDS_TRADES
 CONTRACT_REGISTRY[("sports", "exchange_odds", "trades")] = SPORTS_EXCHANGE_ODDS_TRADES
 CONTRACT_REGISTRY[("sports", "fixed_odds", "trades")] = SPORTS_FIXED_ODDS_TRADES
@@ -657,6 +688,7 @@ __all__ = [
     "PREDICTION_PREDICTION_MARKET_TRADES",
     "SPORTS_EXCHANGE_ODDS_TRADES",
     "SPORTS_FIXED_ODDS_TRADES",
+    "SPORTS_ODDS",
     "SPORTS_ODDS_ARBITRAGE",
     "SPORTS_ODDS_HORIZON_BUCKET",
     "SPORTS_ODDS_MOVEMENT",
