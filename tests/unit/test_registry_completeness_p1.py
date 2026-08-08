@@ -192,25 +192,28 @@ class TestVenueExecutionProfileCommission:
 class TestSportsVenuesInInstrumentTypes:
     """All sports bet-placement venues have INSTRUMENT_TYPES_BY_VENUE entries."""
 
-    def test_exchange_venues_mapped_to_exchange_odds(self) -> None:
+    def test_exchange_venues_mapped_to_odds(self) -> None:
+        # P1: exchange_odds retired; all sports odds venues now stamp "ODDS"
         for venue in SPORTS_EXCHANGE_VENUES:
             assert venue in INSTRUMENT_TYPES_BY_VENUE, f"Missing: {venue}"
-            assert "EXCHANGE_ODDS" in INSTRUMENT_TYPES_BY_VENUE[venue]
+            assert "ODDS" in INSTRUMENT_TYPES_BY_VENUE[venue]
 
     def test_prediction_market_venues_mapped(self) -> None:
         for venue in SPORTS_PREDICTION_MARKET_VENUES:
             assert venue in INSTRUMENT_TYPES_BY_VENUE, f"Missing: {venue}"
             assert "PREDICTION_MARKET" in INSTRUMENT_TYPES_BY_VENUE[venue]
 
-    def test_bookmaker_api_venues_mapped_to_fixed_odds(self) -> None:
+    def test_bookmaker_api_venues_mapped_to_odds(self) -> None:
+        # P1: fixed_odds retired; all sports odds venues now stamp "ODDS"
         for venue in SPORTS_BOOKMAKER_API_VENUES:
             assert venue in INSTRUMENT_TYPES_BY_VENUE, f"Missing: {venue}"
-            assert "FIXED_ODDS" in INSTRUMENT_TYPES_BY_VENUE[venue]
+            assert "ODDS" in INSTRUMENT_TYPES_BY_VENUE[venue]
 
-    def test_bookmaker_web_venues_mapped_to_fixed_odds(self) -> None:
+    def test_bookmaker_web_venues_mapped_to_odds(self) -> None:
+        # P1: fixed_odds retired; all sports odds venues now stamp "ODDS"
         for venue in SPORTS_BOOKMAKER_WEB_VENUES:
             assert venue in INSTRUMENT_TYPES_BY_VENUE, f"Missing: {venue}"
-            assert "FIXED_ODDS" in INSTRUMENT_TYPES_BY_VENUE[venue]
+            assert "ODDS" in INSTRUMENT_TYPES_BY_VENUE[venue]
 
     def test_dfs_venues_mapped_to_prop(self) -> None:
         for venue in SPORTS_DFS_VENUES:
@@ -222,6 +225,27 @@ class TestSportsVenuesInInstrumentTypes:
             assert venue in INSTRUMENT_TYPES_BY_VENUE, (
                 f"Bet placement venue {venue} missing from INSTRUMENT_TYPES_BY_VENUE"
             )
+
+
+class TestIsExchangeVenue:
+    """is_exchange_venue() derives exchange vs sportsbook from SportsVenueType (P1)."""
+
+    def test_exchange_venues_return_true(self) -> None:
+        from unified_api_contracts.registry._sports_venue_constants import is_exchange_venue
+
+        for venue in SPORTS_EXCHANGE_VENUES:
+            assert is_exchange_venue(venue), f"{venue} should be an exchange venue"
+
+    def test_bookmaker_api_venues_return_false(self) -> None:
+        from unified_api_contracts.registry._sports_venue_constants import is_exchange_venue
+
+        for venue in SPORTS_BOOKMAKER_API_VENUES:
+            assert not is_exchange_venue(venue), f"{venue} should not be an exchange venue"
+
+    def test_unknown_venue_returns_false(self) -> None:
+        from unified_api_contracts.registry._sports_venue_constants import is_exchange_venue
+
+        assert not is_exchange_venue("NONEXISTENT_VENUE_XYZ")
 
 
 # ---------------------------------------------------------------------------

@@ -48,6 +48,7 @@ class TestInstrumentTypeEnum:
             "LENDING",
             "STAKING",
             "PREDICTION_MARKET",
+            "ODDS",
             "EXCHANGE_ODDS",
             "FIXED_ODDS",
             "PROP",

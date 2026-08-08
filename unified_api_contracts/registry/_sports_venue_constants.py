@@ -208,3 +208,13 @@ SUPPORTED_MARKET_TYPES.update(dict.fromkeys(SPORTS_PREDICTION_MARKET_VENUES, _PR
 SUPPORTED_MARKET_TYPES.update(dict.fromkeys(SPORTS_BOOKMAKER_API_VENUES, _BOOKMAKER_API_MARKET_TYPES))
 SUPPORTED_MARKET_TYPES.update(dict.fromkeys(SPORTS_BOOKMAKER_WEB_VENUES, _BOOKMAKER_WEB_MARKET_TYPES))
 SUPPORTED_MARKET_TYPES.update(dict.fromkeys(SPORTS_DFS_VENUES, _DFS_MARKET_TYPES))
+
+
+def is_exchange_venue(venue: str) -> bool:
+    """Return True when a sports venue is a peer-to-peer exchange, False for sportsbooks.
+
+    Derives the exchange/fixed-odds distinction from SportsVenueType, replacing the
+    retired exchange_odds/fixed_odds instrument_type split
+    (sports_taxonomy_p1_capture_and_contracts_2026_08_08.md, operator ruling 9).
+    """
+    return SPORTS_VENUE_TYPE_MAP.get(venue.upper()) == SportsVenueType.EXCHANGE_API

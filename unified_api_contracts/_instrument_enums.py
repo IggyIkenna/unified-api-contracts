@@ -92,21 +92,20 @@ class InstrumentType(StrEnum):
     COMBO = "COMBO"
     # Sports / Prediction Markets
     PREDICTION_MARKET = "PREDICTION_MARKET"
-    # EXCHANGE_ODDS / FIXED_ODDS are LIVE in the derivation + adapter layer:
+    # ODDS is the unified forward-written sports instrument_type from P1
+    # (sports_taxonomy_p1_capture_and_contracts_2026_08_08.md, operator ruling 9).
+    # All venues (exchange and sportsbook) now stamp "odds" in the manifest.
+    # Use is_exchange_venue() to derive the exchange/fixed distinction at read time.
+    ODDS = "ODDS"
+    # EXCHANGE_ODDS / FIXED_ODDS remain in the derivation + adapter layer:
     #   - instruments-service ``instruments_service/reference_data/adapters/sports/
     #     adapters/betfair.py:287`` constructs ``InstrumentType.EXCHANGE_ODDS``.
     #   - UTL ``unified_trading_library/canonical/_derive_instrument_id.py:85`` maps
     #     ``("sports", "odds") -> InstrumentType.EXCHANGE_ODDS``.
-    # They are NOT the sports manifest's vocabulary. The sports SchemaContract
-    # registry deliberately does NOT key on InstrumentType — it keys on the declared
-    # contract value ``odds`` (see internal/schemas/_sports_prediction_contracts.py,
-    # instrument_type="odds"), which is also the physical GCS hive partition
-    # (``instrument_type=odds/``) and is still actively written.
-    # Do NOT "fix" the manifest/registry to match these enum members: renaming
-    # ``odds`` -> EXCHANGE_ODDS/FIXED_ODDS would create manifest<->disk<->registry
-    # divergence to change a value that has zero shard + display consumers
-    # (SHARD_AXIS_MATRIX keys sports on ("data_type", "league_id"), not
-    # instrument_type). Operator ruling 2026-07-17: closed as not-a-defect.
+    # They are NOT the forward-written manifest vocabulary post-P1. Existing GCS/
+    # manifest rows written pre-P1 still carry them; P2 will re-stamp to "odds".
+    # Consumer inventory (IS betfair adapter, UTL derive_instrument_id) tracked as
+    # P3 scope — do not remove yet.
     EXCHANGE_ODDS = "EXCHANGE_ODDS"
     FIXED_ODDS = "FIXED_ODDS"
     PROP = "PROP"
