@@ -989,15 +989,14 @@ SPORTS_DATA_TYPE_ACCEPTED_STALE_UPPERCASE_RESIDUE: frozenset[str] = frozenset(
 #   from the ODDS_API vendor response legitimately produces the bare market
 #   token. Same market-grain shape as the suffixed siblings above, not a
 #   distinct writer bug.
-# - "exchange_odds" / "fixed_odds": the deliberate venue-based split target of
-#   the 2026-07-27 migration (`market-tick-data-service/scripts/sports/
-#   exchange_fixed_odds_fork/`) — Betfair-Exchange-style venues (BETFAIR_EX_UK/
-#   BETFAIR_EX_EU/SMARKETS/MATCHBOOK) stamp "exchange_odds", sportsbook-style
-#   venues (BETFAIR_SB_UK/BETMGM/PINNACLE/ODDS_API) stamp "fixed_odds" — both
-#   already registered UAC `CONTRACT_REGISTRY[("sports", "exchange_odds"/
-#   "fixed_odds", "trades")]` keys, not ad hoc strings.
-# - "odds" (lowercase, generic): the pre-fork residual instrument_type for
-#   venues the 2026-07-27 migration didn't (yet) cover.
+# - "exchange_odds" / "fixed_odds": RETIRED 2026-08-08
+#   (sports_taxonomy_p1_capture_and_contracts_2026_08_08.md). The 2026-07-27
+#   venue-class split is reversed — venue class is derivable from
+#   SportsVenueType, so per-instrument stamping is redundant. These values
+#   still appear in existing GCS/manifest rows until the P2 migration moves
+#   them to the canonical "odds" partition; kept here to accept live data.
+# - "odds" (lowercase, generic): the sole canonical instrument_type for all
+#   sports odds (both exchange and sportsbook).
 # All 5 are real `data_type=trades`/bundle-grain MTDS/MDPS output, never
 # members of the per-CONTRACT-grain `InstrumentType` enum for the same reason
 # as the rest of this set.
@@ -1341,8 +1340,6 @@ _INSTRUMENT_TYPE_ALIASES: dict[str, str] = {
     # Sports catalogue tokens (SPORTS_LEAGUE_INSTRUMENT_TYPE = "league")
     "fixture": "fixture",
     "league": "league",
-    "exchange_odds": "exchange_odds",
-    "fixed_odds": "fixed_odds",
     "prop": "prop",
     # DeFi instrument_type values (from InstrumentType enum; already-lowercase
     # after .strip().lower() → map to themselves)
@@ -1466,15 +1463,6 @@ VALID_DATA_TYPES_BY_AG_AND_INSTRUMENT_TYPE: dict[tuple[str, str], frozenset[str]
         # odds_snapshot/odds_movement removed 2026-08-08 (sports taxonomy P1): MDPS-derived
         # processed types, not raw MTDS capture types for instrument_type validity.
     ),  # UNCERTAIN — sports-owner verify
-    ("sports", "exchange_odds"): frozenset(  # UNCERTAIN — sports-owner verify
-        # odds_snapshot/odds_movement removed 2026-08-08 (sports taxonomy P1): MDPS-derived.
-        {"odds", "trades"}
-    ),
-    ("sports", "fixed_odds"): frozenset(  # UNCERTAIN — sports-owner verify
-        # markets/outcomes/settlements removed 2026-08-08 (sports taxonomy P1) — retired.
-        # odds_snapshot/odds_movement removed 2026-08-08 (sports taxonomy P1): MDPS-derived.
-        {"odds", "trades"}
-    ),
     ("sports", "prop"): frozenset(  # UNCERTAIN — sports-owner verify
         # odds_snapshot/odds_movement removed 2026-08-08 (sports taxonomy P1): MDPS-derived.
         {"odds"}
