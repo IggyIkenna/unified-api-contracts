@@ -276,7 +276,7 @@ class TestSinkMatrixCompleteness:
             ("defi", "book_snapshot_5"),
             ("defi", "liquidations"),
             ("tradfi", "trades"),
-            ("sports", "trades"),
+            ("sports", "odds"),
             ("prediction", "trades"),
         ]
         for ag, dt in mtds_shards:

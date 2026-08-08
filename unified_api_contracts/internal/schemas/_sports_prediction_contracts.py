@@ -63,7 +63,7 @@ from unified_api_contracts.internal.schemas.contracts import (
 SPORTS_ODDS_TRADES = SchemaContract(
     asset_group="sports",
     instrument_type="odds",
-    data_type="trades",
+    data_type="odds",
     columns=[
         INSTRUMENT_ID_COL,
         ColumnSpec(
@@ -89,7 +89,7 @@ SPORTS_ODDS_TRADES = SchemaContract(
             name="source",
             dtype="string",
             nullable=False,
-            description="Provider: ODDS_API, SFI, FOOTYSTATS.",
+            description="Provider: odds_api or footystats. Distinguishes the two odds populations.",
         ),
         ColumnSpec(
             name="league_id",
@@ -106,6 +106,15 @@ SPORTS_ODDS_TRADES = SchemaContract(
         ),
         ColumnSpec(name="outcome_name", dtype="string", nullable=False),
         PRICE_COL,
+        ColumnSpec(
+            name="in_play",
+            dtype="bool",
+            nullable=False,
+            description=(
+                "True when the quote was captured after kickoff (bm_minutes_to_kickoff < 0). "
+                "False for pre-match quotes. Replaces the retired trades_inplay data_type."
+            ),
+        ),
     ],
     symbol_column="fixture_id",
     required_row_count_min=1,
@@ -123,7 +132,7 @@ SPORTS_ODDS_TRADES = SchemaContract(
 SPORTS_EXCHANGE_ODDS_TRADES = SchemaContract(
     asset_group="sports",
     instrument_type="exchange_odds",
-    data_type="trades",
+    data_type="odds",
     columns=SPORTS_ODDS_TRADES.columns,
     symbol_column="fixture_id",
     required_row_count_min=1,
@@ -132,7 +141,7 @@ SPORTS_EXCHANGE_ODDS_TRADES = SchemaContract(
 SPORTS_FIXED_ODDS_TRADES = SchemaContract(
     asset_group="sports",
     instrument_type="fixed_odds",
-    data_type="trades",
+    data_type="odds",
     columns=SPORTS_ODDS_TRADES.columns,
     symbol_column="fixture_id",
     required_row_count_min=1,
@@ -594,9 +603,9 @@ PREDICTION_PREDICTION_MARKET_FILLS = SchemaContract(
 # Registry side-effects
 # ---------------------------------------------------------------------------
 
-CONTRACT_REGISTRY[("sports", "odds", "trades")] = SPORTS_ODDS_TRADES
-CONTRACT_REGISTRY[("sports", "exchange_odds", "trades")] = SPORTS_EXCHANGE_ODDS_TRADES
-CONTRACT_REGISTRY[("sports", "fixed_odds", "trades")] = SPORTS_FIXED_ODDS_TRADES
+CONTRACT_REGISTRY[("sports", "odds", "odds")] = SPORTS_ODDS_TRADES
+CONTRACT_REGISTRY[("sports", "exchange_odds", "odds")] = SPORTS_EXCHANGE_ODDS_TRADES
+CONTRACT_REGISTRY[("sports", "fixed_odds", "odds")] = SPORTS_FIXED_ODDS_TRADES
 CONTRACT_REGISTRY[("prediction", "prediction_market", "trades")] = PREDICTION_PREDICTION_MARKET_TRADES
 CONTRACT_REGISTRY[("prediction", "prediction_market", "book_snapshot_5")] = PREDICTION_PREDICTION_MARKET_BOOK_SNAPSHOT
 CONTRACT_REGISTRY[("prediction", "prediction_market", "market_metadata")] = PREDICTION_PREDICTION_MARKET_METADATA

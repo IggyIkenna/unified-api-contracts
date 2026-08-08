@@ -32,12 +32,12 @@ from unified_api_contracts.internal.schemas.contracts import (
 
 
 def test_sports_odds_trades_registered_in_contract_registry() -> None:
-    contract = CONTRACT_REGISTRY[("sports", "odds", "trades")]
+    contract = CONTRACT_REGISTRY[("sports", "odds", "odds")]
     assert contract is SPORTS_ODDS_TRADES
 
 
 def test_sports_odds_trades_lookup_returns_contract() -> None:
-    contract = lookup_contract(asset_group="sports", instrument_type="odds", data_type="trades")
+    contract = lookup_contract(asset_group="sports", instrument_type="odds", data_type="odds")
     assert contract is SPORTS_ODDS_TRADES
 
 
@@ -117,6 +117,7 @@ def test_sports_odds_trades_validates_sample_dataframe() -> None:
             "market_key": pd.Series(["h2h"], dtype="string"),
             "outcome_name": pd.Series(["HOME"], dtype="string"),
             "price": pd.Series([1.85], dtype="float64"),
+            "in_play": pd.Series([False], dtype="bool"),
         }
     )
     violations = validate_dataframe(df, SPORTS_ODDS_TRADES)
@@ -135,22 +136,22 @@ def test_sports_odds_trades_validates_sample_dataframe() -> None:
 
 
 def test_sports_exchange_odds_trades_registered_in_contract_registry() -> None:
-    contract = CONTRACT_REGISTRY[("sports", "exchange_odds", "trades")]
+    contract = CONTRACT_REGISTRY[("sports", "exchange_odds", "odds")]
     assert contract is SPORTS_EXCHANGE_ODDS_TRADES
 
 
 def test_sports_fixed_odds_trades_registered_in_contract_registry() -> None:
-    contract = CONTRACT_REGISTRY[("sports", "fixed_odds", "trades")]
+    contract = CONTRACT_REGISTRY[("sports", "fixed_odds", "odds")]
     assert contract is SPORTS_FIXED_ODDS_TRADES
 
 
 def test_sports_exchange_odds_trades_lookup_returns_contract() -> None:
-    contract = lookup_contract(asset_group="sports", instrument_type="exchange_odds", data_type="trades")
+    contract = lookup_contract(asset_group="sports", instrument_type="exchange_odds", data_type="odds")
     assert contract is SPORTS_EXCHANGE_ODDS_TRADES
 
 
 def test_sports_fixed_odds_trades_lookup_returns_contract() -> None:
-    contract = lookup_contract(asset_group="sports", instrument_type="fixed_odds", data_type="trades")
+    contract = lookup_contract(asset_group="sports", instrument_type="fixed_odds", data_type="odds")
     assert contract is SPORTS_FIXED_ODDS_TRADES
 
 
@@ -168,9 +169,9 @@ def test_sports_exchange_fixed_odds_trades_declare_their_own_instrument_type() -
 
 
 def test_legacy_odds_trades_still_registered_during_dual_read_window() -> None:
-    """The fork adds new entries; it must not remove the legacy odds entry."""
-    assert ("sports", "odds", "trades") in CONTRACT_REGISTRY
-    assert CONTRACT_REGISTRY[("sports", "odds", "trades")] is SPORTS_ODDS_TRADES
+    """The fork adds new entries; the canonical odds entry must remain (now data_type=odds)."""
+    assert ("sports", "odds", "odds") in CONTRACT_REGISTRY
+    assert CONTRACT_REGISTRY[("sports", "odds", "odds")] is SPORTS_ODDS_TRADES
 
 
 def test_sports_exchange_odds_trades_validates_sample_dataframe() -> None:
@@ -188,6 +189,7 @@ def test_sports_exchange_odds_trades_validates_sample_dataframe() -> None:
             "market_key": pd.Series(["h2h"], dtype="string"),
             "outcome_name": pd.Series(["HOME"], dtype="string"),
             "price": pd.Series([1.85], dtype="float64"),
+            "in_play": pd.Series([False], dtype="bool"),
         }
     )
     violations = validate_dataframe(df, SPORTS_EXCHANGE_ODDS_TRADES)
@@ -209,6 +211,7 @@ def test_sports_fixed_odds_trades_validates_sample_dataframe() -> None:
             "market_key": pd.Series(["h2h"], dtype="string"),
             "outcome_name": pd.Series(["HOME"], dtype="string"),
             "price": pd.Series([1.85], dtype="float64"),
+            "in_play": pd.Series([False], dtype="bool"),
         }
     )
     violations = validate_dataframe(df, SPORTS_FIXED_ODDS_TRADES)
@@ -228,15 +231,15 @@ def test_sports_fixed_odds_trades_validates_sample_dataframe() -> None:
 
 
 def test_lookup_contract_legacy_odds_path_still_resolves_directly() -> None:
-    """The legacy path is untouched by the dual-read fallback."""
-    contract = lookup_contract(asset_group="sports", instrument_type="odds", data_type="trades")
+    """The canonical odds path resolves directly."""
+    contract = lookup_contract(asset_group="sports", instrument_type="odds", data_type="odds")
     assert contract is SPORTS_ODDS_TRADES
 
 
 def test_lookup_contract_new_instrument_types_resolve_their_own_forked_entry() -> None:
-    """Where a fork-specific entry exists (trades), it wins over the odds fallback."""
-    exchange = lookup_contract(asset_group="sports", instrument_type="exchange_odds", data_type="trades")
-    fixed = lookup_contract(asset_group="sports", instrument_type="fixed_odds", data_type="trades")
+    """Where a fork-specific entry exists (odds), it wins over the odds fallback."""
+    exchange = lookup_contract(asset_group="sports", instrument_type="exchange_odds", data_type="odds")
+    fixed = lookup_contract(asset_group="sports", instrument_type="fixed_odds", data_type="odds")
     assert exchange is SPORTS_EXCHANGE_ODDS_TRADES
     assert fixed is SPORTS_FIXED_ODDS_TRADES
 
@@ -500,17 +503,15 @@ def test_sports_odds_instrument_type_has_a_validity_matrix_entry() -> None:
     """Regression lock for the ("sports","odds") matrix hole.
 
     Before this fix, ``VALID_DATA_TYPES_BY_AG_AND_INSTRUMENT_TYPE`` had no
-    ``("sports","odds")`` key at all, so every real
-    (instrument_type=odds, data_type=trades) manifest row -- 1,806,527 of them
-    in prod -- silently fell through the "unmapped instrument_type" path
-    instead of an audited, confirmed matrix entry.
+    ``("sports","odds")`` key at all. Now it maps to ``frozenset({"odds"})``
+    following the 2026-08-08 vocabulary collapse (trades → odds).
     """
     from unified_api_contracts.registry.market_data_categories import (
         VALID_DATA_TYPES_BY_AG_AND_INSTRUMENT_TYPE,
     )
 
     assert ("sports", "odds") in VALID_DATA_TYPES_BY_AG_AND_INSTRUMENT_TYPE
-    assert "trades" in VALID_DATA_TYPES_BY_AG_AND_INSTRUMENT_TYPE[("sports", "odds")]
+    assert "odds" in VALID_DATA_TYPES_BY_AG_AND_INSTRUMENT_TYPE[("sports", "odds")]
 
 
 def test_every_sports_odds_family_contract_registry_entry_is_matrix_reachable() -> None:

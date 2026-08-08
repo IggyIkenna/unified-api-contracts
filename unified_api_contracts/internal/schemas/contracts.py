@@ -1207,7 +1207,7 @@ _SPORTS_ODDS_DERIVED_CANDLE_PREFIXES: tuple[str, ...] = (
 
 # Sports EXCHANGE_ODDS/FIXED_ODDS fork instrument_types (contracts-first
 # migration, sports_closeout_exchange_fixed_odds_fork_2026_07_25.md todo 3-4).
-# Only ("sports", "exchange_odds"/"fixed_odds", "trades") has its own
+# Only ("sports", "exchange_odds"/"fixed_odds", "odds") has its own
 # CONTRACT_REGISTRY entry so far -- the sibling odds data_types
 # (sports_odds_snapshot / sports_odds_movement / sports_arbitrage, ...) still
 # resolve only under the legacy "odds" instrument_type. During the migration
