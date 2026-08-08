@@ -34,6 +34,7 @@ from .venue_constants import (
     SBOBET,
     SHARPAPI,
     SKYBET,
+    SMARKETS,
     SOCCER_FOOTBALL_INFO,
     SPORTS_BOOKMAKER_API_VENUES,
     SPORTS_BOOKMAKER_WEB_VENUES,
@@ -80,6 +81,7 @@ SPORTS_VENUE_TYPE_MAP.update(dict.fromkeys(SPORTS_DATA_VENUES, SportsVenueType.D
 SPORTS_AUTH_MAP: dict[str, SportsAuthMethod] = {
     BETFAIR: SportsAuthMethod.SESSION_TOKEN,
     MATCHBOOK: SportsAuthMethod.API_KEY,
+    SMARKETS: SportsAuthMethod.API_KEY,
     POLYMARKET: SportsAuthMethod.WALLET_SIGNATURE,
     KALSHI: SportsAuthMethod.API_KEY,
     NOVIG: SportsAuthMethod.API_KEY,
@@ -196,3 +198,15 @@ SUPPORTED_MARKET_TYPES.update(dict.fromkeys(SPORTS_PREDICTION_MARKET_VENUES, _PR
 SUPPORTED_MARKET_TYPES.update(dict.fromkeys(SPORTS_BOOKMAKER_API_VENUES, _BOOKMAKER_API_MARKET_TYPES))
 SUPPORTED_MARKET_TYPES.update(dict.fromkeys(SPORTS_BOOKMAKER_WEB_VENUES, _BOOKMAKER_WEB_MARKET_TYPES))
 SUPPORTED_MARKET_TYPES.update(dict.fromkeys(SPORTS_DFS_VENUES, _DFS_MARKET_TYPES))
+
+
+def is_sports_venue_executable(venue: str) -> bool:
+    """True when a real IS reference-data adapter exists for this venue (VENUE_TO_ADAPTER_KEY != NO_ADAPTER_YET).
+
+    Separates the 'venue' axis (whose price is this) from the 'executable' axis
+    (can we actually place a bet here today). A venue being canonical does not imply
+    it is executable — the adapter must be registered and real (not NO_ADAPTER_YET).
+    """
+    from .venue_adapter_keys import NO_ADAPTER_YET, VENUE_TO_ADAPTER_KEY
+
+    return VENUE_TO_ADAPTER_KEY.get(venue, NO_ADAPTER_YET) != NO_ADAPTER_YET

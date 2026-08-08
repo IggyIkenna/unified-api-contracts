@@ -37,6 +37,10 @@ EXPECTED_SENTINEL_VENUES: frozenset[str] = frozenset(
         #  unaffected — it still bypasses VENUE_TO_ADAPTER_KEY/URDI via its hardcoded
         #  Yahoo branch; this sentinel was specifically about the reference-data side.)
         # MTDS-owned sports odds venues (Decision C, 2026-06-29).
+        # ODDS_API removed from VENUES_BY_ASSET_GROUP["sports"] 2026-08-08 (source, not venue)
+        # but still sentineled here because it remains in VENUE_TO_ADAPTER_KEY as a
+        # known-adapterless legacy entry (removing it from the key map would lose the
+        # explicit "no adapter" declaration).
         "ODDS_API",
         "PINNACLE",
         "BETFAIR_SB_UK",
@@ -49,15 +53,32 @@ EXPECTED_SENTINEL_VENUES: frozenset[str] = frozenset(
         "LADBROKES",
         "BET888SPORT",
         "SMARKETS",
-        # The 20 ODDS_API fan-out bookmakers (BETMGM..WILLIAMHILL) that were
-        # promoted into VENUES_BY_ASSET_GROUP["sports"] + sentineled here
-        # 2026-07-20 were REVERTED 2026-07-22 (operator ruling: "do NOT add
-        # them, in fact remove them everywhere so they don't come up in audit"
-        # — distinct_values_noncanonical_audit_2026_07_20.md). They are no
-        # longer canonical venues, so they are correctly ABSENT from this set
-        # too (this set only covers canonical-but-adapterless venues). See
-        # `market_data_categories.SPORTS_ODDS_API_ACCEPTED_NONCANONICAL_BOOKMAKERS`
-        # for where they now live instead.
+        # ODDS_API fan-out bookmakers promoted into VENUES_BY_ASSET_GROUP["sports"]
+        # 2026-08-08 (sports_taxonomy_p1_capture_and_contracts_2026_08_08.md).
+        # Under the "venue = whose price" model these are legitimate canonical venues;
+        # no IS reference adapter exists (MTDS-owned odds venues) — executable=False.
+        "BETMGM",
+        "BETONLINEAG",
+        "BETOPENLY",
+        "BETRIVERS",
+        "BETSSON",
+        "BETVICTOR",
+        "BETWAY",
+        "BOVADA",
+        "CASUMO",
+        "CORAL",
+        "LIVESCOREBET",
+        "MATCHBOOK",
+        "NOVIG",
+        "ONEXBET",
+        "PADDYPOWER",
+        "PROPHETX",
+        "SKYBET",
+        "UNIBET",
+        "UNIBET_EU",
+        "UNIBET_UK",
+        "VIRGINBET",
+        "WILLIAMHILL",
         # Sports enrichment providers (2026-07-29): each has a WORKING adapter class, but
         # in instruments-service's separate sports-only sub-factory
         # (reference_data/adapters/sports/factory.py, base class

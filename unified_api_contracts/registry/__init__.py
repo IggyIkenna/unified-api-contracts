@@ -17,6 +17,7 @@ from ._sports_venue_constants import (
     SportsAggregatorType,
     SportsAuthMethod,
     SportsVenueType,
+    is_sports_venue_executable,
 )
 from .archetype_capability_matrix import (
     ASSET_GROUP_ONTOLOGY,
@@ -588,6 +589,8 @@ from .venue_constants import (
     UNDERDOG,
     UNDERSTAT,
     UNIBET,
+    UNIBET_EU,
+    UNIBET_UK,
     UNISWAP_V2_ETH,
     UNISWAP_V3_ETH,
     UNISWAP_V4_ETH,
@@ -979,6 +982,8 @@ __all__ = [
     "UNDERDOG",
     "UNDERSTAT",
     "UNIBET",
+    "UNIBET_EU",
+    "UNIBET_UK",
     "UNISWAP_QUOTER_V2_BY_CHAIN",
     "UNISWAP_SWAP_ROUTER_BY_CHAIN",
     "UNISWAP_V2_ETH",
@@ -1208,6 +1213,7 @@ __all__ = [
     "is_processed_data_type",
     "is_recognized_tradfi_underlying",
     "is_shard_axis",
+    "is_sports_venue_executable",
     "is_supported_venue",
     "is_tardis_free_date",
     "is_token_equivalent",
