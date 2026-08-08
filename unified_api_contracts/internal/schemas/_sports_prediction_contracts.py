@@ -112,28 +112,30 @@ SPORTS_ODDS_TRADES = SchemaContract(
 )
 
 # ---------------------------------------------------------------------------
-# Sports (odds) — EXCHANGE_ODDS / FIXED_ODDS fork (contracts-first migration,
-# sports_closeout_exchange_fixed_odds_fork_2026_07_25.md todo 3). Same row
-# schema as SPORTS_ODDS_TRADES — the fork splits the manifest/GCS
-# instrument_type partition by venue class (peer-to-peer exchange vs
-# sportsbook), it does not change the captured columns. The legacy ``odds``
-# contract above stays registered for the dual-read window (next todo).
+# Sports (odds) — canonical ``data_type=odds`` (trades→odds collapse,
+# sports_taxonomy_p1_capture_and_contracts_2026_08_08.md operator ruling 4).
+# Same row schema as SPORTS_ODDS_TRADES plus ``in_play`` boolean.  The legacy
+# ``data_type=trades`` contract stays registered as a compat alias at
+# ``("sports","odds","trades")`` for the P2 migration window.
 # ---------------------------------------------------------------------------
 
-SPORTS_EXCHANGE_ODDS_TRADES = SchemaContract(
+SPORTS_ODDS = SchemaContract(
     asset_group="sports",
-    instrument_type="exchange_odds",
-    data_type="trades",
-    columns=SPORTS_ODDS_TRADES.columns,
-    symbol_column="fixture_id",
-    required_row_count_min=1,
-)
-
-SPORTS_FIXED_ODDS_TRADES = SchemaContract(
-    asset_group="sports",
-    instrument_type="fixed_odds",
-    data_type="trades",
-    columns=SPORTS_ODDS_TRADES.columns,
+    instrument_type="odds",
+    data_type="odds",
+    columns=[
+        *SPORTS_ODDS_TRADES.columns,
+        ColumnSpec(
+            name="in_play",
+            dtype="bool",
+            nullable=False,
+            description=(
+                "True when bm_minutes_to_kickoff < 0 (game has already kicked off). "
+                "Derivable from the ``bm_minutes_to_kickoff`` column; materialised here "
+                "so consumers do not re-derive it."
+            ),
+        ),
+    ],
     symbol_column="fixture_id",
     required_row_count_min=1,
 )
@@ -637,9 +639,8 @@ PREDICTION_PREDICTION_MARKET_FILLS = SchemaContract(
 # Registry side-effects
 # ---------------------------------------------------------------------------
 
-CONTRACT_REGISTRY[("sports", "odds", "trades")] = SPORTS_ODDS_TRADES
-CONTRACT_REGISTRY[("sports", "exchange_odds", "trades")] = SPORTS_EXCHANGE_ODDS_TRADES
-CONTRACT_REGISTRY[("sports", "fixed_odds", "trades")] = SPORTS_FIXED_ODDS_TRADES
+CONTRACT_REGISTRY[("sports", "odds", "odds")] = SPORTS_ODDS
+CONTRACT_REGISTRY[("sports", "odds", "trades")] = SPORTS_ODDS_TRADES  # compat alias — P2 migration window
 CONTRACT_REGISTRY[("prediction", "prediction_market", "trades")] = PREDICTION_PREDICTION_MARKET_TRADES
 CONTRACT_REGISTRY[("prediction", "prediction_market", "book_snapshot_5")] = PREDICTION_PREDICTION_MARKET_BOOK_SNAPSHOT
 CONTRACT_REGISTRY[("prediction", "prediction_market", "market_metadata")] = PREDICTION_PREDICTION_MARKET_METADATA
@@ -655,8 +656,7 @@ __all__ = [
     "PREDICTION_PREDICTION_MARKET_FILLS",
     "PREDICTION_PREDICTION_MARKET_METADATA",
     "PREDICTION_PREDICTION_MARKET_TRADES",
-    "SPORTS_EXCHANGE_ODDS_TRADES",
-    "SPORTS_FIXED_ODDS_TRADES",
+    "SPORTS_ODDS",
     "SPORTS_ODDS_ARBITRAGE",
     "SPORTS_ODDS_HORIZON_BUCKET",
     "SPORTS_ODDS_MOVEMENT",
