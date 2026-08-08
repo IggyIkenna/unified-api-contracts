@@ -44,12 +44,14 @@ from unified_api_contracts.external.odds_api.schemas import (
 )
 from unified_api_contracts.registry._sports_venue_constants import (
     SUPPORTED_MARKET_TYPES,
+    derive_sports_odds_instrument_type,
 )
 from unified_api_contracts.registry.venue_constants import (
     INSTRUMENT_TYPES_BY_VENUE,
     SPORTS_BET_PLACEMENT_VENUES,
     SPORTS_BOOKMAKER_API_VENUES,
     SPORTS_BOOKMAKER_WEB_VENUES,
+    SPORTS_DATA_VENUES,
     SPORTS_DFS_VENUES,
     SPORTS_EXCHANGE_VENUES,
     SPORTS_PREDICTION_MARKET_VENUES,
@@ -222,6 +224,52 @@ class TestSportsVenuesInInstrumentTypes:
             assert venue in INSTRUMENT_TYPES_BY_VENUE, (
                 f"Bet placement venue {venue} missing from INSTRUMENT_TYPES_BY_VENUE"
             )
+
+
+# ---------------------------------------------------------------------------
+# 4b. derive_sports_odds_instrument_type — exchange_odds/fixed_odds retirement
+# (sports_taxonomy_p1_capture_and_contracts_2026_08_08.md operator ruling 9:
+# derive the split from the venue at read time instead of stamping it).
+# ---------------------------------------------------------------------------
+
+
+class TestDeriveSportsOddsInstrumentType:
+    """Every venue self-classifies via SPORTS_VENUE_TYPE_MAP — no hand-enumerated subset."""
+
+    def test_exchange_venues_derive_exchange_odds(self) -> None:
+        for venue in SPORTS_EXCHANGE_VENUES:
+            assert derive_sports_odds_instrument_type(venue) == "exchange_odds", venue
+
+    def test_bookmaker_api_venues_derive_fixed_odds(self) -> None:
+        for venue in SPORTS_BOOKMAKER_API_VENUES:
+            assert derive_sports_odds_instrument_type(venue) == "fixed_odds", venue
+
+    def test_bookmaker_web_venues_derive_fixed_odds(self) -> None:
+        for venue in SPORTS_BOOKMAKER_WEB_VENUES:
+            assert derive_sports_odds_instrument_type(venue) == "fixed_odds", venue
+
+    def test_prediction_market_venues_derive_none(self) -> None:
+        # Not part of the exchange/sportsbook axis -- callers fall back to the
+        # legacy generic "odds" contract for these, same as today.
+        for venue in SPORTS_PREDICTION_MARKET_VENUES:
+            assert derive_sports_odds_instrument_type(venue) is None, venue
+
+    def test_dfs_venues_derive_none(self) -> None:
+        for venue in SPORTS_DFS_VENUES:
+            assert derive_sports_odds_instrument_type(venue) is None, venue
+
+    def test_data_venues_derive_none(self) -> None:
+        # ODDS_API/FOOTYSTATS live here post-ruling-2 (sources, not venues) --
+        # confirms the resolver does not resurrect them onto the venue axis.
+        for venue in SPORTS_DATA_VENUES:
+            assert derive_sports_odds_instrument_type(venue) is None, venue
+
+    def test_unrecognised_venue_derives_none(self) -> None:
+        assert derive_sports_odds_instrument_type("NOT_A_REAL_VENUE") is None
+
+    def test_derive_is_case_insensitive(self) -> None:
+        for venue in SPORTS_EXCHANGE_VENUES:
+            assert derive_sports_odds_instrument_type(venue.lower()) == "exchange_odds", venue
 
 
 # ---------------------------------------------------------------------------
