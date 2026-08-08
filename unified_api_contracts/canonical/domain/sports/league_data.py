@@ -311,6 +311,54 @@ def canonical_sports_is_data_type(data_type: str) -> str | None:
     return SPORTS_IS_DATA_TYPE_LOWERCASE_FORM.get(upper)
 
 
+# Target collapse for the raw MTDS sports odds vocabulary (operator ruling 4,
+# ``plans/active/sports_taxonomy_p1_capture_and_contracts_2026_08_08.md`` —
+# "collapse the raw odds vocabulary to a single lowercase `odds`"). Today
+# ``trades`` (odds_api bookmaker quotes, 375,257 captured rows, mislabeled as
+# matched-bet events) and ``ODDS``/``odds`` (footystats pre-match odds,
+# 16,207 + 6,306 captured rows) are three tokens for what should be one raw
+# type; the two real populations stay distinguishable via the existing
+# ``source`` column (``odds_api`` vs ``footystats``) — exactly the axis that
+# should carry that distinction. ``trades`` is RE-RESERVED for genuine
+# matched volume, currently zero producers.
+#
+# This is the CONTRACT only, same as ``SPORTS_IS_DATA_TYPE_LOWERCASE_FORM``
+# above: the physical manifest re-stamp (writers switching the on-disk
+# data_type token) is P2 scope, gated the same way — see this plan's own
+# "Full exhaustive enumeration: P2 [REVIEW] P0" note on the collapse todo.
+# Deliberately NOT wired into ``DATA_TYPES_BY_ASSET_GROUP["sports"]``
+# (``market_data_categories.py``) or any writer/reader this phase.
+#
+# The ``in_play`` boolean column (derivable from ``bm_minutes_to_kickoff <
+# 0``) that retires ``trades_inplay`` is NOT added to ``SPORTS_ODDS_TRADES``
+# this phase either: ``validate_dataframe`` (``_validation.py``) flags a
+# declared column as ``missing_column`` whenever it is absent from the
+# dataframe, regardless of ``nullable``/``required`` — confirmed by direct
+# read, not assumed — so adding it now would flag every currently-shipping
+# row as a violation. This is the identical reason
+# ``SPORTS_ODDS_HORIZON_BUCKET`` was registered as its own contract instead
+# of an optional column bolted onto ``SPORTS_ODDS_TRADES``. Both the
+# physical re-stamp and the ``in_play`` column land together in P2, once the
+# writer actually populates them.
+SPORTS_ODDS_DATA_TYPE_CANONICAL_FORM: dict[str, str] = {
+    "trades": "odds",
+    "ODDS": "odds",
+    "odds": "odds",
+}
+
+
+def canonical_sports_odds_data_type(data_type: str) -> str | None:
+    """Return the TARGET collapsed form of a raw sports odds ``data_type``.
+
+    Accepts ``trades``, ``ODDS`` (footystats legacy uppercase), or ``odds``
+    (already-canonical); returns ``None`` for an unrecognised token. P1
+    contract only — see :data:`SPORTS_ODDS_DATA_TYPE_CANONICAL_FORM`'s
+    docstring for why the physical re-stamp + ``in_play`` column are
+    deferred to P2.
+    """
+    return SPORTS_ODDS_DATA_TYPE_CANONICAL_FORM.get(data_type)
+
+
 # ---------------------------------------------------------------------------
 # Structural (league x source) honest-absence gaps (operator 2026-06-27 #6)
 # ---------------------------------------------------------------------------
