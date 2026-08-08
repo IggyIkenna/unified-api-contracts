@@ -492,7 +492,7 @@ TRADFI_EQUITY_OHLCV_1M = SchemaContract(
 # Sports (odds) and Prediction (Polymarket CLOB) contracts are declared in
 # ``_sports_prediction_contracts`` and imported here via a side-effect import
 # to keep this module under the 900-line codex-compliance limit. Re-exports
-# below preserve ``from ...contracts import SPORTS_ODDS_TRADES`` API.
+# below re-export the renamed contracts (SPORTS_ODDS_RAW etc., 2026-08-08 sports taxonomy P1).
 
 # ---------------------------------------------------------------------------
 # Built-in contracts — DeFi
@@ -1215,8 +1215,8 @@ _SPORTS_ODDS_DERIVED_CANDLE_PREFIXES: tuple[str, ...] = (
 # partitions ahead of every odds data_type getting its own fork entry), a
 # lookup for one of these instrument_types against an as-yet-unforked
 # data_type must still resolve -- the row schema is identical, only the
-# partition key differs (SPORTS_EXCHANGE_ODDS_TRADES/SPORTS_FIXED_ODDS_TRADES
-# share SPORTS_ODDS_TRADES.columns by reference).
+# partition key differs (SPORTS_EXCHANGE_ODDS_RAW/SPORTS_FIXED_ODDS_RAW
+# share SPORTS_ODDS_RAW.columns by reference).
 _SPORTS_ODDS_FORK_INSTRUMENT_TYPES: tuple[str, ...] = ("exchange_odds", "fixed_odds")
 
 
@@ -1429,10 +1429,10 @@ from unified_api_contracts.internal.schemas._sports_prediction_contracts import 
     PREDICTION_PREDICTION_MARKET_TRADES as PREDICTION_PREDICTION_MARKET_TRADES,
 )
 from unified_api_contracts.internal.schemas._sports_prediction_contracts import (
-    SPORTS_EXCHANGE_ODDS_TRADES as SPORTS_EXCHANGE_ODDS_TRADES,
+    SPORTS_EXCHANGE_ODDS_RAW as SPORTS_EXCHANGE_ODDS_RAW,
 )
 from unified_api_contracts.internal.schemas._sports_prediction_contracts import (
-    SPORTS_FIXED_ODDS_TRADES as SPORTS_FIXED_ODDS_TRADES,
+    SPORTS_FIXED_ODDS_RAW as SPORTS_FIXED_ODDS_RAW,
 )
 from unified_api_contracts.internal.schemas._sports_prediction_contracts import (
     SPORTS_ODDS_ARBITRAGE as SPORTS_ODDS_ARBITRAGE,
@@ -1444,10 +1444,10 @@ from unified_api_contracts.internal.schemas._sports_prediction_contracts import 
     SPORTS_ODDS_MOVEMENT as SPORTS_ODDS_MOVEMENT,
 )
 from unified_api_contracts.internal.schemas._sports_prediction_contracts import (
-    SPORTS_ODDS_SNAPSHOT as SPORTS_ODDS_SNAPSHOT,
+    SPORTS_ODDS_RAW as SPORTS_ODDS_RAW,
 )
 from unified_api_contracts.internal.schemas._sports_prediction_contracts import (
-    SPORTS_ODDS_TRADES as SPORTS_ODDS_TRADES,
+    SPORTS_ODDS_SNAPSHOT as SPORTS_ODDS_SNAPSHOT,
 )
 
 __all__ = [
@@ -1498,13 +1498,13 @@ __all__ = [
     "OUTCOME_TO_MARKET_TYPE",
     "PREDICTION_PREDICTION_MARKET_TRADES",
     "SLUG_PREFIX_MAP",
-    "SPORTS_EXCHANGE_ODDS_TRADES",
-    "SPORTS_FIXED_ODDS_TRADES",
+    "SPORTS_EXCHANGE_ODDS_RAW",
+    "SPORTS_FIXED_ODDS_RAW",
     "SPORTS_ODDS_ARBITRAGE",
     "SPORTS_ODDS_HORIZON_BUCKET",
     "SPORTS_ODDS_MOVEMENT",
+    "SPORTS_ODDS_RAW",
     "SPORTS_ODDS_SNAPSHOT",
-    "SPORTS_ODDS_TRADES",
     "TRADFI_COMBO_TRADES",
     "TRADFI_EQUITY_OHLCV_1M",
     "TRADFI_EQUITY_TRADES",

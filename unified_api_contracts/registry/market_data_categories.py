@@ -322,34 +322,16 @@ DATA_TYPES_BY_ASSET_GROUP: dict[str, list[str]] = {
         # markets/outcomes/settlements removed 2026-08-08 (sports taxonomy P1, operator ruling
         # #8) — 0 rows ever written, pure phantom declarations. ML labels come from IS
         # fixtures_outcomes/matches (post-lowercasing in P1), not from these retired types.
-        # ── Bet/trade events (PINNACLE, BETFAIR_SB_UK/EX_UK/EX_EU, DRAFTKINGS, FANDUEL) ──
-        "trades",  # Matched bets / trade-level acceptance events (aligned with CeFi/prediction)
-        # NOTE: "TRADES" (uppercase) briefly existed here 2026-07-23..2026-07-27 (K1,
-        # mtds@2536b91c) as a "canonical uppercase form" — REVERTED: the 2026-07-23
-        # reconciliation (sports_consolidated_closeout_2026_07_19.md) decided sports
-        # data_type/instrument_type is lower-case for the whole vocabulary, no UPPER
-        # exception. Do not re-add without re-opening that decision.
-        # 2026-07-17 (operator ruling OR-5b(c), sports legacy-bucket cutover): POST-KICKOFF
-        # ("in-play") bookmaker quotes recovered from the legacy MDT bucket, kept as a
-        # population DISTINCT from pre-match ``trades`` so the observations survive the
-        # legacy-bucket delete without contaminating the pre-match T-0 horizon path.
-        # Discriminator at write time: ``bm_minutes_to_kickoff < 0``.
-        #
-        # Three deliberate NON-registrations keep this inert for the LIVE sports fleet —
-        # do NOT "complete" them without re-measuring, they are the safety design:
-        #   1. NOT in ``SPORTS_DATA_TYPE_TO_SOURCE`` — that (not this dict) is the axis the
-        #      v2 expected-universe enumerator iterates for sports
-        #      (``instruments-service/scripts/enumerate_expected_universe.py::_sports_data_types``).
-        #      Adding it there would mint ``expected_unattempted`` rows across every sports
-        #      instrument x date — the flood this exclusion exists to prevent.
-        #   2. NO ``AVAILABILITY_AT_SEMANTICS`` entry — mirrors ``("sports","trades")``, which
-        #      also has none. Registering one would switch the availability gate ON for the
-        #      live MDT sports fleet (the hazard @57bcc7c5 refused for PLAYER_STATS).
-        #   3. NOT in ``total_universe`` — that enumerates data_types for cefi/defi/tradfi only.
-        # Readers are filename-scoped too: the quarantined objects are written as
-        # ``inplay_ticks.parquet`` (never ``ticks.parquet``), because
-        # ``reprocess_sports_odds.py::_is_consumable_trades_blob`` matches on FILENAME alone.
-        "trades_inplay",
+        # ── Matched bet/trade events — re-reserved 2026-08-08 (sports_taxonomy_p1) for genuine
+        # matched bet volume (PINNACLE executions, BETFAIR exchange-matched trades, etc.).
+        # ZERO current producers. Raw bookmaker quotes formerly written under this token now
+        # use ``odds`` (data_type="odds"). Three deliberate NON-registrations keep this inert:
+        #   1. NOT in ``SPORTS_DATA_TYPE_TO_SOURCE``
+        #   2. NO ``AVAILABILITY_AT_SEMANTICS`` entry
+        #   3. NOT in ``total_universe``
+        "trades",
+        # trades_inplay REMOVED 2026-08-08 (sports_taxonomy_p1): retired data_type.
+        # In-play discrimination is now the ``in_play`` boolean column on data_type="odds".
     ],
     "prediction": [
         # Canonical names — aligned with CeFi. Legacy prediction_* names retired
@@ -948,21 +930,12 @@ SPORTS_VENUE_ACCEPTED_CROSS_AG_BLEED: frozenset[str] = frozenset(
 # vocabulary lowercases with it), so this set is retired to EMPTY rather than corrected in
 # place. Tracked by `/plans/active/sports_taxonomy_p1_capture_and_contracts_2026_08_08.md`
 # (contract) and `/plans/active/sports_taxonomy_p2_migration_2026_08_08.md` (re-stamp).
-# Until that lands the set stays populated so the panel does not regress — but do NOT read
-# it as evidence these values are dead. See
-# `/codex/02-data/entity-rename-and-split-consumer-migration-rule.md` § "Anti-pattern: the
-# accepted-exception escape hatch".
-#
-# NOT a canonical set — never merge into
-# DATA_TYPES_BY_ASSET_GROUP["sports"] (the K1/K2 revert deliberately keeps this lowercase-
-# only). Consumed by `_ACCEPTED_EXCEPTIONS[("data_types", "sports")]`.
-SPORTS_DATA_TYPE_ACCEPTED_STALE_UPPERCASE_RESIDUE: frozenset[str] = frozenset(
-    {
-        "ODDS",
-        "ODDS_MOVEMENT",
-        "ODDS_SNAPSHOT",
-    }
-)
+# Retired to empty 2026-08-08 (sports_taxonomy_p1): the writer now emits lowercase "odds";
+# P2 (sports_taxonomy_p2_migration_2026_08_08.md) will re-stamp the 6,306 historical
+# manifest rows that still carry "ODDS" (FOOTYSTATS). Until P2 lands, the distinct-values
+# panel will flag the uppercase residue — that is expected and tracked.
+# NOT a canonical set — Consumed by `_ACCEPTED_EXCEPTIONS[("data_types", "sports")]`.
+SPORTS_DATA_TYPE_ACCEPTED_STALE_UPPERCASE_RESIDUE: frozenset[str] = frozenset()
 
 # Sports MDPS market-token instrument_type values (sports_instrument_type_market_token_
 # ssot_gap_2026_07_28.md; 4 more added 2026-08-04 per data_pipeline_reconciliation_sports_
@@ -1461,42 +1434,22 @@ VALID_DATA_TYPES_BY_AG_AND_INSTRUMENT_TYPE: dict[tuple[str, str], frozenset[str]
         # markets/outcomes/settlements removed 2026-08-08 (sports taxonomy P1) — retired.
     ),  # UNCERTAIN — sports-owner verify
     ("sports", "exchange_odds"): frozenset(  # UNCERTAIN — sports-owner verify
-        {"odds", "odds_snapshot", "odds_movement", "trades"}
+        {"odds", "odds_snapshot", "odds_movement"}
     ),
     ("sports", "fixed_odds"): frozenset(  # UNCERTAIN — sports-owner verify
         # markets/outcomes/settlements removed 2026-08-08 (sports taxonomy P1) — retired.
-        {"odds", "odds_snapshot", "odds_movement", "trades"}
+        {"odds", "odds_snapshot", "odds_movement"}
     ),
     ("sports", "prop"): frozenset(  # UNCERTAIN — sports-owner verify
         {"odds", "odds_snapshot", "odds_movement"}
     ),
-    # ("sports", "odds") — closes the matrix hole found by
-    # sports_shard_enumeration_cartesian_blowup_2026_07_20.md Part 2 item 2.3
-    # (2026-07-22). Unlike its four neighbours above, this entry is CONFIRMED,
-    # not UNCERTAIN: CONTRACT_REGISTRY[("sports","odds","trades")] =
-    # SPORTS_ODDS_TRADES is a real, registered SchemaContract
-    # (_sports_prediction_contracts.py), and prod carries 1,806,527 rows under
-    # exactly this (instrument_type=odds, data_type=trades) pair. Before this
-    # entry existed the pair had NO matrix row at all, so every one of those
-    # rows silently rode the "unmapped instrument_type" fallback path instead
-    # of an audited entry.
-    # "TRADES" (uppercase) was added to the value set 2026-07-23 when K1
-    # (mtds@2536b91c, 2026-07-22) flipped the live writer to emit
-    # instrument_type=ODDS/data_type=TRADES and K2 migrated the historical
-    # corpus to match. **REVERTED 2026-07-27**: the same-day 2026-07-23
-    # reconciliation (sports_consolidated_closeout_2026_07_19.md, "Canonical
-    # target") decided sports data_type/instrument_type is LOWER-case for the
-    # WHOLE vocabulary, no UPPER exception — K1/K2 are being reverted, not kept.
-    # The lowercase "odds"/"trades" pair is the sole canonical form again.
-    # "odds_horizon_bucket" added 2026-08-08 (sports_taxonomy_p1_capture_and_
-    # contracts_2026_08_08.md, first-class horizon axis): CONFIRMED, not
-    # UNCERTAIN, same basis as "trades" above — CONTRACT_REGISTRY[("sports",
-    # "odds", "odds_horizon_bucket")] = SPORTS_ODDS_HORIZON_BUCKET is a real,
-    # registered SchemaContract and MDPS SportsBucketAssignmentAdapter is the
-    # live, sole writer of this data_type. Folding it into a lowercase "odds"
-    # data_type (per operator ruling 5) is the P2 data re-stamp — this entry
-    # covers the data_type as it is captured TODAY.
-    ("sports", "odds"): frozenset({"trades", "odds_horizon_bucket"}),
+    # ("sports", "odds") — CONFIRMED. "odds" (raw bookmaker quotes, formerly written as
+    # "trades" pre-2026-08-08): CONTRACT_REGISTRY[("sports","odds","odds")] = SPORTS_ODDS_RAW.
+    # "odds_horizon_bucket": CONTRACT_REGISTRY[("sports","odds","odds_horizon_bucket")] =
+    # SPORTS_ODDS_HORIZON_BUCKET (MDPS SportsBucketAssignmentAdapter, live writer).
+    # Updated 2026-08-08 (sports_taxonomy_p1): "trades" collapsed into "odds" per operator
+    # ruling — raw bookmaker quotes now canonical under the "odds" token only.
+    ("sports", "odds"): frozenset({"odds", "odds_horizon_bucket"}),
 }
 
 
