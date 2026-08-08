@@ -10,11 +10,17 @@ performs a lookup.
 
 Sports:
     ``(category=sports, venue=BOOKMAKER, source=odds_api|sfi|footystats,
-       league_id=EPL|LALIGA|…, instrument_type=odds, data_type=trades)``
+       league_id=EPL|LALIGA|…, instrument_type=odds, data_type=odds)``
 
     ``venue`` (manifest/path dimension) is the bookmaker (BET365, PINNACLE,
     BETFAIR, MATCHBOOK, UNITY_BETFAIR). ``source`` is the provider.
     ``league_id`` is a first-class shard column — never overload ``venue``.
+
+    The canonical ``data_type`` is ``odds`` (operator ruling 4, 2026-08-08:
+    ``trades`` → ``odds``; ``in_play`` replaces the retired ``trades_inplay``
+    data_type as a boolean column). ``SPORTS_ODDS_TRADES`` stays registered for
+    the backward-compat dual-read window while existing on-disk
+    ``data_type=trades`` rows are migrated (P2 scope).
 
     **Row-level schema (SPORTS_ODDS_TRADES contract, corrected 2026-07-26 —
     T2.9 of `sports_mtds_odds_trades_index_correctness_followup_2026_07_24.md`):**
@@ -180,6 +186,37 @@ SPORTS_ODDS_HORIZON_BUCKET = SchemaContract(
     symbol_column="fixture_id",
     required_row_count_min=0,
 )
+
+# ---------------------------------------------------------------------------
+# Sports (odds) — unified raw-odds contract (operator ruling 4, 2026-08-08)
+# trades → odds; in_play as column (derivable from bm_minutes_to_kickoff < 0);
+# trades_inplay retired. The existing SPORTS_ODDS_TRADES stays registered for
+# backward-compat reads of on-disk data_type=trades rows during the P2
+# migration window. New writes land data_type=odds going forward.
+# ---------------------------------------------------------------------------
+
+SPORTS_ODDS = SchemaContract(
+    asset_group="sports",
+    instrument_type="odds",
+    data_type="odds",
+    columns=[
+        *SPORTS_ODDS_TRADES.columns,
+        ColumnSpec(
+            name="in_play",
+            dtype="bool",
+            nullable=False,
+            description=(
+                "True when the odds quote was offered after kickoff "
+                "(bm_minutes_to_kickoff < 0). Replaces the retired "
+                "trades_inplay data_type — pre-match vs in-play is now a "
+                "column, not a separate data_type partition."
+            ),
+        ),
+    ],
+    symbol_column="fixture_id",
+    required_row_count_min=0,
+)
+
 
 # ---------------------------------------------------------------------------
 # Prediction markets (Polymarket, Kalshi, …) — Phase 1.1
@@ -637,6 +674,7 @@ PREDICTION_PREDICTION_MARKET_FILLS = SchemaContract(
 # Registry side-effects
 # ---------------------------------------------------------------------------
 
+CONTRACT_REGISTRY[("sports", "odds", "odds")] = SPORTS_ODDS
 CONTRACT_REGISTRY[("sports", "odds", "trades")] = SPORTS_ODDS_TRADES
 CONTRACT_REGISTRY[("sports", "exchange_odds", "trades")] = SPORTS_EXCHANGE_ODDS_TRADES
 CONTRACT_REGISTRY[("sports", "fixed_odds", "trades")] = SPORTS_FIXED_ODDS_TRADES
@@ -657,6 +695,7 @@ __all__ = [
     "PREDICTION_PREDICTION_MARKET_TRADES",
     "SPORTS_EXCHANGE_ODDS_TRADES",
     "SPORTS_FIXED_ODDS_TRADES",
+    "SPORTS_ODDS",
     "SPORTS_ODDS_ARBITRAGE",
     "SPORTS_ODDS_HORIZON_BUCKET",
     "SPORTS_ODDS_MOVEMENT",

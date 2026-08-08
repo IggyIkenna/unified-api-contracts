@@ -324,34 +324,23 @@ DATA_TYPES_BY_ASSET_GROUP: dict[str, list[str]] = {
         "markets",  # Market metadata (event/market listings per bookmaker)
         "outcomes",  # Outcome results (settled markets)
         "settlements",  # Settlement records (payout confirmation)
-        # ── Bet/trade events (PINNACLE, BETFAIR_SB_UK/EX_UK/EX_EU, DRAFTKINGS, FANDUEL) ──
-        "trades",  # Matched bets / trade-level acceptance events (aligned with CeFi/prediction)
-        # NOTE: "TRADES" (uppercase) briefly existed here 2026-07-23..2026-07-27 (K1,
-        # mtds@2536b91c) as a "canonical uppercase form" — REVERTED: the 2026-07-23
-        # reconciliation (sports_consolidated_closeout_2026_07_19.md) decided sports
-        # data_type/instrument_type is lower-case for the whole vocabulary, no UPPER
-        # exception. Do not re-add without re-opening that decision.
-        # 2026-07-17 (operator ruling OR-5b(c), sports legacy-bucket cutover): POST-KICKOFF
-        # ("in-play") bookmaker quotes recovered from the legacy MDT bucket, kept as a
-        # population DISTINCT from pre-match ``trades`` so the observations survive the
-        # legacy-bucket delete without contaminating the pre-match T-0 horizon path.
-        # Discriminator at write time: ``bm_minutes_to_kickoff < 0``.
-        #
-        # Three deliberate NON-registrations keep this inert for the LIVE sports fleet —
-        # do NOT "complete" them without re-measuring, they are the safety design:
-        #   1. NOT in ``SPORTS_DATA_TYPE_TO_SOURCE`` — that (not this dict) is the axis the
-        #      v2 expected-universe enumerator iterates for sports
-        #      (``instruments-service/scripts/enumerate_expected_universe.py::_sports_data_types``).
-        #      Adding it there would mint ``expected_unattempted`` rows across every sports
-        #      instrument x date — the flood this exclusion exists to prevent.
-        #   2. NO ``AVAILABILITY_AT_SEMANTICS`` entry — mirrors ``("sports","trades")``, which
-        #      also has none. Registering one would switch the availability gate ON for the
-        #      live MDT sports fleet (the hazard @57bcc7c5 refused for PLAYER_STATS).
-        #   3. NOT in ``total_universe`` — that enumerates data_types for cefi/defi/tradfi only.
-        # Readers are filename-scoped too: the quarantined objects are written as
-        # ``inplay_ticks.parquet`` (never ``ticks.parquet``), because
-        # ``reprocess_sports_odds.py::_is_consumable_trades_blob`` matches on FILENAME alone.
-        "trades_inplay",
+        # ── Re-RESERVED for genuine matched volume — ZERO current producers ──
+        # Operator ruling 4 (2026-08-08): bookmaker QUOTES were incorrectly labelled
+        # ``trades`` (nothing is actually traded in this flow). The raw-quote
+        # data_type is now ``odds``; ``in_play`` (bm_minutes_to_kickoff < 0) is a
+        # column on that contract, replacing the retired ``trades_inplay`` data_type.
+        # ``trades`` is kept declared here so it can be re-assigned to genuine
+        # matched-volume events (exchange fills) when a real writer exists. It MUST
+        # remain inert until then:
+        #   1. NOT in ``SPORTS_DATA_TYPE_TO_SOURCE`` (enumerator skips it — no phantom
+        #      expected_unattempted flood).
+        #   2. NO ``AVAILABILITY_AT_SEMANTICS`` entry (gate stays OFF).
+        #   3. NOT in ``total_universe``.
+        "trades",  # RESERVED — genuine matched volume, 0 current producers
+        # ``trades_inplay`` RETIRED 2026-08-08 (operator ruling 4): the in-play/pre-match
+        # distinction is now the ``in_play`` boolean column on SPORTS_ODDS (data_type=odds),
+        # not a separate data_type. The 111 legacy fossil rows (2022-09) remain on GCS
+        # but no new writes are produced. Cleanup in P2.
     ],
     "prediction": [
         # Canonical names — aligned with CeFi. Legacy prediction_* names retired
@@ -1467,7 +1456,12 @@ VALID_DATA_TYPES_BY_AG_AND_INSTRUMENT_TYPE: dict[tuple[str, str], frozenset[str]
     # live, sole writer of this data_type. Folding it into a lowercase "odds"
     # data_type (per operator ruling 5) is the P2 data re-stamp — this entry
     # covers the data_type as it is captured TODAY.
-    ("sports", "odds"): frozenset({"trades", "odds_horizon_bucket"}),
+    # "odds" (data_type) added 2026-08-08 (operator ruling 4): the canonical
+    # unified raw-quote type replacing "trades" — CONTRACT_REGISTRY[("sports",
+    # "odds", "odds")] = SPORTS_ODDS is the real registered SchemaContract; new
+    # writes land data_type=odds going forward. "trades" kept during the
+    # dual-read migration window (P2 re-stamps on-disk rows).
+    ("sports", "odds"): frozenset({"odds", "trades", "odds_horizon_bucket"}),
 }
 
 

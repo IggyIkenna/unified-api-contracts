@@ -19,6 +19,7 @@ from unified_api_contracts.internal.schemas.contracts import (
     PREDICTION_PREDICTION_MARKET_TRADES,
     SPORTS_EXCHANGE_ODDS_TRADES,
     SPORTS_FIXED_ODDS_TRADES,
+    SPORTS_ODDS,
     SPORTS_ODDS_HORIZON_BUCKET,
     SPORTS_ODDS_SNAPSHOT,
     SPORTS_ODDS_TRADES,
@@ -270,6 +271,90 @@ def test_sports_odds_horizon_bucket_validates_sample_dataframe() -> None:
     )
     violations = validate_dataframe(df, SPORTS_ODDS_HORIZON_BUCKET)
     assert violations == [], f"expected no violations, got {violations}"
+
+
+# ---------------------------------------------------------------------------
+# SPORTS_ODDS — unified raw-odds contract (operator ruling 4, 2026-08-08)
+# trades → odds; in_play as column; trades_inplay retired.
+# sports_taxonomy_p1_capture_and_contracts_2026_08_08.md Block B todo 3.
+# ---------------------------------------------------------------------------
+
+
+def test_sports_odds_registered_in_contract_registry() -> None:
+    contract = CONTRACT_REGISTRY[("sports", "odds", "odds")]
+    assert contract is SPORTS_ODDS
+
+
+def test_sports_odds_lookup_returns_contract() -> None:
+    contract = lookup_contract(asset_group="sports", instrument_type="odds", data_type="odds")
+    assert contract is SPORTS_ODDS
+
+
+def test_sports_odds_has_in_play_column() -> None:
+    by_name = {c.name: c for c in SPORTS_ODDS.columns}
+    assert "in_play" in by_name
+
+
+def test_sports_odds_in_play_is_non_nullable_bool() -> None:
+    by_name = {c.name: c for c in SPORTS_ODDS.columns}
+    assert by_name["in_play"].nullable is False
+    assert by_name["in_play"].dtype == "bool"
+
+
+def test_sports_odds_shares_base_columns_with_trades_contract() -> None:
+    """SPORTS_ODDS is SPORTS_ODDS_TRADES columns + in_play."""
+    raw_names = {c.name for c in SPORTS_ODDS_TRADES.columns}
+    new_names = {c.name for c in SPORTS_ODDS.columns}
+    assert new_names == raw_names | {"in_play"}
+
+
+def test_sports_odds_symbol_column_is_fixture_id() -> None:
+    assert SPORTS_ODDS.symbol_column == "fixture_id"
+
+
+def test_sports_odds_validates_sample_dataframe() -> None:
+    df = pd.DataFrame(
+        {
+            "instrument_id": pd.Series(
+                ["FOOTBALL:BETFAIR_EX_UK:MATCH_ODDS:EPL:2025-26:ARSENAL-CHELSEA::HOME"],
+                dtype="string",
+            ),
+            "bookmaker_key": pd.Series(["BETFAIR_EX_UK"], dtype="string"),
+            "bm_time": pd.Series(["2026-03-22T14:00:00Z"], dtype="string"),
+            "source": pd.Series(["ODDS_API"], dtype="string"),
+            "league_id": pd.Series(["EPL"], dtype="string"),
+            "fixture_id": pd.Series(["EPL:ARSENAL_v_CHELSEA:20260322"], dtype="string"),
+            "market_key": pd.Series(["h2h"], dtype="string"),
+            "outcome_name": pd.Series(["HOME"], dtype="string"),
+            "price": pd.Series([1.85], dtype="float64"),
+            "in_play": pd.Series([False], dtype="bool"),
+        }
+    )
+    violations = validate_dataframe(df, SPORTS_ODDS)
+    assert violations == [], f"expected no violations, got {violations}"
+
+
+def test_sports_odds_trades_still_registered_during_migration_window() -> None:
+    """P2 migrates on-disk trades rows; legacy registry entry stays until then."""
+    assert ("sports", "odds", "trades") in CONTRACT_REGISTRY
+    assert CONTRACT_REGISTRY[("sports", "odds", "trades")] is SPORTS_ODDS_TRADES
+
+
+def test_trades_inplay_not_in_sports_data_types() -> None:
+    """trades_inplay retired 2026-08-08 (operator ruling 4) — in_play is now a column."""
+    from unified_api_contracts.registry.market_data_categories import DATA_TYPES_BY_ASSET_GROUP
+
+    assert "trades_inplay" not in DATA_TYPES_BY_ASSET_GROUP["sports"]
+
+
+def test_odds_data_type_in_sports_valid_set() -> None:
+    """The new canonical data_type=odds appears in the sports/odds validity matrix."""
+    from unified_api_contracts.registry.market_data_categories import (
+        VALID_DATA_TYPES_BY_AG_AND_INSTRUMENT_TYPE,
+    )
+
+    valid = VALID_DATA_TYPES_BY_AG_AND_INSTRUMENT_TYPE[("sports", "odds")]
+    assert "odds" in valid
 
 
 # ---------------------------------------------------------------------------
