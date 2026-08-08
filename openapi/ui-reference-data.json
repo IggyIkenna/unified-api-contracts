@@ -1,13 +1,13 @@
 {
   "_meta": {
-    "version": "0.80.1.dev632+gd4045838a.d20260729",
+    "version": "0.97.1.dev850+ge092f3e95.d20260808",
     "generator": "generate_ui_reference_data.py",
     "registry_count": 15
   },
   "venue_error_map": {
     "registry_name": "venue_error_map",
-    "version": "0.80.1.dev632+gd4045838a.d20260729",
-    "venue_count": 55,
+    "version": "0.97.1.dev850+ge092f3e95.d20260808",
+    "venue_count": 56,
     "entries": {
       "aave_plasma": [
         {
@@ -1290,11 +1290,27 @@
         },
         {
           "venue": "databento",
+          "error_code": "DATABENTO_LOOKBACK_EXCEEDED",
+          "retry_safe": false,
+          "reconnect": false,
+          "action": "skip",
+          "description": "DatabentoLookbackExceededError \u2014 pre-request billing guard: the requested (data_type, start) falls outside the schema's free included-history window (L2/L3: 1 month, L1: 1 year). The shard is structurally (permanently) unavailable at our subscription tier, not a transient fetch failure \u2014 classify as honest-absence (SKIP), never attempted_failed. SSOT: registry/databento_subscription_allowlist.py."
+        },
+        {
+          "venue": "databento",
           "error_code": "DATABENTO_PAYMENT_REQUIRED",
           "retry_safe": false,
           "reconnect": false,
           "action": "fail",
           "description": "Payment Required from error message (insufficient credit / quota exceeded)"
+        },
+        {
+          "venue": "databento",
+          "error_code": "DATABENTO_SUBSCRIPTION_GUARD",
+          "retry_safe": false,
+          "reconnect": false,
+          "action": "skip",
+          "description": "DatabentoSubscriptionError (non-lookback) \u2014 pre-request billing guard: request's (dataset, schema, api) fell outside the paid subscription allowlist (wrong dataset, banned schema, or banned API). Structurally unavailable at our tier, not a transient failure \u2014 SKIP (honest absence). SSOT: registry/databento_subscription_allowlist.py."
         },
         {
           "venue": "databento",
@@ -2115,6 +2131,16 @@
           "description": "DSProxy execution failed \u2014 revert in spell"
         }
       ],
+      "internal": [
+        {
+          "venue": "internal",
+          "error_code": "UpstreamTimestampBiasError",
+          "retry_safe": true,
+          "reconnect": false,
+          "action": "retry",
+          "description": "MTDS write-time guard: adapter received ticks but ALL fell outside the requested day partition after interval filtering (upstream partition mislabeled, replay window wrong, or clock skew) \u2014 not a vendor API error."
+        }
+      ],
       "kalshi": [
         {
           "venue": "kalshi",
@@ -2130,6 +2156,22 @@
           "retry_safe": false,
           "reconnect": false,
           "action": "fail",
+          "description": "Unauthorized (bad/missing API key)"
+        },
+        {
+          "venue": "kalshi",
+          "error_code": "401",
+          "retry_safe": false,
+          "reconnect": false,
+          "action": "fail",
+          "description": "Unauthorized \u2014 invalid or expired API credentials"
+        },
+        {
+          "venue": "kalshi",
+          "error_code": "401",
+          "retry_safe": false,
+          "reconnect": false,
+          "action": "fail",
           "description": "Unauthorized \u2014 invalid or expired token"
         },
         {
@@ -2138,7 +2180,47 @@
           "retry_safe": false,
           "reconnect": false,
           "action": "fail",
+          "description": "Forbidden"
+        },
+        {
+          "venue": "kalshi",
+          "error_code": "403",
+          "retry_safe": false,
+          "reconnect": false,
+          "action": "fail",
+          "description": "Forbidden \u2014 IP blocked or endpoint not permitted at current tier"
+        },
+        {
+          "venue": "kalshi",
+          "error_code": "403",
+          "retry_safe": false,
+          "reconnect": false,
+          "action": "fail",
           "description": "Forbidden \u2014 insufficient permissions"
+        },
+        {
+          "venue": "kalshi",
+          "error_code": "404",
+          "retry_safe": false,
+          "reconnect": false,
+          "action": "skip",
+          "description": "Series/report not found for window"
+        },
+        {
+          "venue": "kalshi",
+          "error_code": "429",
+          "retry_safe": true,
+          "reconnect": false,
+          "action": "retry",
+          "description": "Rate limited \u2014 back off and retry"
+        },
+        {
+          "venue": "kalshi",
+          "error_code": "429",
+          "retry_safe": true,
+          "reconnect": false,
+          "action": "retry",
+          "description": "Rate limit exceeded (Kalshi basic tier: ~20 req/s published)"
         },
         {
           "venue": "kalshi",
@@ -2154,7 +2236,71 @@
           "retry_safe": true,
           "reconnect": false,
           "action": "retry",
+          "description": "Upstream server error"
+        },
+        {
+          "venue": "kalshi",
+          "error_code": "500",
+          "retry_safe": true,
+          "reconnect": false,
+          "action": "retry",
+          "description": "Kalshi internal server error \u2014 transient, retry-safe"
+        },
+        {
+          "venue": "kalshi",
+          "error_code": "500",
+          "retry_safe": true,
+          "reconnect": false,
+          "action": "retry",
           "description": "Internal server error"
+        },
+        {
+          "venue": "kalshi",
+          "error_code": "502",
+          "retry_safe": true,
+          "reconnect": false,
+          "action": "retry",
+          "description": "Bad gateway"
+        },
+        {
+          "venue": "kalshi",
+          "error_code": "502",
+          "retry_safe": true,
+          "reconnect": false,
+          "action": "retry",
+          "description": "Kalshi gateway error \u2014 transient, retry-safe"
+        },
+        {
+          "venue": "kalshi",
+          "error_code": "503",
+          "retry_safe": true,
+          "reconnect": false,
+          "action": "retry",
+          "description": "Service unavailable"
+        },
+        {
+          "venue": "kalshi",
+          "error_code": "503",
+          "retry_safe": true,
+          "reconnect": false,
+          "action": "retry",
+          "description": "Kalshi service unavailable \u2014 transient, retry-safe"
+        },
+        {
+          "venue": "kalshi",
+          "error_code": "504",
+          "retry_safe": true,
+          "reconnect": false,
+          "action": "retry",
+          "description": "Gateway timeout"
+        },
+        {
+          "venue": "kalshi",
+          "error_code": "CONNECTION_ERROR",
+          "retry_safe": true,
+          "reconnect": false,
+          "action": "retry",
+          "description": "Connection error (DNS/TCP/SSL) \u2014 transient infrastructure"
         },
         {
           "venue": "kalshi",
@@ -2171,6 +2317,22 @@
           "reconnect": false,
           "action": "fail",
           "description": "Market is not open for trading"
+        },
+        {
+          "venue": "kalshi",
+          "error_code": "TIMEOUT",
+          "retry_safe": true,
+          "reconnect": false,
+          "action": "retry",
+          "description": "Request timed out \u2014 transient network"
+        },
+        {
+          "venue": "kalshi",
+          "error_code": "TRADES_FETCH_FAILED",
+          "retry_safe": true,
+          "reconnect": false,
+          "action": "retry",
+          "description": "Per-ticker trades fetch died on a transport error (aiohttp.ClientError / TimeoutError / OSError) \u2014 transient, retry-safe"
         }
       ],
       "kraken": [
@@ -3048,6 +3210,14 @@
           "retry_safe": true,
           "reconnect": false,
           "action": "retry",
+          "description": "Rate limit exceeded (Polymarket Gamma/Data API \u2014 ~20 req/s observed safe)"
+        },
+        {
+          "venue": "polymarket",
+          "error_code": "429",
+          "retry_safe": true,
+          "reconnect": false,
+          "action": "retry",
           "description": "Rate limit exceeded"
         },
         {
@@ -3056,7 +3226,39 @@
           "retry_safe": true,
           "reconnect": false,
           "action": "retry",
+          "description": "Polymarket internal server error \u2014 transient, retry-safe"
+        },
+        {
+          "venue": "polymarket",
+          "error_code": "500",
+          "retry_safe": true,
+          "reconnect": false,
+          "action": "retry",
           "description": "Internal server error"
+        },
+        {
+          "venue": "polymarket",
+          "error_code": "502",
+          "retry_safe": true,
+          "reconnect": false,
+          "action": "retry",
+          "description": "Polymarket gateway error \u2014 transient, retry-safe"
+        },
+        {
+          "venue": "polymarket",
+          "error_code": "503",
+          "retry_safe": true,
+          "reconnect": false,
+          "action": "retry",
+          "description": "Polymarket service unavailable \u2014 transient, retry-safe"
+        },
+        {
+          "venue": "polymarket",
+          "error_code": "TRADES_FETCH_FAILED",
+          "retry_safe": true,
+          "reconnect": false,
+          "action": "retry",
+          "description": "Per-ticker trades fetch died on a transport error (aiohttp.ClientError / TimeoutError / OSError) \u2014 transient, retry-safe"
         }
       ],
       "soccer_football_info": [
@@ -3787,78 +3989,163 @@
   },
   "instruction_constraints": {
     "registry_name": "instruction_constraints",
-    "version": "0.80.1.dev632+gd4045838a.d20260729",
+    "version": "0.97.1.dev850+ge092f3e95.d20260808",
     "entry_count": 11,
     "entries": {
       "ADD_LIQUIDITY": {
-        "order_types": ["MARKET"],
-        "instrument_types": ["POOL"],
-        "venue_categories": ["defi"],
-        "operation_types": ["ADD_LIQUIDITY"],
+        "order_types": [
+          "MARKET"
+        ],
+        "instrument_types": [
+          "POOL"
+        ],
+        "venue_categories": [
+          "defi"
+        ],
+        "operation_types": [
+          "ADD_LIQUIDITY"
+        ],
         "requires_price": false,
         "allows_partial_fill": false
       },
       "COLLECT_FEES": {
-        "order_types": ["MARKET"],
-        "instrument_types": ["POOL"],
-        "venue_categories": ["defi"],
-        "operation_types": ["COLLECT_FEES"],
+        "order_types": [
+          "MARKET"
+        ],
+        "instrument_types": [
+          "POOL"
+        ],
+        "venue_categories": [
+          "defi"
+        ],
+        "operation_types": [
+          "COLLECT_FEES"
+        ],
         "requires_price": false,
         "allows_partial_fill": false
       },
       "FUTURES_ROLL": {
-        "order_types": ["LIMIT", "MARKET"],
-        "instrument_types": ["FUTURE"],
-        "venue_categories": ["cefi", "tradfi"],
-        "operation_types": ["BUY", "SELL"],
+        "order_types": [
+          "LIMIT",
+          "MARKET"
+        ],
+        "instrument_types": [
+          "FUTURE"
+        ],
+        "venue_categories": [
+          "cefi",
+          "tradfi"
+        ],
+        "operation_types": [
+          "BUY",
+          "SELL"
+        ],
         "requires_price": false,
         "allows_partial_fill": true
       },
       "OPTIONS_COMBO": {
-        "order_types": ["LIMIT", "MARKET"],
-        "instrument_types": ["OPTION"],
-        "venue_categories": ["cefi", "tradfi"],
-        "operation_types": ["BUY", "SELL"],
+        "order_types": [
+          "LIMIT",
+          "MARKET"
+        ],
+        "instrument_types": [
+          "OPTION"
+        ],
+        "venue_categories": [
+          "cefi",
+          "tradfi"
+        ],
+        "operation_types": [
+          "BUY",
+          "SELL"
+        ],
         "requires_price": true,
         "allows_partial_fill": true
       },
       "PREDICTION_BET": {
-        "order_types": ["LIMIT", "MARKET"],
-        "instrument_types": ["PREDICTION_MARKET"],
-        "venue_categories": ["prediction", "sports"],
-        "operation_types": ["BUY", "SELL"],
+        "order_types": [
+          "LIMIT",
+          "MARKET"
+        ],
+        "instrument_types": [
+          "PREDICTION_MARKET"
+        ],
+        "venue_categories": [
+          "prediction",
+          "sports"
+        ],
+        "operation_types": [
+          "BUY",
+          "SELL"
+        ],
         "requires_price": true,
         "allows_partial_fill": true
       },
       "REMOVE_LIQUIDITY": {
-        "order_types": ["MARKET"],
-        "instrument_types": ["POOL"],
-        "venue_categories": ["defi"],
-        "operation_types": ["REMOVE_LIQUIDITY"],
+        "order_types": [
+          "MARKET"
+        ],
+        "instrument_types": [
+          "POOL"
+        ],
+        "venue_categories": [
+          "defi"
+        ],
+        "operation_types": [
+          "REMOVE_LIQUIDITY"
+        ],
         "requires_price": false,
         "allows_partial_fill": false
       },
       "SPORTS_BET": {
-        "order_types": ["MARKET"],
-        "instrument_types": ["FIXED_ODDS", "PROP"],
-        "venue_categories": ["sports"],
-        "operation_types": ["BUY"],
+        "order_types": [
+          "MARKET"
+        ],
+        "instrument_types": [
+          "FIXED_ODDS",
+          "PROP"
+        ],
+        "venue_categories": [
+          "sports"
+        ],
+        "operation_types": [
+          "BUY"
+        ],
         "requires_price": true,
         "allows_partial_fill": false
       },
       "SPORTS_EXCHANGE_ORDER": {
-        "order_types": ["LIMIT", "MARKET"],
-        "instrument_types": ["EXCHANGE_ODDS"],
-        "venue_categories": ["sports"],
-        "operation_types": ["BUY", "SELL"],
+        "order_types": [
+          "LIMIT",
+          "MARKET"
+        ],
+        "instrument_types": [
+          "EXCHANGE_ODDS"
+        ],
+        "venue_categories": [
+          "sports"
+        ],
+        "operation_types": [
+          "BUY",
+          "SELL"
+        ],
         "requires_price": true,
         "allows_partial_fill": true
       },
       "SWAP": {
-        "order_types": ["LIMIT", "MARKET"],
-        "instrument_types": ["POOL"],
-        "venue_categories": ["defi"],
-        "operation_types": ["SWAP"],
+        "order_types": [
+          "LIMIT",
+          "MARKET"
+        ],
+        "instrument_types": [
+          "POOL"
+        ],
+        "venue_categories": [
+          "defi"
+        ],
+        "operation_types": [
+          "SWAP"
+        ],
         "requires_price": false,
         "allows_partial_fill": false
       },
@@ -3885,13 +4172,21 @@
           "PERPETUAL",
           "SPOT_PAIR"
         ],
-        "venue_categories": ["cefi", "tradfi"],
-        "operation_types": ["BUY", "SELL"],
+        "venue_categories": [
+          "cefi",
+          "tradfi"
+        ],
+        "operation_types": [
+          "BUY",
+          "SELL"
+        ],
         "requires_price": false,
         "allows_partial_fill": true
       },
       "ZERO_ALPHA": {
-        "order_types": ["MARKET"],
+        "order_types": [
+          "MARKET"
+        ],
         "instrument_types": [
           "A_TOKEN",
           "DEBT_TOKEN",
@@ -3900,7 +4195,9 @@
           "STAKING",
           "YIELD_BEARING"
         ],
-        "venue_categories": ["defi"],
+        "venue_categories": [
+          "defi"
+        ],
         "operation_types": [
           "BORROW",
           "DEPOSIT",
@@ -3917,7 +4214,7 @@
   },
   "market_data_categories": {
     "registry_name": "market_data_categories",
-    "version": "0.80.1.dev632+gd4045838a.d20260729",
+    "version": "0.97.1.dev850+ge092f3e95.d20260808",
     "entries": {
       "data_types_by_asset_group": {
         "cefi": [
@@ -3948,12 +4245,21 @@
           "mev_events",
           "native_staking_rates",
           "oracle_prices",
+          "perp_daily_ctx",
           "perp_funding",
+          "perp_mark_price",
           "perp_trades",
           "position_data",
           "rewards",
           "risk_params",
           "staking_yields",
+          "swaps_ohlcv_15m",
+          "swaps_ohlcv_15s",
+          "swaps_ohlcv_1d",
+          "swaps_ohlcv_1h",
+          "swaps_ohlcv_1m",
+          "swaps_ohlcv_4h",
+          "swaps_ohlcv_5m",
           "token_transfers",
           "utilization",
           "vault_apy",
@@ -3969,15 +4275,9 @@
         ],
         "sports": [
           "arbitrage_opportunity",
-          "markets",
           "odds",
           "odds_horizon_bucket",
-          "odds_movement",
-          "odds_snapshot",
-          "outcomes",
-          "settlements",
-          "trades",
-          "trades_inplay"
+          "trades"
         ],
         "tradfi": [
           "corporate_action_confirmed",
@@ -4016,7 +4316,6 @@
           "KRAKEN-FUTURES",
           "KRAKEN-SPOT",
           "LIGHTER-ZKSYNC",
-          "OKX",
           "OKX-FUTURES",
           "OKX-SPOT",
           "OKX-SWAP",
@@ -4025,6 +4324,7 @@
         ],
         "defi": [
           "AAVE-ETHEREUM",
+          "AAVE-PLASMA",
           "AAVE_V3-ARBITRUM",
           "AAVE_V3-AVALANCHE",
           "AAVE_V3-BASE",
@@ -4034,6 +4334,7 @@
           "AAVE_V3-OPTIMISM",
           "AAVE_V3-POLYGON",
           "AERODROME_V3-BASE",
+          "ANKR-ETHEREUM",
           "BALANCER-ARBITRUM",
           "BALANCER-AVALANCHE",
           "BALANCER-BASE",
@@ -4068,14 +4369,18 @@
           "ETHERFI-ETHEREUM",
           "EULER_V2-ETHEREUM",
           "FLUID-ETHEREUM",
+          "FLUID-PLASMA",
           "IDLE-ETHEREUM",
           "JITO-SOLANA",
           "JITORESTAKING-SOLANA",
+          "JUPITER-SOLANA",
           "KAMINO-SOLANA",
           "KARAK-ARBITRUM",
           "KARAK-ETHEREUM",
           "KELPDAO-ETHEREUM",
           "LIDO-ETHEREUM",
+          "MAKER-ETHEREUM",
+          "MANTLE-ETHEREUM",
           "MARGINFI-SOLANA",
           "MARINADE-SOLANA",
           "MORPHO-BASE",
@@ -4100,10 +4405,13 @@
           "SOLBLAZE-SOLANA",
           "SOLEND-SOLANA",
           "SPARK-ETHEREUM",
+          "STADER-ETHEREUM",
+          "STAKEWISE-ETHEREUM",
           "SUSHISWAP-ARBITRUM",
           "SUSHISWAP_V3-AVALANCHE",
           "SUSHISWAP_V3-BASE",
           "SUSHISWAP_V3-ETHEREUM",
+          "SWELL-ETHEREUM",
           "SYMBIOTIC-ETHEREUM",
           "TRADER_JOE_V2-AVALANCHE",
           "UNISWAP_V2-ETHEREUM",
@@ -4119,25 +4427,68 @@
           "YEARN_V3-ARBITRUM",
           "YEARN_V3-ETHEREUM"
         ],
-        "prediction": ["KALSHI", "POLYMARKET"],
+        "prediction": [
+          "KALSHI",
+          "POLYMARKET"
+        ],
         "sports": [
-          "BETFAIR",
+          "BET888SPORT",
           "BETFAIR_EX_EU",
           "BETFAIR_EX_UK",
           "BETFAIR_SB_UK",
+          "BETMGM",
+          "BETONLINEAG",
+          "BETOPENLY",
+          "BETRIVERS",
+          "BETSSON",
+          "BETVICTOR",
+          "BETWAY",
+          "BOVADA",
+          "CASUMO",
+          "CORAL",
           "DRAFTKINGS",
           "FANDUEL",
-          "ODDS_API",
-          "PINNACLE"
+          "LADBROKES",
+          "LIVESCOREBET",
+          "MATCHBOOK",
+          "NOVIG",
+          "ONEXBET",
+          "PADDYPOWER",
+          "PINNACLE",
+          "PROPHETX",
+          "SKYBET",
+          "SMARKETS",
+          "UNIBET",
+          "UNIBET_EU",
+          "UNIBET_UK",
+          "VIRGINBET",
+          "WILLIAMHILL"
         ],
-        "tradfi": ["CBOE", "CME", "FRED", "FX", "ICE", "KRX", "NASDAQ", "NYSE"]
+        "tradfi": [
+          "CBOE",
+          "CME",
+          "FRED",
+          "FX",
+          "ICE",
+          "KRX",
+          "NASDAQ",
+          "NYSE"
+        ]
       },
-      "timeframes": ["15s", "1m", "5m", "15m", "1h", "4h", "24h"]
+      "timeframes": [
+        "15s",
+        "1m",
+        "5m",
+        "15m",
+        "1h",
+        "4h",
+        "24h"
+      ]
     }
   },
   "venue_rate_limits": {
     "registry_name": "venue_rate_limits",
-    "version": "0.80.1.dev632+gd4045838a.d20260729",
+    "version": "0.97.1.dev850+ge092f3e95.d20260808",
     "venue_count": 13,
     "entries": {
       "api_football": {
@@ -4222,7 +4573,7 @@
   },
   "risk_taxonomy": {
     "registry_name": "risk_taxonomy",
-    "version": "0.80.1.dev632+gd4045838a.d20260729",
+    "version": "0.97.1.dev850+ge092f3e95.d20260808",
     "entries": {
       "risk_types": [
         {
@@ -4398,69 +4749,211 @@
           "theta",
           "vega"
         ],
-        "operational": ["correlation", "venue_protocol"],
-        "second_order": ["gamma", "slide", "vanna", "volga"],
-        "structural": ["concentration", "convexity", "duration", "spread"]
+        "operational": [
+          "correlation",
+          "venue_protocol"
+        ],
+        "second_order": [
+          "gamma",
+          "slide",
+          "vanna",
+          "volga"
+        ],
+        "structural": [
+          "concentration",
+          "convexity",
+          "duration",
+          "spread"
+        ]
       }
     }
   },
   "defi_protocol_registry": {
     "registry_name": "defi_protocol_registry",
-    "version": "0.80.1.dev632+gd4045838a.d20260729",
+    "version": "0.97.1.dev850+ge092f3e95.d20260808",
     "entries": {
       "protocols": [
-        ["aave_plasma", null],
-        ["aave_v3", "ETHEREUM"],
-        ["aerodrome_v3", "BASE"],
-        ["aster", null],
-        ["balancer", "ETHEREUM"],
-        ["camelot_v3", "ARBITRUM"],
-        ["curve", "ETHEREUM"],
-        ["ethena", "ETHEREUM"],
-        ["etherfi", "ETHEREUM"],
-        ["fluid_plasma", null],
-        ["hyperliquid", null],
-        ["lido", "ETHEREUM"],
-        ["morpho", "ETHEREUM"],
-        ["pancakeswap_v3", "BSC"],
-        ["spark", "ETHEREUM"],
-        ["sushiswap_v3", "ETHEREUM"],
-        ["trader_joe_v2", "AVALANCHE"],
-        ["uniswap_v2", "ETHEREUM"],
-        ["uniswap_v3", "ETHEREUM"],
-        ["uniswap_v4", "ETHEREUM"],
-        ["velodrome_v2", "OPTIMISM"]
+        [
+          "aave_plasma",
+          null
+        ],
+        [
+          "aave_v3",
+          "ETHEREUM"
+        ],
+        [
+          "aerodrome_v3",
+          "BASE"
+        ],
+        [
+          "aster",
+          null
+        ],
+        [
+          "balancer",
+          "ETHEREUM"
+        ],
+        [
+          "camelot_v3",
+          "ARBITRUM"
+        ],
+        [
+          "curve",
+          "ETHEREUM"
+        ],
+        [
+          "ethena",
+          "ETHEREUM"
+        ],
+        [
+          "etherfi",
+          "ETHEREUM"
+        ],
+        [
+          "fluid_plasma",
+          null
+        ],
+        [
+          "hyperliquid",
+          null
+        ],
+        [
+          "lido",
+          "ETHEREUM"
+        ],
+        [
+          "morpho",
+          "ETHEREUM"
+        ],
+        [
+          "pancakeswap_v3",
+          "BSC"
+        ],
+        [
+          "spark",
+          "ETHEREUM"
+        ],
+        [
+          "sushiswap_v3",
+          "ETHEREUM"
+        ],
+        [
+          "trader_joe_v2",
+          "AVALANCHE"
+        ],
+        [
+          "uniswap_v2",
+          "ETHEREUM"
+        ],
+        [
+          "uniswap_v3",
+          "ETHEREUM"
+        ],
+        [
+          "uniswap_v4",
+          "ETHEREUM"
+        ],
+        [
+          "velodrome_v2",
+          "OPTIMISM"
+        ]
       ],
       "venue_to_protocol": {
-        "AAVE-PLASMA": ["aave_plasma", null],
-        "AAVE_V3-ETHEREUM": ["aave_v3", "ETHEREUM"],
-        "AERODROME_V3-BASE": ["aerodrome_v3", "BASE"],
-        "CAMELOT_V3-ARBITRUM": ["camelot_v3", "ARBITRUM"],
-        "CURVE-ETHEREUM": ["curve", "ETHEREUM"],
-        "ETHENA-ETHEREUM": ["ethena", "ETHEREUM"],
-        "ETHERFI-ETHEREUM": ["etherfi", "ETHEREUM"],
-        "FLUID-PLASMA": ["fluid_plasma", null],
-        "LIDO-ETHEREUM": ["lido", "ETHEREUM"],
-        "MORPHO-ETHEREUM": ["morpho", "ETHEREUM"],
-        "PANCAKESWAP_V3-BASE": ["pancakeswap_v3", "BASE"],
-        "PANCAKESWAP_V3-BSC": ["pancakeswap_v3", "BSC"],
-        "PANCAKESWAP_V3-ETHEREUM": ["pancakeswap_v3", "ETHEREUM"],
-        "SPARK-ETHEREUM": ["spark", "ETHEREUM"],
-        "SUSHISWAP-ARBITRUM": ["sushiswap", "ARBITRUM"],
-        "SUSHISWAP_V3-AVALANCHE": ["sushiswap_v3", "AVALANCHE"],
-        "SUSHISWAP_V3-ETHEREUM": ["sushiswap_v3", "ETHEREUM"],
-        "TRADER_JOE_V2-AVALANCHE": ["trader_joe_v2", "AVALANCHE"],
-        "UNISWAP_V2-ETHEREUM": ["uniswap_v2", "ETHEREUM"],
-        "UNISWAP_V3-ETHEREUM": ["uniswap_v3", "ETHEREUM"],
-        "UNISWAP_V4-ETHEREUM": ["uniswap_v4", "ETHEREUM"],
-        "VELODROME_V2-OPTIMISM": ["velodrome_v2", "OPTIMISM"]
+        "AAVE-PLASMA": [
+          "aave_plasma",
+          null
+        ],
+        "AAVE_V3-ETHEREUM": [
+          "aave_v3",
+          "ETHEREUM"
+        ],
+        "AERODROME_V3-BASE": [
+          "aerodrome_v3",
+          "BASE"
+        ],
+        "CAMELOT_V3-ARBITRUM": [
+          "camelot_v3",
+          "ARBITRUM"
+        ],
+        "CURVE-ETHEREUM": [
+          "curve",
+          "ETHEREUM"
+        ],
+        "ETHENA-ETHEREUM": [
+          "ethena",
+          "ETHEREUM"
+        ],
+        "ETHERFI-ETHEREUM": [
+          "etherfi",
+          "ETHEREUM"
+        ],
+        "FLUID-PLASMA": [
+          "fluid_plasma",
+          null
+        ],
+        "LIDO-ETHEREUM": [
+          "lido",
+          "ETHEREUM"
+        ],
+        "MORPHO-ETHEREUM": [
+          "morpho",
+          "ETHEREUM"
+        ],
+        "PANCAKESWAP_V3-BASE": [
+          "pancakeswap_v3",
+          "BASE"
+        ],
+        "PANCAKESWAP_V3-BSC": [
+          "pancakeswap_v3",
+          "BSC"
+        ],
+        "PANCAKESWAP_V3-ETHEREUM": [
+          "pancakeswap_v3",
+          "ETHEREUM"
+        ],
+        "SPARK-ETHEREUM": [
+          "spark",
+          "ETHEREUM"
+        ],
+        "SUSHISWAP-ARBITRUM": [
+          "sushiswap",
+          "ARBITRUM"
+        ],
+        "SUSHISWAP_V3-AVALANCHE": [
+          "sushiswap_v3",
+          "AVALANCHE"
+        ],
+        "SUSHISWAP_V3-ETHEREUM": [
+          "sushiswap_v3",
+          "ETHEREUM"
+        ],
+        "TRADER_JOE_V2-AVALANCHE": [
+          "trader_joe_v2",
+          "AVALANCHE"
+        ],
+        "UNISWAP_V2-ETHEREUM": [
+          "uniswap_v2",
+          "ETHEREUM"
+        ],
+        "UNISWAP_V3-ETHEREUM": [
+          "uniswap_v3",
+          "ETHEREUM"
+        ],
+        "UNISWAP_V4-ETHEREUM": [
+          "uniswap_v4",
+          "ETHEREUM"
+        ],
+        "VELODROME_V2-OPTIMISM": [
+          "velodrome_v2",
+          "OPTIMISM"
+        ]
       }
     }
   },
   "chain_rpc_templates": {
     "registry_name": "chain_rpc_templates",
-    "version": "0.80.1.dev632+gd4045838a.d20260729",
-    "chain_count": 35,
+    "version": "0.97.1.dev850+ge092f3e95.d20260808",
+    "chain_count": 36,
     "entries": {
       "1": "https://eth-mainnet.g.alchemy.com/v2/{api_key}",
       "10": "https://opt-mainnet.g.alchemy.com/v2/{api_key}",
@@ -4478,6 +4971,7 @@
       "2741": "https://abstract-mainnet.g.alchemy.com/v2/{api_key}",
       "5000": "https://mantle-mainnet.g.alchemy.com/v2/{api_key}",
       "8453": "https://base-mainnet.g.alchemy.com/v2/{api_key}",
+      "9745": "https://plasma-mainnet.g.alchemy.com/v2/{api_key}",
       "34443": "https://mode-mainnet.g.alchemy.com/v2/{api_key}",
       "42161": "https://arb-mainnet.g.alchemy.com/v2/{api_key}",
       "42220": "https://forno.celo.org",
@@ -4501,7 +4995,7 @@
   },
   "subgraph_ids": {
     "registry_name": "subgraph_ids",
-    "version": "0.80.1.dev632+gd4045838a.d20260729",
+    "version": "0.97.1.dev850+ge092f3e95.d20260808",
     "protocol_count": 21,
     "entries": {
       "aave_v3": {
@@ -4583,7 +5077,7 @@
         "ARBITRUM": "FbCGRftH4a3yZugY7TnbYgPJVEv2LvMT6oF1fxPe9aJM",
         "BASE": "HMuAwufqZ1YCRmzL2SfHTVkzZovC9VL2UAKhjvRqKiR1",
         "ETHEREUM": "5zvR82QoaXYFyDEKLZ9t6v9adgnptxYpKpSbxtgVENFV",
-        "OPTIMISM": "Cghf4LfVqPiFw6fp6Y5X5Ubc8UpmUhSfJL82zwiBFLaj",
+        "OPTIMISM": "EgnS9YE1avupkvCNj9fHnJxppfEmNNywYJtghqiu2pd9",
         "POLYGON": "3hCPRGf4z88VC5rsBKU5AA9FBBq5nF3jbKJG7VZCbhjm"
       },
       "uniswap_v4": {
@@ -4600,12 +5094,16 @@
   },
   "capability_declarations": {
     "registry_name": "capability_declarations",
-    "version": "0.80.1.dev632+gd4045838a.d20260729",
+    "version": "0.97.1.dev850+ge092f3e95.d20260808",
     "entry_count": 60,
     "entries": [
       {
         "source": "aave",
-        "domains": ["market", "position", "reference"],
+        "domains": [
+          "market",
+          "position",
+          "reference"
+        ],
         "supports_live": true,
         "supports_batch": true,
         "supports_testnet": true,
@@ -4622,12 +5120,19 @@
             "health_factor",
             "user_account_data"
           ],
-          "reference": ["incentives", "protocol_data", "reserves_list"]
+          "reference": [
+            "incentives",
+            "protocol_data",
+            "reserves_list"
+          ]
         }
       },
       {
         "source": "alchemy",
-        "domains": ["market", "reference"],
+        "domains": [
+          "market",
+          "reference"
+        ],
         "supports_live": true,
         "supports_batch": true,
         "supports_testnet": true,
@@ -4648,18 +5153,36 @@
       },
       {
         "source": "api_football",
-        "domains": ["market", "reference"],
+        "domains": [
+          "market",
+          "reference"
+        ],
         "supports_live": true,
         "supports_batch": true,
         "supports_testnet": false,
         "operations": {
-          "market": ["fixtures", "odds", "predictions"],
-          "reference": ["leagues", "players", "standings", "teams", "venues"]
+          "market": [
+            "fixtures",
+            "odds",
+            "predictions"
+          ],
+          "reference": [
+            "leagues",
+            "players",
+            "standings",
+            "teams",
+            "venues"
+          ]
         }
       },
       {
         "source": "aster",
-        "domains": ["execution", "market", "position", "reference"],
+        "domains": [
+          "execution",
+          "market",
+          "position",
+          "reference"
+        ],
         "supports_live": true,
         "supports_batch": true,
         "supports_testnet": true,
@@ -4680,13 +5203,22 @@
             "ws_ticker",
             "ws_trades"
           ],
-          "position": ["account", "balances", "positions"],
-          "reference": ["instruments", "server_time"]
+          "position": [
+            "account",
+            "balances",
+            "positions"
+          ],
+          "reference": [
+            "instruments",
+            "server_time"
+          ]
         }
       },
       {
         "source": "aws",
-        "domains": ["reference"],
+        "domains": [
+          "reference"
+        ],
         "supports_live": true,
         "supports_batch": true,
         "supports_testnet": true,
@@ -4701,18 +5233,29 @@
       },
       {
         "source": "baker_hughes",
-        "domains": ["market", "reference"],
+        "domains": [
+          "market",
+          "reference"
+        ],
         "supports_live": false,
         "supports_batch": true,
         "supports_testnet": false,
         "operations": {
-          "market": ["rig_count"],
-          "reference": ["rig_count_series"]
+          "market": [
+            "rig_count"
+          ],
+          "reference": [
+            "rig_count_series"
+          ]
         }
       },
       {
         "source": "betfair",
-        "domains": ["execution", "market", "reference"],
+        "domains": [
+          "execution",
+          "market",
+          "reference"
+        ],
         "supports_live": true,
         "supports_batch": true,
         "supports_testnet": false,
@@ -4740,7 +5283,12 @@
       },
       {
         "source": "binance",
-        "domains": ["execution", "market", "position", "reference"],
+        "domains": [
+          "execution",
+          "market",
+          "position",
+          "reference"
+        ],
         "supports_live": true,
         "supports_batch": true,
         "supports_testnet": true,
@@ -4762,13 +5310,27 @@
             "ws_ticker",
             "ws_trades"
           ],
-          "position": ["account", "balances", "margin_account", "positions"],
-          "reference": ["exchange_info", "server_time", "system_status"]
+          "position": [
+            "account",
+            "balances",
+            "margin_account",
+            "positions"
+          ],
+          "reference": [
+            "exchange_info",
+            "server_time",
+            "system_status"
+          ]
         }
       },
       {
         "source": "bitget",
-        "domains": ["execution", "market", "position", "reference"],
+        "domains": [
+          "execution",
+          "market",
+          "position",
+          "reference"
+        ],
         "supports_live": true,
         "supports_batch": true,
         "supports_testnet": true,
@@ -4789,13 +5351,25 @@
             "ws_ticker",
             "ws_trade"
           ],
-          "position": ["account", "fills", "positions"],
-          "reference": ["server_time", "symbols"]
+          "position": [
+            "account",
+            "fills",
+            "positions"
+          ],
+          "reference": [
+            "server_time",
+            "symbols"
+          ]
         }
       },
       {
         "source": "bybit",
-        "domains": ["execution", "market", "position", "reference"],
+        "domains": [
+          "execution",
+          "market",
+          "position",
+          "reference"
+        ],
         "supports_live": true,
         "supports_batch": true,
         "supports_testnet": true,
@@ -4816,13 +5390,25 @@
             "ws_ticker",
             "ws_trades"
           ],
-          "position": ["pnl", "positions", "wallet_balance"],
-          "reference": ["instruments_info", "server_time"]
+          "position": [
+            "pnl",
+            "positions",
+            "wallet_balance"
+          ],
+          "reference": [
+            "instruments_info",
+            "server_time"
+          ]
         }
       },
       {
         "source": "ccxt",
-        "domains": ["execution", "market", "position", "reference"],
+        "domains": [
+          "execution",
+          "market",
+          "position",
+          "reference"
+        ],
         "supports_live": true,
         "supports_batch": true,
         "supports_testnet": true,
@@ -4842,29 +5428,54 @@
             "watch_order_book",
             "watch_ticker"
           ],
-          "position": ["fetch_balance", "fetch_positions"],
-          "reference": ["fetch_currencies", "fetch_markets", "load_markets"]
+          "position": [
+            "fetch_balance",
+            "fetch_positions"
+          ],
+          "reference": [
+            "fetch_currencies",
+            "fetch_markets",
+            "load_markets"
+          ]
         }
       },
       {
         "source": "cftc",
-        "domains": ["market", "reference"],
+        "domains": [
+          "market",
+          "reference"
+        ],
         "supports_live": false,
         "supports_batch": true,
         "supports_testnet": false,
         "operations": {
-          "market": ["commitments_of_traders", "cot_report"],
-          "reference": ["markets_list", "report_types"]
+          "market": [
+            "commitments_of_traders",
+            "cot_report"
+          ],
+          "reference": [
+            "markets_list",
+            "report_types"
+          ]
         }
       },
       {
         "source": "coinbase",
-        "domains": ["execution", "market", "position", "reference"],
+        "domains": [
+          "execution",
+          "market",
+          "position",
+          "reference"
+        ],
         "supports_live": true,
         "supports_batch": true,
         "supports_testnet": true,
         "operations": {
-          "execution": ["cancel_order", "create_order", "list_orders"],
+          "execution": [
+            "cancel_order",
+            "create_order",
+            "list_orders"
+          ],
           "market": [
             "candles",
             "orderbook",
@@ -4873,13 +5484,22 @@
             "ws_matches",
             "ws_ticker"
           ],
-          "position": ["accounts", "balances"],
-          "reference": ["currencies", "products"]
+          "position": [
+            "accounts",
+            "balances"
+          ],
+          "reference": [
+            "currencies",
+            "products"
+          ]
         }
       },
       {
         "source": "curve",
-        "domains": ["market", "reference"],
+        "domains": [
+          "market",
+          "reference"
+        ],
         "supports_live": true,
         "supports_batch": true,
         "supports_testnet": true,
@@ -4891,12 +5511,20 @@
             "virtual_price",
             "volumes"
           ],
-          "reference": ["factory_pools", "gauges", "pools", "registry"]
+          "reference": [
+            "factory_pools",
+            "gauges",
+            "pools",
+            "registry"
+          ]
         }
       },
       {
         "source": "databento",
-        "domains": ["market", "reference"],
+        "domains": [
+          "market",
+          "reference"
+        ],
         "supports_live": true,
         "supports_batch": true,
         "supports_testnet": false,
@@ -4910,23 +5538,45 @@
             "tbbo",
             "trades"
           ],
-          "reference": ["datasets", "metadata", "publishers", "symbology"]
+          "reference": [
+            "datasets",
+            "metadata",
+            "publishers",
+            "symbology"
+          ]
         }
       },
       {
         "source": "defillama",
-        "domains": ["market", "reference"],
+        "domains": [
+          "market",
+          "reference"
+        ],
         "supports_live": true,
         "supports_batch": true,
         "supports_testnet": false,
         "operations": {
-          "market": ["on_chain_metrics", "protocol_revenue", "tvl", "yields"],
-          "reference": ["chains", "protocols", "stablecoins"]
+          "market": [
+            "on_chain_metrics",
+            "protocol_revenue",
+            "tvl",
+            "yields"
+          ],
+          "reference": [
+            "chains",
+            "protocols",
+            "stablecoins"
+          ]
         }
       },
       {
         "source": "deribit",
-        "domains": ["execution", "market", "position", "reference"],
+        "domains": [
+          "execution",
+          "market",
+          "position",
+          "reference"
+        ],
         "supports_live": true,
         "supports_batch": true,
         "supports_testnet": true,
@@ -4948,18 +5598,31 @@
             "ws_book",
             "ws_ticker"
           ],
-          "position": ["account_summary", "margins", "positions"],
-          "reference": ["currencies", "instruments", "settlement_history"]
+          "position": [
+            "account_summary",
+            "margins",
+            "positions"
+          ],
+          "reference": [
+            "currencies",
+            "instruments",
+            "settlement_history"
+          ]
         }
       },
       {
         "source": "ecb",
-        "domains": ["market", "reference"],
+        "domains": [
+          "market",
+          "reference"
+        ],
         "supports_live": false,
         "supports_batch": true,
         "supports_testnet": false,
         "operations": {
-          "market": ["yield_curve"],
+          "market": [
+            "yield_curve"
+          ],
           "reference": [
             "exchange_rates",
             "interest_rates",
@@ -4969,18 +5632,34 @@
       },
       {
         "source": "eia",
-        "domains": ["market", "reference"],
+        "domains": [
+          "market",
+          "reference"
+        ],
         "supports_live": false,
         "supports_batch": true,
         "supports_testnet": false,
         "operations": {
-          "market": ["energy_data", "ohlcv", "on_chain_metrics"],
-          "reference": ["categories", "geosets", "series"]
+          "market": [
+            "energy_data",
+            "ohlcv",
+            "on_chain_metrics"
+          ],
+          "reference": [
+            "categories",
+            "geosets",
+            "series"
+          ]
         }
       },
       {
         "source": "extended",
-        "domains": ["execution", "market", "position", "reference"],
+        "domains": [
+          "execution",
+          "market",
+          "position",
+          "reference"
+        ],
         "supports_live": true,
         "supports_batch": true,
         "supports_testnet": true,
@@ -5002,23 +5681,39 @@
             "ws_ticker",
             "ws_trades"
           ],
-          "position": ["account", "balances", "positions"],
-          "reference": ["instruments", "markets", "server_time"]
+          "position": [
+            "account",
+            "balances",
+            "positions"
+          ],
+          "reference": [
+            "instruments",
+            "markets",
+            "server_time"
+          ]
         }
       },
       {
         "source": "fear_greed",
-        "domains": ["market"],
+        "domains": [
+          "market"
+        ],
         "supports_live": false,
         "supports_batch": true,
         "supports_testnet": false,
         "operations": {
-          "market": ["fear_greed_index"]
+          "market": [
+            "fear_greed_index"
+          ]
         }
       },
       {
         "source": "fix",
-        "domains": ["execution", "market", "reference"],
+        "domains": [
+          "execution",
+          "market",
+          "reference"
+        ],
         "supports_live": true,
         "supports_batch": false,
         "supports_testnet": true,
@@ -5042,18 +5737,31 @@
       },
       {
         "source": "footystats",
-        "domains": ["market", "reference"],
+        "domains": [
+          "market",
+          "reference"
+        ],
         "supports_live": false,
         "supports_batch": true,
         "supports_testnet": false,
         "operations": {
-          "market": ["matches", "odds"],
-          "reference": ["leagues", "players", "standings", "teams"]
+          "market": [
+            "matches",
+            "odds"
+          ],
+          "reference": [
+            "leagues",
+            "players",
+            "standings",
+            "teams"
+          ]
         }
       },
       {
         "source": "fred",
-        "domains": ["reference"],
+        "domains": [
+          "reference"
+        ],
         "supports_live": false,
         "supports_batch": true,
         "supports_testnet": false,
@@ -5070,7 +5778,9 @@
       },
       {
         "source": "gcp",
-        "domains": ["reference"],
+        "domains": [
+          "reference"
+        ],
         "supports_live": true,
         "supports_batch": true,
         "supports_testnet": true,
@@ -5085,7 +5795,9 @@
       },
       {
         "source": "github",
-        "domains": ["reference"],
+        "domains": [
+          "reference"
+        ],
         "supports_live": true,
         "supports_batch": true,
         "supports_testnet": false,
@@ -5100,7 +5812,10 @@
       },
       {
         "source": "glassnode",
-        "domains": ["market", "reference"],
+        "domains": [
+          "market",
+          "reference"
+        ],
         "supports_live": false,
         "supports_batch": true,
         "supports_testnet": false,
@@ -5117,12 +5832,19 @@
             "sopr",
             "transaction_count"
           ],
-          "reference": ["supported_assets", "supported_metrics"]
+          "reference": [
+            "supported_assets",
+            "supported_metrics"
+          ]
         }
       },
       {
         "source": "hyperliquid",
-        "domains": ["execution", "market", "position"],
+        "domains": [
+          "execution",
+          "market",
+          "position"
+        ],
         "supports_live": true,
         "supports_batch": true,
         "supports_testnet": true,
@@ -5144,12 +5866,21 @@
             "ws_l2_book",
             "ws_trades"
           ],
-          "position": ["clearinghouse_state", "funding_history", "user_state"]
+          "position": [
+            "clearinghouse_state",
+            "funding_history",
+            "user_state"
+          ]
         }
       },
       {
         "source": "ibkr",
-        "domains": ["execution", "market", "position", "reference"],
+        "domains": [
+          "execution",
+          "market",
+          "position",
+          "reference"
+        ],
         "supports_live": true,
         "supports_batch": true,
         "supports_testnet": true,
@@ -5168,30 +5899,62 @@
             "scanner",
             "ws_market_data"
           ],
-          "position": ["account_summary", "pnl", "portfolio", "positions"],
-          "reference": ["contract_details", "market_rules", "matching_symbols"]
+          "position": [
+            "account_summary",
+            "pnl",
+            "portfolio",
+            "positions"
+          ],
+          "reference": [
+            "contract_details",
+            "market_rules",
+            "matching_symbols"
+          ]
         }
       },
       {
         "source": "instadapp",
-        "domains": ["market", "position", "reference"],
+        "domains": [
+          "market",
+          "position",
+          "reference"
+        ],
         "supports_live": true,
         "supports_batch": true,
         "supports_testnet": true,
         "operations": {
-          "market": ["rates", "reserve_data"],
-          "position": ["balances", "positions", "smart_account"],
-          "reference": ["protocols", "tokens"]
+          "market": [
+            "rates",
+            "reserve_data"
+          ],
+          "position": [
+            "balances",
+            "positions",
+            "smart_account"
+          ],
+          "reference": [
+            "protocols",
+            "tokens"
+          ]
         }
       },
       {
         "source": "kalshi",
-        "domains": ["execution", "market", "position", "reference"],
+        "domains": [
+          "execution",
+          "market",
+          "position",
+          "reference"
+        ],
         "supports_live": true,
         "supports_batch": true,
         "supports_testnet": true,
         "operations": {
-          "execution": ["batch_create_orders", "cancel_order", "create_order"],
+          "execution": [
+            "batch_create_orders",
+            "cancel_order",
+            "create_order"
+          ],
           "market": [
             "market_orderbook",
             "markets",
@@ -5199,24 +5962,48 @@
             "trades",
             "ws_orderbook"
           ],
-          "position": ["fills", "portfolio", "positions", "settlements"],
-          "reference": ["categories", "events", "series"]
+          "position": [
+            "fills",
+            "portfolio",
+            "positions",
+            "settlements"
+          ],
+          "reference": [
+            "categories",
+            "events",
+            "series"
+          ]
         }
       },
       {
         "source": "kalshi_perp",
-        "domains": ["market", "reference"],
+        "domains": [
+          "market",
+          "reference"
+        ],
         "supports_live": true,
         "supports_batch": true,
         "supports_testnet": false,
         "operations": {
-          "market": ["funding_rates", "markets", "trades", "ws_trades"],
-          "reference": ["market_detail"]
+          "market": [
+            "funding_rates",
+            "markets",
+            "trades",
+            "ws_trades"
+          ],
+          "reference": [
+            "market_detail"
+          ]
         }
       },
       {
         "source": "kraken",
-        "domains": ["execution", "market", "position", "reference"],
+        "domains": [
+          "execution",
+          "market",
+          "position",
+          "reference"
+        ],
         "supports_live": true,
         "supports_batch": true,
         "supports_testnet": false,
@@ -5236,13 +6023,27 @@
             "ws_ticker",
             "ws_trade"
           ],
-          "position": ["balance", "open_positions", "trade_balance"],
-          "reference": ["asset_pairs", "assets", "server_time", "system_status"]
+          "position": [
+            "balance",
+            "open_positions",
+            "trade_balance"
+          ],
+          "reference": [
+            "asset_pairs",
+            "assets",
+            "server_time",
+            "system_status"
+          ]
         }
       },
       {
         "source": "kraken-futures",
-        "domains": ["execution", "market", "position", "reference"],
+        "domains": [
+          "execution",
+          "market",
+          "position",
+          "reference"
+        ],
         "supports_live": true,
         "supports_batch": true,
         "supports_testnet": true,
@@ -5262,13 +6063,25 @@
             "ws_book",
             "ws_ticker"
           ],
-          "position": ["account", "notifications", "open_positions"],
-          "reference": ["fee_schedules", "instruments"]
+          "position": [
+            "account",
+            "notifications",
+            "open_positions"
+          ],
+          "reference": [
+            "fee_schedules",
+            "instruments"
+          ]
         }
       },
       {
         "source": "kucoin",
-        "domains": ["execution", "market", "position", "reference"],
+        "domains": [
+          "execution",
+          "market",
+          "position",
+          "reference"
+        ],
         "supports_live": true,
         "supports_batch": true,
         "supports_testnet": true,
@@ -5288,57 +6101,111 @@
             "ws_orderbook",
             "ws_ticker"
           ],
-          "position": ["account_ledger", "get_account", "list_accounts"],
-          "reference": ["currencies", "server_time", "symbols_list"]
+          "position": [
+            "account_ledger",
+            "get_account",
+            "list_accounts"
+          ],
+          "reference": [
+            "currencies",
+            "server_time",
+            "symbols_list"
+          ]
         }
       },
       {
         "source": "lighter_api",
-        "domains": ["market"],
+        "domains": [
+          "market"
+        ],
         "supports_live": false,
         "supports_batch": true,
         "supports_testnet": false,
         "operations": {
-          "market": ["candles", "orderbook", "trades"]
+          "market": [
+            "candles",
+            "orderbook",
+            "trades"
+          ]
         }
       },
       {
         "source": "matchbook",
-        "domains": ["execution", "market", "reference"],
+        "domains": [
+          "execution",
+          "market",
+          "reference"
+        ],
         "supports_live": true,
         "supports_batch": true,
         "supports_testnet": false,
         "operations": {
-          "execution": ["cancel_offer", "current_offers", "offer"],
-          "market": ["events", "markets", "prices", "runners"],
-          "reference": ["events_list", "sports"]
+          "execution": [
+            "cancel_offer",
+            "current_offers",
+            "offer"
+          ],
+          "market": [
+            "events",
+            "markets",
+            "prices",
+            "runners"
+          ],
+          "reference": [
+            "events_list",
+            "sports"
+          ]
         }
       },
       {
         "source": "metabet",
-        "domains": ["market", "reference"],
+        "domains": [
+          "market",
+          "reference"
+        ],
         "supports_live": true,
         "supports_batch": true,
         "supports_testnet": false,
         "operations": {
-          "market": ["instruments", "markets"],
-          "reference": ["markets_list", "sports"]
+          "market": [
+            "instruments",
+            "markets"
+          ],
+          "reference": [
+            "markets_list",
+            "sports"
+          ]
         }
       },
       {
         "source": "mev",
-        "domains": ["market", "reference"],
+        "domains": [
+          "market",
+          "reference"
+        ],
         "supports_live": true,
         "supports_batch": true,
         "supports_testnet": false,
         "operations": {
-          "market": ["bundle_results", "flashbots_blocks", "mev_metrics"],
-          "reference": ["builders", "searchers"]
+          "market": [
+            "bundle_results",
+            "flashbots_blocks",
+            "mev_metrics"
+          ],
+          "reference": [
+            "builders",
+            "searchers"
+          ]
         }
       },
       {
         "source": "mexc",
-        "domains": ["execution", "market", "position", "reference"],
+        "domains": [
+          "execution",
+          "market",
+          "position",
+          "reference"
+        ],
         "supports_live": true,
         "supports_batch": true,
         "supports_testnet": false,
@@ -5358,13 +6225,23 @@
             "ws_depth",
             "ws_ticker"
           ],
-          "position": ["account", "balances"],
-          "reference": ["exchange_info", "server_time"]
+          "position": [
+            "account",
+            "balances"
+          ],
+          "reference": [
+            "exchange_info",
+            "server_time"
+          ]
         }
       },
       {
         "source": "nautilus",
-        "domains": ["execution", "market", "reference"],
+        "domains": [
+          "execution",
+          "market",
+          "reference"
+        ],
         "supports_live": true,
         "supports_batch": true,
         "supports_testnet": true,
@@ -5385,45 +6262,80 @@
             "ws_quotes",
             "ws_trades"
           ],
-          "reference": ["instruments", "venues"]
+          "reference": [
+            "instruments",
+            "venues"
+          ]
         }
       },
       {
         "source": "odds_api",
-        "domains": ["market", "reference"],
+        "domains": [
+          "market",
+          "reference"
+        ],
         "supports_live": true,
         "supports_batch": true,
         "supports_testnet": false,
         "operations": {
-          "market": ["historical_odds", "odds", "scores"],
-          "reference": ["participants", "sports"]
+          "market": [
+            "historical_odds",
+            "odds",
+            "scores"
+          ],
+          "reference": [
+            "participants",
+            "sports"
+          ]
         }
       },
       {
         "source": "odds_engine",
-        "domains": ["market", "reference"],
+        "domains": [
+          "market",
+          "reference"
+        ],
         "supports_live": true,
         "supports_batch": true,
         "supports_testnet": false,
         "operations": {
-          "market": ["markets", "odds_lines"],
-          "reference": ["leagues", "sports"]
+          "market": [
+            "markets",
+            "odds_lines"
+          ],
+          "reference": [
+            "leagues",
+            "sports"
+          ]
         }
       },
       {
         "source": "ofr",
-        "domains": ["market", "reference"],
+        "domains": [
+          "market",
+          "reference"
+        ],
         "supports_live": false,
         "supports_batch": true,
         "supports_testnet": false,
         "operations": {
-          "market": ["cds_spreads", "repo_rates"],
-          "reference": ["financial_stability_data"]
+          "market": [
+            "cds_spreads",
+            "repo_rates"
+          ],
+          "reference": [
+            "financial_stability_data"
+          ]
         }
       },
       {
         "source": "okx",
-        "domains": ["execution", "market", "position", "reference"],
+        "domains": [
+          "execution",
+          "market",
+          "position",
+          "reference"
+        ],
         "supports_live": true,
         "supports_batch": true,
         "supports_testnet": true,
@@ -5444,80 +6356,160 @@
             "ws_ticker",
             "ws_trades"
           ],
-          "position": ["account_config", "balance", "positions"],
-          "reference": ["instruments", "system_status"]
+          "position": [
+            "account_config",
+            "balance",
+            "positions"
+          ],
+          "reference": [
+            "instruments",
+            "system_status"
+          ]
         }
       },
       {
         "source": "onexbet",
-        "domains": ["market", "reference"],
+        "domains": [
+          "market",
+          "reference"
+        ],
         "supports_live": true,
         "supports_batch": true,
         "supports_testnet": false,
         "operations": {
-          "market": ["live_odds", "prematch_odds"],
-          "reference": ["sports", "tournaments"]
+          "market": [
+            "live_odds",
+            "prematch_odds"
+          ],
+          "reference": [
+            "sports",
+            "tournaments"
+          ]
         }
       },
       {
         "source": "open_meteo",
-        "domains": ["reference"],
+        "domains": [
+          "reference"
+        ],
         "supports_live": true,
         "supports_batch": true,
         "supports_testnet": false,
         "operations": {
-          "reference": ["feature_records", "forecast", "historical_weather"]
+          "reference": [
+            "feature_records",
+            "forecast",
+            "historical_weather"
+          ]
         }
       },
       {
         "source": "opticodds",
-        "domains": ["market", "reference"],
+        "domains": [
+          "market",
+          "reference"
+        ],
         "supports_live": true,
         "supports_batch": true,
         "supports_testnet": false,
         "operations": {
-          "market": ["fixtures", "odds", "player_props"],
-          "reference": ["books", "leagues", "sports"]
+          "market": [
+            "fixtures",
+            "odds",
+            "player_props"
+          ],
+          "reference": [
+            "books",
+            "leagues",
+            "sports"
+          ]
         }
       },
       {
         "source": "pinnacle",
-        "domains": ["market", "reference"],
+        "domains": [
+          "market",
+          "reference"
+        ],
         "supports_live": true,
         "supports_batch": true,
         "supports_testnet": false,
         "operations": {
-          "market": ["fixtures", "line", "odds", "settled_fixtures"],
-          "reference": ["leagues", "periods", "sports"]
+          "market": [
+            "fixtures",
+            "line",
+            "odds",
+            "settled_fixtures"
+          ],
+          "reference": [
+            "leagues",
+            "periods",
+            "sports"
+          ]
         }
       },
       {
         "source": "polymarket",
-        "domains": ["execution", "market", "position", "reference"],
+        "domains": [
+          "execution",
+          "market",
+          "position",
+          "reference"
+        ],
         "supports_live": true,
         "supports_batch": true,
         "supports_testnet": false,
         "operations": {
-          "execution": ["cancel_order", "create_order", "open_orders"],
-          "market": ["markets", "orderbook", "prices", "trades", "ws_prices"],
-          "position": ["balances", "pnl", "positions"],
-          "reference": ["events", "markets_metadata", "tags"]
+          "execution": [
+            "cancel_order",
+            "create_order",
+            "open_orders"
+          ],
+          "market": [
+            "markets",
+            "orderbook",
+            "prices",
+            "trades",
+            "ws_prices"
+          ],
+          "position": [
+            "balances",
+            "pnl",
+            "positions"
+          ],
+          "reference": [
+            "events",
+            "markets_metadata",
+            "tags"
+          ]
         }
       },
       {
         "source": "polymarket_perp",
-        "domains": ["market", "reference"],
+        "domains": [
+          "market",
+          "reference"
+        ],
         "supports_live": false,
         "supports_batch": false,
         "supports_testnet": false,
         "operations": {
-          "market": ["funding_rates", "markets", "trades", "ws_trades"],
-          "reference": ["market_detail"]
+          "market": [
+            "funding_rates",
+            "markets",
+            "trades",
+            "ws_trades"
+          ],
+          "reference": [
+            "market_detail"
+          ]
         }
       },
       {
         "source": "soccer_football_info",
-        "domains": ["reference"],
+        "domains": [
+          "reference"
+        ],
         "supports_live": false,
         "supports_batch": true,
         "supports_testnet": false,
@@ -5534,7 +6526,10 @@
       },
       {
         "source": "tardis",
-        "domains": ["market", "reference"],
+        "domains": [
+          "market",
+          "reference"
+        ],
         "supports_live": true,
         "supports_batch": true,
         "supports_testnet": false,
@@ -5548,43 +6543,76 @@
             "trades",
             "ws_replay"
           ],
-          "reference": ["data_types", "exchanges", "instruments"]
+          "reference": [
+            "data_types",
+            "exchanges",
+            "instruments"
+          ]
         }
       },
       {
         "source": "thegraph",
-        "domains": ["market", "reference"],
+        "domains": [
+          "market",
+          "reference"
+        ],
         "supports_live": true,
         "supports_batch": true,
         "supports_testnet": false,
         "operations": {
-          "market": ["entity_data", "indexed_events", "subgraph_query"],
-          "reference": ["deployments", "schema_introspection", "subgraphs"]
+          "market": [
+            "entity_data",
+            "indexed_events",
+            "subgraph_query"
+          ],
+          "reference": [
+            "deployments",
+            "schema_introspection",
+            "subgraphs"
+          ]
         }
       },
       {
         "source": "transfermarkt",
-        "domains": ["reference"],
+        "domains": [
+          "reference"
+        ],
         "supports_live": false,
         "supports_batch": true,
         "supports_testnet": false,
         "operations": {
-          "reference": ["market_values", "players", "teams", "transfers"]
+          "reference": [
+            "market_values",
+            "players",
+            "teams",
+            "transfers"
+          ]
         }
       },
       {
         "source": "understat",
-        "domains": ["reference"],
+        "domains": [
+          "reference"
+        ],
         "supports_live": false,
         "supports_batch": true,
         "supports_testnet": false,
         "operations": {
-          "reference": ["fixtures", "leagues", "players", "teams", "xg_stats"]
+          "reference": [
+            "fixtures",
+            "leagues",
+            "players",
+            "teams",
+            "xg_stats"
+          ]
         }
       },
       {
         "source": "uniswap",
-        "domains": ["market", "reference"],
+        "domains": [
+          "market",
+          "reference"
+        ],
         "supports_live": true,
         "supports_batch": true,
         "supports_testnet": true,
@@ -5596,17 +6624,31 @@
             "swap_events",
             "tick_data"
           ],
-          "reference": ["factory", "fee_tiers", "pools", "tokens"]
+          "reference": [
+            "factory",
+            "fee_tiers",
+            "pools",
+            "tokens"
+          ]
         }
       },
       {
         "source": "upbit",
-        "domains": ["execution", "market", "position", "reference"],
+        "domains": [
+          "execution",
+          "market",
+          "position",
+          "reference"
+        ],
         "supports_live": true,
         "supports_batch": true,
         "supports_testnet": false,
         "operations": {
-          "execution": ["cancel_order", "chance", "orders"],
+          "execution": [
+            "cancel_order",
+            "chance",
+            "orders"
+          ],
           "market": [
             "candles_days",
             "candles_minutes",
@@ -5617,30 +6659,53 @@
             "ws_ticker",
             "ws_trade"
           ],
-          "position": ["accounts"],
-          "reference": ["market_all"]
+          "position": [
+            "accounts"
+          ],
+          "reference": [
+            "market_all"
+          ]
         }
       },
       {
         "source": "versifi",
-        "domains": ["execution", "market", "reference"],
+        "domains": [
+          "execution",
+          "market",
+          "reference"
+        ],
         "supports_live": true,
         "supports_batch": true,
         "supports_testnet": true,
         "operations": {
-          "execution": ["fills", "orders"],
-          "market": ["trades", "ws_trades"],
-          "reference": ["instruments"]
+          "execution": [
+            "fills",
+            "orders"
+          ],
+          "market": [
+            "trades",
+            "ws_trades"
+          ],
+          "reference": [
+            "instruments"
+          ]
         }
       },
       {
         "source": "yahoo_finance",
-        "domains": ["market", "reference"],
+        "domains": [
+          "market",
+          "reference"
+        ],
         "supports_live": true,
         "supports_batch": true,
         "supports_testnet": false,
         "operations": {
-          "market": ["ohlcv", "options_chain", "streaming_quotes"],
+          "market": [
+            "ohlcv",
+            "options_chain",
+            "streaming_quotes"
+          ],
           "reference": [
             "balance_sheet",
             "cash_flow",
@@ -5653,7 +6718,7 @@
   },
   "venue_capabilities": {
     "registry_name": "venue_capabilities",
-    "version": "0.80.1.dev632+gd4045838a.d20260729",
+    "version": "0.97.1.dev850+ge092f3e95.d20260808",
     "description": "Combined view: venues with their capabilities, rate limits, and error maps",
     "entries": {
       "aave_plasma": {
@@ -5738,7 +6803,7 @@
           "requests_per_second": null,
           "requests_per_minute": null
         },
-        "error_code_count": 13
+        "error_code_count": 15
       },
       "defillama": {
         "venue": "defillama",
@@ -5800,13 +6865,17 @@
         "venue": "instadapp",
         "error_code_count": 6
       },
+      "internal": {
+        "venue": "internal",
+        "error_code_count": 1
+      },
       "kalshi": {
         "venue": "kalshi",
         "rate_limit": {
           "requests_per_second": 2.0,
           "requests_per_minute": null
         },
-        "error_code_count": 7
+        "error_code_count": 24
       },
       "kraken": {
         "venue": "kraken",
@@ -5878,7 +6947,7 @@
           "requests_per_second": null,
           "requests_per_minute": null
         },
-        "error_code_count": 4
+        "error_code_count": 9
       },
       "soccer_football_info": {
         "venue": "soccer_football_info",
@@ -5924,16 +6993,30 @@
   },
   "data_pipeline_config": {
     "registry_name": "data_pipeline_config",
-    "version": "0.80.1.dev632+gd4045838a.d20260729",
+    "version": "0.97.1.dev850+ge092f3e95.d20260808",
     "description": "Data types, timeframes, and venues by asset_group for pipeline configuration",
     "entries": {
-      "asset_groups": ["cefi", "defi", "prediction", "sports", "tradfi"],
-      "timeframes": ["15s", "1m", "5m", "15m", "1h", "4h", "24h"]
+      "asset_groups": [
+        "cefi",
+        "defi",
+        "prediction",
+        "sports",
+        "tradfi"
+      ],
+      "timeframes": [
+        "15s",
+        "1m",
+        "5m",
+        "15m",
+        "1h",
+        "4h",
+        "24h"
+      ]
     }
   },
   "error_classifications": {
     "registry_name": "error_classifications",
-    "version": "0.80.1.dev632+gd4045838a.d20260729",
+    "version": "0.97.1.dev850+ge092f3e95.d20260808",
     "description": "Error action summary by venue \u2014 how many RETRY/FAIL/SKIP/RECONNECT per venue",
     "entries": {
       "aave_plasma": {
@@ -6007,7 +7090,8 @@
       "databento": {
         "retry": 4,
         "fail": 8,
-        "reconnect": 1
+        "reconnect": 1,
+        "skip": 2
       },
       "defillama": {
         "fail": 3,
@@ -6066,9 +7150,13 @@
         "fail": 3,
         "retry": 3
       },
+      "internal": {
+        "retry": 1
+      },
       "kalshi": {
-        "retry": 2,
-        "fail": 5
+        "retry": 14,
+        "fail": 9,
+        "skip": 1
       },
       "kraken": {
         "fail": 7,
@@ -6129,7 +7217,7 @@
         "fail": 6
       },
       "polymarket": {
-        "retry": 2,
+        "retry": 7,
         "fail": 2
       },
       "soccer_football_info": {
@@ -6178,7 +7266,7 @@
   },
   "tradfi_symbology": {
     "registry_name": "tradfi_symbology",
-    "version": "0.80.1.dev632+gd4045838a.d20260729",
+    "version": "0.97.1.dev850+ge092f3e95.d20260808",
     "description": "TradFi instrument definitions and data provider bindings",
     "entries": {
       "instrument_count": 58,
@@ -6537,23 +7625,60 @@
   },
   "representative_instrument_sample": {
     "registry_name": "representative_instrument_sample",
-    "version": "0.80.1.dev632+gd4045838a.d20260729",
+    "version": "0.97.1.dev850+ge092f3e95.d20260808",
     "description": "SSOT for mock/test instrument selection \u2014 Layer 1 of 3-layer architecture",
     "entries": {
-      "cefi_base_assets": ["BTC", "ETH", "SOL"],
+      "cefi_base_assets": [
+        "BTC",
+        "ETH",
+        "SOL"
+      ],
       "tradfi_equities": {
-        "CBOE": [["VIX", "tradfi_index"]],
-        "NASDAQ": [
-          ["AAPL", "tradfi_equity"],
-          ["QQQ", "tradfi_etf"]
+        "CBOE": [
+          [
+            "VIX",
+            "tradfi_index"
+          ]
         ],
-        "NYSE": [["GLD", "tradfi_etf"]]
+        "NASDAQ": [
+          [
+            "AAPL",
+            "tradfi_equity"
+          ],
+          [
+            "QQQ",
+            "tradfi_etf"
+          ]
+        ],
+        "NYSE": [
+          [
+            "GLD",
+            "tradfi_etf"
+          ]
+        ]
       },
       "tradfi_futures": {
-        "CME": [["ES", "ES", 50.0, 0.25]],
+        "CME": [
+          [
+            "ES",
+            "ES",
+            50.0,
+            0.25
+          ]
+        ],
         "ICE": [
-          ["ZB", "ZB", 1000.0, 0.03125],
-          ["ZN", "ZN", 1000.0, 0.015625]
+          [
+            "ZB",
+            "ZB",
+            1000.0,
+            0.03125
+          ],
+          [
+            "ZN",
+            "ZN",
+            1000.0,
+            0.015625
+          ]
         ]
       },
       "defi_instruments": {
@@ -6727,13 +7852,31 @@
           }
         ]
       },
-      "defi_lending_assets": ["WETH", "USDC", "USDT"],
-      "defi_pool_pairs": [
-        ["USDT", "ETH"],
-        ["USDC", "ETH"],
-        ["DAI", "USDC"]
+      "defi_lending_assets": [
+        "WETH",
+        "USDC",
+        "USDT"
       ],
-      "sports_leagues": ["premier_league", "nba", "la_liga", "nfl"],
+      "defi_pool_pairs": [
+        [
+          "USDT",
+          "ETH"
+        ],
+        [
+          "USDC",
+          "ETH"
+        ],
+        [
+          "DAI",
+          "USDC"
+        ]
+      ],
+      "sports_leagues": [
+        "premier_league",
+        "nba",
+        "la_liga",
+        "nfl"
+      ],
       "options_chain_config": {
         "atm_price_usd": 60000,
         "monthly_expiries": 3,
@@ -6750,12 +7893,17 @@
         "9": "U",
         "12": "Z"
       },
-      "quarterly_months": [3, 6, 9, 12]
+      "quarterly_months": [
+        3,
+        6,
+        9,
+        12
+      ]
     }
   },
   "deployment_enums": {
     "registry_name": "deployment_enums",
-    "version": "0.80.1.dev632+gd4045838a.d20260729",
+    "version": "0.97.1.dev850+ge092f3e95.d20260808",
     "description": "Deployment clusters, tiers, operation modes, statuses from UIC",
     "entries": {
       "DeploymentCluster": [

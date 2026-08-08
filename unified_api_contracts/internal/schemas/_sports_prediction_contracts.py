@@ -182,6 +182,42 @@ SPORTS_ODDS_HORIZON_BUCKET = SchemaContract(
 )
 
 # ---------------------------------------------------------------------------
+# Sports (odds) — new first-class `odds` data_type (sports_taxonomy_p1_
+# capture_and_contracts_2026_08_08.md todo 6). The MTDS odds_api_adapter
+# now stamps data_type="odds" (lowercase) and adds an `in_play` boolean
+# derived from bm_minutes_to_kickoff < 0. `SPORTS_ODDS_TRADES` (data_type=
+# "trades") stays registered for the 375k+ historical shards already
+# captured under that vocabulary — this new contract covers forward capture.
+# `in_play` is NOT bolted onto SPORTS_ODDS_TRADES (validate_dataframe treats
+# every declared column as mandatory — same reason broker/client were dropped).
+# `SPORTS_ODDS_HORIZON_BUCKET` is pre-match only and uses
+# *SPORTS_ODDS_TRADES.columns (no in_play) — unchanged.
+# ---------------------------------------------------------------------------
+
+SPORTS_ODDS = SchemaContract(
+    asset_group="sports",
+    instrument_type="odds",
+    data_type="odds",
+    columns=[
+        *SPORTS_ODDS_TRADES.columns,
+        ColumnSpec(
+            name="in_play",
+            dtype="bool",
+            nullable=False,
+            description=(
+                "True if bm_minutes_to_kickoff < 0 (post-kickoff / in-play tick). "
+                "Derived from bm_minutes_to_kickoff at write time by MTDS "
+                "odds_api_adapter. False for all pre-match ticks. Replaces the "
+                "retired trades_inplay data_type — the two populations are now "
+                "distinguished by this column, not by data_type."
+            ),
+        ),
+    ],
+    symbol_column="fixture_id",
+    required_row_count_min=1,
+)
+
+# ---------------------------------------------------------------------------
 # Prediction markets (Polymarket, Kalshi, …) — Phase 1.1
 # ---------------------------------------------------------------------------
 
@@ -637,6 +673,7 @@ PREDICTION_PREDICTION_MARKET_FILLS = SchemaContract(
 # Registry side-effects
 # ---------------------------------------------------------------------------
 
+CONTRACT_REGISTRY[("sports", "odds", "odds")] = SPORTS_ODDS
 CONTRACT_REGISTRY[("sports", "odds", "trades")] = SPORTS_ODDS_TRADES
 CONTRACT_REGISTRY[("sports", "exchange_odds", "trades")] = SPORTS_EXCHANGE_ODDS_TRADES
 CONTRACT_REGISTRY[("sports", "fixed_odds", "trades")] = SPORTS_FIXED_ODDS_TRADES
@@ -657,6 +694,7 @@ __all__ = [
     "PREDICTION_PREDICTION_MARKET_TRADES",
     "SPORTS_EXCHANGE_ODDS_TRADES",
     "SPORTS_FIXED_ODDS_TRADES",
+    "SPORTS_ODDS",
     "SPORTS_ODDS_ARBITRAGE",
     "SPORTS_ODDS_HORIZON_BUCKET",
     "SPORTS_ODDS_MOVEMENT",

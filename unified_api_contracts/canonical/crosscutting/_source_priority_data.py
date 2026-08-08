@@ -90,6 +90,12 @@ SOURCE_PRIORITY: Final[dict[tuple[str, str], list[str]]] = {
     # inert for the live sports fleet; this SOURCE_PRIORITY-only entry does not touch
     # any of them.
     ("sports", "TRADES_INPLAY"): ["odds_api"],
+    # odds (lowercase) = the new canonical data_type for MTDS Odds API forward capture
+    # (sports_taxonomy_p1_capture_and_contracts_2026_08_08.md todo 6). The writer now
+    # stamps data_type="odds" + in_play bool. derive_pipeline_mode_for_row() tries
+    # data_type as-is FIRST (lowercase "odds" hits here), then uppercase — so this
+    # entry is required for correct source attribution of all forward-captured rows.
+    ("sports", "odds"): ["odds_api"],
     ("sports", "WEATHER_FORECAST"): ["open_meteo"],
     # Sports raw data types (instruments-service manifest data_type names).
     ("sports", "XG"): ["understat"],

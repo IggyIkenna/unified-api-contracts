@@ -93,6 +93,11 @@ AVAILABILITY_AT_SEMANTICS: Final[dict[tuple[str, str], AvailabilitySemantic]] = 
     # root-cause diagnosis. sports_manifest_blank_venue_captured_rows_2026_07_27.md
     # todo 2.
     ("sports", "TRADES_INPLAY"): "publication_time",
+    # odds (lowercase) — forward-capture counterpart of TRADES/TRADES_INPLAY. Added
+    # alongside the SOURCE_PRIORITY entry to satisfy the bidirectional closed-set test
+    # (test_every_source_priority_pair_has_availability_semantic). Same publication-time
+    # semantic — the tick timestamp when the bookmaker quote was observed.
+    ("sports", "odds"): "publication_time",
     ("sports", "WEATHER_FORECAST"): "forecast_issue_time",
     # Sports raw data types written by instruments-service (as recorded in
     # the manifest and used by features-sports-service as upstream inputs).
