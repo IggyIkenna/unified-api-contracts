@@ -19,6 +19,7 @@ from unified_api_contracts.internal.schemas.contracts import (
     PREDICTION_PREDICTION_MARKET_TRADES,
     SPORTS_EXCHANGE_ODDS_TRADES,
     SPORTS_FIXED_ODDS_TRADES,
+    SPORTS_ODDS_HORIZON_BUCKET,
     SPORTS_ODDS_SNAPSHOT,
     SPORTS_ODDS_TRADES,
     SchemaContractNotFoundError,
@@ -212,6 +213,62 @@ def test_sports_fixed_odds_trades_validates_sample_dataframe() -> None:
         }
     )
     violations = validate_dataframe(df, SPORTS_FIXED_ODDS_TRADES)
+    assert violations == [], f"expected no violations, got {violations}"
+
+
+# ---------------------------------------------------------------------------
+# SPORTS_ODDS_HORIZON_BUCKET — first-class ``horizon`` axis
+# (sports_taxonomy_p1_capture_and_contracts_2026_08_08.md, operator ruling 5).
+# Previously ``data_type=odds_horizon_bucket`` had NO registered
+# SchemaContract at all — this formalises it, separate from
+# SPORTS_ODDS_TRADES, precisely because ``validate_dataframe`` requires
+# every declared column present regardless of ``nullable``/``required``
+# (see ``test_sports_odds_trades_no_broker_client_columns`` above).
+# ---------------------------------------------------------------------------
+
+
+def test_sports_odds_horizon_bucket_registered_in_contract_registry() -> None:
+    contract = CONTRACT_REGISTRY[("sports", "odds", "odds_horizon_bucket")]
+    assert contract is SPORTS_ODDS_HORIZON_BUCKET
+
+
+def test_sports_odds_horizon_bucket_lookup_returns_contract() -> None:
+    contract = lookup_contract(asset_group="sports", instrument_type="odds", data_type="odds_horizon_bucket")
+    assert contract is SPORTS_ODDS_HORIZON_BUCKET
+
+
+def test_sports_odds_horizon_bucket_has_required_horizon_column() -> None:
+    by_name = {c.name: c for c in SPORTS_ODDS_HORIZON_BUCKET.columns}
+    assert "horizon" in by_name
+    assert by_name["horizon"].nullable is False
+
+
+def test_sports_odds_horizon_bucket_shares_raw_odds_columns_plus_horizon() -> None:
+    """The bucketed shape is the raw odds row shape plus one new axis column."""
+    raw_names = {c.name for c in SPORTS_ODDS_TRADES.columns}
+    bucketed_names = {c.name for c in SPORTS_ODDS_HORIZON_BUCKET.columns}
+    assert bucketed_names == raw_names | {"horizon"}
+
+
+def test_sports_odds_horizon_bucket_validates_sample_dataframe() -> None:
+    df = pd.DataFrame(
+        {
+            "instrument_id": pd.Series(
+                ["FOOTBALL:PINNACLE:MATCH_ODDS:EPL:2025-26:ARSENAL-CHELSEA::HOME"],
+                dtype="string",
+            ),
+            "bookmaker_key": pd.Series(["PINNACLE"], dtype="string"),
+            "bm_time": pd.Series(["2026-03-22T14:00:00Z"], dtype="string"),
+            "source": pd.Series(["ODDS_API"], dtype="string"),
+            "league_id": pd.Series(["EPL"], dtype="string"),
+            "fixture_id": pd.Series(["EPL:ARSENAL_v_CHELSEA:20260322"], dtype="string"),
+            "market_key": pd.Series(["h2h"], dtype="string"),
+            "outcome_name": pd.Series(["HOME"], dtype="string"),
+            "price": pd.Series([1.85], dtype="float64"),
+            "horizon": pd.Series(["T-24h"], dtype="string"),
+        }
+    )
+    violations = validate_dataframe(df, SPORTS_ODDS_HORIZON_BUCKET)
     assert violations == [], f"expected no violations, got {violations}"
 
 

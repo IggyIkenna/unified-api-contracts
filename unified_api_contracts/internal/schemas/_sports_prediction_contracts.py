@@ -139,6 +139,49 @@ SPORTS_FIXED_ODDS_TRADES = SchemaContract(
 )
 
 # ---------------------------------------------------------------------------
+# Sports (odds) — Tier-1 horizon-bucketed odds (contracts-first, first-class
+# ``horizon`` axis: sports_taxonomy_p1_capture_and_contracts_2026_08_08.md
+# operator ruling 5). Formalises ``data_type=odds_horizon_bucket`` — which had
+# NO registered SchemaContract at all before this — as its own entry rather
+# than adding an always-present-required column to ``SPORTS_ODDS_TRADES``
+# above: ``validate_dataframe`` treats every declared column as mandatory
+# regardless of ``nullable``/``required`` (the SAME reason ``broker``/
+# ``client`` were dropped from that contract rather than kept nullable — see
+# ``test_sports_odds_trades_no_broker_client_columns``), so bolting an
+# optional ``horizon`` onto the raw-tick contract would flag every
+# currently-shipping unbucketed row as a violation. Mirrors the
+# EXCHANGE_ODDS/FIXED_ODDS fork immediately above: same row shape as
+# SPORTS_ODDS_TRADES, plus ``horizon`` — REQUIRED here (every row this
+# adapter emits carries a bucket assignment) — instead of the raw ticks'
+# absent column. ``horizon`` is a FIRST-CLASS axis, separate from
+# ``timeframe`` — ``timeframe`` reverts to meaning candle grain only. Data
+# re-stamp (folding this data_type into ``odds`` per ruling 5) is P2; this
+# phase lands the contract only.
+# ---------------------------------------------------------------------------
+
+SPORTS_ODDS_HORIZON_BUCKET = SchemaContract(
+    asset_group="sports",
+    instrument_type="odds",
+    data_type="odds_horizon_bucket",
+    columns=[
+        *SPORTS_ODDS_TRADES.columns,
+        ColumnSpec(
+            name="horizon",
+            dtype="string",
+            nullable=False,
+            description=(
+                "Time-to-kickoff Tier-1 ML bucket name (T-24h..T-0) — see UAC "
+                "SPORTS_HORIZONS, the SSOT vocabulary for this axis. Assigned "
+                "by MDPS SportsBucketAssignmentAdapter; every row this "
+                "data_type emits carries one."
+            ),
+        ),
+    ],
+    symbol_column="fixture_id",
+    required_row_count_min=0,
+)
+
+# ---------------------------------------------------------------------------
 # Prediction markets (Polymarket, Kalshi, …) — Phase 1.1
 # ---------------------------------------------------------------------------
 
@@ -604,6 +647,7 @@ CONTRACT_REGISTRY[("prediction", "prediction_market", "fills")] = PREDICTION_PRE
 CONTRACT_REGISTRY[("sports", "odds", "sports_odds_snapshot")] = SPORTS_ODDS_SNAPSHOT
 CONTRACT_REGISTRY[("sports", "odds", "sports_odds_movement")] = SPORTS_ODDS_MOVEMENT
 CONTRACT_REGISTRY[("sports", "odds", "sports_arbitrage")] = SPORTS_ODDS_ARBITRAGE
+CONTRACT_REGISTRY[("sports", "odds", "odds_horizon_bucket")] = SPORTS_ODDS_HORIZON_BUCKET
 
 
 __all__ = [
@@ -614,6 +658,7 @@ __all__ = [
     "SPORTS_EXCHANGE_ODDS_TRADES",
     "SPORTS_FIXED_ODDS_TRADES",
     "SPORTS_ODDS_ARBITRAGE",
+    "SPORTS_ODDS_HORIZON_BUCKET",
     "SPORTS_ODDS_MOVEMENT",
     "SPORTS_ODDS_SNAPSHOT",
     "SPORTS_ODDS_TRADES",
