@@ -1207,8 +1207,9 @@ _SPORTS_ODDS_DERIVED_CANDLE_PREFIXES: tuple[str, ...] = (
 
 # Sports EXCHANGE_ODDS/FIXED_ODDS fork instrument_types (contracts-first
 # migration, sports_closeout_exchange_fixed_odds_fork_2026_07_25.md todo 3-4).
-# Only ("sports", "exchange_odds"/"fixed_odds", "trades") has its own
-# CONTRACT_REGISTRY entry so far -- the sibling odds data_types
+# Only ("sports", "exchange_odds"/"fixed_odds", "odds") has its own
+# CONTRACT_REGISTRY entry so far (data_type renamed trades->odds 2026-08-08,
+# sports taxonomy P1) -- the sibling odds data_types
 # (sports_odds_snapshot / sports_odds_movement / sports_arbitrage, ...) still
 # resolve only under the legacy "odds" instrument_type. During the migration
 # window (GCS objects move venue-by-venue into exchange_odds/ or fixed_odds/
@@ -1256,7 +1257,8 @@ def lookup_contract(
            :data:`_SPORTS_ODDS_FORK_INSTRUMENT_TYPES` (``exchange_odds`` /
            ``fixed_odds``), fall back to
            ``CONTRACT_REGISTRY[(asset_group, "odds", data_type)]``. Only the
-           ``trades`` data_type has its own fork-specific registry entry so
+           ``odds`` data_type (raw ticks, renamed from ``trades`` 2026-08-08,
+           sports taxonomy P1) has its own fork-specific registry entry so
            far — the legacy ``odds`` entry backs every other odds data_type
            (``sports_odds_snapshot`` / ``sports_odds_movement`` /
            ``sports_arbitrage`` / ...) under the new instrument_types too,

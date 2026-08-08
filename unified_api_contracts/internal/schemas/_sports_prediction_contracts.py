@@ -10,14 +10,19 @@ performs a lookup.
 
 Sports:
     ``(category=sports, venue=BOOKMAKER, source=odds_api|sfi|footystats,
-       league_id=EPL|LALIGA|…, instrument_type=odds, data_type=trades)``
+       league_id=EPL|LALIGA|…, instrument_type=odds, data_type=odds)``
 
     ``venue`` (manifest/path dimension) is the bookmaker (BET365, PINNACLE,
     BETFAIR, MATCHBOOK, UNITY_BETFAIR). ``source`` is the provider.
     ``league_id`` is a first-class shard column — never overload ``venue``.
 
     **Row-level schema (SPORTS_ODDS_TRADES contract, corrected 2026-07-26 —
-    T2.9 of `sports_mtds_odds_trades_index_correctness_followup_2026_07_24.md`):**
+    T2.9 of `sports_mtds_odds_trades_index_correctness_followup_2026_07_24.md`;
+    ``data_type`` collapsed ``trades`` → ``odds`` 2026-08-08, sports taxonomy
+    P1 operator ruling 4 — ``trades`` is RE-RESERVED for genuine matched
+    volume with ZERO current producers; ``odds_api``/``footystats`` raw
+    bookmaker-quote population now shares the single lowercase ``odds``
+    data_type, distinguished only via the ``source`` column):**
     the ROW columns persisted by the native live writer do NOT mirror the
     manifest partition-dimension names 1:1 — `venue_fetch.py`'s per-bookmaker
     shard grouping renames the row-level ``venue`` key to ``bookmaker_key``
@@ -27,7 +32,10 @@ Sports:
     ``odds_decimal``. There is no ``broker``/``client`` pairing anywhere in
     this ingestion shape (those never existed in the real writer output) —
     verified directly against a live captured
-    ``pipeline_mode=batch_odds_api`` object, not inferred.
+    ``pipeline_mode=batch_odds_api`` object, not inferred. ``in_play`` is a
+    REQUIRED boolean column (added in the same 2026-08-08 change) derived by
+    the writer from ``bm_minutes_to_kickoff < 0`` — it replaces the retired
+    ``trades_inplay`` data_type/filename split.
 
 Prediction:
     ``(category=prediction, venue=POLYMARKET, chain=POLYGON,
@@ -63,7 +71,7 @@ from unified_api_contracts.internal.schemas.contracts import (
 SPORTS_ODDS_TRADES = SchemaContract(
     asset_group="sports",
     instrument_type="odds",
-    data_type="trades",
+    data_type="odds",
     columns=[
         INSTRUMENT_ID_COL,
         ColumnSpec(
@@ -106,6 +114,17 @@ SPORTS_ODDS_TRADES = SchemaContract(
         ),
         ColumnSpec(name="outcome_name", dtype="string", nullable=False),
         PRICE_COL,
+        ColumnSpec(
+            name="in_play",
+            dtype="bool",
+            nullable=False,
+            description=(
+                "True for post-kickoff ('in-play') bookmaker quotes, derived by the writer from "
+                "bm_minutes_to_kickoff < 0. Replaces the retired trades_inplay data_type/filename "
+                "split (sports taxonomy P1, 2026-08-08) — in_play is now a column on the merged "
+                "odds data_type rather than a separate population."
+            ),
+        ),
     ],
     symbol_column="fixture_id",
     required_row_count_min=1,
@@ -123,7 +142,7 @@ SPORTS_ODDS_TRADES = SchemaContract(
 SPORTS_EXCHANGE_ODDS_TRADES = SchemaContract(
     asset_group="sports",
     instrument_type="exchange_odds",
-    data_type="trades",
+    data_type="odds",
     columns=SPORTS_ODDS_TRADES.columns,
     symbol_column="fixture_id",
     required_row_count_min=1,
@@ -132,7 +151,7 @@ SPORTS_EXCHANGE_ODDS_TRADES = SchemaContract(
 SPORTS_FIXED_ODDS_TRADES = SchemaContract(
     asset_group="sports",
     instrument_type="fixed_odds",
-    data_type="trades",
+    data_type="odds",
     columns=SPORTS_ODDS_TRADES.columns,
     symbol_column="fixture_id",
     required_row_count_min=1,
@@ -637,9 +656,9 @@ PREDICTION_PREDICTION_MARKET_FILLS = SchemaContract(
 # Registry side-effects
 # ---------------------------------------------------------------------------
 
-CONTRACT_REGISTRY[("sports", "odds", "trades")] = SPORTS_ODDS_TRADES
-CONTRACT_REGISTRY[("sports", "exchange_odds", "trades")] = SPORTS_EXCHANGE_ODDS_TRADES
-CONTRACT_REGISTRY[("sports", "fixed_odds", "trades")] = SPORTS_FIXED_ODDS_TRADES
+CONTRACT_REGISTRY[("sports", "odds", "odds")] = SPORTS_ODDS_TRADES
+CONTRACT_REGISTRY[("sports", "exchange_odds", "odds")] = SPORTS_EXCHANGE_ODDS_TRADES
+CONTRACT_REGISTRY[("sports", "fixed_odds", "odds")] = SPORTS_FIXED_ODDS_TRADES
 CONTRACT_REGISTRY[("prediction", "prediction_market", "trades")] = PREDICTION_PREDICTION_MARKET_TRADES
 CONTRACT_REGISTRY[("prediction", "prediction_market", "book_snapshot_5")] = PREDICTION_PREDICTION_MARKET_BOOK_SNAPSHOT
 CONTRACT_REGISTRY[("prediction", "prediction_market", "market_metadata")] = PREDICTION_PREDICTION_MARKET_METADATA
