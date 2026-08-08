@@ -103,6 +103,7 @@ def test_sports_odds_trades_validates_sample_dataframe() -> None:
     real column names + dtypes (verified 2026-07-26 against a captured
     ``venue=WILLIAMHILL/league_id=ALLSVENSKAN`` shard) — ``bm_time`` is the
     writer's raw ISO8601 string, not a parsed datetime64 column.
+    ``in_play`` added 2026-08-08 (sports taxonomy P1, operator ruling 4).
     """
     df = pd.DataFrame(
         {
@@ -118,6 +119,7 @@ def test_sports_odds_trades_validates_sample_dataframe() -> None:
             "market_key": pd.Series(["h2h"], dtype="string"),
             "outcome_name": pd.Series(["HOME"], dtype="string"),
             "price": pd.Series([1.85], dtype="float64"),
+            "in_play": pd.Series([False], dtype="bool"),
         }
     )
     violations = validate_dataframe(df, SPORTS_ODDS_TRADES)
@@ -189,6 +191,7 @@ def test_sports_exchange_odds_trades_validates_sample_dataframe() -> None:
             "market_key": pd.Series(["h2h"], dtype="string"),
             "outcome_name": pd.Series(["HOME"], dtype="string"),
             "price": pd.Series([1.85], dtype="float64"),
+            "in_play": pd.Series([False], dtype="bool"),
         }
     )
     violations = validate_dataframe(df, SPORTS_EXCHANGE_ODDS_TRADES)
@@ -210,6 +213,7 @@ def test_sports_fixed_odds_trades_validates_sample_dataframe() -> None:
             "market_key": pd.Series(["h2h"], dtype="string"),
             "outcome_name": pd.Series(["HOME"], dtype="string"),
             "price": pd.Series([1.85], dtype="float64"),
+            "in_play": pd.Series([False], dtype="bool"),
         }
     )
     violations = validate_dataframe(df, SPORTS_FIXED_ODDS_TRADES)
@@ -265,6 +269,7 @@ def test_sports_odds_horizon_bucket_validates_sample_dataframe() -> None:
             "market_key": pd.Series(["h2h"], dtype="string"),
             "outcome_name": pd.Series(["HOME"], dtype="string"),
             "price": pd.Series([1.85], dtype="float64"),
+            "in_play": pd.Series([False], dtype="bool"),
             "horizon": pd.Series(["T-24h"], dtype="string"),
         }
     )

@@ -63,7 +63,7 @@ from unified_api_contracts.internal.schemas.contracts import (
 SPORTS_ODDS_TRADES = SchemaContract(
     asset_group="sports",
     instrument_type="odds",
-    data_type="trades",
+    data_type="odds",
     columns=[
         INSTRUMENT_ID_COL,
         ColumnSpec(
@@ -106,6 +106,17 @@ SPORTS_ODDS_TRADES = SchemaContract(
         ),
         ColumnSpec(name="outcome_name", dtype="string", nullable=False),
         PRICE_COL,
+        ColumnSpec(
+            name="in_play",
+            dtype="bool",
+            nullable=False,
+            description=(
+                "True if bm_minutes_to_kickoff < 0 at fetch time (in-play observation). "
+                "Replaces the retired ``trades_inplay`` data_type — the in-play / pre-match "
+                "population distinction is now carried by this boolean column, not a separate "
+                "data_type entry (sports taxonomy P1, operator ruling 4, 2026-08-08)."
+            ),
+        ),
     ],
     symbol_column="fixture_id",
     required_row_count_min=1,
@@ -123,7 +134,7 @@ SPORTS_ODDS_TRADES = SchemaContract(
 SPORTS_EXCHANGE_ODDS_TRADES = SchemaContract(
     asset_group="sports",
     instrument_type="exchange_odds",
-    data_type="trades",
+    data_type="odds",
     columns=SPORTS_ODDS_TRADES.columns,
     symbol_column="fixture_id",
     required_row_count_min=1,
@@ -132,7 +143,7 @@ SPORTS_EXCHANGE_ODDS_TRADES = SchemaContract(
 SPORTS_FIXED_ODDS_TRADES = SchemaContract(
     asset_group="sports",
     instrument_type="fixed_odds",
-    data_type="trades",
+    data_type="odds",
     columns=SPORTS_ODDS_TRADES.columns,
     symbol_column="fixture_id",
     required_row_count_min=1,
@@ -637,6 +648,10 @@ PREDICTION_PREDICTION_MARKET_FILLS = SchemaContract(
 # Registry side-effects
 # ---------------------------------------------------------------------------
 
+CONTRACT_REGISTRY[("sports", "odds", "odds")] = SPORTS_ODDS_TRADES
+CONTRACT_REGISTRY[("sports", "exchange_odds", "odds")] = SPORTS_EXCHANGE_ODDS_TRADES
+CONTRACT_REGISTRY[("sports", "fixed_odds", "odds")] = SPORTS_FIXED_ODDS_TRADES
+# Backward-compat aliases: existing GCS objects carry data_type="trades" until P2 restamp
 CONTRACT_REGISTRY[("sports", "odds", "trades")] = SPORTS_ODDS_TRADES
 CONTRACT_REGISTRY[("sports", "exchange_odds", "trades")] = SPORTS_EXCHANGE_ODDS_TRADES
 CONTRACT_REGISTRY[("sports", "fixed_odds", "trades")] = SPORTS_FIXED_ODDS_TRADES
