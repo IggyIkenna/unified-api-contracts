@@ -182,6 +182,50 @@ SPORTS_ODDS_HORIZON_BUCKET = SchemaContract(
 )
 
 # ---------------------------------------------------------------------------
+# Sports (odds) — unified lowercase ``odds`` raw tick contract (P1 target,
+# sports_taxonomy_p1_capture_and_contracts_2026_08_08.md operator ruling 4:
+# "trades -> odds (one raw type)"). Same row shape as SPORTS_ODDS_TRADES —
+# the merge is a vocabulary/data_type-token collapse, not a schema change:
+# ODDS_API bookmaker quotes (currently captured as data_type=trades) and
+# FOOTYSTATS pre-match odds (currently captured as data_type=odds/ODDS) both
+# land under this ONE contract going forward, distinguished by the existing
+# ``source`` column (already documents ODDS_API/SFI/FOOTYSTATS as valid
+# values on SPORTS_ODDS_TRADES above — this fork does not need to add it).
+#
+# ``in_play`` is deliberately NOT a declared column here: the live ODDS_API
+# writer (market-tick-data-service odds_api_adapter.py) already emits
+# ``bm_minutes_to_kickoff`` on every row (confirmed directly in the adapter,
+# not inferred), so in_play is DERIVABLE at read time (``bm_minutes_to_kickoff
+# < 0``) without a physical column. Declaring it as a required ColumnSpec
+# would hit the same validate_dataframe every-declared-column-is-mandatory
+# footgun that kept ``horizon`` out of SPORTS_ODDS_TRADES above (see that
+# contract's docstring) — bolting it onto a schema whose real captured rows
+# don't carry the column would flag every currently-shipping row. Retires
+# ``trades_inplay`` (a frozen 2022 legacy-bucket recovery population, not a
+# live capture stream) as a forward vocabulary target: post-merge, in-play
+# quotes are just ``odds`` rows with a negative ``bm_minutes_to_kickoff``,
+# not a distinct data_type.
+#
+# This phase (P1) is contracts-only, per the plan header — no GCS object or
+# manifest row is mutated here, and the writer keeps emitting the CURRENT
+# vocabulary (data_type=trades for ODDS_API, data_type=odds/ODDS for
+# FOOTYSTATS) unchanged. SPORTS_ODDS_TRADES/SPORTS_EXCHANGE_ODDS_TRADES/
+# SPORTS_FIXED_ODDS_TRADES stay registered for the dual-read window (mirrors
+# the EXCHANGE_ODDS/FIXED_ODDS fork's own precedent above). The physical
+# data_type re-stamp across MTDS/MDPS/instruments-service (enumerated in this
+# todo's consumer inventory) is P2 scope.
+# ---------------------------------------------------------------------------
+
+SPORTS_ODDS = SchemaContract(
+    asset_group="sports",
+    instrument_type="odds",
+    data_type="odds",
+    columns=SPORTS_ODDS_TRADES.columns,
+    symbol_column="fixture_id",
+    required_row_count_min=0,
+)
+
+# ---------------------------------------------------------------------------
 # Prediction markets (Polymarket, Kalshi, …) — Phase 1.1
 # ---------------------------------------------------------------------------
 
@@ -648,6 +692,7 @@ CONTRACT_REGISTRY[("sports", "odds", "sports_odds_snapshot")] = SPORTS_ODDS_SNAP
 CONTRACT_REGISTRY[("sports", "odds", "sports_odds_movement")] = SPORTS_ODDS_MOVEMENT
 CONTRACT_REGISTRY[("sports", "odds", "sports_arbitrage")] = SPORTS_ODDS_ARBITRAGE
 CONTRACT_REGISTRY[("sports", "odds", "odds_horizon_bucket")] = SPORTS_ODDS_HORIZON_BUCKET
+CONTRACT_REGISTRY[("sports", "odds", "odds")] = SPORTS_ODDS
 
 
 __all__ = [
@@ -657,6 +702,7 @@ __all__ = [
     "PREDICTION_PREDICTION_MARKET_TRADES",
     "SPORTS_EXCHANGE_ODDS_TRADES",
     "SPORTS_FIXED_ODDS_TRADES",
+    "SPORTS_ODDS",
     "SPORTS_ODDS_ARBITRAGE",
     "SPORTS_ODDS_HORIZON_BUCKET",
     "SPORTS_ODDS_MOVEMENT",
