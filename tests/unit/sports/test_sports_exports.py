@@ -160,3 +160,44 @@ class TestSportsExports:
             "attempted_failed",
             "expected_unattempted",
         }
+
+    # ------------------------------------------------------------------
+    # P1 — sports IS reference data_type lowercase-merge CONTRACT
+    # (sports_taxonomy_p1_capture_and_contracts_2026_08_08.md, operator
+    # ruling 7). Physical manifest re-stamp is P2 — this only guards the
+    # target-form mapping table.
+    # ------------------------------------------------------------------
+
+    def test_sports_is_data_type_lowercase_form_exported(self) -> None:
+        from unified_api_contracts import SPORTS_IS_DATA_TYPE_LOWERCASE_FORM
+
+        assert isinstance(SPORTS_IS_DATA_TYPE_LOWERCASE_FORM, dict)
+        assert SPORTS_IS_DATA_TYPE_LOWERCASE_FORM  # non-empty
+
+    def test_sports_is_data_type_lowercase_form_covers_every_axis_key(self) -> None:
+        """Drift guard: every ``SPORTS_DATA_TYPE_TO_SOURCE`` key must have a
+        registered lowercase target form, so a newly-added IS data_type can
+        never silently miss the P1 contract (mirrors the drift-guard pattern
+        used for ``SPORTS_HORIZONS``/MDPS's bucket-name assertion)."""
+        from unified_api_contracts import (
+            SPORTS_DATA_TYPE_TO_SOURCE,
+            SPORTS_IS_DATA_TYPE_LOWERCASE_FORM,
+        )
+
+        missing = set(SPORTS_DATA_TYPE_TO_SOURCE) - set(SPORTS_IS_DATA_TYPE_LOWERCASE_FORM)
+        assert not missing, f"IS data_type(s) missing a registered lowercase form: {sorted(missing)}"
+
+    def test_sports_is_data_type_lowercase_form_values_are_lowercase(self) -> None:
+        from unified_api_contracts import SPORTS_IS_DATA_TYPE_LOWERCASE_FORM
+
+        for key, value in SPORTS_IS_DATA_TYPE_LOWERCASE_FORM.items():
+            assert value == value.lower(), f"{key!r} maps to non-lowercase form {value!r}"
+            assert value == key.lower(), f"{key!r} should map to its own lowercased form, got {value!r}"
+
+    def test_canonical_sports_is_data_type_resolves_both_cases(self) -> None:
+        from unified_api_contracts import canonical_sports_is_data_type
+
+        assert canonical_sports_is_data_type("FIXTURES") == "fixtures"
+        assert canonical_sports_is_data_type("fixtures") == "fixtures"
+        assert canonical_sports_is_data_type("XG_SHOTS") == "xg_shots"
+        assert canonical_sports_is_data_type("NOT_A_REAL_DATA_TYPE") is None

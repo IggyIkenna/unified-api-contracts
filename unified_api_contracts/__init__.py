@@ -1011,10 +1011,16 @@ from .canonical.domain.sports.league_data import (
     SPORTS_DATA_TYPE_TO_SOURCE as SPORTS_DATA_TYPE_TO_SOURCE,
 )
 from .canonical.domain.sports.league_data import (
+    SPORTS_IS_DATA_TYPE_LOWERCASE_FORM as SPORTS_IS_DATA_TYPE_LOWERCASE_FORM,
+)
+from .canonical.domain.sports.league_data import (
     SPORTS_LEAGUES_CONFIG_HASH as SPORTS_LEAGUES_CONFIG_HASH,
 )
 from .canonical.domain.sports.league_data import (
     SPORTS_LEAGUES_CONFIG_VERSION as SPORTS_LEAGUES_CONFIG_VERSION,
+)
+from .canonical.domain.sports.league_data import (
+    canonical_sports_is_data_type as canonical_sports_is_data_type,
 )
 from .canonical.domain.sports.league_data import (
     get_league as get_league,
@@ -1662,6 +1668,7 @@ __all__ = [
     "SHARE_CLASS_BASE_ASSETS",
     "SPORTS_DATA_TYPE_TO_SOURCE",
     "SPORTS_HORIZONS",
+    "SPORTS_IS_DATA_TYPE_LOWERCASE_FORM",
     "SPORTS_VENUES",
     "STAKING_SPOT_EXCEPTION",
     "STANDALONE_EQUITY_PERP_SYMBOLS",
@@ -2521,6 +2528,7 @@ __all__ = [
     "RoundMatch",
     "SeasonBoundary",
     "footystats_season_status_for_day",
+    "canonical_sports_is_data_type",
     "get_league",
     "get_league_by_api_football_id",
     "get_league_fixture_calendar",

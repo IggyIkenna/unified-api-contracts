@@ -268,6 +268,49 @@ def get_source_for_data_type(data_type: str) -> str | None:
     return SPORTS_DATA_TYPE_TO_SOURCE.get(data_type)
 
 
+# Target lowercase canonical form for the 19-token IS reference-data
+# vocabulary above (operator ruling 7,
+# ``plans/active/sports_taxonomy_p1_capture_and_contracts_2026_08_08.md`` —
+# "merge the sports data_type vocabulary to ONE lowercase form", OVERTURNING
+# the prior "legitimately coexist; do NOT merge" ruling in
+# ``codex/02-data/sports-data-types-catalog.md``). This is the CONTRACT only:
+# the physical manifest re-stamp (writers switching to emit these lowercase
+# strings, and every consumer's lookup keys flipping to match) is P2 scope,
+# gated on the in-flight API-Football campaign — see
+# ``plans/active/sports_taxonomy_p2_migration_2026_08_08.md``. Landing this
+# table now, additively, gives P2's consumer migration a settled target
+# instead of each call site inventing its own ``.lower()`` — same pattern as
+# ``SPORTS_HORIZONS`` (``market_data_categories.py``) being the SSOT for
+# horizon names before any reader consumed them.
+#
+# Deliberately NOT wired into ``SPORTS_DATA_TYPE_TO_SOURCE``'s own keys, and
+# NOT wired into ``enumerate_expected_universe.py``'s could-exist
+# enumeration: doing either today — before the physical re-stamp — would
+# double the axis (uppercase legacy key + lowercase target key both
+# iterating) and duplicate every ``expected_unattempted`` seed row for every
+# league x date, corrupting the could-exist denominator this exact codebase
+# already got burned by once (see the ``FIXTURES``/``FIXTURES_SCHEDULE``
+# incident documented on ``_honest_coverage_logic.SCHEDULE_DEFINING_DATA_TYPES``
+# and on ``enumerate_expected_universe._SPORTS_MANIFEST_DATA_TYPE_OVERRIDE``).
+# ``ODDS_HORIZON_BUCKET`` is the one entry whose "canonical form" is already
+# live (its writer stamps lowercase on disk today), not merely a target.
+SPORTS_IS_DATA_TYPE_LOWERCASE_FORM: dict[str, str] = {key: key.lower() for key in SPORTS_DATA_TYPE_TO_SOURCE}
+
+
+def canonical_sports_is_data_type(data_type: str) -> str | None:
+    """Return the TARGET lowercase form of an IS sports reference ``data_type``.
+
+    Accepts either the legacy uppercase axis key (``SPORTS_DATA_TYPE_TO_SOURCE``)
+    or the lowercase form itself; returns ``None`` for an unrecognised token.
+    This is the P1 contract only — see :data:`SPORTS_IS_DATA_TYPE_LOWERCASE_FORM`'s
+    docstring for why it is not yet wired into live enumeration/lookup keys.
+    """
+    if data_type in SPORTS_IS_DATA_TYPE_LOWERCASE_FORM:
+        return SPORTS_IS_DATA_TYPE_LOWERCASE_FORM[data_type]
+    upper = data_type.upper()
+    return SPORTS_IS_DATA_TYPE_LOWERCASE_FORM.get(upper)
+
+
 # ---------------------------------------------------------------------------
 # Structural (league x source) honest-absence gaps (operator 2026-06-27 #6)
 # ---------------------------------------------------------------------------
