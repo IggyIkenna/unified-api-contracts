@@ -908,11 +908,21 @@ TRADFI_INSTRUMENT_TYPE_ACCEPTED_UNRESOLVED_RESIDUE: frozenset[str] = frozenset(
 # row_count=0, paired with source=polymarket_clob, dates 2020-06-06..2026-05-21.
 # GCS-confirmed 2026-07-30: zero real objects under asset_group=sports/venue=KALSHI at 3
 # dates spanning the full range — purely a manifest phantom, no data at risk. Root-cause
-# classification (fleet-wide manifest_consolidator TOCTOU vs. legacy artifact) remains open
-# on `sports_satellite_ao_dispatch_batch3_2026_07_25.md`; this only silences the panel
-# badge for the confirmed-phantom population. NOT a canonical set — never merge into
+# classification CLOSED 2026-07-31 (`sports_satellite_ao_dispatch_batch3_2026_07_25.md`,
+# archived): classification (b) — a dormant legacy artifact, NOT the (separately fixed)
+# manifest_consolidator TOCTOU bug class. All 20,785 rows' written_at cluster in a single
+# 80s window (2026-07-13T23:54:39-23:55:59) from `rebuild_sports_manifest_v9.py`'s
+# reason-taxonomy rebuild re-stamping pre-existing rows, not creating new ones — the rows
+# predate that rebuild by 6+ weeks and the exact originating write was never pinned. No
+# live enumerator seeds KALSHI into sports today (VENUES_BY_ASSET_GROUP["sports"],
+# expected_coverage.py, and IS's get_venues_for_asset_groups are all clean) — 2026-08-08
+# re-verification found no seeding path to fix, only this exception set + the affected
+# manifest rows (P2 cleanup) remain. This only silences the panel badge for the
+# confirmed-phantom population. NOT a canonical set — never merge into
 # VENUES_BY_ASSET_GROUP["sports"] (KALSHI belongs to prediction, not sports). Consumed by
-# `_ACCEPTED_EXCEPTIONS[("venues", "sports")]`.
+# `_ACCEPTED_EXCEPTIONS[("venues", "sports")]`. Retire once the 20,785 rows are purged
+# (manifest-row cleanup tracked as P2 in `sports_taxonomy_p2_migration_2026_08_08.md`) —
+# do NOT retire while the rows still exist, or the panel badge falsely reflags them.
 SPORTS_VENUE_ACCEPTED_CROSS_AG_BLEED: frozenset[str] = frozenset(
     {
         "KALSHI",
