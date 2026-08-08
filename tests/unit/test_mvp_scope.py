@@ -626,9 +626,9 @@ class TestSportsMvp:
         """EPL league odds data → MVP."""
         assert is_mvp("sports", "ODDS_API", "FIXED_ODDS", "odds", league="EPL")
 
-    def test_mls_odds_snapshot_is_mvp(self) -> None:
-        """MLS (a football league in the 96) odds_snapshot → MVP (decision #1)."""
-        assert is_mvp("sports", "ODDS_API", "FIXED_ODDS", "odds_snapshot", league="MLS")
+    def test_mls_odds_snapshot_retired(self) -> None:
+        """odds_snapshot retired 2026-08-08 (sports taxonomy P1): MDPS-derived, not raw MVP type."""
+        assert not is_mvp("sports", "ODDS_API", "FIXED_ODDS", "odds_snapshot", league="MLS")
 
     def test_eng_championship_is_mvp(self) -> None:
         """ENG_CHAMPIONSHIP (football) IS MVP — the 96-league universe is ALL football
@@ -871,10 +871,11 @@ class TestPredictionReconcileCrossAgUnchanged:
         assert not is_mvp("tradfi", "CME", "FUTURE", "book_snapshot_5", base_ccy="ES")
 
     def test_sports_data_types_unchanged(self) -> None:
-        """Sports MVP data_types is the exact odds set — markets/outcomes/settlements retired 2026-08-08."""
+        """Sports MVP data_types is the exact odds set — markets/outcomes/settlements/odds_snapshot/odds_movement
+        retired 2026-08-08 (sports taxonomy P1): MDPS-derived types removed from raw UAC vocabulary."""
         rule = MVP_SCOPE["sports"]
         assert isinstance(rule, SportsMvpRule)
-        assert rule.data_types == frozenset({"odds", "ODDS", "odds_snapshot"})
+        assert rule.data_types == frozenset({"odds", "ODDS"})
 
     def test_defi_data_types_unchanged(self) -> None:
         """DeFi MVP data_types stays == the derived DATA_TYPES_BY_ASSET_GROUP['defi']."""
