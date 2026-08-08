@@ -899,22 +899,17 @@ TRADFI_INSTRUMENT_TYPE_ACCEPTED_UNRESOLVED_RESIDUE: frozenset[str] = frozenset(
     }
 )
 
-# Sports venue-axis cross-asset-group bleed (2026-07-30 census review). KALSHI is a real,
-# registered `prediction` venue (VENUES_BY_ASSET_GROUP["prediction"]) whose rows also
-# appear in the SPORTS manifest — 20,785 rows, 100% capture_status=empty_confirmed/
-# row_count=0, paired with source=polymarket_clob, dates 2020-06-06..2026-05-21.
-# GCS-confirmed 2026-07-30: zero real objects under asset_group=sports/venue=KALSHI at 3
-# dates spanning the full range — purely a manifest phantom, no data at risk. Root-cause
-# classification (fleet-wide manifest_consolidator TOCTOU vs. legacy artifact) remains open
-# on `sports_satellite_ao_dispatch_batch3_2026_07_25.md`; this only silences the panel
-# badge for the confirmed-phantom population. NOT a canonical set — never merge into
-# VENUES_BY_ASSET_GROUP["sports"] (KALSHI belongs to prediction, not sports). Consumed by
-# `_ACCEPTED_EXCEPTIONS[("venues", "sports")]`.
-SPORTS_VENUE_ACCEPTED_CROSS_AG_BLEED: frozenset[str] = frozenset(
-    {
-        "KALSHI",
-    }
-)
+# Sports venue-axis cross-asset-group bleed — RETIRED 2026-08-08 (sports taxonomy P1).
+# KALSHI is a `prediction` venue (VENUES_BY_ASSET_GROUP["prediction"]), NOT sports.
+# Its 20,785 `empty_confirmed`/`trades` rows in the sports manifest (source=polymarket_clob,
+# 2020-06-06..2026-05-21) are a legacy phantom (batch3 classification (b); no backing GCS
+# objects; formula-inert). Seeding is stopped at the IS enumerator:
+# ``instruments-service/scripts/enumerate_expected_universe.py`` now guards both
+# ``_yield_v2_sports_pre_source_coverage_rows`` and ``_enumerate_v2_sports`` against
+# prediction-market venues via ``is_prediction_market_venue``.
+# Manifest-row cleanup (delete the 20,785 rows): ``sports_taxonomy_p2_migration_2026_08_08.md``.
+# NOT a canonical set — never merge into VENUES_BY_ASSET_GROUP["sports"].
+SPORTS_VENUE_ACCEPTED_CROSS_AG_BLEED: frozenset[str] = frozenset()
 
 # Sports data_type-axis stale uppercase residue (2026-07-30 census review,
 # sports_consolidated_closeout_2026_07_19.md "K1/K2 revert"). `ODDS`/`ODDS_MOVEMENT`/
