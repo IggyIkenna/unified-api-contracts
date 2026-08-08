@@ -496,8 +496,16 @@ PROTOCOL_CAPABILITIES: dict[str, _ProtocolCapability] = {
         venue_prefix="VENUS",
         protocol_class=ProtocolClass.LENDING,
         instrument_types=_LENDING_ATOKEN_DEBTTOKEN,
-        data_types=["lending_indices"],
-        mtds_operations=["collect-lending-indices"],
+        data_types=[
+            "lending_indices",
+            # oracle_prices — SSOT ruling 2026-08-08 (defi_expected_unattempted_backlog_1m_2026_07_03.md):
+            # the legacy venue_mapping.DataTypeConfig table already declared oracle_prices
+            # valid for A_TOKEN/DEBT_TOKEN; widened here so the live-consumed
+            # _INSTRUMENT_TYPE_ALIASES/PROTOCOL_CAPABILITIES SSOT agrees (aspirational:
+            # capture not yet wired).
+            "oracle_prices",
+        ],
+        mtds_operations=["collect-lending-indices", "collect-oracle-prices"],
         required_tokens=frozenset({"XVS"}),
     ),
     "benqi": _ProtocolCapability(
@@ -919,8 +927,16 @@ PROTOCOL_CAPABILITIES: dict[str, _ProtocolCapability] = {
         venue_prefix="SOLEND",
         protocol_class=ProtocolClass.LENDING,
         instrument_types=_LENDING_ATOKEN_DEBTTOKEN,
-        data_types=["lending_indices"],
-        mtds_operations=["collect-lending-indices"],
+        data_types=[
+            "lending_indices",
+            # oracle_prices — SSOT ruling 2026-08-08 (defi_expected_unattempted_backlog_1m_2026_07_03.md):
+            # the legacy venue_mapping.DataTypeConfig table already declared oracle_prices
+            # valid for A_TOKEN/DEBT_TOKEN; widened here so the live-consumed
+            # _INSTRUMENT_TYPE_ALIASES/PROTOCOL_CAPABILITIES SSOT agrees (aspirational:
+            # capture not yet wired).
+            "oracle_prices",
+        ],
+        mtds_operations=["collect-lending-indices", "collect-oracle-prices"],
     ),
     "marinade": _ProtocolCapability(
         venue_prefix="MARINADE",
