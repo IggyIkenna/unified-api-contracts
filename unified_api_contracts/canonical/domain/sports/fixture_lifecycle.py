@@ -48,20 +48,23 @@ from .fixture_status import MatchStatus
 # ---------------------------------------------------------------------------
 # New entity-type / data_type constants — ADDITIVE alongside the live FIXTURES.
 # The single ``FIXTURES`` data_type is still the emitted entity today (see
-# gcs_paths.SPORTS_DATA_TYPE_TO_FOLDER["FIXTURES"]). These two are wired into
+# gcs_paths.SPORTS_DATA_TYPE_TO_FOLDER["fixtures"]). These two are wired into
 # the writer + GCS folders ONLY at the gated split — defining the constants now
 # lets UTL/IS build the migration against a stable name.
+#
+# Vocabulary lowercased 2026-08-08 (sports_taxonomy_p1_capture_and_contracts):
+# all IS data_type tokens are now canonical lowercase.
 # ---------------------------------------------------------------------------
-FIXTURES_SCHEDULE: str = "FIXTURES_SCHEDULE"
+FIXTURES_SCHEDULE: str = "fixtures_schedule"
 """Canonical data_type for the pre-match / scheduling half of a fixture.
 
-GCS sub-folder (post-split): ``entity=fixtures_schedule``. Per-row
+GCS sub-folder: ``entity=fixtures_schedule``. Per-row
 ``available_at`` floor = ``announced_at``."""
 
-FIXTURES_OUTCOMES: str = "FIXTURES_OUTCOMES"
+FIXTURES_OUTCOMES: str = "fixtures_outcomes"
 """Canonical data_type for the result half of a fixture.
 
-GCS sub-folder (post-split): ``entity=fixtures_outcomes``. Per-row
+GCS sub-folder: ``entity=fixtures_outcomes``. Per-row
 ``available_at`` floor = ``match_end_time``."""
 
 

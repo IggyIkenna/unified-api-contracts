@@ -362,7 +362,7 @@ def is_resolved_schedule_empty(data_type: str | None, reason: str | None) -> boo
     if not data_type or not reason:
         return False
     return (
-        data_type.strip().upper() in SCHEDULE_DEFINING_DATA_TYPES and reason.strip() == _SCHEDULE_EMPTY_RESOLVED_REASON
+        data_type.strip().lower() in SCHEDULE_DEFINING_DATA_TYPES and reason.strip() == _SCHEDULE_EMPTY_RESOLVED_REASON
     )
 
 
