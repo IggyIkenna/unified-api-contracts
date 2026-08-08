@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import pytest
 
+from unified_api_contracts.canonical.domain.features import FEATURE_REQUIRED_INPUTS
 from unified_api_contracts.sports import (
     FEATURE_UPSTREAM_REQUIREMENTS,
     UpstreamReq,
@@ -132,6 +133,51 @@ class TestInCoverage:
         # ("soccer_football_info", "SFI_PROGRESSIVE_STATS") = 2020-06-06
         assert in_coverage("soccer_football_info", "SFI_PROGRESSIVE_STATS", "EPL", "2020-06-05") is False
         assert in_coverage("soccer_football_info", "SFI_PROGRESSIVE_STATS", "EPL", "2020-06-06") is True
+
+
+class TestOddsCalculatorRegistryConsistency:
+    """Guards against registry divergence between required_inputs.py and
+    feature_upstream.py for odds_calculator.
+
+    Prior to 2026-08-08 the two registries contradicted each other: the
+    2026-06-25 ruling (footystats ODDS removed; MTDS/odds-api owns raw odds)
+    was recorded in required_inputs.py but never propagated to
+    feature_upstream.py, which still declared footystats ODDS as REQUIRED.
+    """
+
+    def test_no_footystats_odds_upstream(self) -> None:
+        reqs = FEATURE_UPSTREAM_REQUIREMENTS["odds_calculator"]
+        footystats_odds = [r for r in reqs if r.source == "footystats" and r.data_type == "ODDS"]
+        assert footystats_odds == [], (
+            "footystats ODDS was removed from odds_calculator 2026-06-25 "
+            f"(MTDS/odds-api owns raw odds) — still present: {footystats_odds}"
+        )
+
+    def test_mdps_horizon_bucket_is_required(self) -> None:
+        reqs = FEATURE_UPSTREAM_REQUIREMENTS["odds_calculator"]
+        horizon = [r for r in reqs if r.data_type == "ODDS_HORIZON_BUCKET"]
+        assert len(horizon) == 1, f"Expected exactly one ODDS_HORIZON_BUCKET req, got {horizon}"
+        assert horizon[0].source == "mdps_odds_horizon_bucket"
+        assert horizon[0].required is True, "ODDS_HORIZON_BUCKET must be required=True (sole upstream)"
+
+    def test_required_data_types_agree_between_registries(self) -> None:
+        """required_inputs.py and feature_upstream.py must declare the same
+        required data_types for odds_calculator — divergence guard.
+
+        If this test fails, one registry was updated without updating the other.
+        Align them and update the comment in required_inputs.py and/or
+        feature_upstream.py to record the ruling date + rationale.
+        """
+        ri_data_types = {req.data_type for req in FEATURE_REQUIRED_INPUTS["odds_calculator"]}
+        fu_required_data_types = {
+            req.data_type for req in FEATURE_UPSTREAM_REQUIREMENTS["odds_calculator"] if req.required
+        }
+        assert ri_data_types == fu_required_data_types, (
+            "odds_calculator required data_types diverged between registries — "
+            f"required_inputs.py: {ri_data_types!r}, "
+            f"feature_upstream.py (required=True): {fu_required_data_types!r}. "
+            "Update BOTH registries together when changing odds_calculator inputs."
+        )
 
 
 class TestInCoverageDt:

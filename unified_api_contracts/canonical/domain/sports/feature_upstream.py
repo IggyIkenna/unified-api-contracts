@@ -173,12 +173,11 @@ FEATURE_UPSTREAM_REQUIREMENTS: dict[str, list[UpstreamReq]] = {
         UpstreamReq(source="api_football", data_type="FIXTURE_LINEUPS"),
     ],
     "odds_calculator": [
-        UpstreamReq(source="footystats", data_type="ODDS"),
+        # footystats ODDS removed 2026-06-25 (#6 coherent unit) — MTDS/odds-api owns raw odds.
         UpstreamReq(
             source="mdps_odds_horizon_bucket",
             data_type="ODDS_HORIZON_BUCKET",
-            required=False,
-            notes="MDPS post-processed bucketed odds; complements footystats raw odds",
+            notes="MDPS post-processed bucketed odds; sole required upstream as of 2026-06-25",
         ),
     ],
     "multisource_xg": [
