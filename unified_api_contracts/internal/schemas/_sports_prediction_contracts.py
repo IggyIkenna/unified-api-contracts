@@ -182,6 +182,49 @@ SPORTS_ODDS_HORIZON_BUCKET = SchemaContract(
 )
 
 # ---------------------------------------------------------------------------
+# Sports (odds) — merged raw-odds vocabulary (contracts-first, operator ruling
+# 4: sports_taxonomy_p1_capture_and_contracts_2026_08_08.md). Formalises the
+# TARGET of the P2 data re-stamp: ``trades`` (odds_api bookmaker quotes) and
+# footystats ``odds``/``ODDS`` collapse into ONE lowercase ``data_type=odds``,
+# distinguished from each other by the existing ``source`` column
+# (``odds_api`` vs ``footystats``) rather than by a separate data_type per
+# population. New, additive entry — same reasoning as SPORTS_ODDS_HORIZON_BUCKET
+# immediately above: ``validate_dataframe`` treats every declared column as
+# mandatory regardless of ``nullable``/``required``, so bolting ``in_play``
+# onto the still-live SPORTS_ODDS_TRADES contract would flag every
+# currently-shipping row (which has no such column yet) as a violation.
+# ``in_play`` replaces filename-quarantined ``trades_inplay`` (retired — see
+# DATA_TYPES_BY_ASSET_GROUP["sports"] in market_data_categories.py) as the
+# discriminator for the post-kickoff population recovered under OR-5b(c).
+# ``trades`` itself is RE-RESERVED for genuine matched/traded volume (ZERO
+# current producers) once this merge lands physically — this contract is the
+# settled target, not yet the live shape; the physical re-stamp (writers
+# switching to emit ``data_type=odds`` + ``in_play``, and every consumer
+# enumerated in the plan's P1 todo switching its lookup) is P2 scope.
+# ---------------------------------------------------------------------------
+
+SPORTS_ODDS = SchemaContract(
+    asset_group="sports",
+    instrument_type="odds",
+    data_type="odds",
+    columns=[
+        *SPORTS_ODDS_TRADES.columns,
+        ColumnSpec(
+            name="in_play",
+            dtype="bool",
+            nullable=False,
+            description=(
+                "True for post-kickoff (in-play) bookmaker quotes, False for pre-match. "
+                "Derived at write time from bm_minutes_to_kickoff < 0. Replaces the "
+                "retired trades_inplay data_type as the discriminator for that population."
+            ),
+        ),
+    ],
+    symbol_column="fixture_id",
+    required_row_count_min=0,
+)
+
+# ---------------------------------------------------------------------------
 # Prediction markets (Polymarket, Kalshi, …) — Phase 1.1
 # ---------------------------------------------------------------------------
 
@@ -648,6 +691,7 @@ CONTRACT_REGISTRY[("sports", "odds", "sports_odds_snapshot")] = SPORTS_ODDS_SNAP
 CONTRACT_REGISTRY[("sports", "odds", "sports_odds_movement")] = SPORTS_ODDS_MOVEMENT
 CONTRACT_REGISTRY[("sports", "odds", "sports_arbitrage")] = SPORTS_ODDS_ARBITRAGE
 CONTRACT_REGISTRY[("sports", "odds", "odds_horizon_bucket")] = SPORTS_ODDS_HORIZON_BUCKET
+CONTRACT_REGISTRY[("sports", "odds", "odds")] = SPORTS_ODDS
 
 
 __all__ = [
@@ -657,6 +701,7 @@ __all__ = [
     "PREDICTION_PREDICTION_MARKET_TRADES",
     "SPORTS_EXCHANGE_ODDS_TRADES",
     "SPORTS_FIXED_ODDS_TRADES",
+    "SPORTS_ODDS",
     "SPORTS_ODDS_ARBITRAGE",
     "SPORTS_ODDS_HORIZON_BUCKET",
     "SPORTS_ODDS_MOVEMENT",
