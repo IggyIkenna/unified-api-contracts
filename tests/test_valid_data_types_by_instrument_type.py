@@ -516,6 +516,25 @@ class TestValidDataTypesForVenueInstrumentType:
             "defi", "pool"
         )
 
+    def test_lending_a_token_debt_token_exclude_perp_trades(self) -> None:
+        # Regression guard for the 2026-07-16 finding
+        # (defi_expected_unattempted_backlog_1m_2026_07_03.md): an
+        # `--data-types perp_trades` enumerator override must NOT over-fan
+        # A_TOKEN/DEBT_TOKEN lending venues — perp_trades is DRIFT-only.
+        # AAVE_V3/VENUS/SOLEND all declare LENDING data_types with no
+        # perp_trades entry, so the venue-narrowed accessor must exclude it.
+        for venue, instrument_type in (
+            ("AAVE_V3-ETHEREUM", "A_TOKEN"),
+            ("AAVE_V3-ETHEREUM", "DEBT_TOKEN"),
+            ("VENUS-BSC", "A_TOKEN"),
+            ("VENUS-BSC", "DEBT_TOKEN"),
+            ("SOLEND-SOLANA", "A_TOKEN"),
+            ("SOLEND-SOLANA", "DEBT_TOKEN"),
+        ):
+            valid = valid_data_types_for_venue_instrument_type("defi", venue, instrument_type)
+            assert valid is not None
+            assert "perp_trades" not in valid
+
 
 class TestValidDataTypesVenueAxisExclusions:
     """Finding 1 fix (uac_data_type_validity_combinator_fragmentation_2026_07_07.md):
