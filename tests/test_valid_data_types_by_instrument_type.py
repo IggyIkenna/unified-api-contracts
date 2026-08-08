@@ -152,9 +152,9 @@ class TestValidDataTypesByAgAndInstrumentType:
 
         result = valid_data_types_for_instrument_type("sports", "league")
         assert result == frozenset(SPORTS_DATA_TYPE_TO_SOURCE)
-        assert "ODDS" in result  # footystats pre-match snapshot — IS reference data (#6 REVERSED)
-        assert "FIXTURES" in result
-        assert "odds" not in result  # lowercase MTDS market-data type — not a league reference type
+        # P1 2026-08-08: IS reference vocab is now all-lowercase; "odds" = footystats pre-match snapshot.
+        assert "odds" in result  # footystats pre-match snapshot — IS reference data (#6 REVERSED)
+        assert "fixtures" in result
 
     def test_sports_league_uppercase_token_normalises(self) -> None:
         assert valid_data_types_for_instrument_type("sports", "LEAGUE") == valid_data_types_for_instrument_type(

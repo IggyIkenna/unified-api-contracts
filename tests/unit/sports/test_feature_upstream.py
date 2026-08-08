@@ -93,11 +93,11 @@ class TestInCoverage:
     def test_pre_launch_date_returns_false(self) -> None:
         # api_football coverage starts 2020-06-06 (canonical sports floor,
         # operator ruling 2026-07-21 — supersedes any earlier per-source value).
-        assert in_coverage("api_football", "FIXTURES", "EPL", "2014-01-01") is False
+        assert in_coverage("api_football", "fixtures", "EPL", "2014-01-01") is False
 
     def test_post_launch_date_in_coverage_league_returns_true(self) -> None:
         # EPL is in api_football's league coverage; 2024 is well past launch
-        assert in_coverage("api_football", "FIXTURES", "EPL", "2024-04-13") is True
+        assert in_coverage("api_football", "fixtures", "EPL", "2024-04-13") is True
 
     def test_understat_xg_out_of_coverage_league_returns_false(self) -> None:
         # Understat XG only covers 6 European leagues. MLS isn't one of them.
@@ -127,28 +127,28 @@ class TestInCoverage:
     def test_sfi_progressive_stats_pre_2020_06_06_clipped(self) -> None:
         # Per DATA_TYPE_COVERAGE_START override (2020-06-06 canonical sports
         # floor, operator ruling 2026-07-21 — supersedes the old SFI-specific
-        # 2020-01-01 value; SFI_PROGRESSIVE_STATS now coincides with the
+        # 2020-01-01 value; sfi_progressive_stats now coincides with the
         # source-wide floor):
-        # ("soccer_football_info", "SFI_PROGRESSIVE_STATS") = 2020-06-06
-        assert in_coverage("soccer_football_info", "SFI_PROGRESSIVE_STATS", "EPL", "2020-06-05") is False
-        assert in_coverage("soccer_football_info", "SFI_PROGRESSIVE_STATS", "EPL", "2020-06-06") is True
+        # ("soccer_football_info", "sfi_progressive_stats") = 2020-06-06
+        assert in_coverage("soccer_football_info", "sfi_progressive_stats", "EPL", "2020-06-05") is False
+        assert in_coverage("soccer_football_info", "sfi_progressive_stats", "EPL", "2020-06-06") is True
 
 
 class TestInCoverageDt:
     def test_accepts_iso_string(self) -> None:
-        assert in_coverage_dt("api_football", "FIXTURES", "EPL", "2024-04-13") is True
+        assert in_coverage_dt("api_football", "fixtures", "EPL", "2024-04-13") is True
 
     def test_accepts_date(self) -> None:
         from datetime import date
 
-        assert in_coverage_dt("api_football", "FIXTURES", "EPL", date(2024, 4, 13)) is True
+        assert in_coverage_dt("api_football", "fixtures", "EPL", date(2024, 4, 13)) is True
 
     def test_accepts_datetime(self) -> None:
         from datetime import datetime
 
-        assert in_coverage_dt("api_football", "FIXTURES", "EPL", datetime(2024, 4, 13, 14, 30)) is True
+        assert in_coverage_dt("api_football", "fixtures", "EPL", datetime(2024, 4, 13, 14, 30)) is True
 
     def test_pre_launch_via_datetime(self) -> None:
         from datetime import date
 
-        assert in_coverage_dt("api_football", "FIXTURES", "EPL", date(2014, 1, 1)) is False
+        assert in_coverage_dt("api_football", "fixtures", "EPL", date(2014, 1, 1)) is False

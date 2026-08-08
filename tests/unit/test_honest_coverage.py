@@ -364,9 +364,9 @@ def test_schedule_defining_fixtures_empty_is_resolved() -> None:
         is_within_window_absence,
     )
 
-    # Both the legacy FIXTURES atom and the new FIXTURES_SCHEDULE atom are in the
-    # closed set — additive across the migration, not a replace.
-    assert set(SCHEDULE_DEFINING_DATA_TYPES) == {"FIXTURES", "FIXTURES_SCHEDULE"}
+    # The legacy FIXTURES atom, the P1 lowercase "fixtures" atom, and the new
+    # FIXTURES_SCHEDULE atom are in the closed set — additive across the migration.
+    assert set(SCHEDULE_DEFINING_DATA_TYPES) == {"FIXTURES", "fixtures", "FIXTURES_SCHEDULE"}
 
     for atom in ("FIXTURES", "FIXTURES_SCHEDULE"):
         # atom + SOURCE_RETURNED_ZERO → resolved / out-of-window (no matches that day).

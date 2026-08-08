@@ -313,18 +313,19 @@ def compute_layered_coverage(
 # history).
 # ---------------------------------------------------------------------------
 
-SCHEDULE_DEFINING_DATA_TYPES: Final[frozenset[str]] = frozenset({"FIXTURES", FIXTURES_SCHEDULE})
+SCHEDULE_DEFINING_DATA_TYPES: Final[frozenset[str]] = frozenset(
+    {"FIXTURES", "fixtures", FIXTURES_SCHEDULE}
+)
 """Closed set of schedule-DEFINING data_types — the source-of-truth for whether
 anything exists to capture on a (entity, day). For these, a clean
 ``SOURCE_RETURNED_ZERO`` (200 + zero rows) means "no matches that day = complete"
-→ RESOLVED, not a gap (see :func:`is_resolved_schedule_empty`). Today sports
-``FIXTURES_SCHEDULE`` (API-Football, the schedule, post-2026-07-14 cutover)
-PLUS the legacy ``FIXTURES`` literal (pre-cutover manifest rows + any writer
-call site not yet migrated by
-``plans/active/sports_closeout_batch1_ao_ready_2026_07_24.md`` todo 1) — both
-name the SAME schedule source, just at different points in the atom
-migration. Enrichment data_types are NOT here — their zero-row responses may
-be real gaps."""
+→ RESOLVED, not a gap (see :func:`is_resolved_schedule_empty`). Includes:
+* ``FIXTURES_SCHEDULE`` (post-2026-07-14 cutover atom)
+* ``"FIXTURES"`` (legacy uppercase — pre-cutover manifest rows permanently carry
+  this string; drop only after corpus-wide P2 migration is verified complete)
+* ``"fixtures"`` (lowercase UAC axis key post-P1 2026-08-08 operator ruling;
+  IS enumerator now emits this key; drop the ``"FIXTURES"`` literal once P2 is done)
+Enrichment data_types are NOT here — their zero-row responses may be real gaps."""
 
 _SCHEDULE_EMPTY_RESOLVED_REASON: Final[str] = "SOURCE_RETURNED_ZERO"
 """The ONLY ``empty_confirmed`` reason a schedule-defining data_type resolves

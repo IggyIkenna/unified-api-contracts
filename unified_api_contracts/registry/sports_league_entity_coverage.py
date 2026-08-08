@@ -45,27 +45,29 @@ from pathlib import Path
 from typing import cast
 
 # Per-fixture + league-axis api_football enrichment entities that participate in
-# the observed (league x entity) coverage map.  Canonical UPPERCASE data_type
-# names exactly as written to the manifest by the sports_reference orchestrator.
+# the observed (league x entity) coverage map.  Lowercase UAC data_type names
+# (P1 2026-08-08: IS reference vocabulary lowercased; operator ruling).
 LEAGUE_ENTITY_COVERAGE_ENTITIES: frozenset[str] = frozenset(
     {
-        "PLAYER_STATS",
-        "FIXTURE_LINEUPS",
-        "FIXTURE_EVENTS",
-        "FIXTURE_STATS",
-        "TEAMS",
-        "STANDINGS",
-        "INJURIES",
-        "WEATHER",
-        "PLAYER_VALUES",
+        "player_stats",
+        "fixture_lineups",
+        "fixture_events",
+        "fixture_stats",
+        "teams",
+        "standings",
+        "injuries",
+        "weather",
+        "player_values",
     }
 )
 
 _DATA_PATH = Path(__file__).parent / "data" / "sports_league_entity_coverage.json"
 
-# Canonical observed map: ``{ENTITY_UPPER: frozenset(LEAGUE_ID_UPPER, ...)}``.
+# Canonical observed map: ``{entity_lower: frozenset(LEAGUE_ID_UPPER, ...)}``.
+# Entity keys are normalised to lowercase (matching UAC axis keys post-P1);
+# league IDs stay uppercase (manifest grain is uppercase league_id).
 LEAGUE_ENTITY_COVERAGE: dict[str, frozenset[str]] = {
-    str(entity).upper(): frozenset(str(lg).upper() for lg in leagues)
+    str(entity).lower(): frozenset(str(lg).upper() for lg in leagues)
     for entity, leagues in cast(dict[str, list[str]], json.loads(_DATA_PATH.read_text())).items()
 }
 
@@ -83,14 +85,14 @@ def is_league_entity_covered(league_id: str, entity: str) -> bool:
     produced this entity (out-of-coverage honest absence → the IS write-path
     skips the fetch + records ``EXPECTED_NO_PROVIDER_COVERAGE``).
 
-    Both args are matched uppercase-insensitively.  An entity not in
+    Both args are matched case-insensitively.  An entity not in
     :data:`LEAGUE_ENTITY_COVERAGE_ENTITIES` (and never observed) is treated as
     not-covered (conservative — never forces a fetch for an unknown entity).
     """
     league = league_id.strip().upper()
     if not league:
         return False
-    covered = LEAGUE_ENTITY_COVERAGE.get(entity.strip().upper())
+    covered = LEAGUE_ENTITY_COVERAGE.get(entity.strip().lower())
     return covered is not None and league in covered
 
 

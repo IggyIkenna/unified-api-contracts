@@ -19,29 +19,29 @@ from unified_api_contracts.canonical.crosscutting.availability_semantics import 
 
 
 def test_sports_lineups_uses_kickoff_minus_60min() -> None:
-    assert get_availability_semantic("sports", "FIXTURE_LINEUPS") == "kickoff_minus_60min"
+    assert get_availability_semantic("sports", "fixture_lineups") == "kickoff_minus_60min"
 
 
 def test_sports_post_match_uses_match_end_time() -> None:
-    assert get_availability_semantic("sports", "FIXTURE_STATS") == "match_end_time"
-    # PLAYER_STATS (was the phantom FIXTURE_PLAYER_STATS until 2026-07-15 — the entity
-    # folder name; the canonical data_type is PLAYER_STATS, which is what IS writes).
-    assert get_availability_semantic("sports", "PLAYER_STATS") == "match_end_time"
+    assert get_availability_semantic("sports", "fixture_stats") == "match_end_time"
+    # player_stats (was the phantom FIXTURE_PLAYER_STATS until 2026-07-15 — the entity
+    # folder name; the canonical data_type is player_stats, which is what IS writes).
+    assert get_availability_semantic("sports", "player_stats") == "match_end_time"
     assert get_availability_semantic("sports", "RESULTS") == "match_end_time"
     assert get_availability_semantic("sports", "UNDERSTAT_XG") == "match_end_time"
-    assert get_availability_semantic("sports", "SFI_PROGRESSIVE_STATS") == "match_end_time"
+    assert get_availability_semantic("sports", "sfi_progressive_stats") == "match_end_time"
 
 
 def test_sports_events_uses_event_time() -> None:
-    assert get_availability_semantic("sports", "FIXTURE_EVENTS") == "event_time"
+    assert get_availability_semantic("sports", "fixture_events") == "event_time"
 
 
 def test_sports_injuries_uses_report_time() -> None:
-    assert get_availability_semantic("sports", "INJURIES") == "report_time"
+    assert get_availability_semantic("sports", "injuries") == "report_time"
 
 
 def test_sports_fixtures_uses_announced_at() -> None:
-    assert get_availability_semantic("sports", "FIXTURES") == "announced_at"
+    assert get_availability_semantic("sports", "fixtures") == "announced_at"
 
 
 def test_sports_weather_uses_forecast_issue_time() -> None:
@@ -55,7 +55,8 @@ def test_sports_odds_uses_publication_time() -> None:
 
 
 def test_sports_reference_tables_use_fetch_completed_at() -> None:
-    for data_type in ("TEAMS", "PLAYERS", "VENUES", "LEAGUES", "PLAYER_VALUES"):
+    # P1 2026-08-08: IS reference types now lowercase; PLAYERS/VENUES/LEAGUES kept uppercase (not in 19-token vocab).
+    for data_type in ("teams", "PLAYERS", "VENUES", "LEAGUES", "player_values"):
         assert get_availability_semantic("sports", data_type) == "fetch_completed_at"
 
 

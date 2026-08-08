@@ -156,7 +156,7 @@ def test_cefi_trades_schema_via_pydantic() -> None:
 
 
 def test_sports_fixtures_schema_manual() -> None:
-    spec = find_schema(AssetGroup.SPORTS, "FIXTURES")
+    spec = find_schema(AssetGroup.SPORTS, "fixtures")
     assert spec is not None
     assert spec.source == "manual"
     col_names = {c.name for c in spec.columns}

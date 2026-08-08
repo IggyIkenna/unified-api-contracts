@@ -1058,12 +1058,14 @@ DATA_TYPE_CAPABILITY_REGISTRY: Final[tuple[DataTypeCapability, ...]] = (
     # (sports captures source-by-day, not by-venue). Only ODDS_API odds
     # rows (17282) and API_FOOTBALL FIXTURE_STATS rows (5858) carry an
     # explicit venue token. Most-prolific empty-venue data_types:
-    # STANDINGS / FIXTURES / INJURIES / FIXTURE_STATS / FIXTURE_EVENTS /
-    # FIXTURE_LINEUPS / PLAYER_STATS / WEATHER / PREDICTIONS / ODDS /
-    # MATCHES / XG / TRANSFERMARKT_LEAGUES.
+    # standings / fixtures / injuries / fixture_stats / fixture_events /
+    # fixture_lineups / player_stats / weather / predictions / odds /
+    # matches / xg / TRANSFERMARKT_LEAGUES.
+    # P1 2026-08-08: IS reference vocabulary lowercased (operator ruling overturning
+    # sports-data-types-catalog.md "legitimately coexist; do NOT merge").
     DataTypeCapability(
         asset_group=AssetGroup.SPORTS,
-        data_type="FIXTURES",
+        data_type="fixtures",
         venue="",
         instrument_type="",
         live_capable=False,
@@ -1073,7 +1075,7 @@ DATA_TYPE_CAPABILITY_REGISTRY: Final[tuple[DataTypeCapability, ...]] = (
     ),
     DataTypeCapability(
         asset_group=AssetGroup.SPORTS,
-        data_type="ODDS",
+        data_type="odds",
         venue="",
         instrument_type="",
         live_capable=False,
@@ -1089,7 +1091,7 @@ DATA_TYPE_CAPABILITY_REGISTRY: Final[tuple[DataTypeCapability, ...]] = (
     ),
     DataTypeCapability(
         asset_group=AssetGroup.SPORTS,
-        data_type="ODDS",
+        data_type="odds",
         venue="ODDS_API",
         instrument_type="",
         live_capable=False,
@@ -1098,13 +1100,13 @@ DATA_TYPE_CAPABILITY_REGISTRY: Final[tuple[DataTypeCapability, ...]] = (
         retention_days=730,
         notes=(
             "Explicit ODDS_API venue tag (~17K rows in prod). The bulk of "
-            "ODDS data is at empty venue — see the empty-venue capability "
+            "odds data is at empty venue — see the empty-venue capability "
             "above."
         ),
     ),
     DataTypeCapability(
         asset_group=AssetGroup.SPORTS,
-        data_type="FIXTURE_EVENTS",
+        data_type="fixture_events",
         venue="",
         instrument_type="",
         live_capable=False,
@@ -1113,7 +1115,7 @@ DATA_TYPE_CAPABILITY_REGISTRY: Final[tuple[DataTypeCapability, ...]] = (
     ),
     DataTypeCapability(
         asset_group=AssetGroup.SPORTS,
-        data_type="FIXTURE_STATS",
+        data_type="fixture_stats",
         venue="",
         instrument_type="",
         live_capable=False,
@@ -1122,7 +1124,7 @@ DATA_TYPE_CAPABILITY_REGISTRY: Final[tuple[DataTypeCapability, ...]] = (
     ),
     DataTypeCapability(
         asset_group=AssetGroup.SPORTS,
-        data_type="FIXTURE_LINEUPS",
+        data_type="fixture_lineups",
         venue="",
         instrument_type="",
         live_capable=False,
@@ -1130,7 +1132,7 @@ DATA_TYPE_CAPABILITY_REGISTRY: Final[tuple[DataTypeCapability, ...]] = (
     ),
     DataTypeCapability(
         asset_group=AssetGroup.SPORTS,
-        data_type="STANDINGS",
+        data_type="standings",
         venue="",
         instrument_type="",
         live_capable=False,
@@ -1138,7 +1140,7 @@ DATA_TYPE_CAPABILITY_REGISTRY: Final[tuple[DataTypeCapability, ...]] = (
     ),
     DataTypeCapability(
         asset_group=AssetGroup.SPORTS,
-        data_type="INJURIES",
+        data_type="injuries",
         venue="",
         instrument_type="",
         live_capable=False,
@@ -1146,7 +1148,7 @@ DATA_TYPE_CAPABILITY_REGISTRY: Final[tuple[DataTypeCapability, ...]] = (
     ),
     DataTypeCapability(
         asset_group=AssetGroup.SPORTS,
-        data_type="PLAYER_STATS",
+        data_type="player_stats",
         venue="",
         instrument_type="",
         live_capable=False,
@@ -1154,7 +1156,7 @@ DATA_TYPE_CAPABILITY_REGISTRY: Final[tuple[DataTypeCapability, ...]] = (
     ),
     DataTypeCapability(
         asset_group=AssetGroup.SPORTS,
-        data_type="WEATHER",
+        data_type="weather",
         venue="",
         instrument_type="",
         live_capable=False,
@@ -1162,7 +1164,7 @@ DATA_TYPE_CAPABILITY_REGISTRY: Final[tuple[DataTypeCapability, ...]] = (
     ),
     DataTypeCapability(
         asset_group=AssetGroup.SPORTS,
-        data_type="PREDICTIONS",
+        data_type="predictions",
         venue="",
         instrument_type="",
         live_capable=False,
@@ -1170,7 +1172,7 @@ DATA_TYPE_CAPABILITY_REGISTRY: Final[tuple[DataTypeCapability, ...]] = (
     ),
     DataTypeCapability(
         asset_group=AssetGroup.SPORTS,
-        data_type="MATCHES",
+        data_type="matches",
         venue="",
         instrument_type="",
         live_capable=False,
@@ -1178,7 +1180,7 @@ DATA_TYPE_CAPABILITY_REGISTRY: Final[tuple[DataTypeCapability, ...]] = (
     ),
     DataTypeCapability(
         asset_group=AssetGroup.SPORTS,
-        data_type="XG",
+        data_type="xg",
         venue="",
         instrument_type="",
         live_capable=False,

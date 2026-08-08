@@ -30,7 +30,7 @@ from unified_api_contracts.canonical.crosscutting.source_priority import (
 
 
 def test_sports_fixtures_primary_is_api_football() -> None:
-    assert get_primary_source("sports", "FIXTURES") == "api_football"
+    assert get_primary_source("sports", "fixtures") == "api_football"
 
 
 def test_sports_understat_xg_primary_is_understat() -> None:
@@ -38,7 +38,7 @@ def test_sports_understat_xg_primary_is_understat() -> None:
 
 
 def test_sports_sfi_progressive_primary_is_sfi() -> None:
-    assert get_primary_source("sports", "SFI_PROGRESSIVE_STATS") == "soccer_football_info"
+    assert get_primary_source("sports", "sfi_progressive_stats") == "soccer_football_info"
 
 
 def test_sports_odds_primary_is_odds_api() -> None:
@@ -50,7 +50,7 @@ def test_sports_weather_primary_is_open_meteo() -> None:
 
 
 def test_sports_player_values_primary_is_transfermarkt() -> None:
-    assert get_primary_source("sports", "PLAYER_VALUES") == "transfermarkt"
+    assert get_primary_source("sports", "player_values") == "transfermarkt"
 
 
 # ---------------------------------------------------------------------------
@@ -101,7 +101,7 @@ def test_get_primary_source_raises_on_unregistered() -> None:
 
 
 def test_has_source_priority_returns_true_for_registered() -> None:
-    assert has_source_priority("sports", "FIXTURE_LINEUPS") is True
+    assert has_source_priority("sports", "fixture_lineups") is True
 
 
 def test_has_source_priority_returns_false_for_unregistered() -> None:
@@ -173,8 +173,8 @@ def test_source_required_true_for_defi_multi_source() -> None:
 
 
 def test_source_required_true_for_sports_multi_source() -> None:
-    """Sports FIXTURES has api_football + footystats → source required."""
-    assert source_required("sports", "FIXTURES") is True
+    """Sports fixtures has api_football + footystats → source required."""
+    assert source_required("sports", "fixtures") is True
 
 
 def test_source_required_false_for_single_source_cells() -> None:
@@ -182,7 +182,7 @@ def test_source_required_false_for_single_source_cells() -> None:
     assert source_required("defi", "swap") is False
     # (cefi,trades) is multi-source now (hyperliquid/aster); options_chain stays single.
     assert source_required("cefi", "options_chain") is False
-    assert source_required("sports", "FIXTURE_EVENTS") is False
+    assert source_required("sports", "fixture_events") is False
 
 
 def test_source_required_true_for_prediction_multi_source() -> None:
@@ -269,7 +269,7 @@ def test_default_source_multi_external_returns_none() -> None:
     assert default_source("tradfi", "ohlcv_1m") is None
     assert default_source("defi", "oracle_prices") is None
     assert default_source("prediction", "trades") is None  # polymarket_clob + kalshi
-    assert default_source("sports", "FIXTURES") is None
+    assert default_source("sports", "fixtures") is None
 
 
 def test_default_source_computed_and_unregistered_return_none() -> None:
@@ -387,7 +387,7 @@ def test_get_primary_source_with_latency_for_cefi_trades() -> None:
 
 
 def test_get_primary_source_with_latency_for_sports_fixtures() -> None:
-    source, latency_ms = get_primary_source_with_latency("sports", "FIXTURES")
+    source, latency_ms = get_primary_source_with_latency("sports", "fixtures")
     assert source == "api_football"
     assert latency_ms == 1_000
 
@@ -584,10 +584,10 @@ def test_sports_odds_is_footystats_owned_in_both_registries() -> None:
     """
     from unified_api_contracts import SPORTS_DATA_TYPE_TO_SOURCE
 
-    assert has_source_priority("sports", "ODDS") is True
-    assert get_primary_source("sports", "ODDS") == "footystats"
-    assert SPORTS_DATA_TYPE_TO_SOURCE["ODDS"] == "footystats"
-    assert ("sports", "ODDS") in AVAILABILITY_AT_SEMANTICS
+    assert has_source_priority("sports", "odds") is True
+    assert get_primary_source("sports", "odds") == "footystats"
+    assert SPORTS_DATA_TYPE_TO_SOURCE["odds"] == "footystats"
+    assert ("sports", "odds") in AVAILABILITY_AT_SEMANTICS
     # The MTDS raw-tick odds types stay odds_api-owned — the coexistence rule.
     assert get_primary_source("sports", "ODDS_SNAPSHOT") == "odds_api"
     assert get_primary_source("sports", "ODDS_MOVEMENT") == "odds_api"
@@ -595,9 +595,9 @@ def test_sports_odds_is_footystats_owned_in_both_registries() -> None:
 
 def test_sports_odds_api_football_is_not_a_valid_odds_source() -> None:
     """api_football has no odds path in IS (get_odds() is a deprecated stub), so an
-    api_football×ODDS manifest row is impossible by construction. With ODDS
+    api_football×odds manifest row is impossible by construction. With odds
     registered, the UTL write-time mis-stamp guard rejects it again.
     SSOT: codex/02-data/sports-data-source-coverage-matrix.md §4.
     """
-    assert is_valid_manifest_source("sports", "ODDS", "footystats") is True
-    assert is_valid_manifest_source("sports", "ODDS", "api_football") is False
+    assert is_valid_manifest_source("sports", "odds", "footystats") is True
+    assert is_valid_manifest_source("sports", "odds", "api_football") is False

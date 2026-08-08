@@ -308,12 +308,12 @@ class TestSourceCoverageStartCompleteness:
         guard could never fire for them, and ~83,541 real pre-2020-06-06 objects
         misclassified as legitimate E_orphan_real instead of floor violations.
         """
-        assert SPORTS_DATA_TYPE_TO_SOURCE.get("FIXTURES_SCHEDULE") == "api_football"
-        assert SPORTS_DATA_TYPE_TO_SOURCE.get("FIXTURES_OUTCOMES") == "api_football"
-        assert is_pre_launch_date("FIXTURES_SCHEDULE", "2019-01-01") is True
-        assert is_pre_launch_date("FIXTURES_OUTCOMES", "2019-01-01") is True
-        assert is_pre_launch_date("FIXTURES_SCHEDULE", "2021-01-01") is False
-        assert is_pre_launch_date("FIXTURES_OUTCOMES", "2021-01-01") is False
+        assert SPORTS_DATA_TYPE_TO_SOURCE.get("fixtures_schedule") == "api_football"
+        assert SPORTS_DATA_TYPE_TO_SOURCE.get("fixtures_outcomes") == "api_football"
+        assert is_pre_launch_date("fixtures_schedule", "2019-01-01") is True
+        assert is_pre_launch_date("fixtures_outcomes", "2019-01-01") is True
+        assert is_pre_launch_date("fixtures_schedule", "2021-01-01") is False
+        assert is_pre_launch_date("fixtures_outcomes", "2021-01-01") is False
 
 
 class TestOddsApiFloorDerivesFromSportsSsot:

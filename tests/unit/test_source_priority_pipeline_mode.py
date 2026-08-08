@@ -122,7 +122,7 @@ def test_read_with_source_priority_returns_onchain_rpc_for_defi_gas_fees() -> No
 
 
 def test_read_with_source_priority_returns_api_football_for_sports_fixtures() -> None:
-    source, mode = read_with_source_priority("sports", "FIXTURES")
+    source, mode = read_with_source_priority("sports", "fixtures")
     assert source == "api_football"
     assert mode is PipelineMode.BATCH_API_FOOTBALL
 
@@ -480,8 +480,8 @@ def test_select_primary_defi_native_staking_solana_rpc_wins() -> None:
 
 
 def test_select_primary_sports_fixtures_api_football_wins() -> None:
-    """Sports FIXTURES: api_football is primary over footystats → one resolved row."""
-    source, _ = select_primary_available_source("sports", "FIXTURES", {"api_football", "footystats"})
+    """Sports fixtures: api_football is primary over footystats → one resolved row."""
+    source, _ = select_primary_available_source("sports", "fixtures", {"api_football", "footystats"})
     assert source == "api_football"
 
 
@@ -508,7 +508,7 @@ def test_detect_dual_source_conflicts_sports_fixtures() -> None:
         "footystats",
         {shared, ("EPL", "2026-05-30", "fixture_99")},
         asset_group="sports",
-        data_type="FIXTURES",
+        data_type="fixtures",
     )
     assert result == [shared]
 

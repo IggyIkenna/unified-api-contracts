@@ -58,27 +58,29 @@ AvailabilitySemantic = Literal[
 
 AVAILABILITY_AT_SEMANTICS: Final[dict[tuple[str, str], AvailabilitySemantic]] = {
     # ---- Sports ----------------------------------------------------------
-    ("sports", "FIXTURES"): "announced_at",
-    # FIXTURES_SCHEDULE/FIXTURES_OUTCOMES: schedule/outcome split of FIXTURES (writer
+    # P1 2026-08-08: IS reference vocabulary lowercased (operator ruling overturning
+    # sports-data-types-catalog.md "legitimately coexist; do NOT merge").
+    ("sports", "fixtures"): "announced_at",
+    # fixtures_schedule/fixtures_outcomes: schedule/outcome split of fixtures (writer
     # cutover 2026-07-14, fixture_lifecycle.py). Semantics follow the split's own
     # documented rationale — schedule is known at announcement, outcome only at
     # match end (lookahead-bias avoidance is the reason the split exists at all).
-    ("sports", "FIXTURES_SCHEDULE"): "announced_at",
-    ("sports", "FIXTURES_OUTCOMES"): "match_end_time",
-    ("sports", "FIXTURE_LINEUPS"): "kickoff_minus_60min",
-    ("sports", "FIXTURE_EVENTS"): "event_time",
-    ("sports", "INJURIES"): "report_time",
-    ("sports", "FIXTURE_STATS"): "match_end_time",
-    # PLAYER_STATS: renamed from the phantom entity-name FIXTURE_PLAYER_STATS 2026-07-15
+    ("sports", "fixtures_schedule"): "announced_at",
+    ("sports", "fixtures_outcomes"): "match_end_time",
+    ("sports", "fixture_lineups"): "kickoff_minus_60min",
+    ("sports", "fixture_events"): "event_time",
+    ("sports", "injuries"): "report_time",
+    ("sports", "fixture_stats"): "match_end_time",
+    # player_stats: renamed from the phantom entity-name FIXTURE_PLAYER_STATS 2026-07-15
     # (nothing ever wrote that name — see _source_priority_data.py for the full
     # diagnosis). Semantic UNCHANGED: player stats settle with the match, same as
-    # FIXTURE_STATS. Must stay in lockstep with SOURCE_PRIORITY —
+    # fixture_stats. Must stay in lockstep with SOURCE_PRIORITY —
     # test_every_source_priority_pair_has_availability_semantic is a bidirectional
     # closed-set, so the two registries are added/removed together or the suite fails.
-    ("sports", "PLAYER_STATS"): "match_end_time",
+    ("sports", "player_stats"): "match_end_time",
     ("sports", "RESULTS"): "match_end_time",
     ("sports", "UNDERSTAT_XG"): "match_end_time",
-    ("sports", "SFI_PROGRESSIVE_STATS"): "match_end_time",
+    ("sports", "sfi_progressive_stats"): "match_end_time",
     ("sports", "ODDS_SNAPSHOT"): "publication_time",
     ("sports", "ODDS_MOVEMENT"): "publication_time",
     ("sports", "ARBITRAGE"): "publication_time",
@@ -98,26 +100,26 @@ AVAILABILITY_AT_SEMANTICS: Final[dict[tuple[str, str], AvailabilitySemantic]] = 
     # the manifest and used by features-sports-service as upstream inputs).
     # These differ from the processed output types above (UNDERSTAT_XG,
     # WEATHER_FORECAST, ODDS_SNAPSHOT) which represent features-service outputs.
-    ("sports", "XG"): "match_end_time",  # understat raw XG; post-match
-    ("sports", "XG_SHOTS"): "match_end_time",  # understat per-shot XG; post-match
-    ("sports", "MATCHES"): "match_end_time",  # footystats match data; post-match
-    ("sports", "STANDINGS"): "fetch_completed_at",  # api_football standings; polled
-    ("sports", "WEATHER"): "match_end_time",  # open_meteo reanalysis; post-match
-    ("sports", "PREDICTIONS"): "announced_at",  # footystats pre-match predictions
-    # ODDS removed 2026-06-25 (#6 coherent unit), RESTORED 2026-07-15: decision #6 was
-    # REVERSED by the operator 2026-06-27 (footystats ODDS = pre-match snapshot reference
+    ("sports", "xg"): "match_end_time",  # understat raw xg; post-match
+    ("sports", "xg_shots"): "match_end_time",  # understat per-shot xg; post-match
+    ("sports", "matches"): "match_end_time",  # footystats match data; post-match
+    ("sports", "standings"): "fetch_completed_at",  # api_football standings; polled
+    ("sports", "weather"): "match_end_time",  # open_meteo reanalysis; post-match
+    ("sports", "predictions"): "announced_at",  # footystats pre-match predictions
+    # odds removed 2026-06-25 (#6 coherent unit), RESTORED 2026-07-15: decision #6 was
+    # REVERSED by the operator 2026-06-27 (footystats odds = pre-match snapshot reference
     # data owned by IS; raw bookmaker ticks = odds_api/MTDS — they coexist), but the
     # reversal (c75101be) only restored SPORTS_DATA_TYPE_TO_SOURCE. Exact pre-8fb1f54f
     # value. SSOT: codex/02-data/sports-data-source-coverage-matrix.md §4.
-    ("sports", "ODDS"): "publication_time",  # footystats raw odds
-    ("sports", "ODDS_HORIZON_BUCKET"): "publication_time",  # MDPS bucketed odds
+    ("sports", "odds"): "publication_time",  # footystats raw odds
+    ("sports", "odds_horizon_bucket"): "publication_time",  # MDPS bucketed odds
     ("sports", "TRANSFER_RECORDS"): "fetch_completed_at",  # transfermarkt transfers
     # Sports reference tables.
-    ("sports", "TEAMS"): "fetch_completed_at",
+    ("sports", "teams"): "fetch_completed_at",
     ("sports", "PLAYERS"): "fetch_completed_at",
     ("sports", "VENUES"): "fetch_completed_at",
     ("sports", "LEAGUES"): "fetch_completed_at",
-    ("sports", "PLAYER_VALUES"): "fetch_completed_at",
+    ("sports", "player_values"): "fetch_completed_at",
     # ---- CeFi -----------------------------------------------------------
     ("cefi", "trades"): "tick_timestamp",
     ("cefi", "ohlcv_1m"): "tick_timestamp",

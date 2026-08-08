@@ -165,7 +165,10 @@ SOURCE_COVERAGE_START: dict[str, date] = {
 # honest number. (The old floor also conflated "no odds downstream" with "no data
 # upstream" — a downstream trading constraint is not an upstream coverage fact.)
 DATA_TYPE_COVERAGE_START: dict[tuple[str, str], date] = {
-    ("soccer_football_info", "SFI_PROGRESSIVE_STATS"): date(2020, 6, 6),
+    # P1 2026-08-08: lowercase keys added alongside uppercase for back-compat.
+    # Uppercase entries kept until all callers migrate (P2 removes them).
+    ("soccer_football_info", "SFI_PROGRESSIVE_STATS"): date(2020, 6, 6),  # legacy uppercase
+    ("soccer_football_info", "sfi_progressive_stats"): date(2020, 6, 6),  # P1 lowercase
     # SFI_LEAGUES retired 2026-05-05 — was a static provider-catalog mapping,
     # now lives in UAC SOCCER_FOOTBALL_INFO_IDS rather than as captured GCS data.
 }
@@ -224,41 +227,43 @@ SPORTS_DATA_TYPE_TO_SOURCE: dict[str, str] = {
     #   stale outlier vs the canonical SOURCE_PRIORITY[("sports","TEAMS"|"STANDINGS")]
     #   = ["api_football"] (the writer already raised MissingSourceError on footystats),
     #   which produced ~137k mis-sourced/phantom manifest rows. Aligned to the SSOT.
-    "MATCHES": "footystats",
-    "ODDS": "footystats",
-    "PREDICTIONS": "footystats",
+    # P1 2026-08-08: IS reference vocabulary lowercased (operator ruling overturning
+    # sports-data-types-catalog.md "legitimately coexist; do NOT merge").
+    "matches": "footystats",
+    "odds": "footystats",
+    "predictions": "footystats",
     # Understat — xG model + per-shot xG
-    "XG": "understat",
-    "XG_SHOTS": "understat",
+    "xg": "understat",
+    "xg_shots": "understat",
     # API-Football — fixtures + per-fixture detail + reference (teams / standings)
-    "FIXTURES": "api_football",
-    # FIXTURES_SCHEDULE/FIXTURES_OUTCOMES are the schedule/outcome split of the same
+    "fixtures": "api_football",
+    # fixtures_schedule/fixtures_outcomes are the schedule/outcome split of the same
     # api_football fixtures feed (writer cutover 2026-07-14, fixture_lifecycle.py) —
     # missing here meant is_pre_launch_date() silently returned False for them,
     # letting ~83,541 pre-2020-06-06 objects misclassify as real orphans instead of
     # the pre-launch-floor violations they are (found 2026-07-22, orphan-sweep audit).
-    "FIXTURES_SCHEDULE": "api_football",
-    "FIXTURES_OUTCOMES": "api_football",
-    "INJURIES": "api_football",
-    "FIXTURE_STATS": "api_football",
-    "FIXTURE_EVENTS": "api_football",
-    "FIXTURE_LINEUPS": "api_football",
-    "PLAYER_STATS": "api_football",
-    "TEAMS": "api_football",
-    "STANDINGS": "api_football",
+    "fixtures_schedule": "api_football",
+    "fixtures_outcomes": "api_football",
+    "injuries": "api_football",
+    "fixture_stats": "api_football",
+    "fixture_events": "api_football",
+    "fixture_lineups": "api_football",
+    "player_stats": "api_football",
+    "teams": "api_football",
+    "standings": "api_football",
     # Transfermarkt — player values.
     # TRANSFERMARKT_LEAGUES retired 2026-05-05 (was static catalog mapping;
     # lives in UAC TRANSFERMARKT_IDS as provider-id config rather than captured data).
-    # TRANSFERMARKT_VALUES retired 2026-05-15 (stale alias — PLAYER_VALUES is canonical).
-    "PLAYER_VALUES": "transfermarkt",
+    # TRANSFERMARKT_VALUES retired 2026-05-15 (stale alias — player_values is canonical).
+    "player_values": "transfermarkt",
     # SoccerFootball.info.
     # SFI_LEAGUES retired 2026-05-05 (same reason — UAC SOCCER_FOOTBALL_INFO_IDS).
     # SFI_STANDINGS retired 2026-05-05 — SFI has no standings endpoint.
-    "SFI_PROGRESSIVE_STATS": "soccer_football_info",
+    "sfi_progressive_stats": "soccer_football_info",
     # OpenMeteo — historical weather
-    "WEATHER": "open_meteo",
+    "weather": "open_meteo",
     # MDPS odds horizon bucket — derived from odds-api
-    "ODDS_HORIZON_BUCKET": "mdps_odds_horizon_bucket",
+    "odds_horizon_bucket": "mdps_odds_horizon_bucket",
 }
 
 

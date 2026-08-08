@@ -103,11 +103,11 @@ class TestResolveRequiredWindow:
     def test_seasonal_continuous_requires_league_and_season(self) -> None:
         today = date(2026, 6, 28)
         with pytest.raises(ValueError, match="league_id"):
-            resolve_required_window(asset_group="sports", data_type="FIXTURES", today=today)
+            resolve_required_window(asset_group="sports", data_type="fixtures", today=today)
         with pytest.raises(ValueError, match="season_year"):
             resolve_required_window(
                 asset_group="sports",
-                data_type="FIXTURES",
+                data_type="fixtures",
                 today=today,
                 league_id="EPL",
             )
@@ -121,7 +121,7 @@ class TestResolveRequiredWindow:
         today = date(2026, 6, 28)
         window = resolve_required_window(
             asset_group="sports",
-            data_type="FIXTURES",
+            data_type="fixtures",
             today=today,
             league_id="EPL",
             season_year=2025,
@@ -141,7 +141,7 @@ class TestResolveRequiredWindow:
         today = date(2025, 12, 1)
         window = resolve_required_window(
             asset_group="sports",
-            data_type="FIXTURES",
+            data_type="fixtures",
             today=today,
             league_id="EPL",
             season_year=2025,
@@ -157,7 +157,7 @@ class TestResolveRequiredWindow:
         today = date(2026, 7, 1)
         window = resolve_required_window(
             asset_group="sports",
-            data_type="FIXTURES",
+            data_type="fixtures",
             today=today,
             league_id="EPL",
             season_year=2025,
@@ -171,7 +171,7 @@ class TestResolveRequiredWindow:
         today = date(2025, 8, 15)
         window = resolve_required_window(
             asset_group="sports",
-            data_type="FIXTURES",
+            data_type="fixtures",
             today=today,
             league_id="EPL",
             season_year=2025,

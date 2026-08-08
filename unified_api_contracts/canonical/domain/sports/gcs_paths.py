@@ -58,7 +58,11 @@ Ruled 2026-07-28 (Option A of the sub-decision):
 # data-status, audit/reconciliation tools).
 SPORTS_DATA_TYPE_TO_FOLDER: dict[str, str] = {
     # api-football
-    "FIXTURES": "fixtures",
+    # P1 2026-08-08: lowercase UAC axis keys added alongside uppercase entries
+    # for backward compatibility. Uppercase entries kept until all callers migrate
+    # (P2 will remove them). New callers MUST use lowercase keys.
+    "FIXTURES": "fixtures",  # legacy uppercase — keep until P2
+    "fixtures": "fixtures",
     # 2026-07-14+: the writer cut FIXTURES over to a two-entity split with NO legacy
     # dual-write (sports_fixtures_schema_split_completion_2026_06_20.md) — every date
     # on/after the cutover has ONLY these two entities, zero "fixtures" objects.
@@ -67,15 +71,24 @@ SPORTS_DATA_TYPE_TO_FOLDER: dict[str, str] = {
     # ALSO auto-appends FIXTURES_SCHEDULE candidates (see below) so existing "FIXTURES"
     # callers stay correct across the cutover without changing their call sites.
     FIXTURES_SCHEDULE: "fixtures_schedule",
+    "fixtures_schedule": "fixtures_schedule",
     FIXTURES_OUTCOMES: "fixtures_outcomes",
+    "fixtures_outcomes": "fixtures_outcomes",
     "FIXTURE_EVENTS": "fixture_events",
+    "fixture_events": "fixture_events",
     "FIXTURE_LINEUPS": "fixture_lineups",
+    "fixture_lineups": "fixture_lineups",
     "FIXTURE_STATS": "fixture_stats",
+    "fixture_stats": "fixture_stats",
     "PLAYER_STATS": "player_stats",
+    "player_stats": "player_stats",
     "INJURIES": "injuries",
+    "injuries": "injuries",
     "STANDINGS": "standings",
+    "standings": "standings",
     "LEAGUES": "leagues",
     "TEAMS": "teams",
+    "teams": "teams",
     "VENUES": "venues",
     # 2026-08-03: season-keyed TEAMS archive, distinct from the routine daily
     # "TEAMS" data_type above (PER_DAY_PER_LEAGUE). Folded from the legacy
@@ -87,11 +100,16 @@ SPORTS_DATA_TYPE_TO_FOLDER: dict[str, str] = {
     TEAMS_SEASON_SNAPSHOT: "teams",
     # footystats
     "MATCHES": "footystats_matches",
+    "matches": "footystats_matches",
     "ODDS": "footystats_odds",
+    "odds": "footystats_odds",
     "PREDICTIONS": "footystats_predictions",
+    "predictions": "footystats_predictions",
     # understat
     "XG": "understat_xg",
+    "xg": "understat_xg",
     "XG_SHOTS": "understat_xg_shots",
+    "xg_shots": "understat_xg_shots",
     # transfermarkt — TRANSFERMARKT_LEAGUES retired 2026-05-05 (was static
     # provider-catalog mapping, belongs in UAC TRANSFERMARKT_IDS not as
     # captured GCS data; orchestrator still calls adapter.get_leagues() at
@@ -107,11 +125,14 @@ SPORTS_DATA_TYPE_TO_FOLDER: dict[str, str] = {
     # zero-row placeholders to mask the drift. Aligned to the writer's truth:
     # folder=player_values + layout=PER_DAY_PER_SEASON.
     "PLAYER_VALUES": "player_values",
+    "player_values": "player_values",
     # soccer-football-info — SFI_LEAGUES retired 2026-05-05 same reason
     # (mapping in UAC SOCCER_FOOTBALL_INFO_IDS; runtime fetch only).
     "SFI_PROGRESSIVE_STATS": "progressive_stats",
+    "sfi_progressive_stats": "progressive_stats",
     # open-meteo
     "WEATHER": "weather",
+    "weather": "weather",
 }
 
 
@@ -150,27 +171,45 @@ class SportsPathLayout(StrEnum):
 # returns multiple candidates ordered by likelihood.
 SPORTS_DATA_TYPE_LAYOUT: dict[str, SportsPathLayout] = {
     # Per-league subpartition (modern layout for most entities)
+    # P1 2026-08-08: lowercase keys added alongside uppercase for back-compat.
     "FIXTURES": SportsPathLayout.PER_DAY_PER_LEAGUE,
+    "fixtures": SportsPathLayout.PER_DAY_PER_LEAGUE,
     FIXTURES_SCHEDULE: SportsPathLayout.PER_DAY_PER_LEAGUE,
+    "fixtures_schedule": SportsPathLayout.PER_DAY_PER_LEAGUE,
     FIXTURES_OUTCOMES: SportsPathLayout.PER_DAY_PER_LEAGUE,
+    "fixtures_outcomes": SportsPathLayout.PER_DAY_PER_LEAGUE,
     "FIXTURE_EVENTS": SportsPathLayout.PER_DAY_PER_LEAGUE,
+    "fixture_events": SportsPathLayout.PER_DAY_PER_LEAGUE,
     "FIXTURE_LINEUPS": SportsPathLayout.PER_DAY_PER_LEAGUE,
+    "fixture_lineups": SportsPathLayout.PER_DAY_PER_LEAGUE,
     "FIXTURE_STATS": SportsPathLayout.PER_DAY_PER_LEAGUE,
+    "fixture_stats": SportsPathLayout.PER_DAY_PER_LEAGUE,
     "PLAYER_STATS": SportsPathLayout.PER_DAY_PER_LEAGUE,
+    "player_stats": SportsPathLayout.PER_DAY_PER_LEAGUE,
     "INJURIES": SportsPathLayout.PER_DAY_PER_LEAGUE,
+    "injuries": SportsPathLayout.PER_DAY_PER_LEAGUE,
     "STANDINGS": SportsPathLayout.PER_DAY_PER_LEAGUE,
+    "standings": SportsPathLayout.PER_DAY_PER_LEAGUE,
     "TEAMS": SportsPathLayout.PER_DAY_PER_LEAGUE,
+    "teams": SportsPathLayout.PER_DAY_PER_LEAGUE,
     "MATCHES": SportsPathLayout.PER_DAY_PER_LEAGUE,
+    "matches": SportsPathLayout.PER_DAY_PER_LEAGUE,
     "ODDS": SportsPathLayout.PER_DAY_PER_LEAGUE,
+    "odds": SportsPathLayout.PER_DAY_PER_LEAGUE,
     "PREDICTIONS": SportsPathLayout.PER_DAY_PER_LEAGUE,
+    "predictions": SportsPathLayout.PER_DAY_PER_LEAGUE,
     "PLAYER_VALUES": SportsPathLayout.PER_DAY_PER_SEASON,
+    "player_values": SportsPathLayout.PER_DAY_PER_SEASON,
     # TRANSFERMARKT_LEAGUES + SFI_LEAGUES retired 2026-05-05 — provider
     # catalog mappings live in UAC, not as captured GCS data.
     "SFI_PROGRESSIVE_STATS": SportsPathLayout.PER_DAY_PER_LEAGUE,
+    "sfi_progressive_stats": SportsPathLayout.PER_DAY_PER_LEAGUE,
     # Per-shot xG — per-league subpartition (one file per league per day)
     "XG_SHOTS": SportsPathLayout.PER_DAY_PER_LEAGUE,
+    "xg_shots": SportsPathLayout.PER_DAY_PER_LEAGUE,
     # Bare path (single file per day — XG often un-partitioned)
     "XG": SportsPathLayout.PER_DAY_BARE,
+    "xg": SportsPathLayout.PER_DAY_BARE,
     # WEATHER: 2026-07-25 SSOT realignment (same drift class as PLAYER_VALUES
     # above). The IS weather writer (engine/orchestrator/weather.py) emits
     # ONE per-league partitioned parquet per (date, league) — "Per-league
@@ -183,6 +222,7 @@ SPORTS_DATA_TYPE_LAYOUT: dict[str, SportsPathLayout] = {
     # false-flagged every captured WEATHER row as phantom (>=106 proven false
     # positives). Aligned to the writer's truth: PER_DAY_PER_LEAGUE.
     "WEATHER": SportsPathLayout.PER_DAY_PER_LEAGUE,
+    "weather": SportsPathLayout.PER_DAY_PER_LEAGUE,
     "LEAGUES": SportsPathLayout.PER_DAY_BARE,
     # Flat (singleton)
     "VENUES": SportsPathLayout.FLAT,
@@ -374,11 +414,11 @@ def candidate_parquet_paths(
     # 2026-07-14+ writer cutover fallback: FIXTURES has no legacy dual-write, so every
     # date on/after the cutover has ONLY entity=fixtures_schedule (+ fixtures_outcomes),
     # zero entity=fixtures objects. Append FIXTURES_SCHEDULE candidates so existing
-    # "FIXTURES" callers (e.g. MTDS fixture_id_resolver.py) keep resolving fixture rows
-    # across the cutover without changing their call sites. FIXTURES_OUTCOMES is
-    # deliberately NOT probed here — it's a subset (completed fixtures only) and would
+    # "FIXTURES"/"fixtures" callers (e.g. MTDS fixture_id_resolver.py) keep resolving
+    # fixture rows across the cutover without changing their call sites. FIXTURES_OUTCOMES
+    # is deliberately NOT probed here — it's a subset (completed fixtures only) and would
     # under-report thin/no-completed-match days as missing when used as a presence marker.
-    if data_type == "FIXTURES":
+    if data_type in {"FIXTURES", "fixtures"}:
         paths.extend(
             candidate_parquet_paths(
                 FIXTURES_SCHEDULE,
