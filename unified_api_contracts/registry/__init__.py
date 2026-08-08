@@ -11,12 +11,14 @@ from unified_api_contracts.canonical.coverage_exclusions import (
 from ._sports_venue_constants import (
     SPORTS_AUTH_MAP,
     SPORTS_CAPTCHA_RISK,
+    SPORTS_ODDS_FORK_INSTRUMENT_TYPE_BY_VENUE_TYPE,
     SPORTS_VENUE_TYPE_MAP,
     SUPPORTED_MARKET_TYPES,
     VENUE_AGGREGATOR_TYPE,
     SportsAggregatorType,
     SportsAuthMethod,
     SportsVenueType,
+    derive_sports_odds_fork_instrument_type,
 )
 from .archetype_capability_matrix import (
     ASSET_GROUP_ONTOLOGY,
@@ -944,6 +946,7 @@ __all__ = [
     "SPORTS_LEAGUES",
     "SPORTS_MARKET_TOKEN_ACCEPTED_NONCANONICAL_INSTRUMENT_TYPES",
     "SPORTS_ODDS_API_ACCEPTED_NONCANONICAL_BOOKMAKERS",
+    "SPORTS_ODDS_FORK_INSTRUMENT_TYPE_BY_VENUE_TYPE",
     "SPORTS_PREDICTION_MARKET_VENUES",
     "SPORTS_VENUES",
     "SPORTS_VENUE_ACCEPTED_CROSS_AG_BLEED",
@@ -1110,6 +1113,7 @@ __all__ = [
     "compute_max_leverage_from_spread_move",
     "databento_schema_level",
     "derive_expiry_bucket",
+    "derive_sports_odds_fork_instrument_type",
     "earliest_allowed_start",
     "enumerate_possible_shard_keys",
     "expected_coverage",

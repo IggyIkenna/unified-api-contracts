@@ -80,6 +80,55 @@ SPORTS_VENUE_TYPE_MAP.update(dict.fromkeys(SPORTS_BOOKMAKER_WEB_VENUES, SportsVe
 SPORTS_VENUE_TYPE_MAP.update(dict.fromkeys(SPORTS_DFS_VENUES, SportsVenueType.DFS_PLATFORM))
 SPORTS_VENUE_TYPE_MAP.update(dict.fromkeys(SPORTS_DATA_VENUES, SportsVenueType.DATA_ONLY))
 
+# Target derive-at-read-time replacement for the stamped `exchange_odds`/
+# `fixed_odds` instrument_type split (operator ruling 9,
+# `plans/active/sports_taxonomy_p1_capture_and_contracts_2026_08_08.md` —
+# "retire the exchange_odds/fixed_odds instrument_type split... exchange-
+# vs-sportsbook is a property of the VENUE, so stamping it per-instrument is
+# redundant. Derive at read time."). `SPORTS_VENUE_TYPE_MAP` above already
+# encodes exactly this distinction (EXCHANGE_API vs BOOKMAKER_API/WEB_SCRAPER)
+# — this table + resolver just name the target instrument_type token each
+# venue type derives to, so P2's physical migration and every consumer have
+# one SSOT instead of re-deriving the venue-type-to-token mapping ad hoc.
+#
+# This is the P1 CONTRACT only, same pattern as `SPORTS_IS_DATA_TYPE_
+# LOWERCASE_FORM`/`SPORTS_ODDS_DATA_TYPE_CANONICAL_FORM` in `league_data.py`:
+# the physical re-stamp (writers stop stamping `instrument_type=exchange_odds`/
+# `fixed_odds`, the `CONTRACT_REGISTRY[("sports","exchange_odds"/"fixed_odds",
+# "trades")]` entries retire, and `contracts.py::_SPORTS_ODDS_FORK_
+# INSTRUMENT_TYPES`'s dual-read fallback is removed) is P2 scope. Deliberately
+# NOT wired into `CONTRACT_REGISTRY` or any writer/reader this phase.
+#
+# `PREDICTION_MARKET_API`/`DFS_PLATFORM`/`DATA_ONLY` venue types (e.g.
+# ODDS_API, which leaves the venue axis entirely per operator ruling 2 in the
+# same plan) have no exchange/sportsbook classification and correctly resolve
+# to `None` — this split only ever covered the two bet-placement venue types
+# it was named for.
+SPORTS_ODDS_FORK_INSTRUMENT_TYPE_BY_VENUE_TYPE: dict[SportsVenueType, str] = {
+    SportsVenueType.EXCHANGE_API: "exchange_odds",
+    SportsVenueType.BOOKMAKER_API: "fixed_odds",
+    SportsVenueType.WEB_SCRAPER: "fixed_odds",
+}
+
+
+def derive_sports_odds_fork_instrument_type(venue: str) -> str | None:
+    """Return the TARGET `exchange_odds`/`fixed_odds` instrument_type for a
+    sports venue, derived from its `SportsVenueType` instead of a per-row
+    stamp.
+
+    Accepts either case; returns ``None`` for a venue with no registered
+    `SportsVenueType` (unknown venue) or one whose venue type carries no
+    exchange/sportsbook classification (prediction-market, DFS, or
+    data-only venues, e.g. `ODDS_API`). P1 contract only — see the
+    `SPORTS_ODDS_FORK_INSTRUMENT_TYPE_BY_VENUE_TYPE` docstring above for why
+    the physical stamp + registry retirement are deferred to P2.
+    """
+    venue_type = SPORTS_VENUE_TYPE_MAP.get(venue.upper())
+    if venue_type is None:
+        return None
+    return SPORTS_ODDS_FORK_INSTRUMENT_TYPE_BY_VENUE_TYPE.get(venue_type)
+
+
 SPORTS_AUTH_MAP: dict[str, SportsAuthMethod] = {
     BETFAIR: SportsAuthMethod.SESSION_TOKEN,
     # BETFAIR_EX_UK/EX_EU are the same session-token-based Betfair Exchange API
