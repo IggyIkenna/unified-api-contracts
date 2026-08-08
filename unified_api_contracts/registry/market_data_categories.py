@@ -65,8 +65,9 @@ BASE_GRANULARITY_BY_DATA_TYPE: dict[str, str] = {
     "eigenlayer_rewards": "24h",
     "vault_share_price": "1h",  # ERC-4626 share-price tick: per-block read; 1h sampling enough for APY drift
     # Sports — horizon-based, not standard timeframes
-    "odds_snapshot": "15m",
-    "odds_movement": "15m",
+    # odds_snapshot/odds_movement removed 2026-08-08 (sports taxonomy P1) — MDPS-internal
+    # processed keys, not raw UAC data types; they derive from data_type=odds via the
+    # OddsSnapshotAdapter and OddsMovementAdapter. P1 will pin the processed key prefix.
     "arbitrage_opportunity": "15m",
     "odds_horizon_bucket": "15m",
     # markets/outcomes/settlements removed 2026-08-08 (sports taxonomy P1) — 0 rows ever
@@ -315,8 +316,10 @@ DATA_TYPES_BY_ASSET_GROUP: dict[str, list[str]] = {
     ],
     "sports": [
         "odds",  # Raw bookmaker odds from Odds API (MTDS raw tick data)
-        "odds_snapshot",  # Point-in-time bookmaker odds (LOCF sampled)
-        "odds_movement",  # Odds line movement OHLC candles
+        # odds_snapshot/odds_movement removed 2026-08-08 (sports taxonomy P1, operator
+        # ruling): these are MDPS-derived processed types (LOCF resample and OHLC candle
+        # of odds), NOT distinct raw MTDS capture types. Fleet-wide MDPS ruling: raw
+        # data_type vocabulary = raw source token; processed grain lives in timeframe axis.
         "arbitrage_opportunity",  # Cross-bookmaker arbitrage detection
         "odds_horizon_bucket",  # Time-to-event horizon bucket assignment for odds
         # markets/outcomes/settlements removed 2026-08-08 (sports taxonomy P1, operator ruling
@@ -1120,8 +1123,9 @@ NEEDS_CANDLE_PROCESSING: dict[str, bool] = {
     "native_staking_rates": False,  # Solana validator native staking APY per epoch — pass-through
     # Sports — candle adapters process these
     "odds": False,  # Raw tick data, not directly processed (bucket adapter handles)
-    "odds_snapshot": True,
-    "odds_movement": True,
+    # odds_snapshot/odds_movement removed 2026-08-08 (sports taxonomy P1): these are
+    # MDPS-internal processed type keys, not raw input types needing candle gating here.
+    # CandleAdapterRegistry handles them as output adapters; default True applies.
     "arbitrage_opportunity": True,
     "odds_horizon_bucket": True,
     # markets/outcomes/settlements removed 2026-08-08 (sports taxonomy P1) — retired.
@@ -1457,18 +1461,23 @@ VALID_DATA_TYPES_BY_AG_AND_INSTRUMENT_TYPE: dict[tuple[str, str], frozenset[str]
     # (slot-4 verified 2026-06-07 — the prior literal silently dropped "ODDS"). The fixture/odds rows
     # below are NOT consulted by the league-grain producer (kept as future fixture-grain scaffolding).
     ("sports", "fixture"): frozenset(
-        {"odds", "odds_snapshot", "odds_movement"}
+        {"odds"}
         # markets/outcomes/settlements removed 2026-08-08 (sports taxonomy P1) — retired.
+        # odds_snapshot/odds_movement removed 2026-08-08 (sports taxonomy P1): MDPS-derived
+        # processed types, not raw MTDS capture types for instrument_type validity.
     ),  # UNCERTAIN — sports-owner verify
     ("sports", "exchange_odds"): frozenset(  # UNCERTAIN — sports-owner verify
-        {"odds", "odds_snapshot", "odds_movement", "trades"}
+        # odds_snapshot/odds_movement removed 2026-08-08 (sports taxonomy P1): MDPS-derived.
+        {"odds", "trades"}
     ),
     ("sports", "fixed_odds"): frozenset(  # UNCERTAIN — sports-owner verify
         # markets/outcomes/settlements removed 2026-08-08 (sports taxonomy P1) — retired.
-        {"odds", "odds_snapshot", "odds_movement", "trades"}
+        # odds_snapshot/odds_movement removed 2026-08-08 (sports taxonomy P1): MDPS-derived.
+        {"odds", "trades"}
     ),
     ("sports", "prop"): frozenset(  # UNCERTAIN — sports-owner verify
-        {"odds", "odds_snapshot", "odds_movement"}
+        # odds_snapshot/odds_movement removed 2026-08-08 (sports taxonomy P1): MDPS-derived.
+        {"odds"}
     ),
     # ("sports", "odds") — closes the matrix hole found by
     # sports_shard_enumeration_cartesian_blowup_2026_07_20.md Part 2 item 2.3
@@ -2293,8 +2302,9 @@ VENUE_DATA_TYPE_CAPABILITIES: dict[str, dict[str, str]] = {
     # it fans out to is the P2 data re-stamp this plan phase explicitly defers
     # — this phase lands the CONTRACT only, per todo 3's own scoping.)
     "PINNACLE": {
-        "odds_snapshot": "2024-01-01",
-        "odds_movement": "2024-01-01",
+        # odds_snapshot/odds_movement removed 2026-08-08 (sports taxonomy P1): MDPS-derived
+        # processed types; PINNACLE is a raw-tick venue (data_type=odds), these are
+        # derived candle outputs not raw PINNACLE captures.
         # markets/outcomes/settlements removed 2026-08-08 (sports taxonomy P1) — retired.
     },
     # Bare "BETFAIR" removed 2026-08-08 (sports taxonomy P1 — operator-group parent,
