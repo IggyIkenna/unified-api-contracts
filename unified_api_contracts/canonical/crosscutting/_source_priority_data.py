@@ -117,6 +117,39 @@ SOURCE_PRIORITY: Final[dict[tuple[str, str], list[str]]] = {
     ("sports", "VENUES"): ["api_football"],
     ("sports", "LEAGUES"): ["api_football"],
     ("sports", "PLAYER_VALUES"): ["transfermarkt"],
+    # ---- Sports lowercase canonical forms (P1 migration — additive alongside uppercase) ----
+    # During P1→P2 window: old manifest rows carry uppercase, new rows carry lowercase.
+    # P2 re-stamps all uppercase rows. TRADES/TRADES_INPLAY kept uppercase (documented
+    # exception — derive_pipeline_mode_for_row() .upper() fallback handles them).
+    ("sports", "fixtures"): ["api_football", "footystats"],
+    ("sports", "fixtures_schedule"): ["api_football", "footystats"],
+    ("sports", "fixtures_outcomes"): ["api_football", "footystats"],
+    ("sports", "fixture_lineups"): ["api_football"],
+    ("sports", "fixture_events"): ["api_football"],
+    ("sports", "fixture_stats"): ["api_football"],
+    ("sports", "player_stats"): ["api_football"],
+    ("sports", "injuries"): ["api_football"],
+    ("sports", "results"): ["api_football"],
+    ("sports", "understat_xg"): ["understat"],
+    ("sports", "sfi_progressive_stats"): ["soccer_football_info"],
+    ("sports", "odds_snapshot"): ["odds_api"],
+    ("sports", "odds_movement"): ["odds_api"],
+    ("sports", "arbitrage"): ["odds_api"],
+    ("sports", "weather_forecast"): ["open_meteo"],
+    ("sports", "xg"): ["understat"],
+    ("sports", "xg_shots"): ["understat"],
+    ("sports", "matches"): ["footystats"],
+    ("sports", "standings"): ["api_football"],
+    ("sports", "weather"): ["open_meteo"],
+    ("sports", "predictions"): ["footystats"],
+    ("sports", "odds"): ["footystats"],
+    ("sports", "odds_horizon_bucket"): ["mdps_odds_horizon_bucket"],
+    ("sports", "transfer_records"): ["transfermarkt"],
+    ("sports", "teams"): ["api_football"],
+    ("sports", "players"): ["api_football"],
+    ("sports", "venues"): ["api_football"],
+    ("sports", "leagues"): ["api_football"],
+    ("sports", "player_values"): ["transfermarkt"],
     # ---- CeFi -----------------------------------------------------------
     # Tardis is the canonical CeFi tick source (multi-venue archive).
     # Per-venue REST/WS adapters serve live-time updates; archive falls

@@ -67,7 +67,9 @@ SPORTS_DATA_TYPE_TO_FOLDER: dict[str, str] = {
     # ALSO auto-appends FIXTURES_SCHEDULE candidates (see below) so existing "FIXTURES"
     # callers stay correct across the cutover without changing their call sites.
     FIXTURES_SCHEDULE: "fixtures_schedule",
+    "FIXTURES_SCHEDULE": "fixtures_schedule",   # legacy uppercase key — P2 re-stamps manifest rows
     FIXTURES_OUTCOMES: "fixtures_outcomes",
+    "FIXTURES_OUTCOMES": "fixtures_outcomes",   # legacy uppercase key — P2 re-stamps manifest rows
     "FIXTURE_EVENTS": "fixture_events",
     "FIXTURE_LINEUPS": "fixture_lineups",
     "FIXTURE_STATS": "fixture_stats",
@@ -152,7 +154,9 @@ SPORTS_DATA_TYPE_LAYOUT: dict[str, SportsPathLayout] = {
     # Per-league subpartition (modern layout for most entities)
     "FIXTURES": SportsPathLayout.PER_DAY_PER_LEAGUE,
     FIXTURES_SCHEDULE: SportsPathLayout.PER_DAY_PER_LEAGUE,
+    "FIXTURES_SCHEDULE": SportsPathLayout.PER_DAY_PER_LEAGUE,   # legacy uppercase key
     FIXTURES_OUTCOMES: SportsPathLayout.PER_DAY_PER_LEAGUE,
+    "FIXTURES_OUTCOMES": SportsPathLayout.PER_DAY_PER_LEAGUE,   # legacy uppercase key
     "FIXTURE_EVENTS": SportsPathLayout.PER_DAY_PER_LEAGUE,
     "FIXTURE_LINEUPS": SportsPathLayout.PER_DAY_PER_LEAGUE,
     "FIXTURE_STATS": SportsPathLayout.PER_DAY_PER_LEAGUE,
@@ -378,7 +382,7 @@ def candidate_parquet_paths(
     # across the cutover without changing their call sites. FIXTURES_OUTCOMES is
     # deliberately NOT probed here — it's a subset (completed fixtures only) and would
     # under-report thin/no-completed-match days as missing when used as a presence marker.
-    if data_type == "FIXTURES":
+    if data_type.upper() == "FIXTURES":
         paths.extend(
             candidate_parquet_paths(
                 FIXTURES_SCHEDULE,

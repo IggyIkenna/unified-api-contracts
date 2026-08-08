@@ -431,6 +431,12 @@ SCHEMA_SPEC_REGISTRY: Final[tuple[SchemaSpec, ...]] = (
     ),
     SchemaSpec(
         asset_group=AssetGroup.SPORTS,
+        data_type="fixtures_schedule",
+        columns=_SPORTS_FIXTURE_COLUMNS,
+        source="manual",
+    ),
+    SchemaSpec(
+        asset_group=AssetGroup.SPORTS,
         data_type="ODDS",
         columns=_SPORTS_ODDS_COLUMNS,
         source="manual",

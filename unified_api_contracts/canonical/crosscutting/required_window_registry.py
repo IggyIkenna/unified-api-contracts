@@ -263,9 +263,21 @@ MVP_REQUIRED_WINDOW_REGISTRY: Final[dict[tuple[str, str], RequiredWindowSpec]] =
         kind="seasonal_continuous",
         notes="API-Football fixtures by (league, season) — schedule data spans the season window.",
     ),
+    ("sports", "fixtures"): RequiredWindowSpec(
+        kind="seasonal_continuous",
+        notes="Lowercase canonical form of FIXTURES (P1 migration).",
+    ),
+    ("sports", "fixtures_schedule"): RequiredWindowSpec(
+        kind="seasonal_continuous",
+        notes="Post-cutover split of FIXTURES — schedule half.",
+    ),
     ("sports", "XG"): RequiredWindowSpec(
         kind="seasonal_continuous",
         notes="Understat xG by (league, season) — match-level xG joined to fixtures.",
+    ),
+    ("sports", "xg"): RequiredWindowSpec(
+        kind="seasonal_continuous",
+        notes="Lowercase canonical form of XG (P1 migration).",
     ),
     ("sports", "ODDS"): RequiredWindowSpec(
         kind="seasonal_continuous",
