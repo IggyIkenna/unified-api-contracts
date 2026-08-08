@@ -65,9 +65,17 @@ BASE_GRANULARITY_BY_DATA_TYPE: dict[str, str] = {
     "eigenlayer_rewards": "24h",
     "vault_share_price": "1h",  # ERC-4626 share-price tick: per-block read; 1h sampling enough for APY drift
     # Sports — horizon-based, not standard timeframes
-    # odds_snapshot/odds_movement removed 2026-08-08 (sports taxonomy P1) — MDPS-internal
-    # processed keys, not raw UAC data types; they derive from data_type=odds via the
-    # OddsSnapshotAdapter and OddsMovementAdapter. P1 will pin the processed key prefix.
+    # odds_snapshot/odds_movement RESTORED 2026-08-08 (sports taxonomy P1, this todo — the
+    # "pin the processed key prefix" the collapse commit deferred to). They are legitimate
+    # MDPS-derived PROCESSED-key discriminators (verified live/production in
+    # codex/02-data/sports-data-types-catalog.md — NOT phantom declarations like the
+    # markets/outcomes/settlements retirement below), distinct from the RAW MTDS capture
+    # vocabulary collapse (trades/ODDS/trades_inplay/odds_horizon_bucket -> odds). The
+    # collapse commit (1f5879fc) over-broadly stripped them from this dict too, which
+    # silently disabled MDPS candle dispatch for BOTH (0 candles computed 2026-08-08 until
+    # this fix — see the "Snapshot-vs-candle discriminator" section in the codex doc).
+    "odds_snapshot": "15m",
+    "odds_movement": "15m",
     "arbitrage_opportunity": "15m",
     "odds_horizon_bucket": "15m",
     # markets/outcomes/settlements removed 2026-08-08 (sports taxonomy P1) — 0 rows ever
@@ -316,10 +324,28 @@ DATA_TYPES_BY_ASSET_GROUP: dict[str, list[str]] = {
     ],
     "sports": [
         "odds",  # Raw bookmaker odds from Odds API (MTDS raw tick data)
-        # odds_snapshot/odds_movement removed 2026-08-08 (sports taxonomy P1, operator
-        # ruling): these are MDPS-derived processed types (LOCF resample and OHLC candle
-        # of odds), NOT distinct raw MTDS capture types. Fleet-wide MDPS ruling: raw
-        # data_type vocabulary = raw source token; processed grain lives in timeframe axis.
+        # odds_snapshot/odds_movement RESTORED 2026-08-08 (sports taxonomy P1, this todo).
+        # The collapse (1f5879fc) correctly removed the RAW MTDS capture aliases that
+        # duplicated `odds` (trades/ODDS/trades_inplay/odds_horizon_bucket all fold into
+        # `odds` + axes — see codex/02-data/sports-data-types-catalog.md "Prior names merged
+        # into odds"), but odds_snapshot/odds_movement are NOT raw capture aliases — they are
+        # MDPS-derived PROCESSED types (LOCF resample / OHLC candle of odds), each with its
+        # own live UAC contract + production shard population, exactly like the two
+        # MDPS-derived siblings below (arbitrage_opportunity/odds_horizon_bucket) that were
+        # correctly left untouched by the same collapse. Removing them from this list ALSO
+        # over-broadly cut the CandleAdapterRegistry dispatch gate (this list is what
+        # `_process_one_category` filters candidate data_types against), silently disabling
+        # MDPS odds_snapshot/odds_movement candle computation entirely (0 shards produced
+        # 2026-08-08 until this fix). `timeframe` cannot discriminate LOCF-snapshot vs
+        # OHLC-candle shape at the same grain, so the discriminator is this processed
+        # data_type STRING itself — mdps_data_type_key's fallback (no
+        # _DATA_TYPE_TO_MDPS_PREFIX entry for either) naturally yields the distinct manifest
+        # keys `odds_snapshot_{tf}` / `odds_movement_{tf}`, matching the already-registered,
+        # schema-verified UAC contracts in _candle_contracts.py's sports-derived-candle loop
+        # (unchanged by this fix). See codex/02-data/sports-data-types-catalog.md
+        # "Snapshot-vs-candle discriminator" for the full decision record.
+        "odds_snapshot",  # MDPS LOCF resample of odds (point-in-time) — processed key, not raw capture
+        "odds_movement",  # MDPS OHLC candle of odds (line movement) — processed key, not raw capture
         "arbitrage_opportunity",  # Cross-bookmaker arbitrage detection
         "odds_horizon_bucket",  # Time-to-event horizon bucket assignment for odds
         # markets/outcomes/settlements removed 2026-08-08 (sports taxonomy P1, operator ruling
@@ -1133,9 +1159,11 @@ NEEDS_CANDLE_PROCESSING: dict[str, bool] = {
     "native_staking_rates": False,  # Solana validator native staking APY per epoch — pass-through
     # Sports — candle adapters process these
     "odds": False,  # Raw tick data, not directly processed (bucket adapter handles)
-    # odds_snapshot/odds_movement removed 2026-08-08 (sports taxonomy P1): these are
-    # MDPS-internal processed type keys, not raw input types needing candle gating here.
-    # CandleAdapterRegistry handles them as output adapters; default True applies.
+    # odds_snapshot/odds_movement RESTORED 2026-08-08 (sports taxonomy P1, this todo) —
+    # explicit True entries (matching arbitrage_opportunity/odds_horizon_bucket's style
+    # below) rather than relying on the silent default-True fallback.
+    "odds_snapshot": True,
+    "odds_movement": True,
     "arbitrage_opportunity": True,
     "odds_horizon_bucket": True,
     # markets/outcomes/settlements removed 2026-08-08 (sports taxonomy P1) — retired.
