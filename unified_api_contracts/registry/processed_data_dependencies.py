@@ -34,6 +34,15 @@ _RAW_TO_PROCESSED_PREFIX: dict[str, str] = {
     "oracle_prices": "oracle_ohlcv",
     "lst_rates": "lst_ohlcv",
     "odds": "odds_ohlcv",
+    # Sports snapshot-vs-candle discriminator (2026-08-08, sports_taxonomy_p1):
+    # ``odds`` collapsed to ONE raw data_type, but MDPS derives TWO distinct
+    # shapes from it — an OHLC candle (keyed via the ``odds`` entry above,
+    # ``odds_ohlcv_{tf}``) and a LOCF point-in-time snapshot. Since this dict
+    # is raw_dt -> ONE prefix, the snapshot form cannot reuse the ``odds`` key;
+    # ``odds_snapshot`` here is an MDPS-INTERNAL lookup key only (NOT added to
+    # ``DATA_TYPES_BY_ASSET_GROUP`` — it is not a new raw MTDS capture type).
+    # SSOT: /codex/02-data/sports-data-types-catalog.md.
+    "odds_snapshot": "odds_snap",
     "prediction_market": "pred_ohlcv",
 }
 
@@ -93,6 +102,15 @@ def _expand_processed_keys() -> dict[str, list[str]]:
             key = f"{prefix}_{tf}"
             if prefix == "ohlcv":
                 expanded[key] = list(_PASSTHROUGH_RAW_FOR_OHLCV)
+            elif prefix == "odds_snap":
+                # ``odds_snapshot`` (the dict key above) is an MDPS-internal
+                # lookup token, NOT a genuine raw precondition — nothing ever
+                # raw-captures it. The real raw precondition for the LOCF
+                # snapshot form is ``odds`` itself (same source the OHLC
+                # candle depends on), so it is substituted here rather than
+                # falling through to the generic ``[raw_dt]`` branch, which
+                # would wrongly declare a precondition that can never resolve.
+                expanded[key] = ["odds"]
             else:
                 expanded[key] = [raw_dt]
     for derived_dt, raw_sources in _DERIVED_ONLY.items():

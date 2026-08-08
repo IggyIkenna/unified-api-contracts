@@ -218,6 +218,10 @@ def _odds_key(tf: str) -> str:
     return f"odds_ohlcv_{tf}"
 
 
+def _odds_snap_key(tf: str) -> str:
+    return f"odds_snap_{tf}"
+
+
 def _pred_key(tf: str) -> str:
     return f"pred_ohlcv_{tf}"
 
@@ -638,6 +642,34 @@ for _tf in _TIMEFRAMES_SPORTS:
 
 
 # ---------------------------------------------------------------------------
+# Sports snapshot-vs-candle discriminator (2026-08-08, sports_taxonomy_p1) —
+# ``odds_snap_{tf}``, the collapsed model's target key for the LOCF
+# point-in-time form. Same shape as the legacy ``odds_snapshot_{tf}`` above
+# (SportsOddsSnapshotAdapter's CandleOutput is unchanged); registered
+# ADDITIVELY here so ``lookup_contract`` already resolves once the writer
+# migrates (P2) — the legacy ``odds_snapshot_{tf}`` entry is NOT removed this
+# phase (still backs any already-written historical shards). The OHLC form
+# (formerly ``odds_movement``) needs no new entry: it collapses onto the
+# pre-existing ``odds_ohlcv_{tf}`` contract registered above (``_odds_key``)
+# since the OHLC form IS ``odds`` + ``timeframe``, per fleet convention.
+# SSOT: /codex/02-data/sports-data-types-catalog.md.
+# ---------------------------------------------------------------------------
+
+for _tf in _TIMEFRAMES_SPORTS:
+    _register(
+        _build(
+            "sports",
+            "odds",
+            _odds_snap_key(_tf),
+            symbol_column="symbol",
+            extra_cols=[],
+            anchor_col=None,
+            nullable_ohlcv=True,
+        )
+    )
+
+
+# ---------------------------------------------------------------------------
 # Prediction candles — prediction_market x trades (1m / 15m / 1h)
 # ---------------------------------------------------------------------------
 
@@ -736,6 +768,7 @@ MDPS_KEY_RATE = _rate_key
 MDPS_KEY_ORACLE = _oracle_key
 MDPS_KEY_LST = _lst_key
 MDPS_KEY_ODDS = _odds_key
+MDPS_KEY_ODDS_SNAP = _odds_snap_key
 MDPS_KEY_PRED = _pred_key
 
 
@@ -746,6 +779,7 @@ __all__ = [
     "MDPS_KEY_LIQ",
     "MDPS_KEY_LST",
     "MDPS_KEY_ODDS",
+    "MDPS_KEY_ODDS_SNAP",
     "MDPS_KEY_ORACLE",
     "MDPS_KEY_POOL_STATE",
     "MDPS_KEY_PRED",

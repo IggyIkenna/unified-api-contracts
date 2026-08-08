@@ -1203,6 +1203,13 @@ _SPORTS_ODDS_DERIVED_CANDLE_PREFIXES: tuple[str, ...] = (
     "odds_snapshot_",
     "odds_horizon_bucket_",
     "arbitrage_opportunity_",
+    # ``odds_snap_`` (2026-08-08, sports_taxonomy_p1): the collapsed model's
+    # LOCF snapshot discriminator key (``processed_data_dependencies.py``'s
+    # ``odds_snapshot`` -> ``odds_snap`` prefix). ``odds_movement_`` collapses
+    # onto the pre-existing ``odds_ohlcv_{tf}`` contract (the OHLC candle IS
+    # ``odds`` + ``timeframe``, no new prefix needed there) once the writer
+    # migrates; kept here alongside the legacy prefixes during the transition.
+    "odds_snap_",
 )
 
 # Sports EXCHANGE_ODDS/FIXED_ODDS fork instrument_types (contracts-first

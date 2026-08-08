@@ -21,6 +21,7 @@ from unified_api_contracts.internal.schemas._candle_contracts import (
     MDPS_KEY_LIQ,
     MDPS_KEY_LST,
     MDPS_KEY_ODDS,
+    MDPS_KEY_ODDS_SNAP,
     MDPS_KEY_ORACLE,
     MDPS_KEY_POOL_STATE,
     MDPS_KEY_PRED,
@@ -398,6 +399,22 @@ def test_sports_odds_candles(tf: str) -> None:
     names = {c.name for c in contract.columns}
     assert "quote_count" in names
     assert "source_count" in names
+
+
+@pytest.mark.parametrize("tf", MDPS_TIMEFRAMES_SPORTS)
+def test_sports_odds_snap_candles_registered(tf: str) -> None:
+    """Snapshot-vs-candle discriminator (2026-08-08, sports_taxonomy_p1):
+    ``odds_snap_{tf}`` — the collapsed model's target key for the LOCF
+    point-in-time form — is discoverable and distinct from the OHLC candle
+    key (``odds_ohlcv_{tf}``, ``MDPS_KEY_ODDS``)."""
+    contract = lookup_contract(asset_group="sports", instrument_type="odds", data_type=MDPS_KEY_ODDS_SNAP(tf))
+    assert contract.symbol_column == "symbol"
+    names = {c.name for c in contract.columns}
+    assert "instrument_id" in names
+    assert "venue" in names
+    open_col = next(c for c in contract.columns if c.name == "open")
+    assert open_col.nullable is True
+    assert MDPS_KEY_ODDS_SNAP(tf) != MDPS_KEY_ODDS(tf), "snapshot key must never collide with the OHLC candle key"
 
 
 @pytest.mark.parametrize("tf", MDPS_TIMEFRAMES_PREDICTION)

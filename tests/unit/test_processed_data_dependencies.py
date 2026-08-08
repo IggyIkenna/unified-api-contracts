@@ -101,3 +101,25 @@ class TestTimeframeVocabulary:
         manifest rows under either token."""
         assert is_processed_data_type("deriv_ohlcv_24h") is True
         assert is_processed_data_type("deriv_ohlcv_1d") is True
+
+
+class TestSportsOddsSnapshotVsCandleDiscriminator:
+    """sports_taxonomy_p1_capture_and_contracts_2026_08_08.md: ``odds``
+    collapsed to one raw data_type, but MDPS derives two distinct SHAPES —
+    an OHLC candle (``odds_ohlcv_{tf}``) and a LOCF snapshot
+    (``odds_snap_{tf}``) — that must never collide, and the snapshot form's
+    raw precondition must be ``odds`` (the genuine raw source), never the
+    MDPS-internal ``odds_snapshot`` lookup key itself."""
+
+    def test_odds_snap_is_processed(self) -> None:
+        assert is_processed_data_type("odds_snap_15m") is True
+
+    def test_odds_snap_raw_precondition_is_odds_not_odds_snapshot(self) -> None:
+        """``odds_snapshot`` is a lookup token only — nothing ever raw-
+        captures it, so it must never appear as a declared precondition."""
+        assert get_raw_source_data_types("odds_snap_15m") == ["odds"]
+
+    def test_odds_ohlcv_and_odds_snap_keys_are_distinguishable(self) -> None:
+        assert "odds_ohlcv_15m" != "odds_snap_15m"
+        assert is_processed_data_type("odds_ohlcv_15m") is True
+        assert get_raw_source_data_types("odds_ohlcv_15m") == ["odds"]
