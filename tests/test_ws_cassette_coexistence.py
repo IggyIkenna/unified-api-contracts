@@ -239,6 +239,12 @@ def test_ws_connector_has_cassette(connector_stem: str) -> None:
         # other XFAILs — needs a real capture, not a fabricated cassette (would
         # defeat the schema-drift canary this test exists to enforce).
         pytest.xfail("jupiter_solana_ws: connector landed without a WS frame cassette + venue mapping yet")
+    if connector_stem == "aave_liquidations_ethereum_ws":
+        # 2026-08-08: OnChainEventPoller/AaveV3EthereumWSFeedConnector connector landed
+        # (commit 73abd655) without a corresponding WS frame cassette in UAC and no
+        # dedicated external/aave/ venue dir. Acknowledged gap — same pattern as
+        # jupiter_solana_ws above. Needs a real WS capture, not a fabricated cassette.
+        pytest.xfail("aave_liquidations_ethereum_ws: connector landed without a WS frame cassette + venue mapping yet")
     venue = _CONNECTOR_TO_VENUE.get(connector_stem)
     assert venue is not None, (
         f"Connector '{connector_stem}' not in _CONNECTOR_TO_VENUE map. "
