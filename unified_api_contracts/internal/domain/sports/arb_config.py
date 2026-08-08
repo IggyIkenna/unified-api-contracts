@@ -15,6 +15,7 @@ from __future__ import annotations
 from pydantic import BaseModel, Field
 
 from unified_api_contracts.registry.venue_constants import (
+    BETFAIR,
     BETFAIR_EX_EU,
     BETFAIR_EX_UK,
     BETFAIR_SB_UK,
@@ -22,6 +23,7 @@ from unified_api_contracts.registry.venue_constants import (
     LEOVEGAS,
     UNIBET,
     WILLIAMHILL,
+    WINAMAX,
 )
 
 
@@ -178,28 +180,42 @@ EXCHANGE_COMMISSION_RATES: dict[str, float] = {
     "matchbook": 0.015,  # 1.5%
 }
 
-# Bookmaker operator groups — same company, different regional skins.
-# Arbs between venues in the same group are not real (same operator).
+# Bookmaker operator hierarchy — same company, different regional skins.
+# Arbs between venues in the same group are not real (same counterparty).
 # Strategy must ensure arb legs come from DIFFERENT groups.
+#
+# BETFAIR_SB (sportsbook) collapses into BETFAIR per operator ruling 2026-08-08:
+# the sportsbook and exchange products are the same counterparty for arb-independence.
+# Phantom regional venues (no UAC constant yet) are kept here until todo 4 prunes
+# any that are absent from the live sports manifest.
+OPERATOR_GROUP_VENUES: dict[str, frozenset[str]] = {
+    BETFAIR: frozenset(
+        {
+            BETFAIR_EX_UK,
+            BETFAIR_EX_EU,
+            "BETFAIR_EX_AU",  # no UAC constant; pruned by todo 4 if absent from manifest
+            BETFAIR_SB_UK,
+        }
+    ),
+    UNIBET: frozenset(
+        {
+            UNIBET,
+            "UNIBET_UK",  # phantom regional venues; pruned by todo 4 if absent from manifest
+            "UNIBET_FR",
+            "UNIBET_NL",
+            "UNIBET_SE",
+        }
+    ),
+    LEOVEGAS: frozenset({LEOVEGAS, "LEOVEGAS_SE"}),
+    LADBROKES: frozenset({LADBROKES, "LADBROKES_AU"}),
+    WILLIAMHILL: frozenset({WILLIAMHILL, "WILLIAMHILL_US"}),
+    WINAMAX: frozenset({"WINAMAX_FR", "WINAMAX_DE"}),
+}
+
+# Derived from OPERATOR_GROUP_VENUES — do not restate here.
 # Keys are UAC canonical venue constants (uppercase); get_operator() normalises via .upper().
 VENUE_OPERATOR_GROUPS: dict[str, str] = {
-    BETFAIR_EX_UK: "BETFAIR",
-    BETFAIR_EX_EU: "BETFAIR",
-    "BETFAIR_EX_AU": "BETFAIR",
-    BETFAIR_SB_UK: "BETFAIR_SB",
-    UNIBET: "UNIBET",
-    "UNIBET_UK": "UNIBET",
-    "UNIBET_FR": "UNIBET",
-    "UNIBET_NL": "UNIBET",
-    "UNIBET_SE": "UNIBET",
-    LEOVEGAS: "LEOVEGAS",
-    "LEOVEGAS_SE": "LEOVEGAS",
-    LADBROKES: "LADBROKES",
-    "LADBROKES_AU": "LADBROKES",
-    WILLIAMHILL: "WILLIAMHILL",
-    "WILLIAMHILL_US": "WILLIAMHILL",
-    "WINAMAX_FR": "WINAMAX",
-    "WINAMAX_DE": "WINAMAX",
+    venue: operator for operator, venues in OPERATOR_GROUP_VENUES.items() for venue in venues
 }
 
 
