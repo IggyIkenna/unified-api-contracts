@@ -80,6 +80,17 @@ SPORTS_VENUE_TYPE_MAP.update(dict.fromkeys(SPORTS_BOOKMAKER_WEB_VENUES, SportsVe
 SPORTS_VENUE_TYPE_MAP.update(dict.fromkeys(SPORTS_DFS_VENUES, SportsVenueType.DFS_PLATFORM))
 SPORTS_VENUE_TYPE_MAP.update(dict.fromkeys(SPORTS_DATA_VENUES, SportsVenueType.DATA_ONLY))
 
+
+def is_exchange_odds_venue(venue: str) -> bool:
+    """Return True if venue is a peer-to-peer betting exchange (not a sportsbook).
+
+    Use this to derive the exchange-vs-sportsbook distinction at read time instead
+    of reading instrument_type=exchange_odds / fixed_odds from the manifest — those
+    partition keys are RETIRED (sports taxonomy P1, 2026-08-08); SportsVenueType
+    already encodes the venue class.
+    """
+    return SPORTS_VENUE_TYPE_MAP.get(venue) == SportsVenueType.EXCHANGE_API
+
 SPORTS_AUTH_MAP: dict[str, SportsAuthMethod] = {
     BETFAIR: SportsAuthMethod.SESSION_TOKEN,
     # BETFAIR_EX_UK/EX_EU are the same session-token-based Betfair Exchange API

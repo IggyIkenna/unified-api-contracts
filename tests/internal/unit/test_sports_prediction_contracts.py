@@ -591,7 +591,7 @@ def test_every_sports_odds_family_contract_registry_entry_is_matrix_reachable() 
         VALID_DATA_TYPES_BY_AG_AND_INSTRUMENT_TYPE,
     )
 
-    odds_family_instrument_types = {"fixture", "exchange_odds", "fixed_odds", "prop", "odds"}
+    odds_family_instrument_types = {"fixture", "prop", "odds"}
     sports_data_types = set(DATA_TYPES_BY_ASSET_GROUP["sports"])
 
     violations: list[tuple[str, str, str]] = []

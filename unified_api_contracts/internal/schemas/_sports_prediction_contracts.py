@@ -112,12 +112,12 @@ SPORTS_ODDS_TRADES = SchemaContract(
 )
 
 # ---------------------------------------------------------------------------
-# Sports (odds) — EXCHANGE_ODDS / FIXED_ODDS fork (contracts-first migration,
-# sports_closeout_exchange_fixed_odds_fork_2026_07_25.md todo 3). Same row
-# schema as SPORTS_ODDS_TRADES — the fork splits the manifest/GCS
-# instrument_type partition by venue class (peer-to-peer exchange vs
-# sportsbook), it does not change the captured columns. The legacy ``odds``
-# contract above stays registered for the dual-read window (next todo).
+# Sports (odds) — EXCHANGE_ODDS / FIXED_ODDS fork (RETIRED 2026-08-08,
+# sports taxonomy P1). Writer-side: MTDS now stamps "odds" for all sports
+# odds venues (exchange and sportsbook alike). These contracts are KEPT in
+# the registry for the P2 dual-read migration window — existing manifest rows
+# still carry instrument_type=exchange_odds / fixed_odds and must resolve a
+# valid SchemaContract. Same row schema as SPORTS_ODDS_TRADES.
 # ---------------------------------------------------------------------------
 
 SPORTS_EXCHANGE_ODDS_TRADES = SchemaContract(

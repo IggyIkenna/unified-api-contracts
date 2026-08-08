@@ -92,21 +92,17 @@ class InstrumentType(StrEnum):
     COMBO = "COMBO"
     # Sports / Prediction Markets
     PREDICTION_MARKET = "PREDICTION_MARKET"
-    # EXCHANGE_ODDS / FIXED_ODDS are LIVE in the derivation + adapter layer:
+    # EXCHANGE_ODDS / FIXED_ODDS remain in the derivation + adapter layer:
     #   - instruments-service ``instruments_service/reference_data/adapters/sports/
     #     adapters/betfair.py:287`` constructs ``InstrumentType.EXCHANGE_ODDS``.
     #   - UTL ``unified_trading_library/canonical/_derive_instrument_id.py:85`` maps
     #     ``("sports", "odds") -> InstrumentType.EXCHANGE_ODDS``.
-    # They are NOT the sports manifest's vocabulary. The sports SchemaContract
-    # registry deliberately does NOT key on InstrumentType — it keys on the declared
-    # contract value ``odds`` (see internal/schemas/_sports_prediction_contracts.py,
-    # instrument_type="odds"), which is also the physical GCS hive partition
-    # (``instrument_type=odds/``) and is still actively written.
-    # Do NOT "fix" the manifest/registry to match these enum members: renaming
-    # ``odds`` -> EXCHANGE_ODDS/FIXED_ODDS would create manifest<->disk<->registry
-    # divergence to change a value that has zero shard + display consumers
-    # (SHARD_AXIS_MATRIX keys sports on ("data_type", "league_id"), not
-    # instrument_type). Operator ruling 2026-07-17: closed as not-a-defect.
+    # RETIRED 2026-08-08 as sports manifest/GCS vocabulary (sports taxonomy P1):
+    # MTDS now writes ``instrument_type=odds`` for all sports odds venues; the
+    # exchange-vs-sportsbook distinction is derived at read time via SportsVenueType.
+    # The CONTRACT_REGISTRY entries for exchange_odds/fixed_odds are kept for the
+    # P2 dual-read migration window (existing manifest rows keep those partition
+    # keys until P2 re-stamps them). P3 will align IS/UTL derivation.
     EXCHANGE_ODDS = "EXCHANGE_ODDS"
     FIXED_ODDS = "FIXED_ODDS"
     PROP = "PROP"

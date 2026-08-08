@@ -1205,18 +1205,14 @@ _SPORTS_ODDS_DERIVED_CANDLE_PREFIXES: tuple[str, ...] = (
     "arbitrage_opportunity_",
 )
 
-# Sports EXCHANGE_ODDS/FIXED_ODDS fork instrument_types (contracts-first
-# migration, sports_closeout_exchange_fixed_odds_fork_2026_07_25.md todo 3-4).
-# Only ("sports", "exchange_odds"/"fixed_odds", "trades") has its own
-# CONTRACT_REGISTRY entry so far -- the sibling odds data_types
-# (sports_odds_snapshot / sports_odds_movement / sports_arbitrage, ...) still
-# resolve only under the legacy "odds" instrument_type. During the migration
-# window (GCS objects move venue-by-venue into exchange_odds/ or fixed_odds/
-# partitions ahead of every odds data_type getting its own fork entry), a
-# lookup for one of these instrument_types against an as-yet-unforked
-# data_type must still resolve -- the row schema is identical, only the
-# partition key differs (SPORTS_EXCHANGE_ODDS_TRADES/SPORTS_FIXED_ODDS_TRADES
-# share SPORTS_ODDS_TRADES.columns by reference).
+# Sports EXCHANGE_ODDS/FIXED_ODDS fork instrument_types — RETIRED as writer
+# vocabulary 2026-08-08 (sports taxonomy P1). Kept for the P2 dual-read
+# migration window: existing manifest rows still carry instrument_type=
+# exchange_odds / fixed_odds and must fall back to the "odds" contract for
+# any data_type not individually forked. The row schema is identical across
+# all three (SPORTS_EXCHANGE_ODDS_TRADES/SPORTS_FIXED_ODDS_TRADES share
+# SPORTS_ODDS_TRADES.columns by reference). P2 will re-stamp all manifest
+# rows to instrument_type=odds and remove this fallback.
 _SPORTS_ODDS_FORK_INSTRUMENT_TYPES: tuple[str, ...] = ("exchange_odds", "fixed_odds")
 
 

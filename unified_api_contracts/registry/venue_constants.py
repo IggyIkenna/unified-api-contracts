@@ -544,10 +544,10 @@ INSTRUMENT_TYPES_BY_VENUE: dict[str, set[str]] = {
     KALSHI_PERP: {"PERPETUAL"},
     POLYMARKET_PERP: {"PERPETUAL"},
 }
-INSTRUMENT_TYPES_BY_VENUE.update({v: {"EXCHANGE_ODDS"} for v in SPORTS_EXCHANGE_VENUES})
+INSTRUMENT_TYPES_BY_VENUE.update({v: {"ODDS"} for v in SPORTS_EXCHANGE_VENUES})
 INSTRUMENT_TYPES_BY_VENUE.update({v: {"PREDICTION_MARKET"} for v in SPORTS_PREDICTION_MARKET_VENUES})
-INSTRUMENT_TYPES_BY_VENUE.update({v: {"FIXED_ODDS"} for v in SPORTS_BOOKMAKER_API_VENUES})
-INSTRUMENT_TYPES_BY_VENUE.update({v: {"FIXED_ODDS"} for v in SPORTS_BOOKMAKER_WEB_VENUES})
+INSTRUMENT_TYPES_BY_VENUE.update({v: {"ODDS"} for v in SPORTS_BOOKMAKER_API_VENUES})
+INSTRUMENT_TYPES_BY_VENUE.update({v: {"ODDS"} for v in SPORTS_BOOKMAKER_WEB_VENUES})
 INSTRUMENT_TYPES_BY_VENUE.update({v: {"PROP"} for v in SPORTS_DFS_VENUES})
 
 INSTRUMENT_TYPE_FOLDER_MAP: dict[str, str] = {
@@ -576,8 +576,7 @@ INSTRUMENT_TYPE_FOLDER_MAP: dict[str, str] = {
     # instrument_type the DeFi manifest already emits (LST->lst, STAKING->staking).
     "RESTAKING": "restaking",
     "A_TOKEN": "a_tokens",
-    "EXCHANGE_ODDS": "exchange_odds",
-    "FIXED_ODDS": "fixed_odds",
+    "ODDS": "odds",
     "PREDICTION_MARKET": "prediction_markets",
     "PROP": "props",
     "COMBO": "combos",
