@@ -89,6 +89,8 @@ _INSTRUMENT_TYPE_TO_LEDGER_ASSET_CLASS: dict[InstrumentType, LedgerAssetClass] =
     # Event / prediction / sports
     InstrumentType.EVENT_CONTRACT: LedgerAssetClass.PREDICTION_CONTRACT,
     InstrumentType.PREDICTION_MARKET: LedgerAssetClass.PREDICTION_CONTRACT,
+    InstrumentType.ODDS: LedgerAssetClass.SPORTS_OUTCOME,
+    # EXCHANGE_ODDS/FIXED_ODDS kept for IS betfair adapter (P2 migration)
     InstrumentType.EXCHANGE_ODDS: LedgerAssetClass.SPORTS_OUTCOME,
     InstrumentType.FIXED_ODDS: LedgerAssetClass.SPORTS_OUTCOME,
     InstrumentType.PROP: LedgerAssetClass.SPORTS_OUTCOME,

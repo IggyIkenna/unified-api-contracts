@@ -92,21 +92,17 @@ class InstrumentType(StrEnum):
     COMBO = "COMBO"
     # Sports / Prediction Markets
     PREDICTION_MARKET = "PREDICTION_MARKET"
-    # EXCHANGE_ODDS / FIXED_ODDS are LIVE in the derivation + adapter layer:
-    #   - instruments-service ``instruments_service/reference_data/adapters/sports/
-    #     adapters/betfair.py:287`` constructs ``InstrumentType.EXCHANGE_ODDS``.
-    #   - UTL ``unified_trading_library/canonical/_derive_instrument_id.py:85`` maps
-    #     ``("sports", "odds") -> InstrumentType.EXCHANGE_ODDS``.
-    # They are NOT the sports manifest's vocabulary. The sports SchemaContract
-    # registry deliberately does NOT key on InstrumentType — it keys on the declared
-    # contract value ``odds`` (see internal/schemas/_sports_prediction_contracts.py,
-    # instrument_type="odds"), which is also the physical GCS hive partition
-    # (``instrument_type=odds/``) and is still actively written.
-    # Do NOT "fix" the manifest/registry to match these enum members: renaming
-    # ``odds`` -> EXCHANGE_ODDS/FIXED_ODDS would create manifest<->disk<->registry
-    # divergence to change a value that has zero shard + display consumers
-    # (SHARD_AXIS_MATRIX keys sports on ("data_type", "league_id"), not
-    # instrument_type). Operator ruling 2026-07-17: closed as not-a-defect.
+    # ODDS is the unified sports manifest instrument_type (2026-08-08,
+    # sports_taxonomy_p1_capture_and_contracts_2026_08_08.md): exchange-vs-
+    # sportsbook is a VENUE property (SportsVenueType encodes it), so the per-
+    # instrument split is redundant. INSTRUMENT_TYPES_BY_VENUE maps every sports
+    # bet-placement venue to this member; the GCS hive partition is
+    # ``instrument_type=odds/``. MTDS sports_catalog_reader uses this for CatalogRow.
+    ODDS = "ODDS"
+    # EXCHANGE_ODDS / FIXED_ODDS are kept for the IS betfair adapter and UTL
+    # _derive_instrument_id.py which still reference them (P2 consumer migration).
+    # They are NOT the MTDS manifest vocabulary — the CONTRACT_REGISTRY and
+    # INSTRUMENT_TYPES_BY_VENUE no longer key on them (retired 2026-08-08).
     EXCHANGE_ODDS = "EXCHANGE_ODDS"
     FIXED_ODDS = "FIXED_ODDS"
     PROP = "PROP"

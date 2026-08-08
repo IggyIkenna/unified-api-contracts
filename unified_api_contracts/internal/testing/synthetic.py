@@ -617,7 +617,7 @@ class SyntheticDataGenerator:
             return None
 
         # Sports → match odds
-        if itype in ("PREDICTION_MARKET", "EXCHANGE_ODDS", "FIXED_ODDS"):
+        if itype in ("PREDICTION_MARKET", "ODDS", "EXCHANGE_ODDS", "FIXED_ODDS"):
             league = symbol.split("-")[0] if "-" in symbol else "general"
             return self.generate_match_odds(league, venue, num_matches=20)
 

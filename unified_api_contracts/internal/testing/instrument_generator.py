@@ -579,11 +579,7 @@ class InstrumentGenerator:
             # Venue-specific IDs
             if "condition_id" in spec:
                 inst_kwargs["pool_id"] = spec["condition_id"]
-            elif itype == InstrumentType.EXCHANGE_ODDS:
-                market_id_bytes: bytes = sport_rng.bytes(8)
-                inst_kwargs["pool_id"] = str(int.from_bytes(market_id_bytes[:4], "big") % 10_000_000)
-                inst_kwargs["venue_type"] = spec.get("venue_type")
-            elif itype == InstrumentType.FIXED_ODDS:
+            elif itype in (InstrumentType.ODDS, InstrumentType.EXCHANGE_ODDS, InstrumentType.FIXED_ODDS):
                 event_id_bytes: bytes = sport_rng.bytes(8)
                 inst_kwargs["pool_id"] = str(int.from_bytes(event_id_bytes[:4], "big") % 10_000_000)
                 inst_kwargs["venue_type"] = spec.get("venue_type")

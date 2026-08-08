@@ -18,6 +18,8 @@ class TestInstrumentType:
     def test_sports_instrument_types_present(self) -> None:
         from unified_api_contracts.canonical.domain.reference import InstrumentType
 
+        assert InstrumentType.ODDS == "ODDS"
+        # EXCHANGE_ODDS/FIXED_ODDS kept as enum members for IS betfair adapter (P2 migration)
         assert InstrumentType.EXCHANGE_ODDS == "EXCHANGE_ODDS"
         assert InstrumentType.FIXED_ODDS == "FIXED_ODDS"
         assert InstrumentType.PROP == "PROP"
@@ -28,8 +30,12 @@ class TestInstrumentType:
             INSTRUMENT_TYPE_FOLDER_MAP,
         )
 
-        for key in ("PREDICTION_MARKET", "EXCHANGE_ODDS", "FIXED_ODDS", "PROP"):
+        for key in ("PREDICTION_MARKET", "ODDS", "PROP"):
             assert key in INSTRUMENT_TYPE_FOLDER_MAP, f"Missing folder mapping for {key}"
+        # EXCHANGE_ODDS/FIXED_ODDS retired from INSTRUMENT_TYPE_FOLDER_MAP 2026-08-08
+        # (sports_taxonomy_p1); kept as enum members for IS betfair adapter (P2 migration).
+        for key in ("EXCHANGE_ODDS", "FIXED_ODDS"):
+            assert key not in INSTRUMENT_TYPE_FOLDER_MAP, f"Retired key still in folder map: {key}"
 
 
 class TestInstructionType:
