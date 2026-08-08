@@ -790,9 +790,8 @@ MVP_SCOPE: Final[dict[str, object]] = {
                 "odds",  # Raw bookmaker odds (from ODDS_API)
                 "ODDS",  # Canonical uppercase alias (instruments-service)
                 "odds_snapshot",  # Point-in-time bookmaker odds (LOCF sampled)
-                "markets",  # Market metadata (event/market listings)
-                "outcomes",  # Outcome results (settled markets)
-                "settlements",  # Settlement records
+                # markets/outcomes/settlements removed 2026-08-08 (sports taxonomy P1,
+                # operator ruling #8) — 0 rows ever written, retired phantom declarations.
             }
         ),
     ),

@@ -69,9 +69,8 @@ BASE_GRANULARITY_BY_DATA_TYPE: dict[str, str] = {
     "odds_movement": "15m",
     "arbitrage_opportunity": "15m",
     "odds_horizon_bucket": "15m",
-    "markets": "24h",
-    "outcomes": "24h",
-    "settlements": "24h",
+    # markets/outcomes/settlements removed 2026-08-08 (sports taxonomy P1) — 0 rows ever
+    # written; retired per operator ruling #8. ML labels come from IS fixtures_outcomes/matches.
     # Prediction — tick-level from CLOB (uses canonical "trades" / "book_snapshot_5",
     # aligned with CeFi; no category-specific data_type names).
     # DeFi adapter-produced types (canonicalized 2026-05-23).
@@ -320,10 +319,9 @@ DATA_TYPES_BY_ASSET_GROUP: dict[str, list[str]] = {
         "odds_movement",  # Odds line movement OHLC candles
         "arbitrage_opportunity",  # Cross-bookmaker arbitrage detection
         "odds_horizon_bucket",  # Time-to-event horizon bucket assignment for odds
-        # ── Exchange/market lifecycle types (in venue_data_types.yaml, canonicalized 2026-05-23) ──
-        "markets",  # Market metadata (event/market listings per bookmaker)
-        "outcomes",  # Outcome results (settled markets)
-        "settlements",  # Settlement records (payout confirmation)
+        # markets/outcomes/settlements removed 2026-08-08 (sports taxonomy P1, operator ruling
+        # #8) — 0 rows ever written, pure phantom declarations. ML labels come from IS
+        # fixtures_outcomes/matches (post-lowercasing in P1), not from these retired types.
         # ── Bet/trade events (PINNACLE, BETFAIR_SB_UK/EX_UK/EX_EU, DRAFTKINGS, FANDUEL) ──
         "trades",  # Matched bets / trade-level acceptance events (aligned with CeFi/prediction)
         # NOTE: "TRADES" (uppercase) briefly existed here 2026-07-23..2026-07-27 (K1,
@@ -1097,9 +1095,7 @@ NEEDS_CANDLE_PROCESSING: dict[str, bool] = {
     "odds_movement": True,
     "arbitrage_opportunity": True,
     "odds_horizon_bucket": True,
-    "markets": False,  # Reference/lifecycle data — pass-through
-    "outcomes": False,  # Settlement results — pass-through
-    "settlements": False,  # Settlement records — pass-through
+    # markets/outcomes/settlements removed 2026-08-08 (sports taxonomy P1) — retired.
     # Prediction — uses canonical "trades" / "book_snapshot_5" (same keys as CeFi).
     # DeFi adapter-produced types — all pass-through (snapshot/event data).
     "utilization": False,
@@ -1432,13 +1428,15 @@ VALID_DATA_TYPES_BY_AG_AND_INSTRUMENT_TYPE: dict[tuple[str, str], frozenset[str]
     # (slot-4 verified 2026-06-07 — the prior literal silently dropped "ODDS"). The fixture/odds rows
     # below are NOT consulted by the league-grain producer (kept as future fixture-grain scaffolding).
     ("sports", "fixture"): frozenset(
-        {"odds", "odds_snapshot", "odds_movement", "markets", "outcomes", "settlements"}
+        {"odds", "odds_snapshot", "odds_movement"}
+        # markets/outcomes/settlements removed 2026-08-08 (sports taxonomy P1) — retired.
     ),  # UNCERTAIN — sports-owner verify
     ("sports", "exchange_odds"): frozenset(  # UNCERTAIN — sports-owner verify
         {"odds", "odds_snapshot", "odds_movement", "trades"}
     ),
     ("sports", "fixed_odds"): frozenset(  # UNCERTAIN — sports-owner verify
-        {"odds", "odds_snapshot", "odds_movement", "markets", "outcomes", "settlements", "trades"}
+        # markets/outcomes/settlements removed 2026-08-08 (sports taxonomy P1) — retired.
+        {"odds", "odds_snapshot", "odds_movement", "trades"}
     ),
     ("sports", "prop"): frozenset(  # UNCERTAIN — sports-owner verify
         {"odds", "odds_snapshot", "odds_movement"}
@@ -2268,9 +2266,7 @@ VENUE_DATA_TYPE_CAPABILITIES: dict[str, dict[str, str]] = {
     "PINNACLE": {
         "odds_snapshot": "2024-01-01",
         "odds_movement": "2024-01-01",
-        "markets": "2024-01-01",
-        "outcomes": "2024-01-01",
-        "settlements": "2024-01-01",
+        # markets/outcomes/settlements removed 2026-08-08 (sports taxonomy P1) — retired.
     },
     # Bare "BETFAIR" removed 2026-08-08 (sports taxonomy P1 — operator-group parent,
     # not a data-axis venue; concrete sub-venues carry their own entries below).
